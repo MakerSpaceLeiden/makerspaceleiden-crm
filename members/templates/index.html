@@ -1,0 +1,26 @@
+{% if agg %}
+<table>
+<th>
+    {% for n in perms %}
+       <td>{{ n }}</td>
+    {% endfor %}
+</th>
+    {% for u,ps in agg.items %}
+    <tr>
+       <td><b> {{ u }} </b></td>
+       {% for p in perms %}
+        <td>
+           {% if p in ps %}
+              yes
+           {% else %}
+              -
+           {% endif %}
+       </td>
+       {% endfor %}
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+    <p>No Entitlements .</p>
+{% endif %}
+

@@ -1,0 +1,58 @@
+<h1><hr/>API page<hr/></h1>
+
+Quick internal page to show lists for the XS control systems. Not visible to end users
+as it reveals the tags.
+
+<h2>All Machines (and permitted passes)</h2>
+{% if lst %}
+<ul>
+    {% for p in lst %}
+    <li> <a href="{{p.id}}">{{ p.name }}</a>
+    (<i> {{ p.description }} </i>)
+    {% endfor %}
+</ul>
+{% else %}
+    <p>No machines</p>
+{% endif %}
+
+
+<h2>Permit required</h2>
+{% if perms  %}
+<dl>
+    {% for p,v in perms.items %}
+    <dt> {{ p }} </a></td>
+    <dd>
+        {% for m in v %} 
+            <a href="{{m.id}}">{{ m.name }}</a>
+	    (<i> {{ m.description }} </i>)
+        {% endfor %}
+    </dd>
+    {% endfor %}
+</dl>
+{% else %}
+    <p>none</p>
+{% endif %}
+
+<h2>Instructions required</h2>
+{% if instructions %}
+<ul>
+    {% for m in instructions %}
+    <li> <a href="{{m.id}}">{{ m.name }}</a>
+    (<i> {{ m.description }} </i>)
+    {% endfor %}
+</ul>
+{% else %}
+    <p>none</p>
+{% endif %}
+
+<h2>Free for al</h2>
+{% if freeforall %}
+<ul>
+    {% for m in freeforall %}
+    <li> <a href="{{m.id}}">{{ m.name }}</a>
+    (<i> {{ m.description }} </i>)
+    {% endfor %}
+</ul>
+{% else %}
+    <p>none</p>
+{% endif %}
