@@ -18,7 +18,11 @@ python3.6 -m venv .
  . bin/activate
 
 # Install dependencies - default test install asume SQLLite as
-# the db.
+# the db. 
+# 
+# OSX 10.14 users with a locked down ~/Library; use
+# pip install --no-cache-dir -r requirements.txt
+# to avoid having to write in ~/Library/Caches/pip/wheel..
 #
 pip install -r requirements.txt 
 
