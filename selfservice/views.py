@@ -44,7 +44,12 @@ def selfupdate(request):
 
 @login_required
 def recordinstructions(request):
-    machines = Machine.objects.filter(instruction__holder=request.user.id)
+    try:
+       member = Member.objects.get(user = request.user)
+    except Member.DoesNotExist:
+       return HttpResponse("You are propably not a member-- admin perhaps?",status=500,content_type="text/plain")
+
+    machines = Machine.objects.filter(instruction__holder=member)
     members =  Member.objects.exclude(user = request.user.id).order_by('user__first_name')
  
     ps =[]
@@ -102,14 +107,6 @@ def recordinstructions(request):
    
     return render(request, 'record.html', context)
 
-@login_required
-def saveinstructions(request):
-    # add issuer!
-    context = {
-	'user' : request.user,
-    }
-    return render(request, 'ok.html', context)
-
 class UserForm(ModelForm):
     class Meta:
        model = User
@@ -133,7 +130,8 @@ def userdetails(request):
              request.user = user
              return render(request, 'userdetails.html', { 'form' : user, 'saved': True })
        except Exception as e:
-         logger.error("Unexpected error during save of intructions: {0}".format(e))
+         logger.error("Unexpected error during save of user: {0}".format(e))
 
     form = UserForm(instance = request.user)
     return render(request, 'userdetails.html', { 'form' : form })
+

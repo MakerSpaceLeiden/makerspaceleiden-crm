@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<p>{{ desc }}</p>
+
+<table>
+<tr>
+<th>member</th><th>permits / training</th></tr>
+{% for member,permits in amiss.items %}
+<tr>
+	<td> {{ member.user.first_name }}  {{ member.user.last_name }} </td>
+	<td> {% for permit in permits %}
+		{{ permit }}
+             {% endfor %}
+	</td>
+</tr>
+{% endfor %}
+</table>
+
+{% endblock %}

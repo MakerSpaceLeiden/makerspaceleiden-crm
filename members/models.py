@@ -40,12 +40,12 @@ class Entitlement(models.Model):
 	on_delete=models.CASCADE,
     )
     holder = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
+        Member,
         on_delete=models.CASCADE,
         related_name='isGivenTo',
     )
     issuer = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
+        Member,
         on_delete=models.CASCADE,
         related_name='isIssuedBy',
     )

@@ -6,6 +6,11 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate
 from django.conf import settings
 from django.shortcuts import redirect
+from django.views.generic import ListView, CreateView, UpdateView
+from django.urls import reverse_lazy
+from django import forms
+from django.forms import ModelForm
+from django.contrib.auth.models import User
 
 from members.models import PermitType,Member,Entitlement,Tag
 from .models import Machine,Instruction
@@ -20,7 +25,7 @@ def matrix_mm(machine,mbr):
        # Is a permit required ?
        # If not - fall back to a dead normal instruction need.
        if machine.requires_permit: 
-           if Entitlement.objects.filter(permit = machine.requires_permit, holder = mbr.user).count() < 1:
+           if Entitlement.objects.filter(permit = machine.requires_permit, holder = mbr).count() < 1:
              return
        else:  
            if machine.requires_instruction and Instruction.objects.filter(machine = machine.id, holder = mbr).count() < 1:
@@ -107,3 +112,32 @@ def details(request,machine_id):
        'lst': matrix_m(machine)
     }
     return render(request, 'acl/details.txt', context, content_type='text/plain')
+
+def missing(tof):
+    entitlements = Entitlement.objects.filter(holder__form_on_file = tof)
+    missing = {}
+    for e in entitlements:
+      holder = e.holder
+      if not holder in missing:
+        missing[ holder ] = []
+      missing[ holder ].append(e.permit)
+
+    return missing
+
+@login_required
+def missing_forms(request):
+    context = {
+	'title': 'Missing forms',
+	'desc': 'Missing forms (of people who had instruction on a machine that needs it).',
+	'amiss': missing(False)
+    }
+    return render(request, 'acl/missing.html',context)
+
+@login_required
+def filed_forms(request):
+    context = {
+	'title': 'Filed forms',
+	'desc': 'Forms on file for people that also had instruction on something',
+	'amiss': missing(True)
+    }
+    return render(request, 'acl/missing.html',context)
