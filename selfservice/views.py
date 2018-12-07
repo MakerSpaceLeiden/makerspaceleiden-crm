@@ -51,7 +51,7 @@ def recordinstructions(request):
       ms.append((m.id,m.name))
   
     form = forms.Form(request.POST) # machines, members)
-    form.fields['machine'] = forms.ChoiceField(label='Machine',choices=ms)
+    form.fields['machine'] = forms.MultipleChoiceField(label='Machine',choices=ms,help_text='Select multiple if so desired')
     form.fields['person'] = forms.ChoiceField(label='Person',choices=ps)
 
     context = {
@@ -66,8 +66,10 @@ def recordinstructions(request):
 
     saved = False
     if request.method == "POST" and form.is_valid():
+      context['machines'] = []
+      for mid in form.cleaned_data['machine']:
        try:  
-         m = Machine.objects.get(pk=form.cleaned_data['machine'])
+         m = Machine.objects.get(pk=mid)
          p = Member.objects.get(pk=form.cleaned_data['person'])
          i = Member.objects.get(user=request.user.id)
 
@@ -86,7 +88,7 @@ def recordinstructions(request):
            created = True
 
          context["created"] = created
-         context['machine'] = m
+         context['machines'].append(m)
          context['holder'] = p
          context['issuer'] = i
 

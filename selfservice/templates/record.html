@@ -5,11 +5,12 @@
 {% if saved %}
   <p>The following record has been {% if created %}added{% else %}updated{% endif %}:<p>
   <blockquote>
-    <i>{{ issuer.user.first_name }} {{ issuer.user.last_name }} 
+    <emph>{{ issuer.user.first_name }} {{ issuer.user.last_name }} 
     has given instruction to 
 	{{ holder.user.first_name }} {{ holder.user.last_name }} 
     for use of 
-	{{ machine.name }} .
+	{{ machines|join:", "  }}
+    </emph>
    <p>
    {{ issuer.user.first_name }} trust {{ holder.user.first_name }} to use this machine properly and safely.</i>
    </p>

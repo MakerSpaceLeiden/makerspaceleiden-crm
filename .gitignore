@@ -106,3 +106,4 @@ venv.bak/
 .sqlite
 .sqlite3
 venv
+static
