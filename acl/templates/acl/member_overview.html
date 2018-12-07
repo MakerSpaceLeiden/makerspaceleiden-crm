@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% if lst %}
+<table>
+	{% for machine,info in lst.items %}
+	<tr>
+		<td align=right>{{ machine }}</td>
+		<td>{%if info.xs %}yes{%else%}--{%endif%}</td>
+    	{% endfor %}
+	</tr>
+</table>
+{% else %}
+    <p>Nothing configured yet.</p>
+{% endif %}
+{% endblock %}

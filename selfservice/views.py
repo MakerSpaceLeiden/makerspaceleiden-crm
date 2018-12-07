@@ -20,6 +20,7 @@ def index(request):
     context = {
 	'title': 'Selfservice',
 	'user' : request.user,
+	'member' : Member.objects.get(user = request.user),
 	'is_logged_in': request.user.is_authenticated,
 	'has_permission': True,
     }

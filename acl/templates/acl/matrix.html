@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1><hr/>Full XS matrix<hr/></h1>
+
+{% if lst %}
+<table>
+	<tr>
+	<th></th>
+    	{% for machine in machines %}
+		<th>{{ machine }}</th>
+    	{% endfor %}
+	</tr>
+    	{% for member in members %}
+	<tr>
+	<td align=right>{{member.user.first_name}} {{member.user.last_name}}</i></td>
+	<!-- very slow - but cannot find a way to do lst.machine.member.xs -->
+	{% for machine,mbrs in lst.items %}
+	   {% for mbr,info in mbrs.items %}
+            {%if mbr == member %}
+		<td>
+                {%if info.xs %}yes{%endif%} 
+		</td>
+            {% endif %}
+    	   {% endfor %}
+    	{% endfor %}
+	</tr>
+    	{% endfor %}
+</table>
+{% else %}
+    <p>Nothing configured yet.</p>
+{% endif %}
+
+{% endblock %}

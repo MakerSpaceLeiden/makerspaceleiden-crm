@@ -1,3 +1,8 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
 <h1><hr/>API page<hr/></h1>
 
 Quick internal page to show lists for the XS control systems. Not visible to end users
@@ -22,10 +27,11 @@ as it reveals the tags.
     {% for p,v in perms.items %}
     <dt> {{ p }} </a></td>
     <dd>
+	<ul>
         {% for m in v %} 
-            <a href="{{m.id}}">{{ m.name }}</a>
-	    (<i> {{ m.description }} </i>)
+            <li><a href="{{m.id}}">{{ m.name }}</a> (<i> {{ m.description }} </i>)
         {% endfor %}
+        </ul>
     </dd>
     {% endfor %}
 </dl>
@@ -56,3 +62,5 @@ as it reveals the tags.
 {% else %}
     <p>none</p>
 {% endif %}
+
+{% endblock %}

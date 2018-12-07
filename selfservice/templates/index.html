@@ -4,7 +4,10 @@
 
 {% if is_logged_in %}
 <ul>
-<li><a href="/update">Update your details</a>
+<li><a href="/acl/overview/{{ member.id }}">Instructions you've had</a>
+<li><a href="/acl/overview">Instruction details for all users</a>
+<li>Update your personal details
+<li>Storage management
 <li><a href="/record_instructions">Record instructions you've just given</a>
 <li><a href="/admin/logout/?next=/">logout</a>
 </ul>
