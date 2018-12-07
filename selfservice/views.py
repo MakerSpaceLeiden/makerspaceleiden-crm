@@ -22,7 +22,7 @@ def index(request):
     context = {
 	'title': 'Selfservice',
 	'user' : request.user,
-	'has_permission': True,
+	'has_permission': request.user.is_authenticated,
     }
     if (request.user.is_authenticated):
         context['is_logged_in'] = request.user.is_authenticated
@@ -33,16 +33,6 @@ def index(request):
     return render(request, 'index.html', context)
 
 @login_required
-def selfupdate(request):
-    context = {
-	'title': 'Selfservice - update your record',
-	'is_logged_in': request.user.is_authenticated,
-	'user' : request.user,
-	'has_permission': True,
-    }
-    return render(request, 'update.html', context)
-
-@login_required
 def recordinstructions(request):
     try:
        member = Member.objects.get(user = request.user)
@@ -51,10 +41,11 @@ def recordinstructions(request):
 
     machines = Machine.objects.filter(instruction__holder=member)
     members =  Member.objects.exclude(user = request.user.id).order_by('user__first_name')
- 
+
     ps =[]
     for m in members:
       ps.append((m.id,m.user.first_name +' ' + m.user.last_name))
+
     ms = []
     for m in machines:
       ms.append((m.id,m.name))
@@ -133,5 +124,12 @@ def userdetails(request):
          logger.error("Unexpected error during save of user: {0}".format(e))
 
     form = UserForm(instance = request.user)
-    return render(request, 'userdetails.html', { 'form' : form })
+    context = {
+	'title': 'Selfservice - update details',
+	'is_logged_in': request.user.is_authenticated,
+	'user' : request.user,
+	'form': form,
+        'has_permission': True,
+    }
+    return render(request, 'userdetails.html', context)
 

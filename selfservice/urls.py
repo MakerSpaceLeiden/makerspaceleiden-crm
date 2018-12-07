@@ -9,7 +9,6 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('update/', views.selfupdate, name='update'),
     path('record_instructions/', views.recordinstructions, name='add_instruction'),
     path('userdetails/', views.userdetails, name='userdetails'),
     # for the password reset by email.
