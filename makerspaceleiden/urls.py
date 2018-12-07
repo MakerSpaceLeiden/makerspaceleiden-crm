@@ -17,7 +17,9 @@ from django.contrib import admin
 from django.urls import include, path
 
 urlpatterns = [
+    path('', include('selfservice.urls')),
     path('members/', include('members.urls')),
     path('acl/', include('acl.urls')),
-    path('admin/', admin.site.urls)
+    path('admin/', admin.site.urls),
+#    url(r'^autocomplete/', include('autocomplete_light.urls')),
 ]

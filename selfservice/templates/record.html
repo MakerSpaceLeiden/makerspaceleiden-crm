@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% if saved %}
+  <p>The following record has been {% if created %}added{% else %}updated{% endif %}:<p>
+  <blockquote>
+    <i>{{ issuer.user.first_name }} {{ issuer.user.last_name }} 
+    has given instruction to 
+	{{ holder.user.first_name }} {{ holder.user.last_name }} 
+    for use of 
+	{{ machine.name }} .
+   <p>
+   {{ issuer.user.first_name }} trust {{ holder.user.first_name }} to use this machine properly and safely.</i>
+   </p>
+  </blockquote>
+  <p>
+  Thanks for help us grow the makerspace ! 
+  <hr>
+  <a href="">record more instruction given</a> or 
+  <a href="..">back to the home page</a>
+{% else %}
+
+  <p>Record the instruction you've just given.</p>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    <table>
+        {{ form.as_table }}
+    </table>
+    <button type="submit">Save</button>
+    <a href="{% url 'index' %}">Cancel</a>
+  </form>
+{% endif %}
+
+{% endblock %}
+

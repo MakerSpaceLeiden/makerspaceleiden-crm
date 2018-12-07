@@ -30,9 +30,13 @@ Self service
 
 -	record whom you have given instruction to.
 
--	(bonus) accident list.
 
 Self service (bonus)
+
+-	report accident 
+
+- 	report outages
+	activate lockout
 
 -	location members bin
 		visible to all
@@ -41,4 +45,4 @@ Self service (bonus)
 		request
 		visible to all
 
-
+-	track ordering of spares.

@@ -3,6 +3,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
 from import_export.admin import ImportExportModelAdmin
 from import_export import resources
+from simple_history.admin import SimpleHistoryAdmin
 
 from .models import Member, Tag, PermitType, Entitlement
 
@@ -40,7 +41,7 @@ class MemberInline(admin.StackedInline):
     list_display = ('username','email','form_on_file')
 
 # Define a new User admin
-class UserAdmin(ImportExportModelAdmin, BaseUserAdmin):
+class UserAdmin(ImportExportModelAdmin, BaseUserAdmin, SimpleHistoryAdmin):
     inlines = (MemberInline,)
     resource_class = UserResource
 
@@ -48,23 +49,27 @@ class UserAdmin(ImportExportModelAdmin, BaseUserAdmin):
 # to manage the extra bits there.
 #
 admin.site.unregister(User)
-admin.site.register(User, UserAdmin)
+admin.site.register(User,UserAdmin)
 
-class MemberAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+# class MemberAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+class MemberAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     list_display = ('user','form_on_file')
     resource_class = MemberResource
 admin.site.register(Member,MemberAdmin)
 
-class TagAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+# class TagAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+class TagAdmin(ImportExportModelAdmin,SimpleHistoryAdmin):
     resource_class = TagResource
 
 admin.site.register(Tag,TagAdmin)
 
-class PermitAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+# class PermitAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+class PermitAdmin(ImportExportModelAdmin,SimpleHistoryAdmin):
     list_display = ('name','description')
 admin.site.register(PermitType,PermitAdmin)
 
-class EntitlementAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+# class EntitlementAdmin(ImportExportModelAdmin,admin.ModelAdmin, SimpleHistoryAdmin):
+class EntitlementAdmin(ImportExportModelAdmin,SimpleHistoryAdmin):
     list_display = ('permit','holder','issuer')
     resource_class = EntitlementResource
 admin.site.register(Entitlement,EntitlementAdmin)
