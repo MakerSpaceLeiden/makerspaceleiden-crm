@@ -70,5 +70,15 @@ Instructions
 Entitlements
 	heavier version of an instruction - connects a member to
 	an permit. Permits can span multiple devices (unlike
-	instructions).
+	instructions). 
+
+	Assumption is that only a few peple add these.
+
+Issues
+	Members extenion of Users is messy.
 	
+	Instructions and permits too similar.
+
+	Unclear approval workflow for Entitlements; e.g. explicit
+	ok from both instructor and trustee ? Or do we use
+	the second layer instructions for this ?
