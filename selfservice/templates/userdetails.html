@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% if saved %}
+  <p>The following record has been {% if created %}added{% else %}updated{% endif %}:<p>
+  <p>
+    <table>
+        {{ form.as_table }}
+    </table>
+  Thanks for help us grow the makerspace ! 
+ <p/>
+  <hr>
+  <a href="..">back to the home page</a>
+{% else %}
+  <form method="post" novalidate>
+    {% csrf_token %}
+    <table>
+        {{ form.as_table }}
+    </table>
+    <button type="submit">Save</button>
+    <a href="{% url 'index' %}">Cancel</a>
+  </form>
+{% endif %}
+
+{% endblock %}
+

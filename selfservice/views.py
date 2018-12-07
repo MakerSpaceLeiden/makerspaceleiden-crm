@@ -8,6 +8,8 @@ from django.views.generic import ListView, CreateView, UpdateView
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
 from django import forms
+from django.forms import ModelForm
+from django.contrib.auth.models import User
 
 import logging
 logger = logging.getLogger(__name__)
@@ -20,10 +22,14 @@ def index(request):
     context = {
 	'title': 'Selfservice',
 	'user' : request.user,
-	'member' : Member.objects.get(user = request.user),
-	'is_logged_in': request.user.is_authenticated,
 	'has_permission': True,
     }
+    if (request.user.is_authenticated):
+        context['is_logged_in'] = request.user.is_authenticated
+        try:
+           context['member'] = Member.objects.get(user = request.user)
+        except Member.DoesNotExist:
+           pass
     return render(request, 'index.html', context)
 
 @login_required
@@ -49,8 +55,8 @@ def recordinstructions(request):
       ms.append((m.id,m.name))
   
     form = forms.Form(request.POST) # machines, members)
-    form.fields['machine'] =  forms.ChoiceField(label='Machine',choices=ms)
-    form.fields['person'] =  forms.ChoiceField(label='Person',choices=ps)
+    form.fields['machine'] = forms.ChoiceField(label='Machine',choices=ms)
+    form.fields['person'] = forms.ChoiceField(label='Person',choices=ps)
 
     context = {
         'machines': machines,
@@ -103,4 +109,31 @@ def saveinstructions(request):
 	'user' : request.user,
     }
     return render(request, 'ok.html', context)
- 
+
+class UserForm(ModelForm):
+    class Meta:
+       model = User
+       fields = [ 'first_name', 'last_name', 'email' ]
+
+@login_required
+def userdetails(request):
+    try:
+       member = Member.objects.get(user = request.user)
+    except Member.DoesNotExist:
+       return HttpResponse("You are propably not a member-- admin perhaps?",status=500,content_type="text/plain")
+
+    if request.method == "POST":
+       try:
+         user = UserForm(request.POST, instance = request.user) 
+         if user.is_valid():
+             user.changeReason = 'Updated through the self-service interface by {0}'.format(request.user)
+             user.save()
+             for f in user.fields:
+               user.fields[f].disabled = True
+             request.user = user
+             return render(request, 'userdetails.html', { 'form' : user, 'saved': True })
+       except Exception as e:
+         logger.error("Unexpected error during save of intructions: {0}".format(e))
+
+    form = UserForm(instance = request.user)
+    return render(request, 'userdetails.html', { 'form' : form })

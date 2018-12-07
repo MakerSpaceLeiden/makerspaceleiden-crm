@@ -12,6 +12,7 @@ urlpatterns = [
     path('update/', views.selfupdate, name='update'),
     path('record_instructions/', views.recordinstructions, name='add_instruction'),
     path('store_instructions/', views.saveinstructions, name='store_record'),
+    path('userdetails/', views.userdetails, name='userdetails'),
     # for the password reset by email.
     re_path('^registration/', include('django.contrib.auth.urls')),
 ]

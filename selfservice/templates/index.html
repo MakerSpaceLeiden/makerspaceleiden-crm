@@ -4,15 +4,17 @@
 
 {% if is_logged_in %}
 <ul>
-<li><a href="/acl/overview/{{ member.id }}">Instructions you've had</a>
-<li><a href="/acl/overview">Instruction details for all users</a>
-<li>Update your personal details
+<li><a href="acl/overview/{{ member.id }}">Instructions you've had</a>
+<li><a href="acl/overview">Instruction details for all users</a>
+<li><a href="userdetails/">Update your personal details</a>
 <li>Storage management
-<li><a href="/record_instructions">Record instructions you've just given</a>
-<li><a href="/admin/logout/?next=/">logout</a>
+<li><a href="record_instructions">Record instructions you've just given</a>
+<li><a href="admin/logout/?next=/">logout</a>
+<li><a href="admin">admin stuff</a>
+<li><a href="acl">acl stuff</a>
 </ul>
 {% else %}
-<a href="signup">signup</a> or <a href="/admin/login/?next=/">login</a> or <a href="registration/password_reset/">reset my password</a>
+<a href="signup">signup</a> or <a href="admin/login/?next=/crm/">login</a> or <a href="registration/password_reset/">reset my password</a>
 {% endif %}
 
 {% endblock %}
