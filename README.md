@@ -1,3 +1,4 @@
+
 Requirements
 
 Trustees
@@ -46,3 +47,28 @@ Self service (bonus)
 		visible to all
 
 -	track ordering of spares.
+
+= Current design
+
+Normal Django users; Members adds a field to that (form on file). May
+	add more in the future (e.g. emergency contact). Another
+	option would be to use the more modern AbstractBaseUser.
+
+Machines
+	Machines or things that you can interact with (like doors).
+	May require instructions
+	May require the waiver to be on file.
+	May require a 'permit' of a specific type.
+
+Permits
+	E.g. allowed to open doors.
+
+Instructions
+	member can give & record instructions
+	but only on the things they have received instruction on.
+
+Entitlements
+	heavier version of an instruction - connects a member to
+	an permit. Permits can span multiple devices (unlike
+	instructions).
+	
