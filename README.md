@@ -82,3 +82,16 @@ Issues
 	Unclear approval workflow for Entitlements; e.g. explicit
 	ok from both instructor and trustee ? Or do we use
 	the second layer instructions for this ?
+
+Redesign ideas
+	
+	make one type of entitlement
+		put a permit on the issuer as well 
+
+	to permit
+		add 'approved' or 'active' flag that can only be set by specific people.
+
+	Make a type of default 'any member' permit for every machine and on the issuer of most entitlements
+
+	then ditch instructions.
+
