@@ -12,6 +12,6 @@ urlpatterns = [
     path('record_instructions/', views.recordinstructions, name='add_instruction'),
     path('userdetails/', views.userdetails, name='userdetails'),
     # for the password reset by email.
-    re_path('^registration/', include('django.contrib.auth.urls')),
+    re_path('^registration/', include('django.contrib.auth.urls'), name='password_reset'),
 ]
 

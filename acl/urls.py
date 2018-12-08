@@ -9,6 +9,6 @@ urlpatterns = [
     path('filed_forms/', views.filed_forms, name='filed_forms'),
     path('overview/', views.overview, name='overview'),
     path('<int:machine_id>', views.details, name='details'),
-    path('', views.index, name='index'),
+    path('', views.index, name='acl-index'),
 ]
 
