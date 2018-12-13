@@ -3,24 +3,30 @@
 {% block content %}
 
 {% if is_logged_in %}
+The wifi password is currently: <code>M@@K1234</code>.
+<p>
 <ul>
 <li><a href="acl/overview/{{ member.id }}">Instructions you've had</a>
 <li><a href="acl/overview">Instruction details for all users</a>
-<li><a href="acl/missing_forms">Missing forms</a>
-<li><a href="acl/filed_forms">Filed forms</a>
 <p>
 <li><a href="record_instructions">Record instructions you've just given</a>
 <p>
+<li><a href="acl/missing_forms">Missing forms</a>
+<li><a href="acl/filed_forms">Filed forms</a>
+<p>
 <li><a href="userdetails/">Update your personal details</a>
 <li><a href="{% url 'admin:password_change' %}">change your password</a>
+<p>
+<li>Members box management
 <li>Storage management
+<p>
 <li><a href="admin">admin stuff</a>
 <li><a href="acl">acl stuff</a>
 <p>
 <li><a href="{% url 'admin:logout' %}?next={% url 'index' %}">logout</a>
 </ul>
 {% else %}
-<a href="XXXX">signup</a> or <a href="{% url 'admin:login' %}?next={% url 'index' %}">login</a> or <a href="{% url 'password_reset' %}">reset my password</a>
+<a href="signup">signup</a> or <a href="{% url 'admin:login' %}?next={% url 'index' %}">login</a> or <a href="{% url 'password_reset' %}">reset my password</a>
 {% endif %}
 
 {% endblock %}

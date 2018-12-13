@@ -13,6 +13,9 @@ class Member(models.Model):
     form_on_file = models.BooleanField( 
 	default=False,
     )
+    email_confirmed = models.BooleanField(
+        default=False
+    )
     history = HistoricalRecords()
 
     def __str__(self):
