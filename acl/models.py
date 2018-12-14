@@ -1,8 +1,9 @@
 from django.db import models
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from members.models import PermitType, Member
+from members.models import PermitType
 from simple_history.models import HistoricalRecords
+from members.models import User
 
 class Location(models.Model):
     name = models.CharField(max_length=20, unique=True)
@@ -29,12 +30,12 @@ class Instruction(models.Model):
        on_delete=models.CASCADE,
     )
     holder = models.ForeignKey(
-        Member,
+        User,
         on_delete=models.CASCADE,
         related_name='hadInstructionFor',
     )
     issuer = models.ForeignKey(
-        Member,
+        User,
         on_delete=models.CASCADE,
         related_name='isInstructedBy',
     )

@@ -3,7 +3,6 @@ from django.contrib.auth import views as auth_views
 from django.views.generic import ListView, CreateView, UpdateView
 from django.urls import reverse_lazy
 
-from members.models import Member
 from acl.models import Machine,Instruction
 from . import views
 

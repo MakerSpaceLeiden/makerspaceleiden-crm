@@ -10,9 +10,8 @@ from django.views.generic import ListView, CreateView, UpdateView
 from django.urls import reverse_lazy
 from django import forms
 from django.forms import ModelForm
-from django.contrib.auth.models import User
 
-from members.models import PermitType,Member,Entitlement,Tag
+from members.models import PermitType,Entitlement,Tag,User
 from .models import Machine,Instruction
 
 def matrix_mm(machine,mbr):
@@ -40,7 +39,7 @@ def matrix_mm(machine,mbr):
 
 def matrix_m(machine):
     lst = {}
-    for mbr in Member.objects.order_by():
+    for mbr in User.objects.order_by():
        lst[ mbr ] = matrix_mm(machine,mbr)
   
     return lst 
@@ -78,7 +77,7 @@ def overview(request):
        lst[ mchn.name ] = matrix_m(mchn)
 
     context = {
-       'members': Member.objects.order_by(),
+       'members': User.objects.order_by(),
        'machines': machines,
        'lst': lst,
     }
@@ -86,14 +85,14 @@ def overview(request):
 
 @login_required
 def member_overview(request,member_id):
-    member = Member.objects.get(pk=member_id)
+    member = User.objects.get(pk=member_id)
     machines = Machine.objects.order_by()
     lst = {}
     for mchn in machines:
        lst[ mchn.name ] = matrix_mm(mchn, member)
 
     context = {
-       'title': "XS matrix " + member.user.first_name + ' ' + member.user.last_name,
+       'title': "XS matrix " + member.first_name + ' ' + member.last_name,
        'member': member,
        'machines': machines,
        'lst': lst,

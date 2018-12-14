@@ -33,7 +33,7 @@ INSTALLED_APPS = [
     'simple_history',
     'storage.apps.StorageConfig',
     'memberbox.apps.MemberboxConfig',
-    'members.apps.MembersConfig',
+    'members.apps.UserConfig',
     'acl.apps.AclConfig',
     'selfservice.apps.SelfserviceConfig',
     'django.contrib.admin',
@@ -133,3 +133,6 @@ LOGIN_REDIRECT_URL = '/'
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 STATICFILES_DIRS = [ ]
+
+AUTH_USER_MODEL = 'members.User'
+

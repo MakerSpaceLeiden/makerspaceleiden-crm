@@ -21,7 +21,10 @@
   <a href="">record more instruction given</a> or 
   <a href="..">back to the home page</a>
 {% else %}
-
+{% if not lst %}
+Sorry - you have not had instructions on any machine yourself (yet). So you
+cannot give instructions to others.
+{% else %}
   <p>Record the instruction you've just given.</p>
 
   <form method="post" novalidate>
@@ -32,6 +35,7 @@
     <button type="submit">Save</button>
     <a href="{% url 'index' %}">Cancel</a>
   </form>
+{% endif %}
 {% endif %}
 
 {% endblock %}

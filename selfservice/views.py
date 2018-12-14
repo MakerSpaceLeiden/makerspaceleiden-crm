@@ -12,7 +12,6 @@ from django.views.generic import ListView, CreateView, UpdateView
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
 from django import forms
-from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
@@ -20,7 +19,7 @@ from django.utils import six
 import logging
 
 
-from members.models import PermitType,Member,Entitlement,Tag
+from members.models import PermitType,Entitlement,Tag,User
 from acl.models import Machine,Instruction
 from selfservice.forms import UserForm, SignUpForm
 
@@ -40,24 +39,24 @@ def index(request):
     if (request.user.is_authenticated):
         context['is_logged_in'] = request.user.is_authenticated
         try:
-           context['member'] = Member.objects.get(user = request.user)
-        except Member.DoesNotExist:
+           context['member'] = request.user
+        except User.DoesNotExist:
            pass
     return render(request, 'index.html', context)
 
 @login_required
 def recordinstructions(request):
     try:
-       member = Member.objects.get(user = request.user)
-    except Member.DoesNotExist:
+       member = request.user
+    except User.DoesNotExist:
        return HttpResponse("You are propably not a member-- admin perhaps?",status=500,content_type="text/plain")
 
     machines = Machine.objects.filter(instruction__holder=member)
-    members =  Member.objects.exclude(user = request.user.id).order_by('user__first_name')
+    members = User.objects.exclude(id = member.id) #.order_by('first_name')
 
     ps =[]
     for m in members:
-      ps.append((m.id,m.user.first_name +' ' + m.user.last_name))
+      ps.append((m.id,m.first_name +' ' + m.last_name))
 
     ms = []
     for m in machines:
@@ -83,8 +82,8 @@ def recordinstructions(request):
       for mid in form.cleaned_data['machine']:
        try:  
          m = Machine.objects.get(pk=mid)
-         p = Member.objects.get(pk=form.cleaned_data['person'])
-         i = Member.objects.get(user=request.user.id)
+         p = User.objects.get(pk=form.cleaned_data['person'])
+         i = user=request.user.id
 
          created = False
 
@@ -152,8 +151,8 @@ def confirmemail(request, uidb64, token, newemail):
 @login_required
 def userdetails(request):
     try:
-       member = Member.objects.get(user = request.user)
-    except Member.DoesNotExist:
+       member = request.user
+    except User.DoesNotExist:
        return HttpResponse("You are propably not a member-- admin perhaps?",status=500,content_type="text/plain")
 
     if request.method == "POST":
@@ -161,7 +160,7 @@ def userdetails(request):
          user = UserForm(request.POST, instance = request.user) 
          save_user = user.save(commit=False)
          if user.is_valid():
-             old_email = "{}".format(member.user.email)
+             old_email = "{}".format(member.email)
              new_email = "{}".format(user.cleaned_data['email'])
 
              save_user.email = old_email
