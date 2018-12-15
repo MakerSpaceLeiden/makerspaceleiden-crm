@@ -38,8 +38,8 @@ def index(request):
 
         if not k in tmp:
           tmp[ k ] = {}
-          sizes_r[k] = r
-          sizes_c[k] = c
+          sizes_r[k] = 6
+          sizes_c[k] = 6
 
         if r >  sizes_r[k]:
            sizes_r[k] = r
@@ -60,7 +60,7 @@ def index(request):
     boxes = {}
     for k,contents in tmp.items():
        contents = []
-       for r in range(1,sizes_r[k]+1):
+       for r in reversed(range(1,sizes_r[k]+1)):
          row = []
          for c in range(1,sizes_c[k]+1):
             try:

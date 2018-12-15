@@ -3,3 +3,5 @@ pytz
 django-import-export
 # django-autocomplete-light
 django-simple-history
+qrcode
+django-qrcode

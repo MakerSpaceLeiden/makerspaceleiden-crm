@@ -31,6 +31,7 @@ ALLOWED_HOSTS = [ '10.11.0.158', '*' ]
 INSTALLED_APPS = [
     'import_export',
     'simple_history',
+    'qrcode',
 
 #    'selfservice',
 #    'storage',
@@ -51,7 +52,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 #    'autocomplete_light',
+    'django.contrib.sites',
 ]
+
+SITE_ID = 1
 
 MIDDLEWARE = [
     'simple_history.middleware.HistoryRequestMiddleware',
