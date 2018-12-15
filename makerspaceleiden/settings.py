@@ -31,11 +31,19 @@ ALLOWED_HOSTS = [ '10.11.0.158', '*' ]
 INSTALLED_APPS = [
     'import_export',
     'simple_history',
+
+#    'selfservice',
+#    'storage',
+#    'members',
+#    'memberbox',
+#    'acl',
+
     'storage.apps.StorageConfig',
     'memberbox.apps.MemberboxConfig',
     'members.apps.UserConfig',
     'acl.apps.AclConfig',
     'selfservice.apps.SelfserviceConfig',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

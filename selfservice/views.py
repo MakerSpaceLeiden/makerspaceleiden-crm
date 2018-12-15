@@ -22,6 +22,7 @@ import logging
 from members.models import PermitType,Entitlement,Tag,User
 from acl.models import Machine,Instruction
 from selfservice.forms import UserForm, SignUpForm
+from .models import WiFiNetwork
 
 class AccountActivationTokenGenerator(PasswordResetTokenGenerator):
     def _make_hash_value(self, user, timestamp):
@@ -38,10 +39,8 @@ def index(request):
     }
     if (request.user.is_authenticated):
         context['is_logged_in'] = request.user.is_authenticated
-        try:
-           context['member'] = request.user
-        except User.DoesNotExist:
-           pass
+        context['member'] = request.user
+        context['wifinetworks'] = WiFiNetwork.objects.order_by('network')
     return render(request, 'index.html', context)
 
 @login_required

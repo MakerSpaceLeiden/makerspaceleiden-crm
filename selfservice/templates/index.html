@@ -3,7 +3,20 @@
 {% block content %}
 
 {% if is_logged_in %}
-The wifi password is currently: <code>M@@K1234</code>.
+{% if wifinetworks %}
+<p>Wifi networks at the space for members:</p>
+<blockquote>
+<table>
+<tr><th>network</th><th>password</th></tr>
+{% for e in wifinetworks %}
+<tr><td>{{ e.network }}</td><td><code>{{ e.password }}</code></td></tr>
+{% endfor %}
+</table>
+</blockquote>
+{% else %}
+There are no wifi network passwords for members at the moment.
+{% endif %}
+<h2>Manage your data</h2>
 <p>
 <ul>
 <li><a href="acl/overview/{{ member.id }}">Instructions you've had</a>
@@ -17,8 +30,8 @@ The wifi password is currently: <code>M@@K1234</code>.
 <li><a href="userdetails/">Update your personal details</a>
 <li><a href="{% url 'admin:password_change' %}">change your password</a>
 <p>
-<li>Members box management
-<li>Storage management
+<li><a href="{% url 'boxes' %}">Members box management</a>
+<li><a href="{% url 'storage' %}">Storage management</a>
 <p>
 <li><a href="admin">admin stuff</a>
 <li><a href="acl">acl stuff</a>

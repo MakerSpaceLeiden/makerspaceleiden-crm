@@ -19,6 +19,8 @@ from django.urls import include, path
 urlpatterns = [
     path('', include('selfservice.urls')),
     path('members/', include('members.urls')),
+    path('storage/', include('storage.urls')),
+    path('boxes/', include('memberbox.urls')),
     path('acl/', include('acl.urls')),
     path('admin/', admin.site.urls),
 #    url(r'^autocomplete/', include('autocomplete_light.urls')),

@@ -1,3 +1,11 @@
 from django.db import models
+from simple_history.models import HistoricalRecords
 
-# Create your models here.
+class WiFiNetwork(models.Model):
+    network = models.CharField(max_length=30)
+    password = models.CharField(max_length=30)
+    history = HistoricalRecords()
+    def __str__(self):
+        return self.network
+
+
