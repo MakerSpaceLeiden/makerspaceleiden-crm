@@ -1,7 +1,6 @@
+# Requirements
 
-Requirements
-
-Trustees
+## Trustees
 -	Create member, progress status from initial to full (i.e. with 24x7 key)
 
 -	Checkboxes for things such as 'form on file', member-in-good-standing
@@ -14,14 +13,14 @@ Trustees
 
 -	Reports on bins & (big/overdue) storage permits.
 
-API
+## API
 
 -	lists or OK/deny on tag's.
 		based on just being a member
 		based on having had instructions
 		based on an actual permit
 
-Self service
+## Self service
 
 -	Initial contact / request membership (no auth)
 
@@ -32,7 +31,7 @@ Self service
 -	record whom you have given instruction to.
 
 
-Self service (bonus)
+## Self service (bonus)
 
 -	report accident 
 
@@ -48,50 +47,75 @@ Self service (bonus)
 
 -	track ordering of spares.
 
-= Current design
+## Non functional requirements
 
-Normal Django users; Members adds a field to that (form on file). May
-	add more in the future (e.g. emergency contact). Another
-	option would be to use the more modern AbstractBaseUser.
+- Very 'standard' approach - so ops and code evolving does not rely on a few skilled people.
+- Some 10's of machines
+- Low 100's of users
 
-Machines
+# Current design
+
+- Normal Django users; Members adds a field to that (form on file). May
+	add more in the future (e.g. emergency contact).
+	
+- Machines
 	Machines or things that you can interact with (like doors).
 	May require instructions
 	May require the waiver to be on file.
 	May require a 'permit' of a specific type.
 
-Permits
+- Permits
 	E.g. allowed to open doors.
 
-Instructions
+- Instructions
 	member can give & record instructions
 	but only on the things they have received instruction on.
 
-Entitlements
+- Entitlements
 	heavier version of an instruction - connects a member to
 	an permit. Permits can span multiple devices (unlike
 	instructions). 
 
-	Assumption is that only a few peple add these.
+	- Assumption is that only a few peple add these.
 
-Issues
+- Issues
 	Members extenion of Users is messy.
+
+## issues with the current design
 	
-	Instructions and permits too similar.
+- member structure messy
+- Instructions and permits too similar.
+- Unclear approval workflow for Entitlements; e.g. explicit
+ok from both instructor and trustee ? Or do we use
+the second layer instructions for this ?
 
-	Unclear approval workflow for Entitlements; e.g. explicit
-	ok from both instructor and trustee ? Or do we use
-	the second layer instructions for this ?
+# Redesign ideas
 
-Redesign ideas
+- Drop member and do something with modernish AbstractBaseUser.
+
+- Drop the Instruction class and replace it by
+
+	- PermitTypes get an 3rd flag (besides form-required, instruction required) which is *enabled* or *approved*.
+
+	- PermitTypes get issuer permit required.
+
+	- Entitlements become the new instructions
 	
-	make one type of entitlement
-		put a permit on the issuer as well 
+		- but check the Entitlement or holder too issue that permit too.
+	
+	- Make a type of default 'any member' permit for every machine and on the issuer of most entitlements. Or give any member the 'member' entitlement.
+	
+Or on other words - Entitlement becomes more of a 'tag'.
 
-	to permit
-		add 'approved' or 'active' flag that can only be set by specific people.
+	
 
-	Make a type of default 'any member' permit for every machine and on the issuer of most entitlements
 
-	then ditch instructions.
+
+
+
+
+
+
+
+
 

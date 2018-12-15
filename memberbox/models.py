@@ -11,5 +11,5 @@ class Memberbox(models.Model):
     history = HistoricalRecords()
 
     def __str__(self):
-        return "Box owned by " + owner.user.first_name + " " + owner.user.last_name + " at " + self.location
+        return "Box owned by " + self.owner.first_name + " " + self.owner.last_name + " at " + self.location
 

@@ -53,7 +53,7 @@ class User(AbstractUser):
     history = HistoricalRecords()
     objects = UserManager() 
     def __str__(self):
-        return self.first_name + ' ' + self.last_name + ' (' + self.username + ')'
+        return self.first_name + ' ' + self.last_name
 
 
 class Tag(models.Model):

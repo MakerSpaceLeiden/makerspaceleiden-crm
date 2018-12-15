@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+.showhover { display: none; }
+.hashover:hover .showhover { display: block; }
+.box { border:1px solid black; }
+</style>
+
+<p>Members may have a <i>members box</i> which have a fixed, assigned, place. Unlike long-storage items - these are not time limited for members.</p>
+
+<p><a href="{% url 'addbox' %}">[Add or Record] </a> a box/slot that is not yet in this overview.</p>
+
+{% if yours %}
+<h3>Member box(es) and items with your name on it</h3>
+<table>
+ {% for item in yours %}
+  <tr>
+        <td>{{ item.location }}</td>
+        <td>{{ item.extra_info }}</rd>
+        <td>
+		<a href="{% url 'changebox' pk=item.id %}">[change]</a> 
+		<a href="{% url 'deletebox' pk=item.id  %}">[delete]</a>
+	</td>
+  </tr>
+  {% endfor %}
+</table>
+{% else %}
+Ask a trustee if you do not yet have a box/slot.
+{% endif %}
+
+
+<h2>Members storage cupboards</h2>
+
+<p>
+The contents of the two main member cabinets along the long wall (on your left as you come in).
+<p>
+
+{% for cabinet,contents in boxes.items %}
+<h3> {{ cabinet }}</h3>
+<table>
+  {% for row in contents %}
+  <tr>
+    {% for box in row %}
+       <td> {% if box %}
+		<div class="box">
+		<div class="hashover">{{ box.owner }}<div class="showhover">{{ box.location }}<br>{{box.extra_info}}</div></div>
+		</div>
+	    {% else %}
+               <i>free</i>
+	    {% endif %}
+       </td> 
+    {% endfor %}
+  </tr>
+  {% endfor %}
+</table>
+{% endfor %}
+
+{% if floating %}
+<h2>Other (non boxed storage)</h2>
+
+<p>
+In a few <i>exceptional</i> cases - there is permission for a member to store things outside his or her box.
+</p>
+<table>
+  <tr><th>owner</th><th>location</th><th></th></tr>
+  {% for item in floating %}
+  <tr>
+	<td>{{ item.owner}}</td>
+  	<td>{{ item.location }}</td>
+	<td>{{ item.extra_info }}</rd>
+  </tr>
+  {% endfor %}
+</table>
+{% endif %}
+
+{% endblock %}

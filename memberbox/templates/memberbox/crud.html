@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>{{ label }}</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">{{ action }}</button>
+  </form>
+  </p>
+
+<hr>
+<p>
+<a href="{% url "boxes" %}">back</a> to the overview.
+{% endblock %}
