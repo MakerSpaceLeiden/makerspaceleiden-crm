@@ -22,31 +22,36 @@
 <h2>{{ label }}</h2>
 <table>
   <tr>	
+	<th>id</th>
 	<th class="sem">status</th>
 	<th>location and owner</th>
 	<th width=60%>item</th>
   </tr>
  {% for item in storage %}
   <tr>
+	<td><code>{{ item.id }}<code></td>
         <td>
 	{{ item.get_state_display }}
-	{% qr_from_text item.id "s" %}
-
+	<center>{% qr_from_text item.id "s" %}
+	</center>
         </td>
         <td>{{ item.what}}<br/>
             <i><a href="{% url 'storage' user_pk=item.owner.id %}">{{ item.owner }}</a></i><br/>
         </td>
         <td>
-	  <b>{{ item.what }}</b></br>
+	  <b>{{ item.location }}</b></br>
           {{ item.extra_info }}<br/>
           {{ item.requested }} + {{ item.duration }} days = {{ item.enddate }} <br/>
           <p>
-            {% if item in canedit %}
+            {% if item.editable %}
 		<a href="{% url 'changestorage' pk=item.id %}">[change]</a> 
+            {% elif item.location_updatable %}
+		<a href="{% url 'changestorage' pk=item.id %}">[relocate]</a> 
             {% endif %}
             {% if item.deletable %}
-		<a href="{% url 'deletestorage' pk=item.id  %}">[delete]</a>
+		<a href="{% url 'deletestorage' pk=item.id  %}">[remove]</a>
             {% endif %}
+	    <a href="{% url 'showhistory' pk=item.id  %}">[history]</a>
            </p>
 	</td>
 	<td>

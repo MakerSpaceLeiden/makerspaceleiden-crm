@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('', include('selfservice.urls')),
@@ -25,3 +26,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 #    url(r'^autocomplete/', include('autocomplete_light.urls')),
 ]
+
+urlpatterns += static(r'/favicon.ico', document_root='static/favicon.ico')
+

@@ -5,20 +5,29 @@
   <form method="post">
     {% csrf_token %}
     <table>
-    {% if delete %}
+    {% if delete or not form.fields.what %}
     <tr><td>What:</td><td><b>{{ box.what}}</b></td></tr>
     {% endif %}
     {% if box %}
     <tr><td>Owner</td><td>{{ box.owner }}</td></tr>
     <tr><td>Period:</td><td>{{ box.requested }} + {{ box.duration }} days = {{ box.enddate }}</td></tr>
     {% endif %}
+    {%if action %}
     {{ form.as_table }}
     <tr><td><a href="{% url "storage" %}">cancel</a></td><td><button type="submit">{{ action }}</button></td></td>
+    {% else %}
+    <tr><td>Location</td><td>{{ box.location}}</td></tr>
+    <tr><td>Justifcaton:</td><td>{{ box.extra_info }}</td></tr>
+    {% endif %}
     </table>
   </form>
   </p>
 
 <hr>
 <p>
-<a href="{% url "storage" %}">back</a> to the overview.
+{% if history %}
+<a href="{% url "showhistory" pk=box.id %}">back</a> to the history overview.
+{% else %}
+<a href="{% url "storage" %}">back</a> to the storage overview.
+{% endif %}
 {% endblock %}

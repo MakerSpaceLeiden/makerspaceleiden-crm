@@ -13,8 +13,8 @@ from .models import Tag, PermitType, Entitlement, User
 class UserResource(resources.ModelResource):
     class Meta:
        model = User
-       fields = ('username', 'first_name', 'last_name', 'email','is_active','date_joined', 'form_on_file','email_confirmed')
-       import_id_fields = ['username','first_name', 'last_name', 'email']
+       fields = ('first_name', 'last_name', 'email','is_active','date_joined', 'form_on_file','email_confirmed')
+       import_id_fields = ['first_name', 'last_name', 'email']
 
 class TagResource(resources.ModelResource):
     class Meta:

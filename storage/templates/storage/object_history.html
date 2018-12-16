@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load display_list from storage_history_admin_list %}
+
+{% block content %}
+  <div id="content-main">
+    <div class="module">
+      {% if action_list %}
+        {% display_list %}
+      {% else %}
+        <p>{% trans "This object doesn't have a change history." %}</p>
+      {% endif %}
+    </div>
+  </div>
+
+<hr>
+<a href="{% url "storage" %}">back</a> to the storage overview.
+{% endblock %}
+

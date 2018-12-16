@@ -1,4 +1,5 @@
 from django.contrib.sites.shortcuts import get_current_site
+from django.contrib.admin.sites import AdminSite
 from django.template import loader
 from django.http import HttpResponse
 from django.conf import settings
@@ -13,6 +14,7 @@ from django.utils import six
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_protect
 from django.db.models import Q
+from simple_history.admin import SimpleHistoryAdmin
 
 import datetime
 
@@ -32,7 +34,7 @@ def index(request,user_pk):
     storage = []
     owner = 'everyone'
 
-    sc = Storage.objects.all()
+    sc = Storage.objects.all().order_by('requested','id').reverse()
     if user_pk:
        owner = User.objects.get(pk=user_pk)
        sc = sc.filter(owner_id = user_pk)
@@ -109,7 +111,7 @@ def modify(request,pk):
     except Storage.DoesNotExist:
          return HttpResponse("Eh - what box ??",status=404,content_type="text/plain")
 
-    if not box.editable():
+    if not box.editable() and not box.location_updatable():
          return HttpResponse("Eh - no can do ??",status=403,content_type="text/plain")
 
     form = StorageForm(request.POST or None, instance = box)
@@ -149,11 +151,8 @@ def delete(request,pk):
     except Storage.DoesNotExist:
          return HttpResponse("Eh - what box ??",status=404,content_type="text/plain")
 
-    if box.owner != request.user:
-         return HttpResponse("Eh - not your box ?!",status=403,content_type="text/plain")
-
+    form = ConfirmForm(request.POST or None, initial = {'pk':pk})
     if not request.POST:
-         form = ConfirmForm(initial = {'pk':pk})
          context = {
             'title': 'Confirm delete',
             'label': 'Confirm puring storage request',
@@ -167,6 +166,12 @@ def delete(request,pk):
          }
          return render(request, 'storage/crud.html', context)
 
+    if not form.is_valid():
+         return HttpResponse("Eh - confused ?!",status=403,content_type="text/plain")
+
+    if box.owner != request.user and form.cleaned_data['pk'] != pk:
+         return HttpResponse("Eh - not your box ?!",status=403,content_type="text/plain")
+
     try:
        box.changeReason = 'Set to done via the self-service interface by {0}'.format(request.user)
        box.state = 'D'
@@ -176,3 +181,45 @@ def delete(request,pk):
          return HttpResponse("Box fail",status=400,content_type="text/plain")
 
     return redirect('storage')
+
+class MySimpleHistoryAdmin(SimpleHistoryAdmin):
+    object_history_template = "storage/object_history.html"
+    # object_history_form_template = "storage/object_history_form.html"
+
+    # Bit risky - routes in to bypass for naughtyness in below showhistory.
+    def has_change_permission(self, request, obj):
+       return True
+
+@login_required
+@csrf_protect
+def showhistory(request,pk,rev=None):
+    try:
+         box = Storage.objects.get(pk=pk)
+    except Storage.DoesNotExist:
+         return HttpResponse("Eh - what box ??",status=404,content_type="text/plain")
+    context = {
+       'title': 'View history',
+#       'opts': { 'admin_url': { 'simple_history': 'xxx' } },
+    }
+    if rev:
+      revInfo = box.history.get(pk = rev)
+      historic = revInfo.instance
+      logger.error("===>" + str(historic))
+      form = StorageForm(None, instance = historic)
+      logger.error("===>" + str(form))
+      context = {
+            'title': 'Historic record',
+            'label': revInfo,
+            'action': None,
+            'is_logged_in': request.user.is_authenticated,
+            'user' : request.user,
+            'owner' : box.owner,
+            'form':  form,
+            'box':  historic,
+            'history': True,
+      }
+      return render(request, 'storage/crud.html', context)
+      # return historyAdmin.history_form_view(request,str(pk),str(rev), context)
+
+    historyAdmin = MySimpleHistoryAdmin(Storage,AdminSite())
+    return historyAdmin.history_view(request,str(pk),context)

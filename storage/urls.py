@@ -9,5 +9,8 @@ urlpatterns = [
     path('modify/<int:pk>', views.modify, name='changestorage'),
     path('delete/<int:pk>', views.delete, name='deletestorage'),
 
+    path('showhistory/<int:pk>', views.showhistory, name='showhistory'),
+    path('showhistory/<int:pk>/<int:rev>', views.showhistory, name='showhistory'),
+
 ]
 

@@ -3,9 +3,12 @@ from django.contrib.auth.forms import UserCreationForm
 from .models import Storage
 from django.forms import ModelForm
 
+import logging
+logger = logging.getLogger(__name__)
+
 class ConfirmForm(forms.Form):
     pk = forms.IntegerField(disabled=True, widget = forms.HiddenInput())
-    
+ 
 class StorageForm(ModelForm):
     class Meta:
        model = Storage
@@ -20,6 +23,9 @@ class StorageForm(ModelForm):
        super(ModelForm, self).__init__(storageOrFormOrNone, *args, **kwargs)
 
        storage = None
+       if kwargs is not None and 'instance' in kwargs:
+          storage = kwargs['instance']
+
        if storageOrFormOrNone and isinstance(storageOrFormOrNone,Storage):
           storage = storageOrFormOrNone
 
@@ -36,5 +42,7 @@ class StorageForm(ModelForm):
           del self.fields['extra_info'] 
 
        if not storage.editable():
-          self.fields = []
+          del self.fields['what'] 
+          del self.fields['duration'] 
 
+       logger.error("2- Got "+",".join(self.fields.keys()))

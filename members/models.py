@@ -8,7 +8,6 @@ from django.utils.translation import ugettext_lazy as _
 
 class UserManager(BaseUserManager):
     """Define a model manager for User model with no username field."""
-
     use_in_migrations = True
 
     def _create_user(self, email, password, **extra_fields):
@@ -40,7 +39,7 @@ class UserManager(BaseUserManager):
         return self._create_user(email, password, **extra_fields)
 
 class User(AbstractUser):
-    # username = None
+    username = None
     email = models.EmailField(_('email address'), unique=True)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name']
@@ -62,7 +61,7 @@ class Tag(models.Model):
     history = HistoricalRecords()
 
     def __str__(self):
-        return self.tag + ' (' + self.owner.user.username + ')'
+        return self.tag + ' (' + self.owner.user.str() + ')'
 
 class PermitType(models.Model):
     name = models.CharField(max_length=20, unique=True)
