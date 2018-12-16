@@ -11,6 +11,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils import six
 from django.shortcuts import render
+from django.views.decorators.csrf import csrf_protect
 from django.db.models import Q
 
 import datetime
@@ -18,7 +19,7 @@ import datetime
 from .models import Storage
 from members.models import User
 from .admin import StorageAdmin
-from .forms import StorageForm
+from .forms import StorageForm,ConfirmForm
 
 import logging
 logger = logging.getLogger(__name__)
@@ -70,6 +71,7 @@ def index(request,user_pk):
     return render(request, 'storage/index.html', context)
 
 @login_required
+@csrf_protect
 def create(request):
     form = StorageForm(request.POST or None, initial = { 'owner': request.user.id })
     form.fields['duration'].help_text= "days. Short requests (month or less) are automatically approved."
@@ -77,8 +79,9 @@ def create(request):
     if form.is_valid():
        try:
            logger.error("Ok!")
-           form.changeReason = 'Created through the self-service interface by {0}'.format(request.user)
-           s = form.save()
+           s = form.save(commit=False)
+           s.changeReason = 'Created through the self-service interface by {0}'.format(request.user)
+           s.save()
            s.apply_rules()
            return redirect('storage')
        except Exception as e:
@@ -99,6 +102,7 @@ def create(request):
     return render(request, 'storage/crud.html', context)
 
 @login_required
+@csrf_protect
 def modify(request,pk):
     try:
          box = Storage.objects.get(pk=pk)
@@ -138,6 +142,7 @@ def modify(request,pk):
     return render(request, 'storage/crud.html', context)
 
 @login_required
+@csrf_protect
 def delete(request,pk):
     try:
          box = Storage.objects.get(pk=pk)
@@ -146,6 +151,21 @@ def delete(request,pk):
 
     if box.owner != request.user:
          return HttpResponse("Eh - not your box ?!",status=403,content_type="text/plain")
+
+    if not request.POST:
+         form = ConfirmForm(initial = {'pk':pk})
+         context = {
+            'title': 'Confirm delete',
+            'label': 'Confirm puring storage request',
+            'action': 'Delete',
+            'is_logged_in': request.user.is_authenticated,
+            'user' : request.user,
+            'owner' : box.owner,
+            'form':  form,
+            'box': box,
+            'delete': True,
+         }
+         return render(request, 'storage/crud.html', context)
 
     try:
        box.changeReason = 'Set to done via the self-service interface by {0}'.format(request.user)
@@ -156,4 +176,3 @@ def delete(request,pk):
          return HttpResponse("Box fail",status=400,content_type="text/plain")
 
     return redirect('storage')
-

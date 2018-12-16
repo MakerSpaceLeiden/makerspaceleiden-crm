@@ -51,6 +51,9 @@ class Storage(models.Model):
     def editable(self): # we can still change anything
         return self.state in ('R') 
 
+    def deletable(self):
+        return self.state in ('R','OK','1st','AG')
+
     def __str__(self):
         return self.what + "@" + self.location
 
@@ -70,18 +73,18 @@ class Storage(models.Model):
         s = self.state
 
         if self.state == '':
+             self.changeReason = '[rule] State set to R'
              self.state = 'R'
 
         if self.state == 'R' and self.duration <= 31:
-             self.changeReason = 'Auto approved (month or less)'
+             self.changeReason = '[rule] Auto approved (month or less)'
              self.state = 'AG'
 
         if self.expired():
-             self.changeReason = 'Expired -- been there too long'
+             self.changeReason = '[rule] Expired -- been there too long'
              self.state = 'EX'
+
         if s != self.state:
            self.save()
 
         return
-
-

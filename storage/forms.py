@@ -3,6 +3,9 @@ from django.contrib.auth.forms import UserCreationForm
 from .models import Storage
 from django.forms import ModelForm
 
+class ConfirmForm(forms.Form):
+    pk = forms.IntegerField(disabled=True, widget = forms.HiddenInput())
+    
 class StorageForm(ModelForm):
     class Meta:
        model = Storage

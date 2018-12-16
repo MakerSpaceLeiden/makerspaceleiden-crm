@@ -43,6 +43,8 @@
           <p>
             {% if item in canedit %}
 		<a href="{% url 'changestorage' pk=item.id %}">[change]</a> 
+            {% endif %}
+            {% if item.deletable %}
 		<a href="{% url 'deletestorage' pk=item.id  %}">[delete]</a>
             {% endif %}
            </p>
