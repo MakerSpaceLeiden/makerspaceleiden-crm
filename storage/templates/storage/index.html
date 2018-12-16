@@ -19,6 +19,7 @@
 <p><a href="{% url 'addstorage' %}">[File a request]</a> for the storage of an item outside members storage.</p>
 
 {% for label,storage in overview.items %}
+{% if storage %}
 <h2>{{ label }}</h2>
 <table>
   <tr>	
@@ -62,6 +63,8 @@
   </tr>
   {% endfor %}
  </table>
+{% endif %}
+
 {% endfor %}
 <hr>
 <p>
