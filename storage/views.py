@@ -18,7 +18,7 @@ import datetime
 from .models import Storage
 from members.models import User
 from .admin import StorageAdmin
-from .forms import StorageForm, NewStorageForm
+from .forms import StorageForm
 
 import logging
 logger = logging.getLogger(__name__)
@@ -69,44 +69,23 @@ def index(request,user_pk):
     }
     return render(request, 'storage/index.html', context)
 
-#        ('R', 'Requested'),
-#        ('AG','Auto granted (<= month)'),
-#        ('1st','First extension'),
-#        ('OK','Approved'),
-#        ('NO','Denied'),
-#        ('EX','Expired'),
-#        ('D', 'Done'),
-
-def apply_rules(pk):
-    storage = Storage.objects.get(pk=pk)
-    logger.error("Apply rules to S=" + storage.state + " " + str(storage))
-    s = storage.state
-    if storage.state == '':
-         storage.state = 'R'
-    if storage.state == 'R' and storage.duration <= 31:
-         storage.changeReason = 'Auto approved (month or less)'
-         storage.state = 'AG'
-    expires = datetime.timedelta(days=storage.duration) + storage.requested
-    if expires < datetime.date.today():
-         storage.changeReason = 'Expired -- been there too long'
-         storage.state = 'EX'
-    if s != storage.state:
-       storage.save()
-    return
-
 @login_required
 def create(request):
-    form = NewStorageForm(request.POST or None, initial = { 'owner': request.user.id })
+    form = StorageForm(request.POST or None, initial = { 'owner': request.user.id })
+    form.fields['duration'].help_text= "days. Short requests (month or less) are automatically approved."
+    logger.error("WE have:" +str(request.POST))
     if form.is_valid():
-       #try:
+       try:
+           logger.error("Ok!")
            form.changeReason = 'Created through the self-service interface by {0}'.format(request.user)
            s = form.save()
-           apply_rules(s.pk)
+           s.apply_rules()
            return redirect('storage')
-       #except Exception as e:
+       except Exception as e:
            logger.error("Unexpected error during create of new box : {0}".format(e))
     else:
-       logger.error("nope")
+       logger.error("nope: " + str(form.errors))
+       logger.error("nope: " + str(form.non_field_errors))
 
     context = {
         'label': 'Request a storage excemption',
@@ -130,19 +109,14 @@ def modify(request,pk):
          return HttpResponse("Eh - no can do ??",status=403,content_type="text/plain")
 
     form = StorageForm(request.POST or None, instance = box)
-    if (box.state != 'AG'):
-       form.fields['extension_rq'].disabled = True
-       form.fields['extension_rq'].help_text= "(Can only be requestion after first automatic month)"
 
     if form.is_valid():
        logger.error("saving")
        try:
            box = form.save(commit=False)
            box.changeReason = 'Updated through the self-service interface by {0}'.format(request.user)
-           if form.cleaned_data['extension_rq']:
-              box.state = '1st'
            box.save()
-           apply_rules(box.pk)
+           box.apply_rules()
            return redirect('storage')
 
        except Exception as e:
