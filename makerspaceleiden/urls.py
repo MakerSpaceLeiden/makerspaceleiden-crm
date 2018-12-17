@@ -19,6 +19,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('', include('selfservice.urls')),
+    path('', include('django.contrib.auth.urls')),
     path('members/', include('members.urls')),
     path('storage/', include('storage.urls')),
     path('boxes/', include('memberbox.urls')),

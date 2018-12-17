@@ -198,12 +198,14 @@ def signup(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
         if form.is_valid():
-            form.save()
+            user = form.save()
             email = form.cleaned_data.get('email')
             raw_password = form.cleaned_data.get('password1')
+            return sentEmailVerification(request,user,email)
+
             user = authenticate(email=email, password=raw_password)
             login(request, user)
-            return redirect('home')
+            return redirect('index')
     else:
         form = SignUpForm()
     return render(request, 'signup.html', {'form': form})

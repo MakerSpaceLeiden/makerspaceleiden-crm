@@ -13,12 +13,12 @@
 	</tr>
     	{% for member in members %}
 	<tr>
-	<td align=right>{{member.user.first_name}} {{member.user.last_name}}</i></td>
+	<td align=right>{{member.first_name}} {{member.last_name}}</i></td>
 	<!-- very slow - but cannot find a way to do lst.machine.member.xs -->
 	{% for machine,mbrs in lst.items %}
 	   {% for mbr,info in mbrs.items %}
             {%if mbr == member %}
-		<td>
+                <td>
                 {%if info.xs %}yes{%endif%} 
 		</td>
             {% endif %}
