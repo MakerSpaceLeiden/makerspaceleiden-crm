@@ -107,3 +107,7 @@ venv.bak/
 .sqlite3
 venv
 static
+
+initial_populate
+*/migrations/0*.py
+*.swp

@@ -26,11 +26,13 @@ class Command(BaseCommand):
            name = sys.stdin.readline().strip()
            what = sys.stdin.readline().strip()
            phone = sys.stdin.readline().strip()
+           member = None
 
            try:
                member = User.objects.get(email=email)
                if not user0:
                    user0 = member
+
            except User.DoesNotExist:
                member = User()
                member.email = email
@@ -43,10 +45,11 @@ class Command(BaseCommand):
                if len(what.split(' ')) > 1:
                   member.form_on_file = True
                member.save()
+               if not user0:
+                   user0 = member
                self.stdout.write('Imported {} <{}>'.format(name,email))
            except Exception as e:
                raise e
-
            for w in what.split(' '):
                 # loc = Location(name = 'At the usual spot')
                try:

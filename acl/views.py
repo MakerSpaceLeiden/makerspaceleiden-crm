@@ -15,20 +15,24 @@ from members.models import PermitType,Entitlement,Tag,User
 from .models import Machine,Instruction
 
 def matrix_mm(machine,mbr):
-       out = { 'xs' : False, 'tags' : [] }
+       out = { 'xs' : False, 'instructions_needed' : False, 'tags' : [] }
+
+       out['requires_instruction'] = machine.requires_instruction
+       out['requires_permit'] = machine.requires_permit
+       out['requires_form'] = machine.requires_form
 
        # Does the machine require a form; and does the user have that form on file.
        if machine.requires_form and not mbr.form_on_file:
-          return
+          return out
 
        # Is a permit required ?
        # If not - fall back to a dead normal instruction need.
        if machine.requires_permit: 
            if Entitlement.objects.filter(permit = machine.requires_permit, holder = mbr).count() < 1:
-             return
+             return out
        else:  
            if machine.requires_instruction and Instruction.objects.filter(machine = machine.id, holder = mbr).count() < 1:
-             return
+             return out
 
        for tag in Tag.objects.filter(owner = mbr):
           out['tags'].append(tag.tag)
@@ -113,10 +117,22 @@ def details(request,machine_id):
     return render(request, 'acl/details.txt', context, content_type='text/plain')
 
 def missing(tof):
-    entitlements = Entitlement.objects.filter(holder__form_on_file = tof)
+    relevant_machines = Machine.objects.filter(requires_form = True)
+    relevant_permits = {}
+    permits = PermitType.objects.all()
+    for p in permits:
+      for m in permits:
+         if m.requires_permit == p.name:
+            relevant_permits[ p.name ] = 1
+
+    print(relevant_permits)
+
+    entitlements = Entitlement.objects.filter(holder__form_on_file = True)
     missing = {}
     for e in entitlements:
       holder = e.holder
+      if not e.permit.name in relevant_permits:
+        continue
       if not holder in missing:
         missing[ holder ] = []
       missing[ holder ].append(e.permit)

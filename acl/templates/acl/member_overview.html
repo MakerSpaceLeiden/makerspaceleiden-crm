@@ -7,7 +7,40 @@
 	{% for machine,info in lst.items %}
 	<tr>
 		<td align=right>{{ machine }}</td>
-		<td>{%if info.xs %}yes{%else%}--{%endif%}</td>
+		<td>
+                {%if info.xs == True %}
+		<b>
+			yes 
+		</b>
+	                {%if info.requires_permit %}
+	 			-- permit '{{ info.requires_permit }}' 
+	                {% if info.requires_form and member.form_on_file == True  %}
+				and liability waiver form
+				{% endif %}
+			on file.
+			{% elif info.requires_instruction == False %}
+			    -- <i>(no instructions needed)</i>
+			{% endif %}
+                {% else %}
+		<i>
+			no.
+	                {% if info.requires_permit %}
+	 		Requires permit '{{ info.requires_permit }}'
+			{% else %}
+	                {%if info.requires_instruction == True %}
+                        Instruction needed.
+			{% endif %}
+			{% endif %}
+	                {%if info.requires_form == True %}
+			and the liabiity waiver form
+					{%if member.form_on_file == False %}
+						(not yet filed)
+			               {% endif %}
+			to be on file.
+			{% endif %}
+		<i/>
+                   {% endif %}
+               </td>
     	{% endfor %}
 	</tr>
 </table>
