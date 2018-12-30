@@ -16,11 +16,13 @@ from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils import six
+from django.db.models import Q
+from django.core.exceptions import ObjectDoesNotExist
 import logging
 
 
-from members.models import PermitType,Entitlement,Tag,User
-from acl.models import Machine,Instruction
+from members.models import Tag,User
+from acl.models import Machine,Entitlement,PermitType
 from selfservice.forms import UserForm, SignUpForm
 from .models import WiFiNetwork
 
@@ -44,14 +46,49 @@ def index(request):
     return render(request, 'index.html', context)
 
 @login_required
+def pending(request):
+    pending = Entitlement.objects.all().filter(active = False)
+
+    es = []
+    for p in pending:
+        es.append((p.id,p))
+
+    form = forms.Form(request.POST)
+    form.fields['entitlement'] = forms.MultipleChoiceField(label='Entitlements',choices=es)
+    context = {
+	'title': 'Pending entitlements',
+	'user' : request.user,
+	'has_permission': request.user.is_authenticated,
+        'pending': pending,
+	'lst': es,
+	'form': form,
+    }
+    if request.method == "POST" and form.is_valid():
+      if not request.user.is_staff:
+          return HttpResponse("You are propably not an admin ?",status=403,content_type="text/plain")
+
+      for eid in form.cleaned_data['entitlement']:
+          e = Entitlement.objects.get(pk=eid)
+          e.active = True
+          e.changeReason = 'Activated through the self-service interface by {0}'.format(request.user)
+          e.save()
+      context['saved'] = True
+
+    return render(request, 'pending.html', context)
+
+@login_required
 def recordinstructions(request):
     try:
        member = request.user
     except User.DoesNotExist:
        return HttpResponse("You are propably not a member-- admin perhaps?",status=500,content_type="text/plain")
 
-    machines = Machine.objects.filter(instruction__holder=member)
+    # keep the option open to `do bulk adds
     members = User.objects.exclude(id = member.id) #.order_by('first_name')
+
+    # Only show machine we are entitled for ourselves.
+    #
+    machines = Machine.objects.all().filter(requires_permit__isRequiredToOperate__holder=member).filter(Q(requires_permit__permit=None) | Q(requires_permit__permit__isRequiredToOperate__holder=member))
 
     ps =[]
     for m in members:
@@ -59,8 +96,8 @@ def recordinstructions(request):
 
     ms = []
     for m in machines:
-      ms.append((m.id,m.name))
-  
+          ms.append((m.id,m.name))
+
     form = forms.Form(request.POST) # machines, members)
     form.fields['machine'] = forms.MultipleChoiceField(label='Machine',choices=ms,help_text='Select multiple if so desired')
     form.fields['person'] = forms.ChoiceField(label='Person',choices=ps)
@@ -73,6 +110,7 @@ def recordinstructions(request):
 	'user' : request.user,
 	'has_permission': True,
 	'form': form,
+        'lst': ms,
     }
 
     saved = False
@@ -82,21 +120,36 @@ def recordinstructions(request):
        try:  
          m = Machine.objects.get(pk=mid)
          p = User.objects.get(pk=form.cleaned_data['person'])
-         i = user=request.user.id
+         i = user=request.user
 
+         pt = None
+         if m.requires_permit:
+             pt = PermitType.objects.get(pk=m.requires_permit.id)
+
+         # Note: We allow for 'refreshers' -- and rely on the history record.
+         #
          created = False
-
-         # We allow for 'refreshers' -- and rely on the history record.
          try:
-           record = Instruction.objects.get(machine=m, holder=p)
-           record.changeReason = 'Updated through the self-service interface by {0}'.format(i)
-           record.issuer = i
-           record.save()
-         except Instruction.DoesNotExist:
-           record = Instruction(machine=m, holder=p, issuer=i)
-           record.changeReason = 'Created in the self-service interface by {0}'.format(i)
-           record.save()
-           created = True
+            record = Entitlement.objects.get(permit=pt, holder=p)
+            record.issuer = i
+            record.changeReason = 'Updated through the self-service interface by {0}'.format(i)
+         except Entitlement.DoesNotExist:
+            record = Entitlement.objects.create(permit=pt, holder=p, issuer=i)
+            created = True
+            record.changeReason = 'Created in the self-service interface by {0}'.format(i)
+         except Exception as e:
+            logger.error("Something else went wrong during create: {0}".format(e))
+            raise e
+
+         if pt and pt.permit:
+             # Entitlements that require instruction permits also
+             # require a trustee OK. This gets reset on re-intruction.
+             #
+             record.active = False;
+         else:
+             record.active = True;
+
+         record.save()
 
          context["created"] = created
          context['machines'].append(m)

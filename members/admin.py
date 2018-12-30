@@ -8,7 +8,7 @@ from simple_history.admin import SimpleHistoryAdmin
 from django.utils.translation import ugettext_lazy as _
 
 
-from .models import Tag, PermitType, Entitlement, User
+from .models import Tag,  User
 
 class UserResource(resources.ModelResource):
     class Meta:
@@ -22,14 +22,6 @@ class TagResource(resources.ModelResource):
        fields = [ 'owner', 'tag' ]
        import_id_fields = [ 'owner', 'tag' ]
 
-class EntitlementResource(resources.ModelResource):
-    class Meta:
-       model = Entitlement
-       fields = [ 'permit', 'holder', 'issuer' ]
-       import_id_fields = [ 'permit', 'holder', 'issuer' ]
-       # import_id_fields = [ 'permit', 'holder', 'issuer' ]
-
-# Define a new User admin
 class UserAdmin(ImportExportModelAdmin, BaseUserAdmin, SimpleHistoryAdmin):
     resource_class = UserResource
     fieldsets = (
@@ -55,13 +47,3 @@ class TagAdmin(ImportExportModelAdmin,SimpleHistoryAdmin):
 
 admin.site.register(Tag,TagAdmin)
 
-# class PermitAdmin(ImportExportModelAdmin,admin.ModelAdmin):
-class PermitAdmin(ImportExportModelAdmin,SimpleHistoryAdmin):
-    list_display = ('name','description')
-admin.site.register(PermitType,PermitAdmin)
-
-# class EntitlementAdmin(ImportExportModelAdmin,admin.ModelAdmin, SimpleHistoryAdmin):
-class EntitlementAdmin(ImportExportModelAdmin,SimpleHistoryAdmin):
-    list_display = ('permit','holder','issuer')
-    resource_class = EntitlementResource
-admin.site.register(Entitlement,EntitlementAdmin)

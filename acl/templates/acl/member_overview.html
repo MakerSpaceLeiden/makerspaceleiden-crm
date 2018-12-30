@@ -4,6 +4,64 @@
 
 {% if lst %}
 <table>
+	<tr><td colspan=2><h3>Personal details</h3></tr>
+	<tr><td align=right>First name</td><td>{{ member.first_name}}</td></tr>
+	<tr><td align=right>Last name</td><td>{{ member.last_name}}</td></tr>
+	<tr><td align=right>Email (usernme)</td><td>{{ member.email}}</td></tr>
+	<tr><td align=right>Waiver on file</td><td>
+			{%if member.form_on_file %} yes {% else %} no {% endif %}
+			</td></tr>
+	{%if member == user %}
+			<tr><td></td><td><a href="{% url 'userdetails' %}">[edit]</a></td><td>
+	{% endif %}
+
+	<tr><td colspan=2><h3>Boxes</h3></tr>
+	{% if boxes %}
+        {% for box in boxes %}
+	<tr><td align=right>{{ box.location }} </td><td>
+			{% if box.extra_info %}
+				{{ box.extra_info }}
+			{% else %}
+				{{ box }}
+			{% endif %}
+			<p>
+			<a href="{% url 'changebox' pk=box.id %}">[change]</a>
+	{%if member == user %}
+			<a href="{% url 'deletebox' pk=box.id %}">[delete]</a>
+	{% endif %}
+		</td></tr>
+	{% endfor %}
+	{% else %}
+	<tr><td></td><td>
+		<i>no box assigned yet.</i>
+		<a href="{% url 'addbox' %}">[add]</a>
+		</td></tr>
+	{% endif %}
+
+	<tr><td colspan=2><h3>Storage</h3></tr>
+	{% if storage %}
+        {% for box in storage %}
+	<tr><td align=right>
+			{{ box.location }}<br>
+		</td><td>
+			{{ box.duration }} days until {{ box.enddate }}<br>
+			<b>{{ box.get_state_display }}</b><br>
+			{{ box.extra_info }}<br>
+			<a href="{% url 'changestorage' pk=box.id %}">[change]</a>
+	{%if member == user %}
+			<a href="{% url 'deletestorage' pk=box.id %}">[delete]</a>
+	{% endif %}
+		</td></tr>
+	{% endfor %}
+	{% else %}
+	<tr><td></td><td>
+		<i>no items in special storage</i>
+		<p>
+		<a href="{% url 'addstorage' %}">[request extra storage]</a>
+		</td></tr>
+	{% endif %}
+
+	<tr><td colspan=2><h3>Entitlements</h3></tr>
 	{% for machine,info in lst.items %}
 	<tr>
 		<td align=right>{{ machine }}</td>
@@ -25,24 +83,34 @@
 		<i>
 			no.
 	                {% if info.requires_permit %}
-	 		Requires permit '{{ info.requires_permit }}'
+			{% if info.has_permit %}
+	 		Already has the required permit 
+	                {% if not info.activated %}
+			but it is not yet activated by a trustee
+			{% endif %}.
+			{% else %}
+			Requires the permit
+			'{{ info.requires_permit }}'.
+			{% endif %}
 			{% else %}
 	                {%if info.requires_instruction == True %}
                         Instruction needed.
 			{% endif %}
 			{% endif %}
 	                {%if info.requires_form == True %}
-			and the liabiity waiver form
-					{%if member.form_on_file == False %}
-						(not yet filed)
-			               {% endif %}
-			to be on file.
+			The required liability waiver
+				{%if member.form_on_file == False %}
+				is not yet filed.
+				{% else %}
+				is already on file.
+			        {% endif %}
 			{% endif %}
 		<i/>
                    {% endif %}
                </td>
     	{% endfor %}
 	</tr>
+	<tr><td></td><td><a href="{% url 'add_instruction' %}">[add]</a></td><td>
 </table>
 {% else %}
     <p>Nothing configured yet.</p>

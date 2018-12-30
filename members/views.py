@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.template import loader
 from django.http import HttpResponse
 
-from .models import Entitlement
+from acl.models import Entitlement
 
 def index(request):
     lst = Entitlement.objects.order_by('holder__id')

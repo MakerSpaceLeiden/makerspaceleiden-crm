@@ -83,7 +83,6 @@
 
 ## issues with the current design
 	
-- member structure messy
 - Instructions and permits too similar.
 - Unclear approval workflow for Entitlements; e.g. explicit
 ok from both instructor and trustee ? Or do we use
@@ -91,31 +90,21 @@ the second layer instructions for this ?
 
 # Redesign ideas
 
-- Drop member and do something with modernish AbstractBaseUser.
-
 - Drop the Instruction class and replace it by
 
-	- PermitTypes get an 3rd flag (besides form-required, instruction required) which is *enabled* or *approved*.
+	- PermitTypes get issuer permit required. I.e. what entitelemt an issuer must have before giving an entitlement.
+		- not ideal - smells of recursion ?!
+		- can this just be a flag ?
 
-	- PermitTypes get issuer permit required.
+        - Entitlements get an extra flag - 'activate`' (managed by trustees)
+		it is set by default to YES for everything except when it is for a 'form needed' permitType
 
 	- Entitlements become the new instructions
 	
-		- but check the Entitlement or holder too issue that permit too.
+		- but check the Entitlement or holder too issue that permit too at time of issue.
 	
-	- Make a type of default 'any member' permit for every machine and on the issuer of most entitlements. Or give any member the 'member' entitlement.
+	- Make a type of default 'any member' permit for every machine and on the issuer of most entitlements. 
+	Or give any member the 'member' entitlement. So this entitlement acts as a 'is a full member'.
 	
 Or on other words - Entitlement becomes more of a 'tag'.
-
-	
-
-
-
-
-
-
-
-
-
-
 

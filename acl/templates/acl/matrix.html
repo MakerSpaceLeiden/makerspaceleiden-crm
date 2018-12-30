@@ -13,7 +13,8 @@
 	</tr>
     	{% for member in members %}
 	<tr>
-	<td align=right>{{member.first_name}} {{member.last_name}}</i></td>
+	<td align=right>
+	<i><a href="{% url 'overview' member_id=member.id %}">{{member.first_name}} {{member.last_name}}</a></i></td>
 	<!-- very slow - but cannot find a way to do lst.machine.member.xs -->
 	{% for machine,mbrs in lst.items %}
 	   {% for mbr,info in mbrs.items %}

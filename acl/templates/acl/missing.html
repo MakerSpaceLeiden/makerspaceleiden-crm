@@ -5,14 +5,10 @@
 
 <table>
 <tr>
-<th>member</th><th>permits / training</th></tr>
-{% for member,permits in amiss.items %}
+<th>member</th></tr>
+{% for member in amiss %}
 <tr>
-	<td> {{ member.first_name }}  {{ member.last_name }} </td>
-	<td> {% for permit in permits %}
-		{{ permit }}
-             {% endfor %}
-	</td>
+	<td><a href="{% url 'overview' member_id=member.id %}"> {{ member.first_name }}  {{ member.last_name }}</a></td>
 </tr>
 {% endfor %}
 </table>

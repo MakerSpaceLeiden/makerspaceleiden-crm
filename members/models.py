@@ -63,35 +63,3 @@ class Tag(models.Model):
     def __str__(self):
         return self.tag + ' (' + self.owner.user.str() + ')'
 
-class PermitType(models.Model):
-    name = models.CharField(max_length=20, unique=True)
-    description =  models.CharField(max_length=200)
-    history = HistoricalRecords()
-
-    def __str__(self):
-        return self.name
-
-class Entitlement(models.Model):
-    permit = models.ForeignKey(
-	'PermitType',
-	on_delete=models.CASCADE,
-    )
-    holder = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='isGivenTo',
-    )
-    issuer = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='isIssuedBy',
-    )
-    history = HistoricalRecords()
-
-    def __str__(self):
-        return str(self.holder) + ' on ' + self.permit.name
-    def save_model(self, request, obj, form, change):
-        if not obj.issuer:
-            obj.issuer = request.user
-        obj.save()
-

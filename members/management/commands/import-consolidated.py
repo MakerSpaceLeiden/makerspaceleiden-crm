@@ -1,10 +1,10 @@
 from django.core.management.base import BaseCommand, CommandError
+from django.contrib.auth.models import User
 
-from members.models import PermitType
 from simple_history.models import HistoricalRecords
 from members.models import User
-from members.models import PermitType,Entitlement,Tag,User
-from acl.models import Machine,Instruction,Location
+from members.models import Tag
+from acl.models import Machine,Location,PermitType,Entitlement
 from memberbox.models import Memberbox
 from storage.models import Storage
 
@@ -17,7 +17,22 @@ class Command(BaseCommand):
         """ Do your work here """
         # self.stdout.write('There are {} things!'.format(User.objects.count()))
         user0 = None
+        admin = None
         cup = 0
+
+        try:
+           admin = User.objects.get(email='admin@admin.nl')
+        except:
+           admin = User.objects.create_superuser('admin@admin.nl', '1234')
+           admin.first_name='Ad',
+           admin.last_name='Min'
+           admin.save()
+        print("Admin = {}".format(admin.email))
+
+        woodpermit,wasCreated = PermitType.objects.get_or_create(name = 'Wood Instruction')
+        woodpermit.description = 'Can issue wood machine entitlement'
+        woodpermit.save()
+
         while True:
            email = sys.stdin.readline().strip()
            if email == '':
@@ -28,61 +43,62 @@ class Command(BaseCommand):
            phone = sys.stdin.readline().strip()
            member = None
 
-           try:
-               member = User.objects.get(email=email)
-               if not user0:
-                   user0 = member
+           member,wasCreated = User.objects.get_or_create(email=email)
 
-           except User.DoesNotExist:
-               member = User()
-               member.email = email
-               if ' ' in name:
+           member.email = email
+           member.set_password('1234')
+           if ' ' in name:
                  member.first_name = name.split(' ',1)[0]
                  member.last_name = name.split(' ',1)[1] 
-               else:
+           else:
                  member.first_name = name
                  member.last_name = ''
-               if len(what.split(' ')) > 1:
+           if len(what.split(' ')) > 1:
                   member.form_on_file = True
-               member.save()
-               if not user0:
-                   user0 = member
-               self.stdout.write('Imported {} <{}>'.format(name,email))
-           except Exception as e:
-               raise e
+           member.save()
+           print("Member={}".format(member))
+
+           if not user0:
+                user0 = member
+                entit = Entitlement(permit = woodpermit, holder = user0, issuer = admin, active = True)
+                print(user0.email)
+                print(admin.email)
+                print(woodpermit)
+                print(entit)
+                entit.save()
+
+           self.stdout.write('Imported {} <{}>'.format(name,email))
+
            for w in what.split(' '):
                 # loc = Location(name = 'At the usual spot')
-               try:
-                 permit = PermitType.objects.get(name = w)
-               except PermitType.DoesNotExist:
-                 permit = PermitType()
-                 permit.name = w
-                 permit.description = 'The ' + w + ' permit'
-                 permit.save()
-               except Exception as e:
-                 raise e
-               try:
-                 machine = Machine.objects.get(name = w)
-               except Machine.DoesNotExist:
-                 machine = Machine()
-                 machine.name = w
-                 machine.description = 'The ' + w + ' machine'
-                 # machine.location = loc 
-                 machine.requires_form = True 
-                 machine.requires_instruction = True
-                 machine.requires_permit = permit
-                 self.stdout.write('Imported {}'.format(what))
-                 # loc.save()
-                 machine.save()
-               except Exception as e:
-                 raise e
-               try:
-                 entit = Entitlement.objects.get(permit = permit, holder = member, issuer = user0)
-               except Entitlement.DoesNotExist:
-                 entit = Entitlement(permit = permit, holder = member, issuer = user0)
-                 entit.save()
-               except Exception as e:
-                 raise e
+               permit = None
+               permit,wasCreated = PermitType.objects.get_or_create(name = w)
+               permit.description = 'The ' + w + ' permit'
+               permit.permit = woodpermit 
+               permit.save()
+
+               machine,wasCreated = Machine.objects.get_or_create(name = w)
+               machine.description = 'The ' + w + ' machine'
+               # machine.location = loc 
+               machine.requires_form = True 
+               machine.requires_instruction = True
+               machine.requires_permit = permit
+               self.stdout.write('Machine imported {}'.format(w))
+               # loc.save()
+               machine.save()
+
+#               try:
+#                 entit,wasCreated = Entitlement.objects.get_or_create(permit = permit, holder = member, issuer = user0)
+#               except Entitlement.DoesNotExist  
+#               except DoesNotExist:
+               entit = Entitlement()
+               entit.permit = permit
+               entit.holder = member
+               entit.issuer = user0
+               entit.active = True
+               entit.save()
+#               except Exception as e:
+#                 raise e
 
            col = cup % 6
            row = int(cup/6) % 6
@@ -93,13 +109,7 @@ class Command(BaseCommand):
                    l = 'L'+str(col)+str(row)
            if k == 1:
                    l = 'R'+str(col)+str(row)
-           try:
-                  box = Memberbox.objects.get(location = l)
-           except Memberbox.DoesNotExist:
-                  box = Memberbox()
-                  box.owner = member
-                  box.location = l
-                  box.description = 'The nice box of '+str(member)
-                  box.save()
-           except Exception as e:
-                 raise e
+
+           box,wasCreated = Memberbox.objects.get_or_create(location = l, owner=member)
+           box.description = 'The nice box of '+str(member)
+           box.save()

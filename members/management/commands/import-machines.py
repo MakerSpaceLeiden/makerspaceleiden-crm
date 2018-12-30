@@ -1,10 +1,9 @@
 from django.core.management.base import BaseCommand, CommandError
 
-from members.models import PermitType
 from simple_history.models import HistoricalRecords
 from members.models import User
-from members.models import PermitType,Entitlement,Tag,User
-from acl.models import Machine,Instruction,Location
+from members.models import Tag,User
+from acl.models import Machine,Location,PermitType,Entitlement
 from memberbox.models import Memberbox
 from storage.models import Storage
 
@@ -31,6 +30,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         for line in sys.stdin:
+           line = line.strip()
            print(line)
            name, i, p, pt, desc,location = line.split(',')
 
@@ -42,33 +42,19 @@ class Command(BaseCommand):
            machine = None
 
            if pt:
-               try:
-                   permit = PermitType.objects.get(name=pt)
-               except PermitType.DoesNotExist:
-                   permit = PermitType()
-
-               permit.name = pt
+               permit,wasCreated = PermitType.objects.get_or_create(name=pt)
                permit.description = 'Permit to use ' + pt
                permit.changeReason = "Added during bulk import."
                permit.save()
 
            if location:
-               try:
-                   loc = Location.objects.get(name=location)
-               except Location.DoesNotExist:
-                   loc = Location()
-
-               loc.name = location
+               loc,wasCreated = Location.objects.get_or_create(name=location)
                loc.changeReason = "Added during bulk import."
                loc.save()
 
-           try:
-               machine = Machine.objects.get(name=name)
-           except Machine.DoesNotExist:
-               machine = Machine()
-
-           machine.name = name
+           machine,wasCreated = Machine.objects.get_or_create(name=name)
            machine.description = desc
+
            if location:
                   machine.location = loc 
            if int(i)>0:

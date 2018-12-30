@@ -11,8 +11,10 @@ from django.urls import reverse_lazy
 from django import forms
 from django.forms import ModelForm
 
-from members.models import PermitType,Entitlement,Tag,User
-from .models import Machine,Instruction
+from members.models import Tag,User
+from .models import Machine,Entitlement,PermitType
+from storage.models import Storage
+from memberbox.models import Memberbox
 
 def matrix_mm(machine,mbr):
        out = { 'xs' : False, 'instructions_needed' : False, 'tags' : [] }
@@ -25,19 +27,23 @@ def matrix_mm(machine,mbr):
        if machine.requires_form and not mbr.form_on_file:
           return out
 
-       # Is a permit required ?
-       # If not - fall back to a dead normal instruction need.
+       xs = True
        if machine.requires_permit: 
-           if Entitlement.objects.filter(permit = machine.requires_permit, holder = mbr).count() < 1:
+           ents = Entitlement.objects.filter(permit = machine.requires_permit, holder = mbr)
+           if ents.count() < 1:
              return out
-       else:  
-           if machine.requires_instruction and Instruction.objects.filter(machine = machine.id, holder = mbr).count() < 1:
-             return out
+
+           for e in ents:
+               out['has_permit'] = True
+               print(e)
+               if e.active == False:
+                    xs = False
 
        for tag in Tag.objects.filter(owner = mbr):
           out['tags'].append(tag.tag)
        
-       out['xs'] = True
+       out['activated'] = xs
+       out['xs'] = xs
 
        return out 
 
@@ -91,6 +97,9 @@ def overview(request):
 def member_overview(request,member_id):
     member = User.objects.get(pk=member_id)
     machines = Machine.objects.order_by()
+    boxes = Memberbox.objects.all().filter(owner = member)
+    storage = Storage.objects.all().filter(owner = member)
+
     lst = {}
     for mchn in machines:
        lst[ mchn.name ] = matrix_mm(mchn, member)
@@ -99,6 +108,8 @@ def member_overview(request,member_id):
        'title': "XS matrix " + member.first_name + ' ' + member.last_name,
        'member': member,
        'machines': machines,
+       'storage': storage,
+       'boxes': boxes,
        'lst': lst,
     }
     return render(request, 'acl/member_overview.html', context)
@@ -113,31 +124,12 @@ def details(request,machine_id):
     context = {
        'machine': machine.name,
        'lst': matrix_m(machine)
-    }
+       }
     return render(request, 'acl/details.txt', context, content_type='text/plain')
 
 def missing(tof):
-    relevant_machines = Machine.objects.filter(requires_form = True)
-    relevant_permits = {}
-    permits = PermitType.objects.all()
-    for p in permits:
-      for m in permits:
-         if m.requires_permit == p.name:
-            relevant_permits[ p.name ] = 1
-
-    print(relevant_permits)
-
-    entitlements = Entitlement.objects.filter(holder__form_on_file = True)
-    missing = {}
-    for e in entitlements:
-      holder = e.holder
-      if not e.permit.name in relevant_permits:
-        continue
-      if not holder in missing:
-        missing[ holder ] = []
-      missing[ holder ].append(e.permit)
-
-    return missing
+    holders = User.objects.all().filter(form_on_file = tof).filter(isGivenTo__permit__has_permit__requires_form = True).distinct()
+    return holders
 
 @login_required
 def missing_forms(request):
@@ -150,6 +142,7 @@ def missing_forms(request):
 
 @login_required
 def filed_forms(request):
+    # people_with_forms = User.objects.all().filter(form_on_file = True)
     context = {
 	'title': 'Filed forms',
 	'desc': 'Forms on file for people that also had instruction on something',
