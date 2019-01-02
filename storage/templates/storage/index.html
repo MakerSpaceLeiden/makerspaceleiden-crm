@@ -37,7 +37,13 @@
 	</center>
         </td>
         <td>{{ item.what}}<br/>
-            <i><a href="{% url 'storage' user_pk=item.owner.id %}">{{ item.owner }}</a></i><br/>
+            <i>
+{% if limit %}
+                <a href="{% url 'overview' member_id=item.owner.id %}">
+{% else %}
+                <a href="{% url 'storage' user_pk=item.owner.id %}">
+{% endif %}
+			    {{ item.owner }}</a></i><br/>
         </td>
         <td>
 	  <b>{{ item.location }}</b></br>

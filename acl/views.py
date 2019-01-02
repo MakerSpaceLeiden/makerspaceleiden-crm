@@ -35,7 +35,6 @@ def matrix_mm(machine,mbr):
 
            for e in ents:
                out['has_permit'] = True
-               print(e)
                if e.active == False:
                     xs = False
 
@@ -55,7 +54,7 @@ def matrix_m(machine):
     return lst 
 
 @login_required
-def index(request):
+def api_index(request):
     lst = Machine.objects.order_by()
     perms = {}
     instructions= []
@@ -80,25 +79,53 @@ def index(request):
     return render(request, 'acl/index.html', context)
 
 @login_required
-def overview(request):
-    machines = Machine.objects.order_by()
+def machine_overview(request, machine_id = None):
+    instructors = []
+    machines = Machine.objects.order_by('name')
+    if machine_id:
+        machines = machines.filter(pk = machine_id)
+        machine = machines.first()
+        permit = machine.requires_permit
+        if permit:
+            permit = PermitType.objects.get(pk = permit.id)
+            if permit.permit:
+                instructors = Entitlement.objects.filter(permit=permit)
     lst = {}
     for mchn in machines:
        lst[ mchn.name ] = matrix_m(mchn)
 
     context = {
-       'members': User.objects.order_by(),
+       'members': User.objects.order_by('first_name'),
        'machines': machines,
        'lst': lst,
+       'instructors': instructors,
     }
     return render(request, 'acl/matrix.html', context)
 
 @login_required
-def member_overview(request,member_id):
+def members(request):
+    members = User.objects.order_by('first_name')
+
+    context = {
+       'title': "Members list",
+       'members': members,
+    }
+    return render(request, 'acl/members.html', context)
+
+@login_required
+def member_overview(request,member_id = None):
     member = User.objects.get(pk=member_id)
     machines = Machine.objects.order_by()
     boxes = Memberbox.objects.all().filter(owner = member)
     storage = Storage.objects.all().filter(owner = member)
+    normal_permits = {}
+    for m in machines:
+        normal_permits[ m.requires_permit ] = True
+
+    specials = []
+    for e in Entitlement.objects.all().filter(holder = member):
+        if not e.permit in normal_permits:
+            specials.append(e)
 
     lst = {}
     for mchn in machines:
@@ -111,11 +138,12 @@ def member_overview(request,member_id):
        'storage': storage,
        'boxes': boxes,
        'lst': lst,
+       'permits': specials,
     }
     return render(request, 'acl/member_overview.html', context)
 
 @login_required
-def details(request,machine_id):
+def api_details(request,machine_id):
     try:
        machine = Machine.objects.get(pk=machine_id)
     except:

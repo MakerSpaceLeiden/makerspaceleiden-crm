@@ -11,8 +11,9 @@ as it reveals the tags.
 {% if lst %}
 <ul>
     {% for p in lst %}
-    <li> <a href="{{p.id}}">{{ p.name }}</a>
+    <li> <a href="{% url 'machine_overview' p.id %}">{{ p.name }}</a>
     (<i> {{ p.description }} </i>)
+    <a href="{{p.id}}">[tags]</a>
     {% endfor %}
 </ul>
 {% else %}

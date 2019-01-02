@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<ul>
+    {% for m in members %}
+    <li> <a href="{% url 'overview' m.id %}">{{ m }}</a>
+    {% endfor %}
+</ul>
+
+
+{% endblock %}

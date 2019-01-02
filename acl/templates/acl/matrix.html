@@ -1,7 +1,43 @@
 {% extends 'base.html' %}
 
 {% block content %}
+{% if machines.count == 1 %}
+<h1><hr/>XS matrix for {{ machines.first }} <hr/></h1>
+<table>
+	<tr><td alight=right>Machine: </td><td>{{ machines.first.name }}</td></tr>
+	<tr><td alight=right></td><td>{{ machines.first.description}}</td></tr>
+	<tr><td alight=right>Location: </td><td>{{ machines.first.location}}</td></tr>
+	<tr><td alight=right>Waiver: </td><td>
+			{% if  machines.first.requires_form %}
+			The waiver form needs to be on file.
+			{% else %}
+			Not required.
+			{% endif %}
+		</td></tr>
+		<tr><td alight=right>Instruction: </td>
+			<td>{% if machines.first.requires_permit %}
+				Instructions are required ({{ machines.first.requires_permit }})
+			{% if instructors %}
+			<br/>Instructions can be given by:
+			<ol>
+			{% for e in instructors %}
+			<li><a href="{% url 'overview' member_id=e.holder.id %}">{{ e.holder }}</a>
+				{% if e.active %}
+				<!-- active -->
+				{% else %}
+				(not active)
+				{% endif %}
+			{% endfor %}
+			</ol>
+			{% endif %}
+			{% else %}
+			None required.
+			{% endif %}
+			</td></tr>
+</table>
+{% else %}
 <h1><hr/>Full XS matrix<hr/></h1>
+{% endif %}
 
 {% if lst %}
 <table>

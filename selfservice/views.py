@@ -88,7 +88,9 @@ def recordinstructions(request):
 
     # Only show machine we are entitled for ourselves.
     #
-    machines = Machine.objects.all().filter(requires_permit__isRequiredToOperate__holder=member).filter(Q(requires_permit__permit=None) | Q(requires_permit__permit__isRequiredToOperate__holder=member))
+    machines = Machine.objects.all().filter(requires_permit__isRequiredToOperate__holder=member)
+    machines = Machine.objects.all().filter(requires_permit__isRequiredToOperate__holder=member).filter(Q(requires_permit__permit=None) | Q(requires_permit__permit__isRequiredToOperate__holder=member) | Q(requires_permit = None))
+    print(machines)
 
     ps =[]
     for m in members:

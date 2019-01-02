@@ -19,26 +19,31 @@ There are no wifi network passwords for members at the moment.
 <h2>Manage your data</h2>
 <p>
 <ul>
-<li><a href="acl/overview/{{ member.id }}">Your data</a>
-<li><a href="acl/overview">Instruction details for all users</a>
-<p>
-<li><a href="record_instructions">Record instructions you've just given</a>
-<p>
-<li><a href="pending">Instructions pending approval trustee</a>
-<li><a href="acl/missing_forms">Missing forms</a>
-<li><a href="acl/filed_forms">Filed forms</a>
-<p>
-<li><a href="userdetails/">Update your personal details</a>
-<li><a href="{% url 'password_change' %}">change your password</a>
-<p>
-<li><a href="{% url 'boxes' %}">Members box management</a>
-<li><a href="{% url 'storage' %}">Storage management</a>
-<p>
-<li><a href="admin">admin stuff</a>
-<li><a href="acl">acl stuff</a>
-<p>
-<li><a href="{% url 'logout' %}?next={% url 'index' %}">logout</a>
-</ul>
+	<li><a href="{% url 'overview' member_id=member.id %}">Your data</a>
+	<li><a href="{% url 'overview' %}">All members </a>
+	<li><a href="{% url 'machine_overview' %}">All machines (slow)</a>
+	<p/>
+	<li><a href="{% url 'add_instruction' %}">Record instructions you've just given</a>
+	<p/>
+	<li><a href="{% url 'userdetails' %}">Update your personal details</a>
+	<li><a href="{% url 'password_change' %}">change your password</a>
+	<p/>
+	<li><a href="{% url 'boxes' %}">Members box management</a>
+	<li><a href="{% url 'storage' %}">Storage management</a>
+	<p/>
+{%if user.is_staff %}
+	<li><a href="{% url 'pending' %}">Instructions pending approval trustee</a>
+	<li><a href="{% url 'missing_forms' %}">Missing forms</a>
+	<li><a href="{% url 'filed_forms' %}">Filed forms</a>
+	<li><a href="{% url 'userdetails' %}">Update your personal details</a>
+	<p/>
+	<li><a href="admin/">raw database access</a>
+	<p/>
+	<li><a href="{% url 'acl-index' %}">rfid acl stuff</a>
+{% endif %}
+	<p/>
+	<li><a href="{% url 'logout' %}?next={% url 'index' %}">logout</a>
+	</ul>
 {% else %}
 <a href="signup">signup</a> or <a href="{% url 'login' %}?next={% url 'index' %}">login</a> or <a href="{% url 'password_reset' %}">reset my password</a>
 {% endif %}

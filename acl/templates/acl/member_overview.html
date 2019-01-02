@@ -14,8 +14,24 @@
 	{%if member == user %}
 			<tr><td></td><td><a href="{% url 'userdetails' %}">[edit]</a></td><td>
 	{% endif %}
+	{%if member.is_staff %}
+			<tr><td></td><td>Can edit databases (staff)</td><td>
+	{% endif %}
+	{%if member.is_superuser%}
+			<tr><td></td><td>Is a superuser</td><td>
+	{% endif %}
+	{%if permits %}
+	<tr><td colspan=2><h3>Special Permits and Instructions</h3></tr>
+	{%for p in permits %}
+	<tr><td align=right>{{ p.permit.name }}</td><td>{{ p.permit.description }}
+			{% if not p.active %}
+			Not active at this time (awaiting Trustee approval).
+			{% endif %}
+		</td></tr>
+	{%endfor %}
+	{% endif %}
 
-	<tr><td colspan=2><h3>Boxes</h3></tr>
+	<tr><td colspan=2><h3><a href="{% url 'boxes' %}">Boxes</h3></tr>
 	{% if boxes %}
         {% for box in boxes %}
 	<tr><td align=right>{{ box.location }} </td><td>
@@ -25,7 +41,7 @@
 				{{ box }}
 			{% endif %}
 			<p>
-			<a href="{% url 'changebox' pk=box.id %}">[change]</a>
+			<a href="{% url 'changebox' pk=box.id %}">[update]</a>
 	{%if member == user %}
 			<a href="{% url 'deletebox' pk=box.id %}">[delete]</a>
 	{% endif %}
@@ -38,7 +54,7 @@
 		</td></tr>
 	{% endif %}
 
-	<tr><td colspan=2><h3>Storage</h3></tr>
+	<tr><td colspan=2><h3><a href="{% url 'storage' %}">Storage</a></h3></tr>
 	{% if storage %}
         {% for box in storage %}
 	<tr><td align=right>
@@ -47,7 +63,7 @@
 			{{ box.duration }} days until {{ box.enddate }}<br>
 			<b>{{ box.get_state_display }}</b><br>
 			{{ box.extra_info }}<br>
-			<a href="{% url 'changestorage' pk=box.id %}">[change]</a>
+			<a href="{% url 'changestorage' pk=box.id %}">[update]</a>
 	{%if member == user %}
 			<a href="{% url 'deletestorage' pk=box.id %}">[delete]</a>
 	{% endif %}

@@ -45,7 +45,9 @@ The contents of the two main member cabinets along the long wall (on your left a
     {% for box in row %}
        <td> {% if box %}
 		<div class="box">
-		<div class="hashover">{{ box.owner }}<div class="showhover">{{ box.location }}<br>{{box.extra_info}}</div></div>
+		<div class="hashover">
+			<a href="{% url 'overview' member_id=box.owner.id %}">{{ box.owner }}</a>
+			<div class="showhover">{{ box.location }}<br>{{box.extra_info}}</div></div>
 		</div>
 	    {% else %}
                <i>free</i>
@@ -67,7 +69,7 @@ In a few <i>exceptional</i> cases - there is permission for a member to store th
   <tr><th>owner</th><th>location</th><th></th></tr>
   {% for item in floating %}
   <tr>
-	<td>{{ item.owner}}</td>
+	  <td><a href="{% url 'overview' member_id=item.owner.id %}">{{ item.owner}}</a></td>
   	<td>{{ item.location }}</td>
 	<td>{{ item.extra_info }}</rd>
   </tr>

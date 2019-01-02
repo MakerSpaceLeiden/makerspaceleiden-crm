@@ -3,6 +3,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from simple_history.models import HistoricalRecords
 from members.models import User
+
 import datetime
 
 class Storage(models.Model):
@@ -73,14 +74,17 @@ class Storage(models.Model):
         s = self.state
 
         if self.state == '':
+             self._history_user = None
              self.changeReason = '[rule] State set to R'
              self.state = 'R'
 
         if self.state == 'R' and self.duration <= 31:
+             self._history_user = None
              self.changeReason = '[rule] Auto approved (month or less)'
              self.state = 'AG'
 
         if self.expired():
+             self._history_user = None
              self.changeReason = '[rule] Expired -- been there too long'
              self.state = 'EX'
 
