@@ -1,0 +1,4854 @@
+[
+   {
+      "fields" : {
+         "name" : "metalstuff",
+         "permit" : null,
+         "description" : "Can work with metal"
+      },
+      "pk" : 1,
+      "model" : "acl.permittype"
+   },
+   {
+      "model" : "acl.permittype",
+      "fields" : {
+         "name" : "tablesaw",
+         "permit" : 3,
+         "description" : "The tablesaw permit"
+      },
+      "pk" : 2
+   },
+   {
+      "pk" : 3,
+      "fields" : {
+         "name" : "Wood Instruction",
+         "permit" : null,
+         "description" : "Can issue wood machine entitlement"
+      },
+      "model" : "acl.permittype"
+   },
+   {
+      "pk" : 4,
+      "fields" : {
+         "description" : "The doors permit",
+         "name" : "doors",
+         "permit" : 7
+      },
+      "model" : "acl.permittype"
+   },
+   {
+      "model" : "acl.permittype",
+      "pk" : 7,
+      "fields" : {
+         "name" : "Door Approval",
+         "permit" : null,
+         "description" : "Can approve door access"
+      }
+   },
+   {
+      "fields" : {
+         "name" : "Frontroom",
+         "description" : "I.e. where you come in."
+      },
+      "pk" : 1,
+      "model" : "acl.location"
+   },
+   {
+      "fields" : {
+         "description" : "Area near the big CNC machine",
+         "name" : "Metalshop"
+      },
+      "pk" : 2,
+      "model" : "acl.location"
+   },
+   {
+      "model" : "acl.location",
+      "pk" : 3,
+      "fields" : {
+         "description" : "Wood area near the back of the space.",
+         "name" : "Woodshop"
+      }
+   },
+   {
+      "fields" : {
+         "location" : 1,
+         "description" : "3D-printer, requires instructions by someone who had instructions on this machine.",
+         "requires_form" : false,
+         "requires_permit" : null,
+         "name" : "3D-printer",
+         "requires_instruction" : true
+      },
+      "pk" : 1,
+      "model" : "acl.machine"
+   },
+   {
+      "pk" : 2,
+      "fields" : {
+         "location" : 2,
+         "description" : "Abene VHF3 Metaalfrees machine",
+         "requires_permit" : null,
+         "name" : "metalmill",
+         "requires_form" : true,
+         "requires_instruction" : true
+      },
+      "model" : "acl.machine"
+   },
+   {
+      "model" : "acl.machine",
+      "pk" : 3,
+      "fields" : {
+         "requires_permit" : null,
+         "requires_form" : true,
+         "name" : "metallathe",
+         "requires_instruction" : true,
+         "description" : "Huvema HU760 Draaibank, Reqires instructions by someone who had instruction on this machine.",
+         "location" : 2
+      }
+   },
+   {
+      "model" : "acl.machine",
+      "fields" : {
+         "description" : "The tablesaw machine, requires instructions and the waiver form to be on file.",
+         "location" : 3,
+         "requires_instruction" : true,
+         "requires_permit" : 2,
+         "name" : "tablesaw",
+         "requires_form" : true
+      },
+      "pk" : 4
+   },
+   {
+      "pk" : 5,
+      "fields" : {
+         "name" : "doors",
+         "requires_permit" : 4,
+         "requires_form" : false,
+         "requires_instruction" : true,
+         "location" : null,
+         "description" : "Allowed to open the doors to the space."
+      },
+      "model" : "acl.machine"
+   },
+   {
+      "model" : "acl.machine",
+      "fields" : {
+         "requires_instruction" : true,
+         "requires_permit" : 1,
+         "name" : "Bandsaw for metal",
+         "requires_form" : false,
+         "description" : "Metal bandaw, requries instructions by someone who has 'metalstuff'  instructions.",
+         "location" : 2
+      },
+      "pk" : 8
+   },
+   {
+      "model" : "acl.machine",
+      "pk" : 9,
+      "fields" : {
+         "name" : "Hammer",
+         "requires_permit" : null,
+         "requires_form" : false,
+         "requires_instruction" : false,
+         "location" : null,
+         "description" : "General hammer, can be used without ado"
+      }
+   },
+   {
+      "model" : "selfservice.wifinetwork",
+      "pk" : 1,
+      "fields" : {
+         "password" : "1234",
+         "network" : "Members"
+      }
+   },
+   {
+      "pk" : 2,
+      "fields" : {
+         "network" : "Members-5G",
+         "password" : "1234"
+      },
+      "model" : "selfservice.wifinetwork"
+   },
+   {
+      "model" : "selfservice.wifinetwork",
+      "pk" : 3,
+      "fields" : {
+         "password" : "Welcome",
+         "network" : "Guests"
+      }
+   },
+   {
+      "model" : "contenttypes.contenttype",
+      "pk" : 1,
+      "fields" : {
+         "model" : "historicalstorage",
+         "app_label" : "storage"
+      }
+   },
+   {
+      "model" : "contenttypes.contenttype",
+      "pk" : 2,
+      "fields" : {
+         "app_label" : "storage",
+         "model" : "storage"
+      }
+   },
+   {
+      "fields" : {
+         "app_label" : "memberbox",
+         "model" : "historicalmemberbox"
+      },
+      "pk" : 3,
+      "model" : "contenttypes.contenttype"
+   },
+   {
+      "pk" : 4,
+      "fields" : {
+         "app_label" : "memberbox",
+         "model" : "memberbox"
+      },
+      "model" : "contenttypes.contenttype"
+   },
+   {
+      "pk" : 5,
+      "fields" : {
+         "app_label" : "members",
+         "model" : "user"
+      },
+      "model" : "contenttypes.contenttype"
+   },
+   {
+      "model" : "contenttypes.contenttype",
+      "pk" : 6,
+      "fields" : {
+         "app_label" : "members",
+         "model" : "historicaltag"
+      }
+   },
+   {
+      "model" : "contenttypes.contenttype",
+      "pk" : 7,
+      "fields" : {
+         "model" : "historicaluser",
+         "app_label" : "members"
+      }
+   },
+   {
+      "fields" : {
+         "app_label" : "members",
+         "model" : "tag"
+      },
+      "pk" : 8,
+      "model" : "contenttypes.contenttype"
+   },
+   {
+      "pk" : 9,
+      "fields" : {
+         "model" : "entitlement",
+         "app_label" : "acl"
+      },
+      "model" : "contenttypes.contenttype"
+   },
+   {
+      "pk" : 10,
+      "fields" : {
+         "model" : "historicalentitlement",
+         "app_label" : "acl"
+      },
+      "model" : "contenttypes.contenttype"
+   },
+   {
+      "fields" : {
+         "app_label" : "acl",
+         "model" : "historicallocation"
+      },
+      "pk" : 11,
+      "model" : "contenttypes.contenttype"
+   },
+   {
+      "fields" : {
+         "model" : "historicalmachine",
+         "app_label" : "acl"
+      },
+      "pk" : 12,
+      "model" : "contenttypes.contenttype"
+   },
+   {
+      "model" : "contenttypes.contenttype",
+      "pk" : 13,
+      "fields" : {
+         "app_label" : "acl",
+         "model" : "historicalpermittype"
+      }
+   },
+   {
+      "fields" : {
+         "app_label" : "acl",
+         "model" : "location"
+      },
+      "pk" : 14,
+      "model" : "contenttypes.contenttype"
+   },
+   {
+      "model" : "contenttypes.contenttype",
+      "pk" : 15,
+      "fields" : {
+         "model" : "machine",
+         "app_label" : "acl"
+      }
+   },
+   {
+      "fields" : {
+         "model" : "permittype",
+         "app_label" : "acl"
+      },
+      "pk" : 16,
+      "model" : "contenttypes.contenttype"
+   },
+   {
+      "model" : "contenttypes.contenttype",
+      "pk" : 17,
+      "fields" : {
+         "app_label" : "selfservice",
+         "model" : "historicalwifinetwork"
+      }
+   },
+   {
+      "pk" : 18,
+      "fields" : {
+         "model" : "wifinetwork",
+         "app_label" : "selfservice"
+      },
+      "model" : "contenttypes.contenttype"
+   },
+   {
+      "model" : "contenttypes.contenttype",
+      "pk" : 19,
+      "fields" : {
+         "model" : "logentry",
+         "app_label" : "admin"
+      }
+   },
+   {
+      "model" : "contenttypes.contenttype",
+      "fields" : {
+         "app_label" : "auth",
+         "model" : "permission"
+      },
+      "pk" : 20
+   },
+   {
+      "fields" : {
+         "model" : "group",
+         "app_label" : "auth"
+      },
+      "pk" : 21,
+      "model" : "contenttypes.contenttype"
+   },
+   {
+      "fields" : {
+         "app_label" : "contenttypes",
+         "model" : "contenttype"
+      },
+      "pk" : 22,
+      "model" : "contenttypes.contenttype"
+   },
+   {
+      "model" : "contenttypes.contenttype",
+      "fields" : {
+         "model" : "session",
+         "app_label" : "sessions"
+      },
+      "pk" : 23
+   },
+   {
+      "pk" : 24,
+      "fields" : {
+         "model" : "site",
+         "app_label" : "sites"
+      },
+      "model" : "contenttypes.contenttype"
+   },
+   {
+      "model" : "sessions.session",
+      "fields" : {
+         "session_data" : "ZGMxNzgwZjQ0YzU4MWIyYTgwZTY4M2Q0MzYzMzk5ZGYzZGQ3MmExMzp7Il9hdXRoX3VzZXJfaWQiOiIxIiwiX2F1dGhfdXNlcl9iYWNrZW5kIjoiZGphbmdvLmNvbnRyaWIuYXV0aC5iYWNrZW5kcy5Nb2RlbEJhY2tlbmQiLCJfYXV0aF91c2VyX2hhc2giOiIzZjI3MDI3NzNhYzkzN2VmODIyYWMzMzc0MDEyZmNiYWZmNTUxN2Y1In0=",
+         "expire_date" : "2019-01-16T20:25:38.693Z"
+      },
+      "pk" : "3azo5poxcltmobezr6udbiz4q8urf0pn"
+   },
+   {
+      "model" : "sites.site",
+      "pk" : 1,
+      "fields" : {
+         "name" : "example.com",
+         "domain" : "example.com"
+      }
+   },
+   {
+      "pk" : 1,
+      "fields" : {
+         "codename" : "add_historicalstorage",
+         "content_type" : 1,
+         "name" : "Can add historical storage"
+      },
+      "model" : "auth.permission"
+   },
+   {
+      "model" : "auth.permission",
+      "fields" : {
+         "codename" : "change_historicalstorage",
+         "content_type" : 1,
+         "name" : "Can change historical storage"
+      },
+      "pk" : 2
+   },
+   {
+      "pk" : 3,
+      "fields" : {
+         "codename" : "delete_historicalstorage",
+         "name" : "Can delete historical storage",
+         "content_type" : 1
+      },
+      "model" : "auth.permission"
+   },
+   {
+      "model" : "auth.permission",
+      "fields" : {
+         "codename" : "view_historicalstorage",
+         "content_type" : 1,
+         "name" : "Can view historical storage"
+      },
+      "pk" : 4
+   },
+   {
+      "fields" : {
+         "codename" : "add_storage",
+         "name" : "Can add storage",
+         "content_type" : 2
+      },
+      "pk" : 5,
+      "model" : "auth.permission"
+   },
+   {
+      "pk" : 6,
+      "fields" : {
+         "codename" : "change_storage",
+         "name" : "Can change storage",
+         "content_type" : 2
+      },
+      "model" : "auth.permission"
+   },
+   {
+      "model" : "auth.permission",
+      "pk" : 7,
+      "fields" : {
+         "name" : "Can delete storage",
+         "content_type" : 2,
+         "codename" : "delete_storage"
+      }
+   },
+   {
+      "model" : "auth.permission",
+      "pk" : 8,
+      "fields" : {
+         "codename" : "view_storage",
+         "name" : "Can view storage",
+         "content_type" : 2
+      }
+   },
+   {
+      "model" : "auth.permission",
+      "fields" : {
+         "codename" : "add_historicalmemberbox",
+         "name" : "Can add historical memberbox",
+         "content_type" : 3
+      },
+      "pk" : 9
+   },
+   {
+      "model" : "auth.permission",
+      "fields" : {
+         "name" : "Can change historical memberbox",
+         "content_type" : 3,
+         "codename" : "change_historicalmemberbox"
+      },
+      "pk" : 10
+   },
+   {
+      "fields" : {
+         "codename" : "delete_historicalmemberbox",
+         "content_type" : 3,
+         "name" : "Can delete historical memberbox"
+      },
+      "pk" : 11,
+      "model" : "auth.permission"
+   },
+   {
+      "model" : "auth.permission",
+      "pk" : 12,
+      "fields" : {
+         "codename" : "view_historicalmemberbox",
+         "content_type" : 3,
+         "name" : "Can view historical memberbox"
+      }
+   },
+   {
+      "model" : "auth.permission",
+      "fields" : {
+         "codename" : "add_memberbox",
+         "content_type" : 4,
+         "name" : "Can add memberbox"
+      },
+      "pk" : 13
+   },
+   {
+      "fields" : {
+         "codename" : "change_memberbox",
+         "content_type" : 4,
+         "name" : "Can change memberbox"
+      },
+      "pk" : 14,
+      "model" : "auth.permission"
+   },
+   {
+      "fields" : {
+         "content_type" : 4,
+         "name" : "Can delete memberbox",
+         "codename" : "delete_memberbox"
+      },
+      "pk" : 15,
+      "model" : "auth.permission"
+   },
+   {
+      "model" : "auth.permission",
+      "pk" : 16,
+      "fields" : {
+         "name" : "Can view memberbox",
+         "content_type" : 4,
+         "codename" : "view_memberbox"
+      }
+   },
+   {
+      "pk" : 17,
+      "fields" : {
+         "name" : "Can add user",
+         "content_type" : 5,
+         "codename" : "add_user"
+      },
+      "model" : "auth.permission"
+   },
+   {
+      "model" : "auth.permission",
+      "pk" : 18,
+      "fields" : {
+         "name" : "Can change user",
+         "content_type" : 5,
+         "codename" : "change_user"
+      }
+   },
+   {
+      "model" : "auth.permission",
+      "fields" : {
+         "content_type" : 5,
+         "name" : "Can delete user",
+         "codename" : "delete_user"
+      },
+      "pk" : 19
+   },
+   {
+      "pk" : 20,
+      "fields" : {
+         "content_type" : 5,
+         "name" : "Can view user",
+         "codename" : "view_user"
+      },
+      "model" : "auth.permission"
+   },
+   {
+      "pk" : 21,
+      "fields" : {
+         "content_type" : 6,
+         "name" : "Can add historical tag",
+         "codename" : "add_historicaltag"
+      },
+      "model" : "auth.permission"
+   },
+   {
+      "pk" : 22,
+      "fields" : {
+         "name" : "Can change historical tag",
+         "content_type" : 6,
+         "codename" : "change_historicaltag"
+      },
+      "model" : "auth.permission"
+   },
+   {
+      "fields" : {
+         "codename" : "delete_historicaltag",
+         "name" : "Can delete historical tag",
+         "content_type" : 6
+      },
+      "pk" : 23,
+      "model" : "auth.permission"
+   },
+   {
+      "pk" : 24,
+      "fields" : {
+         "name" : "Can view historical tag",
+         "content_type" : 6,
+         "codename" : "view_historicaltag"
+      },
+      "model" : "auth.permission"
+   },
+   {
+      "fields" : {
+         "name" : "Can add historical user",
+         "content_type" : 7,
+         "codename" : "add_historicaluser"
+      },
+      "pk" : 25,
+      "model" : "auth.permission"
+   },
+   {
+      "pk" : 26,
+      "fields" : {
+         "codename" : "change_historicaluser",
+         "name" : "Can change historical user",
+         "content_type" : 7
+      },
+      "model" : "auth.permission"
+   },
+   {
+      "model" : "auth.permission",
+      "fields" : {
+         "codename" : "delete_historicaluser",
+         "name" : "Can delete historical user",
+         "content_type" : 7
+      },
+      "pk" : 27
+   },
+   {
+      "fields" : {
+         "name" : "Can view historical user",
+         "content_type" : 7,
+         "codename" : "view_historicaluser"
+      },
+      "pk" : 28,
+      "model" : "auth.permission"
+   },
+   {
+      "pk" : 29,
+      "fields" : {
+         "codename" : "add_tag",
+         "name" : "Can add tag",
+         "content_type" : 8
+      },
+      "model" : "auth.permission"
+   },
+   {
+      "fields" : {
+         "content_type" : 8,
+         "name" : "Can change tag",
+         "codename" : "change_tag"
+      },
+      "pk" : 30,
+      "model" : "auth.permission"
+   },
+   {
+      "pk" : 31,
+      "fields" : {
+         "name" : "Can delete tag",
+         "content_type" : 8,
+         "codename" : "delete_tag"
+      },
+      "model" : "auth.permission"
+   },
+   {
+      "model" : "auth.permission",
+      "pk" : 32,
+      "fields" : {
+         "content_type" : 8,
+         "name" : "Can view tag",
+         "codename" : "view_tag"
+      }
+   },
+   {
+      "pk" : 33,
+      "fields" : {
+         "codename" : "add_entitlement",
+         "content_type" : 9,
+         "name" : "Can add entitlement"
+      },
+      "model" : "auth.permission"
+   },
+   {
+      "model" : "auth.permission",
+      "fields" : {
+         "codename" : "change_entitlement",
+         "name" : "Can change entitlement",
+         "content_type" : 9
+      },
+      "pk" : 34
+   },
+   {
+      "model" : "auth.permission",
+      "fields" : {
+         "codename" : "delete_entitlement",
+         "content_type" : 9,
+         "name" : "Can delete entitlement"
+      },
+      "pk" : 35
+   },
+   {
+      "model" : "auth.permission",
+      "pk" : 36,
+      "fields" : {
+         "name" : "Can view entitlement",
+         "content_type" : 9,
+         "codename" : "view_entitlement"
+      }
+   },
+   {
+      "model" : "auth.permission",
+      "fields" : {
+         "codename" : "add_historicalentitlement",
+         "name" : "Can add historical entitlement",
+         "content_type" : 10
+      },
+      "pk" : 37
+   },
+   {
+      "pk" : 38,
+      "fields" : {
+         "codename" : "change_historicalentitlement",
+         "content_type" : 10,
+         "name" : "Can change historical entitlement"
+      },
+      "model" : "auth.permission"
+   },
+   {
+      "fields" : {
+         "codename" : "delete_historicalentitlement",
+         "name" : "Can delete historical entitlement",
+         "content_type" : 10
+      },
+      "pk" : 39,
+      "model" : "auth.permission"
+   },
+   {
+      "pk" : 40,
+      "fields" : {
+         "codename" : "view_historicalentitlement",
+         "content_type" : 10,
+         "name" : "Can view historical entitlement"
+      },
+      "model" : "auth.permission"
+   },
+   {
+      "pk" : 41,
+      "fields" : {
+         "codename" : "add_historicallocation",
+         "name" : "Can add historical location",
+         "content_type" : 11
+      },
+      "model" : "auth.permission"
+   },
+   {
+      "model" : "auth.permission",
+      "pk" : 42,
+      "fields" : {
+         "content_type" : 11,
+         "name" : "Can change historical location",
+         "codename" : "change_historicallocation"
+      }
+   },
+   {
+      "model" : "auth.permission",
+      "pk" : 43,
+      "fields" : {
+         "name" : "Can delete historical location",
+         "content_type" : 11,
+         "codename" : "delete_historicallocation"
+      }
+   },
+   {
+      "pk" : 44,
+      "fields" : {
+         "codename" : "view_historicallocation",
+         "name" : "Can view historical location",
+         "content_type" : 11
+      },
+      "model" : "auth.permission"
+   },
+   {
+      "model" : "auth.permission",
+      "fields" : {
+         "content_type" : 12,
+         "name" : "Can add historical machine",
+         "codename" : "add_historicalmachine"
+      },
+      "pk" : 45
+   },
+   {
+      "model" : "auth.permission",
+      "pk" : 46,
+      "fields" : {
+         "codename" : "change_historicalmachine",
+         "name" : "Can change historical machine",
+         "content_type" : 12
+      }
+   },
+   {
+      "fields" : {
+         "codename" : "delete_historicalmachine",
+         "content_type" : 12,
+         "name" : "Can delete historical machine"
+      },
+      "pk" : 47,
+      "model" : "auth.permission"
+   },
+   {
+      "model" : "auth.permission",
+      "pk" : 48,
+      "fields" : {
+         "name" : "Can view historical machine",
+         "content_type" : 12,
+         "codename" : "view_historicalmachine"
+      }
+   },
+   {
+      "pk" : 49,
+      "fields" : {
+         "codename" : "add_historicalpermittype",
+         "name" : "Can add historical permit type",
+         "content_type" : 13
+      },
+      "model" : "auth.permission"
+   },
+   {
+      "model" : "auth.permission",
+      "pk" : 50,
+      "fields" : {
+         "name" : "Can change historical permit type",
+         "content_type" : 13,
+         "codename" : "change_historicalpermittype"
+      }
+   },
+   {
+      "model" : "auth.permission",
+      "fields" : {
+         "codename" : "delete_historicalpermittype",
+         "content_type" : 13,
+         "name" : "Can delete historical permit type"
+      },
+      "pk" : 51
+   },
+   {
+      "fields" : {
+         "content_type" : 13,
+         "name" : "Can view historical permit type",
+         "codename" : "view_historicalpermittype"
+      },
+      "pk" : 52,
+      "model" : "auth.permission"
+   },
+   {
+      "model" : "auth.permission",
+      "fields" : {
+         "codename" : "add_location",
+         "content_type" : 14,
+         "name" : "Can add location"
+      },
+      "pk" : 53
+   },
+   {
+      "model" : "auth.permission",
+      "pk" : 54,
+      "fields" : {
+         "codename" : "change_location",
+         "content_type" : 14,
+         "name" : "Can change location"
+      }
+   },
+   {
+      "model" : "auth.permission",
+      "fields" : {
+         "codename" : "delete_location",
+         "name" : "Can delete location",
+         "content_type" : 14
+      },
+      "pk" : 55
+   },
+   {
+      "model" : "auth.permission",
+      "fields" : {
+         "content_type" : 14,
+         "name" : "Can view location",
+         "codename" : "view_location"
+      },
+      "pk" : 56
+   },
+   {
+      "pk" : 57,
+      "fields" : {
+         "content_type" : 15,
+         "name" : "Can add machine",
+         "codename" : "add_machine"
+      },
+      "model" : "auth.permission"
+   },
+   {
+      "model" : "auth.permission",
+      "fields" : {
+         "codename" : "change_machine",
+         "content_type" : 15,
+         "name" : "Can change machine"
+      },
+      "pk" : 58
+   },
+   {
+      "fields" : {
+         "codename" : "delete_machine",
+         "name" : "Can delete machine",
+         "content_type" : 15
+      },
+      "pk" : 59,
+      "model" : "auth.permission"
+   },
+   {
+      "model" : "auth.permission",
+      "fields" : {
+         "codename" : "view_machine",
+         "name" : "Can view machine",
+         "content_type" : 15
+      },
+      "pk" : 60
+   },
+   {
+      "model" : "auth.permission",
+      "pk" : 61,
+      "fields" : {
+         "codename" : "add_permittype",
+         "name" : "Can add permit type",
+         "content_type" : 16
+      }
+   },
+   {
+      "pk" : 62,
+      "fields" : {
+         "content_type" : 16,
+         "name" : "Can change permit type",
+         "codename" : "change_permittype"
+      },
+      "model" : "auth.permission"
+   },
+   {
+      "model" : "auth.permission",
+      "pk" : 63,
+      "fields" : {
+         "content_type" : 16,
+         "name" : "Can delete permit type",
+         "codename" : "delete_permittype"
+      }
+   },
+   {
+      "fields" : {
+         "name" : "Can view permit type",
+         "content_type" : 16,
+         "codename" : "view_permittype"
+      },
+      "pk" : 64,
+      "model" : "auth.permission"
+   },
+   {
+      "fields" : {
+         "codename" : "add_historicalwifinetwork",
+         "content_type" : 17,
+         "name" : "Can add historical wi fi network"
+      },
+      "pk" : 65,
+      "model" : "auth.permission"
+   },
+   {
+      "model" : "auth.permission",
+      "pk" : 66,
+      "fields" : {
+         "content_type" : 17,
+         "name" : "Can change historical wi fi network",
+         "codename" : "change_historicalwifinetwork"
+      }
+   },
+   {
+      "model" : "auth.permission",
+      "pk" : 67,
+      "fields" : {
+         "codename" : "delete_historicalwifinetwork",
+         "name" : "Can delete historical wi fi network",
+         "content_type" : 17
+      }
+   },
+   {
+      "model" : "auth.permission",
+      "pk" : 68,
+      "fields" : {
+         "codename" : "view_historicalwifinetwork",
+         "content_type" : 17,
+         "name" : "Can view historical wi fi network"
+      }
+   },
+   {
+      "fields" : {
+         "name" : "Can add wi fi network",
+         "content_type" : 18,
+         "codename" : "add_wifinetwork"
+      },
+      "pk" : 69,
+      "model" : "auth.permission"
+   },
+   {
+      "model" : "auth.permission",
+      "pk" : 70,
+      "fields" : {
+         "name" : "Can change wi fi network",
+         "content_type" : 18,
+         "codename" : "change_wifinetwork"
+      }
+   },
+   {
+      "fields" : {
+         "codename" : "delete_wifinetwork",
+         "name" : "Can delete wi fi network",
+         "content_type" : 18
+      },
+      "pk" : 71,
+      "model" : "auth.permission"
+   },
+   {
+      "model" : "auth.permission",
+      "fields" : {
+         "name" : "Can view wi fi network",
+         "content_type" : 18,
+         "codename" : "view_wifinetwork"
+      },
+      "pk" : 72
+   },
+   {
+      "model" : "auth.permission",
+      "pk" : 73,
+      "fields" : {
+         "name" : "Can add log entry",
+         "content_type" : 19,
+         "codename" : "add_logentry"
+      }
+   },
+   {
+      "pk" : 74,
+      "fields" : {
+         "codename" : "change_logentry",
+         "name" : "Can change log entry",
+         "content_type" : 19
+      },
+      "model" : "auth.permission"
+   },
+   {
+      "model" : "auth.permission",
+      "fields" : {
+         "content_type" : 19,
+         "name" : "Can delete log entry",
+         "codename" : "delete_logentry"
+      },
+      "pk" : 75
+   },
+   {
+      "pk" : 76,
+      "fields" : {
+         "content_type" : 19,
+         "name" : "Can view log entry",
+         "codename" : "view_logentry"
+      },
+      "model" : "auth.permission"
+   },
+   {
+      "pk" : 77,
+      "fields" : {
+         "codename" : "add_permission",
+         "content_type" : 20,
+         "name" : "Can add permission"
+      },
+      "model" : "auth.permission"
+   },
+   {
+      "pk" : 78,
+      "fields" : {
+         "codename" : "change_permission",
+         "content_type" : 20,
+         "name" : "Can change permission"
+      },
+      "model" : "auth.permission"
+   },
+   {
+      "pk" : 79,
+      "fields" : {
+         "codename" : "delete_permission",
+         "content_type" : 20,
+         "name" : "Can delete permission"
+      },
+      "model" : "auth.permission"
+   },
+   {
+      "model" : "auth.permission",
+      "fields" : {
+         "name" : "Can view permission",
+         "content_type" : 20,
+         "codename" : "view_permission"
+      },
+      "pk" : 80
+   },
+   {
+      "model" : "auth.permission",
+      "pk" : 81,
+      "fields" : {
+         "name" : "Can add group",
+         "content_type" : 21,
+         "codename" : "add_group"
+      }
+   },
+   {
+      "pk" : 82,
+      "fields" : {
+         "name" : "Can change group",
+         "content_type" : 21,
+         "codename" : "change_group"
+      },
+      "model" : "auth.permission"
+   },
+   {
+      "pk" : 83,
+      "fields" : {
+         "codename" : "delete_group",
+         "content_type" : 21,
+         "name" : "Can delete group"
+      },
+      "model" : "auth.permission"
+   },
+   {
+      "model" : "auth.permission",
+      "fields" : {
+         "codename" : "view_group",
+         "content_type" : 21,
+         "name" : "Can view group"
+      },
+      "pk" : 84
+   },
+   {
+      "pk" : 85,
+      "fields" : {
+         "content_type" : 22,
+         "name" : "Can add content type",
+         "codename" : "add_contenttype"
+      },
+      "model" : "auth.permission"
+   },
+   {
+      "model" : "auth.permission",
+      "fields" : {
+         "codename" : "change_contenttype",
+         "name" : "Can change content type",
+         "content_type" : 22
+      },
+      "pk" : 86
+   },
+   {
+      "fields" : {
+         "codename" : "delete_contenttype",
+         "name" : "Can delete content type",
+         "content_type" : 22
+      },
+      "pk" : 87,
+      "model" : "auth.permission"
+   },
+   {
+      "model" : "auth.permission",
+      "fields" : {
+         "codename" : "view_contenttype",
+         "name" : "Can view content type",
+         "content_type" : 22
+      },
+      "pk" : 88
+   },
+   {
+      "model" : "auth.permission",
+      "fields" : {
+         "codename" : "add_session",
+         "name" : "Can add session",
+         "content_type" : 23
+      },
+      "pk" : 89
+   },
+   {
+      "pk" : 90,
+      "fields" : {
+         "codename" : "change_session",
+         "name" : "Can change session",
+         "content_type" : 23
+      },
+      "model" : "auth.permission"
+   },
+   {
+      "model" : "auth.permission",
+      "fields" : {
+         "name" : "Can delete session",
+         "content_type" : 23,
+         "codename" : "delete_session"
+      },
+      "pk" : 91
+   },
+   {
+      "model" : "auth.permission",
+      "pk" : 92,
+      "fields" : {
+         "codename" : "view_session",
+         "name" : "Can view session",
+         "content_type" : 23
+      }
+   },
+   {
+      "model" : "auth.permission",
+      "fields" : {
+         "name" : "Can add site",
+         "content_type" : 24,
+         "codename" : "add_site"
+      },
+      "pk" : 93
+   },
+   {
+      "model" : "auth.permission",
+      "pk" : 94,
+      "fields" : {
+         "content_type" : 24,
+         "name" : "Can change site",
+         "codename" : "change_site"
+      }
+   },
+   {
+      "pk" : 95,
+      "fields" : {
+         "codename" : "delete_site",
+         "name" : "Can delete site",
+         "content_type" : 24
+      },
+      "model" : "auth.permission"
+   },
+   {
+      "model" : "auth.permission",
+      "pk" : 96,
+      "fields" : {
+         "codename" : "view_site",
+         "content_type" : 24,
+         "name" : "Can view site"
+      }
+   },
+   {
+      "pk" : 1,
+      "fields" : {
+         "first_name" : "('Ad',)",
+         "user_permissions" : [],
+         "last_name" : "Min",
+         "is_active" : true,
+         "form_on_file" : false,
+         "groups" : [],
+         "email" : "admin@admin.nl",
+         "is_superuser" : true,
+         "email_confirmed" : false,
+         "date_joined" : "2019-01-02T20:25:26.383Z",
+         "last_login" : "2019-01-02T20:25:38.681Z",
+         "password" : "pbkdf2_sha256$120000$TY4hMK9jYxkN$0BEbC+38ajbxDd4uakNP/FPTUUy7cmIWDy9y5VSqQ9A=",
+         "is_staff" : true
+      },
+      "model" : "members.user"
+   },
+   {
+      "model" : "members.user",
+      "fields" : {
+         "last_name" : "Trustuee",
+         "is_active" : true,
+         "form_on_file" : true,
+         "first_name" : "Theo",
+         "user_permissions" : [],
+         "password" : "pbkdf2_sha256$120000$eqrt8m4dux5r$IPKRtAT8TzQk4TJS1iqfpgVzvAVNK05pqFF7AHGXYrg=",
+         "is_staff" : true,
+         "groups" : [],
+         "email_confirmed" : true,
+         "is_superuser" : false,
+         "email" : "theo.trustee@makerspaceleiden.nl",
+         "date_joined" : "2019-01-02T20:25:26Z",
+         "last_login" : null
+      },
+      "pk" : 2
+   },
+   {
+      "pk" : 3,
+      "fields" : {
+         "is_staff" : false,
+         "password" : "pbkdf2_sha256$120000$eflktFQDbnic$ufdAAYN8bn85NuKf0lCR4T2bPC9c3YfqKauydfY08KU=",
+         "last_login" : null,
+         "date_joined" : "2019-01-02T20:25:26.757Z",
+         "is_superuser" : false,
+         "email_confirmed" : false,
+         "email" : "ida.instruct@makerspaceleiden.nl",
+         "groups" : [],
+         "form_on_file" : true,
+         "is_active" : true,
+         "last_name" : "Instructor",
+         "user_permissions" : [],
+         "first_name" : "Ida"
+      },
+      "model" : "members.user"
+   },
+   {
+      "fields" : {
+         "password" : "pbkdf2_sha256$120000$7e6tseRdos9P$G63i47OXNk3XVgqkmjcB/QW0YmSg3xYZ8lNwe2alb5Y=",
+         "is_staff" : false,
+         "date_joined" : "2019-01-02T20:25:27.068Z",
+         "last_login" : null,
+         "groups" : [],
+         "email" : "mary.maker@makerspaceleiden.nl",
+         "email_confirmed" : false,
+         "is_superuser" : false,
+         "is_active" : true,
+         "form_on_file" : true,
+         "last_name" : "Maker",
+         "user_permissions" : [],
+         "first_name" : "Mary"
+      },
+      "pk" : 4,
+      "model" : "members.user"
+   },
+   {
+      "model" : "members.user",
+      "fields" : {
+         "is_active" : true,
+         "form_on_file" : false,
+         "last_name" : "Plain",
+         "user_permissions" : [],
+         "first_name" : "Peter",
+         "password" : "pbkdf2_sha256$120000$oHALNvRPf3Xp$lLthEcRxW3WQSVIzWha0AH3pFdCfwrjwW1Wxl0PMJqg=",
+         "is_staff" : false,
+         "date_joined" : "2019-01-02T20:25:27.266Z",
+         "last_login" : null,
+         "groups" : [],
+         "email" : "peter.plain@makerspaceleiden.nl",
+         "email_confirmed" : false,
+         "is_superuser" : false
+      },
+      "pk" : 5
+   },
+   {
+      "pk" : 6,
+      "fields" : {
+         "password" : "pbkdf2_sha256$120000$h3zvvUxWPIEm$zkLQFdjVMtyNB+444ir29HnVMPS1CEeLSe7XvGCSYx4=",
+         "is_staff" : false,
+         "date_joined" : "2019-01-02T20:25:27.418Z",
+         "last_login" : null,
+         "groups" : [],
+         "email_confirmed" : false,
+         "is_superuser" : false,
+         "email" : "tom.tags@makerspaceleiden.nl",
+         "is_active" : true,
+         "form_on_file" : false,
+         "last_name" : "LotsATags",
+         "user_permissions" : [],
+         "first_name" : "Tom"
+      },
+      "model" : "members.user"
+   },
+   {
+      "pk" : 7,
+      "fields" : {
+         "user_permissions" : [],
+         "first_name" : "Mary",
+         "is_active" : true,
+         "form_on_file" : true,
+         "last_name" : "Metal",
+         "date_joined" : "2019-01-02T20:25:27.582Z",
+         "last_login" : null,
+         "groups" : [],
+         "is_superuser" : false,
+         "email_confirmed" : false,
+         "email" : "mary.metal@makerspaceleiden.nl",
+         "password" : "pbkdf2_sha256$120000$wmOanOhjsgdb$V1HeooPnxfIt3TtR3UTd5BDSzn/T9Ysf4+HAGhYJV+8=",
+         "is_staff" : false
+      },
+      "model" : "members.user"
+   },
+   {
+      "model" : "members.user",
+      "pk" : 8,
+      "fields" : {
+         "password" : "pbkdf2_sha256$120000$u8ih7cFF7p9t$YPYTucVPfNp48mJnSI3FAjcaRILbuZfofbP9/N/KALY=",
+         "is_staff" : false,
+         "groups" : [],
+         "is_superuser" : false,
+         "email_confirmed" : false,
+         "email" : "mike.newmetal@makerspaceleiden.nl",
+         "date_joined" : "2019-01-02T20:25:27.835Z",
+         "last_login" : null,
+         "last_name" : "Newmetal",
+         "is_active" : true,
+         "form_on_file" : true,
+         "first_name" : "Mike",
+         "user_permissions" : []
+      }
+   },
+   {
+      "model" : "members.historicaluser",
+      "pk" : 1,
+      "fields" : {
+         "history_change_reason" : null,
+         "password" : "pbkdf2_sha256$120000$TY4hMK9jYxkN$0BEbC+38ajbxDd4uakNP/FPTUUy7cmIWDy9y5VSqQ9A=",
+         "is_staff" : true,
+         "history_date" : "2019-01-02T20:25:26.477Z",
+         "email" : "admin@admin.nl",
+         "is_superuser" : true,
+         "email_confirmed" : false,
+         "date_joined" : "2019-01-02T20:25:26.383Z",
+         "history_user" : null,
+         "last_login" : null,
+         "history_type" : "+",
+         "last_name" : "",
+         "is_active" : true,
+         "id" : 1,
+         "form_on_file" : false,
+         "first_name" : ""
+      }
+   },
+   {
+      "model" : "members.historicaluser",
+      "fields" : {
+         "is_active" : true,
+         "id" : 1,
+         "form_on_file" : false,
+         "last_name" : "Min",
+         "first_name" : "('Ad',)",
+         "password" : "pbkdf2_sha256$120000$TY4hMK9jYxkN$0BEbC+38ajbxDd4uakNP/FPTUUy7cmIWDy9y5VSqQ9A=",
+         "is_staff" : true,
+         "history_change_reason" : null,
+         "history_user" : null,
+         "date_joined" : "2019-01-02T20:25:26.383Z",
+         "last_login" : null,
+         "history_type" : "~",
+         "history_date" : "2019-01-02T20:25:26.496Z",
+         "email" : "admin@admin.nl",
+         "is_superuser" : true,
+         "email_confirmed" : false
+      },
+      "pk" : 2
+   },
+   {
+      "model" : "members.historicaluser",
+      "fields" : {
+         "email_confirmed" : false,
+         "is_superuser" : false,
+         "email" : "theo.trustee@makerspaceleiden.nl",
+         "history_date" : "2019-01-02T20:25:26.522Z",
+         "history_type" : "+",
+         "last_login" : null,
+         "history_user" : null,
+         "date_joined" : "2019-01-02T20:25:26.522Z",
+         "history_change_reason" : null,
+         "is_staff" : false,
+         "password" : "",
+         "first_name" : "",
+         "last_name" : "",
+         "form_on_file" : false,
+         "id" : 2,
+         "is_active" : true
+      },
+      "pk" : 3
+   },
+   {
+      "fields" : {
+         "history_change_reason" : null,
+         "password" : "pbkdf2_sha256$120000$eqrt8m4dux5r$IPKRtAT8TzQk4TJS1iqfpgVzvAVNK05pqFF7AHGXYrg=",
+         "is_staff" : false,
+         "history_date" : "2019-01-02T20:25:26.618Z",
+         "is_superuser" : false,
+         "email_confirmed" : false,
+         "email" : "theo.trustee@makerspaceleiden.nl",
+         "date_joined" : "2019-01-02T20:25:26.522Z",
+         "history_user" : null,
+         "history_type" : "~",
+         "last_login" : null,
+         "last_name" : "Trustuee",
+         "is_active" : true,
+         "form_on_file" : true,
+         "id" : 2,
+         "first_name" : "Theo"
+      },
+      "pk" : 4,
+      "model" : "members.historicaluser"
+   },
+   {
+      "pk" : 5,
+      "fields" : {
+         "first_name" : "",
+         "is_active" : true,
+         "id" : 3,
+         "form_on_file" : false,
+         "last_name" : "",
+         "history_user" : null,
+         "date_joined" : "2019-01-02T20:25:26.757Z",
+         "last_login" : null,
+         "history_type" : "+",
+         "history_date" : "2019-01-02T20:25:26.758Z",
+         "email" : "ida.instruct@makerspaceleiden.nl",
+         "email_confirmed" : false,
+         "is_superuser" : false,
+         "password" : "",
+         "is_staff" : false,
+         "history_change_reason" : null
+      },
+      "model" : "members.historicaluser"
+   },
+   {
+      "model" : "members.historicaluser",
+      "fields" : {
+         "last_name" : "Instructor",
+         "is_active" : true,
+         "id" : 3,
+         "form_on_file" : true,
+         "first_name" : "Ida",
+         "history_change_reason" : null,
+         "password" : "pbkdf2_sha256$120000$eflktFQDbnic$ufdAAYN8bn85NuKf0lCR4T2bPC9c3YfqKauydfY08KU=",
+         "is_staff" : false,
+         "history_date" : "2019-01-02T20:25:26.858Z",
+         "email" : "ida.instruct@makerspaceleiden.nl",
+         "is_superuser" : false,
+         "email_confirmed" : false,
+         "history_user" : null,
+         "date_joined" : "2019-01-02T20:25:26.757Z",
+         "last_login" : null,
+         "history_type" : "~"
+      },
+      "pk" : 6
+   },
+   {
+      "model" : "members.historicaluser",
+      "fields" : {
+         "id" : 4,
+         "form_on_file" : false,
+         "is_active" : true,
+         "last_name" : "",
+         "first_name" : "",
+         "is_staff" : false,
+         "password" : "",
+         "history_change_reason" : null,
+         "last_login" : null,
+         "history_type" : "+",
+         "history_user" : null,
+         "date_joined" : "2019-01-02T20:25:27.068Z",
+         "email" : "mary.maker@makerspaceleiden.nl",
+         "email_confirmed" : false,
+         "is_superuser" : false,
+         "history_date" : "2019-01-02T20:25:27.068Z"
+      },
+      "pk" : 7
+   },
+   {
+      "model" : "members.historicaluser",
+      "pk" : 8,
+      "fields" : {
+         "history_change_reason" : null,
+         "is_staff" : false,
+         "password" : "pbkdf2_sha256$120000$7e6tseRdos9P$G63i47OXNk3XVgqkmjcB/QW0YmSg3xYZ8lNwe2alb5Y=",
+         "email" : "mary.maker@makerspaceleiden.nl",
+         "is_superuser" : false,
+         "email_confirmed" : false,
+         "history_date" : "2019-01-02T20:25:27.167Z",
+         "last_login" : null,
+         "history_type" : "~",
+         "date_joined" : "2019-01-02T20:25:27.068Z",
+         "history_user" : null,
+         "last_name" : "Maker",
+         "id" : 4,
+         "form_on_file" : true,
+         "is_active" : true,
+         "first_name" : "Mary"
+      }
+   },
+   {
+      "fields" : {
+         "first_name" : "",
+         "last_name" : "",
+         "is_active" : true,
+         "id" : 5,
+         "form_on_file" : false,
+         "history_date" : "2019-01-02T20:25:27.266Z",
+         "email" : "peter.plain@makerspaceleiden.nl",
+         "is_superuser" : false,
+         "email_confirmed" : false,
+         "history_user" : null,
+         "date_joined" : "2019-01-02T20:25:27.266Z",
+         "last_login" : null,
+         "history_type" : "+",
+         "history_change_reason" : null,
+         "password" : "",
+         "is_staff" : false
+      },
+      "pk" : 9,
+      "model" : "members.historicaluser"
+   },
+   {
+      "pk" : 10,
+      "fields" : {
+         "first_name" : "Peter",
+         "id" : 5,
+         "form_on_file" : false,
+         "is_active" : true,
+         "last_name" : "Plain",
+         "last_login" : null,
+         "history_type" : "~",
+         "date_joined" : "2019-01-02T20:25:27.266Z",
+         "history_user" : null,
+         "email" : "peter.plain@makerspaceleiden.nl",
+         "is_superuser" : false,
+         "email_confirmed" : false,
+         "history_date" : "2019-01-02T20:25:27.364Z",
+         "is_staff" : false,
+         "password" : "pbkdf2_sha256$120000$oHALNvRPf3Xp$lLthEcRxW3WQSVIzWha0AH3pFdCfwrjwW1Wxl0PMJqg=",
+         "history_change_reason" : null
+      },
+      "model" : "members.historicaluser"
+   },
+   {
+      "model" : "members.historicaluser",
+      "fields" : {
+         "last_name" : "",
+         "is_active" : true,
+         "form_on_file" : false,
+         "id" : 6,
+         "first_name" : "",
+         "history_change_reason" : null,
+         "password" : "",
+         "is_staff" : false,
+         "history_date" : "2019-01-02T20:25:27.419Z",
+         "is_superuser" : false,
+         "email_confirmed" : false,
+         "email" : "tom.tags@makerspaceleiden.nl",
+         "history_user" : null,
+         "date_joined" : "2019-01-02T20:25:27.418Z",
+         "history_type" : "+",
+         "last_login" : null
+      },
+      "pk" : 11
+   },
+   {
+      "model" : "members.historicaluser",
+      "fields" : {
+         "history_change_reason" : null,
+         "password" : "pbkdf2_sha256$120000$h3zvvUxWPIEm$zkLQFdjVMtyNB+444ir29HnVMPS1CEeLSe7XvGCSYx4=",
+         "is_staff" : false,
+         "history_date" : "2019-01-02T20:25:27.510Z",
+         "is_superuser" : false,
+         "email_confirmed" : false,
+         "email" : "tom.tags@makerspaceleiden.nl",
+         "date_joined" : "2019-01-02T20:25:27.418Z",
+         "history_user" : null,
+         "history_type" : "~",
+         "last_login" : null,
+         "last_name" : "LotsATags",
+         "is_active" : true,
+         "form_on_file" : false,
+         "id" : 6,
+         "first_name" : "Tom"
+      },
+      "pk" : 12
+   },
+   {
+      "model" : "members.historicaluser",
+      "pk" : 13,
+      "fields" : {
+         "is_superuser" : false,
+         "email_confirmed" : false,
+         "email" : "mary.metal@makerspaceleiden.nl",
+         "history_date" : "2019-01-02T20:25:27.583Z",
+         "history_type" : "+",
+         "last_login" : null,
+         "date_joined" : "2019-01-02T20:25:27.582Z",
+         "history_user" : null,
+         "history_change_reason" : null,
+         "is_staff" : false,
+         "password" : "",
+         "first_name" : "",
+         "last_name" : "",
+         "form_on_file" : false,
+         "id" : 7,
+         "is_active" : true
+      }
+   },
+   {
+      "model" : "members.historicaluser",
+      "pk" : 14,
+      "fields" : {
+         "is_active" : true,
+         "form_on_file" : true,
+         "id" : 7,
+         "last_name" : "Metal",
+         "first_name" : "Mary",
+         "password" : "pbkdf2_sha256$120000$wmOanOhjsgdb$V1HeooPnxfIt3TtR3UTd5BDSzn/T9Ysf4+HAGhYJV+8=",
+         "is_staff" : false,
+         "history_change_reason" : null,
+         "date_joined" : "2019-01-02T20:25:27.582Z",
+         "history_user" : null,
+         "history_type" : "~",
+         "last_login" : null,
+         "history_date" : "2019-01-02T20:25:27.681Z",
+         "email_confirmed" : false,
+         "is_superuser" : false,
+         "email" : "mary.metal@makerspaceleiden.nl"
+      }
+   },
+   {
+      "model" : "members.historicaluser",
+      "fields" : {
+         "first_name" : "",
+         "last_name" : "",
+         "is_active" : true,
+         "id" : 8,
+         "form_on_file" : false,
+         "history_date" : "2019-01-02T20:25:27.835Z",
+         "email" : "mike.newmetal@makerspaceleiden.nl",
+         "email_confirmed" : false,
+         "is_superuser" : false,
+         "history_user" : null,
+         "date_joined" : "2019-01-02T20:25:27.835Z",
+         "last_login" : null,
+         "history_type" : "+",
+         "history_change_reason" : null,
+         "password" : "",
+         "is_staff" : false
+      },
+      "pk" : 15
+   },
+   {
+      "fields" : {
+         "history_date" : "2019-01-02T20:25:27.934Z",
+         "email_confirmed" : false,
+         "is_superuser" : false,
+         "email" : "mike.newmetal@makerspaceleiden.nl",
+         "date_joined" : "2019-01-02T20:25:27.835Z",
+         "history_user" : null,
+         "history_type" : "~",
+         "last_login" : null,
+         "history_change_reason" : null,
+         "password" : "pbkdf2_sha256$120000$u8ih7cFF7p9t$YPYTucVPfNp48mJnSI3FAjcaRILbuZfofbP9/N/KALY=",
+         "is_staff" : false,
+         "first_name" : "Mike",
+         "last_name" : "Newmetal",
+         "is_active" : true,
+         "form_on_file" : true,
+         "id" : 8
+      },
+      "pk" : 16,
+      "model" : "members.historicaluser"
+   },
+   {
+      "model" : "members.historicaluser",
+      "pk" : 17,
+      "fields" : {
+         "id" : 1,
+         "form_on_file" : false,
+         "is_active" : true,
+         "last_name" : "Min",
+         "first_name" : "('Ad',)",
+         "is_staff" : true,
+         "password" : "pbkdf2_sha256$120000$TY4hMK9jYxkN$0BEbC+38ajbxDd4uakNP/FPTUUy7cmIWDy9y5VSqQ9A=",
+         "history_change_reason" : null,
+         "last_login" : "2019-01-02T20:25:38.681Z",
+         "history_type" : "~",
+         "date_joined" : "2019-01-02T20:25:26.383Z",
+         "history_user" : 1,
+         "email" : "admin@admin.nl",
+         "is_superuser" : true,
+         "email_confirmed" : false,
+         "history_date" : "2019-01-02T20:25:38.687Z"
+      }
+   },
+   {
+      "model" : "members.historicaluser",
+      "pk" : 18,
+      "fields" : {
+         "history_date" : "2019-01-02T20:30:12.448Z",
+         "email_confirmed" : true,
+         "is_superuser" : false,
+         "email" : "theo.trustee@makerspaceleiden.nl",
+         "date_joined" : "2019-01-02T20:25:26Z",
+         "history_user" : 1,
+         "history_type" : "~",
+         "last_login" : null,
+         "history_change_reason" : null,
+         "password" : "pbkdf2_sha256$120000$eqrt8m4dux5r$IPKRtAT8TzQk4TJS1iqfpgVzvAVNK05pqFF7AHGXYrg=",
+         "is_staff" : true,
+         "first_name" : "Theo",
+         "last_name" : "Trustuee",
+         "is_active" : true,
+         "form_on_file" : true,
+         "id" : 2
+      }
+   },
+   {
+      "model" : "memberbox.memberbox",
+      "fields" : {
+         "location" : "L33",
+         "owner" : 2,
+         "extra_info" : "Various tins of paint"
+      },
+      "pk" : 1
+   },
+   {
+      "pk" : 2,
+      "fields" : {
+         "owner" : 3,
+         "extra_info" : "Small carton box",
+         "location" : "L11"
+      },
+      "model" : "memberbox.memberbox"
+   },
+   {
+      "fields" : {
+         "location" : "L21",
+         "extra_info" : "Red box with wires sticking out",
+         "owner" : 4
+      },
+      "pk" : 3,
+      "model" : "memberbox.memberbox"
+   },
+   {
+      "pk" : 4,
+      "fields" : {
+         "location" : "L32",
+         "extra_info" : "Blue crate",
+         "owner" : 5
+      },
+      "model" : "memberbox.memberbox"
+   },
+   {
+      "pk" : 5,
+      "fields" : {
+         "owner" : 6,
+         "extra_info" : "Pile of glass",
+         "location" : "L41"
+      },
+      "model" : "memberbox.memberbox"
+   },
+   {
+      "pk" : 6,
+      "fields" : {
+         "extra_info" : "My stuff - do no touch it !",
+         "owner" : 7,
+         "location" : "L53"
+      },
+      "model" : "memberbox.memberbox"
+   },
+   {
+      "fields" : {
+         "extra_info" : "my tuff",
+         "owner" : 8,
+         "location" : "L31"
+      },
+      "pk" : 7,
+      "model" : "memberbox.memberbox"
+   },
+   {
+      "fields" : {
+         "history_user" : null,
+         "history_type" : "+",
+         "id" : 1,
+         "history_date" : "2019-01-02T20:25:26.738Z",
+         "location" : "L00",
+         "history_change_reason" : null,
+         "owner" : 2,
+         "extra_info" : ""
+      },
+      "pk" : 1,
+      "model" : "memberbox.historicalmemberbox"
+   },
+   {
+      "model" : "memberbox.historicalmemberbox",
+      "pk" : 2,
+      "fields" : {
+         "id" : 1,
+         "history_type" : "~",
+         "history_user" : null,
+         "extra_info" : "",
+         "owner" : 2,
+         "history_change_reason" : null,
+         "location" : "L00",
+         "history_date" : "2019-01-02T20:25:26.750Z"
+      }
+   },
+   {
+      "pk" : 3,
+      "fields" : {
+         "location" : "L10",
+         "history_date" : "2019-01-02T20:25:27.049Z",
+         "extra_info" : "",
+         "owner" : 3,
+         "history_change_reason" : null,
+         "history_user" : null,
+         "id" : 2,
+         "history_type" : "+"
+      },
+      "model" : "memberbox.historicalmemberbox"
+   },
+   {
+      "model" : "memberbox.historicalmemberbox",
+      "pk" : 4,
+      "fields" : {
+         "history_change_reason" : null,
+         "owner" : 3,
+         "extra_info" : "",
+         "history_date" : "2019-01-02T20:25:27.060Z",
+         "location" : "L10",
+         "history_type" : "~",
+         "id" : 2,
+         "history_user" : null
+      }
+   },
+   {
+      "model" : "memberbox.historicalmemberbox",
+      "fields" : {
+         "location" : "L20",
+         "history_date" : "2019-01-02T20:25:27.248Z",
+         "extra_info" : "",
+         "history_change_reason" : null,
+         "owner" : 4,
+         "history_user" : null,
+         "id" : 3,
+         "history_type" : "+"
+      },
+      "pk" : 5
+   },
+   {
+      "model" : "memberbox.historicalmemberbox",
+      "pk" : 6,
+      "fields" : {
+         "history_date" : "2019-01-02T20:25:27.259Z",
+         "location" : "L20",
+         "history_change_reason" : null,
+         "owner" : 4,
+         "extra_info" : "",
+         "history_user" : null,
+         "history_type" : "~",
+         "id" : 3
+      }
+   },
+   {
+      "fields" : {
+         "history_user" : null,
+         "id" : 4,
+         "history_type" : "+",
+         "location" : "L30",
+         "history_date" : "2019-01-02T20:25:27.402Z",
+         "extra_info" : "",
+         "owner" : 5,
+         "history_change_reason" : null
+      },
+      "pk" : 7,
+      "model" : "memberbox.historicalmemberbox"
+   },
+   {
+      "model" : "memberbox.historicalmemberbox",
+      "pk" : 8,
+      "fields" : {
+         "id" : 4,
+         "history_type" : "~",
+         "history_user" : null,
+         "extra_info" : "",
+         "owner" : 5,
+         "history_change_reason" : null,
+         "location" : "L30",
+         "history_date" : "2019-01-02T20:25:27.412Z"
+      }
+   },
+   {
+      "fields" : {
+         "history_date" : "2019-01-02T20:25:27.557Z",
+         "location" : "L40",
+         "history_change_reason" : null,
+         "owner" : 6,
+         "extra_info" : "",
+         "history_user" : null,
+         "history_type" : "+",
+         "id" : 5
+      },
+      "pk" : 9,
+      "model" : "memberbox.historicalmemberbox"
+   },
+   {
+      "pk" : 10,
+      "fields" : {
+         "history_date" : "2019-01-02T20:25:27.572Z",
+         "location" : "L40",
+         "history_change_reason" : null,
+         "owner" : 6,
+         "extra_info" : "",
+         "history_user" : null,
+         "history_type" : "~",
+         "id" : 5
+      },
+      "model" : "memberbox.historicalmemberbox"
+   },
+   {
+      "model" : "memberbox.historicalmemberbox",
+      "fields" : {
+         "extra_info" : "",
+         "owner" : 7,
+         "history_change_reason" : null,
+         "location" : "L50",
+         "history_date" : "2019-01-02T20:25:27.817Z",
+         "id" : 6,
+         "history_type" : "+",
+         "history_user" : null
+      },
+      "pk" : 11
+   },
+   {
+      "fields" : {
+         "history_user" : null,
+         "history_type" : "~",
+         "id" : 6,
+         "history_date" : "2019-01-02T20:25:27.828Z",
+         "location" : "L50",
+         "history_change_reason" : null,
+         "owner" : 7,
+         "extra_info" : ""
+      },
+      "pk" : 12,
+      "model" : "memberbox.historicalmemberbox"
+   },
+   {
+      "pk" : 13,
+      "fields" : {
+         "extra_info" : "",
+         "history_change_reason" : null,
+         "owner" : 8,
+         "location" : "L01",
+         "history_date" : "2019-01-02T20:25:28.021Z",
+         "id" : 7,
+         "history_type" : "+",
+         "history_user" : null
+      },
+      "model" : "memberbox.historicalmemberbox"
+   },
+   {
+      "model" : "memberbox.historicalmemberbox",
+      "fields" : {
+         "id" : 7,
+         "history_type" : "~",
+         "history_user" : null,
+         "extra_info" : "",
+         "history_change_reason" : null,
+         "owner" : 8,
+         "location" : "L01",
+         "history_date" : "2019-01-02T20:25:28.033Z"
+      },
+      "pk" : 14
+   },
+   {
+      "fields" : {
+         "history_type" : "~",
+         "id" : 3,
+         "history_user" : 1,
+         "history_change_reason" : "Updated through the self-service interface by ('Ad',) Min",
+         "owner" : 4,
+         "extra_info" : "Red box with wires sticking out",
+         "history_date" : "2019-01-02T20:40:17.321Z",
+         "location" : "L21"
+      },
+      "pk" : 15,
+      "model" : "memberbox.historicalmemberbox"
+   },
+   {
+      "model" : "memberbox.historicalmemberbox",
+      "fields" : {
+         "history_type" : "~",
+         "id" : 2,
+         "history_user" : 1,
+         "owner" : 3,
+         "history_change_reason" : "Updated through the self-service interface by ('Ad',) Min",
+         "extra_info" : "Small carton box",
+         "history_date" : "2019-01-02T20:41:05.226Z",
+         "location" : "L11"
+      },
+      "pk" : 16
+   },
+   {
+      "pk" : 17,
+      "fields" : {
+         "history_user" : 1,
+         "id" : 5,
+         "history_type" : "~",
+         "location" : "L41",
+         "history_date" : "2019-01-02T20:41:38.021Z",
+         "extra_info" : "Pile of glass",
+         "history_change_reason" : "Updated through the self-service interface by ('Ad',) Min",
+         "owner" : 6
+      },
+      "model" : "memberbox.historicalmemberbox"
+   },
+   {
+      "pk" : 18,
+      "fields" : {
+         "owner" : 7,
+         "history_change_reason" : "Updated through the self-service interface by ('Ad',) Min",
+         "extra_info" : "My stuff - do no touch it !",
+         "history_date" : "2019-01-02T20:41:58.015Z",
+         "location" : "L53",
+         "history_type" : "~",
+         "id" : 6,
+         "history_user" : 1
+      },
+      "model" : "memberbox.historicalmemberbox"
+   },
+   {
+      "model" : "memberbox.historicalmemberbox",
+      "pk" : 19,
+      "fields" : {
+         "location" : "L31",
+         "history_date" : "2019-01-02T20:42:27.285Z",
+         "extra_info" : "my tuff",
+         "history_change_reason" : "Updated through the self-service interface by ('Ad',) Min",
+         "owner" : 8,
+         "history_user" : 1,
+         "id" : 7,
+         "history_type" : "~"
+      }
+   },
+   {
+      "model" : "memberbox.historicalmemberbox",
+      "pk" : 20,
+      "fields" : {
+         "extra_info" : "Blue crate",
+         "history_change_reason" : "Updated through the self-service interface by ('Ad',) Min",
+         "owner" : 5,
+         "location" : "L32",
+         "history_date" : "2019-01-02T20:42:42.698Z",
+         "id" : 4,
+         "history_type" : "~",
+         "history_user" : 1
+      }
+   },
+   {
+      "model" : "memberbox.historicalmemberbox",
+      "pk" : 21,
+      "fields" : {
+         "history_user" : 1,
+         "history_type" : "~",
+         "id" : 1,
+         "history_date" : "2019-01-02T20:43:05.316Z",
+         "location" : "L33",
+         "owner" : 2,
+         "history_change_reason" : "Updated through the self-service interface by ('Ad',) Min",
+         "extra_info" : "Various tins of paint"
+      }
+   },
+   {
+      "fields" : {
+         "state" : "AG",
+         "duration" : 10,
+         "extra_info" : "Working on my bike; waiting for new argon gas. \r\n\r\nShould be done next week.",
+         "extends" : null,
+         "owner" : 7,
+         "requested" : "2019-01-02",
+         "location" : "Corridor next to the washbasin",
+         "lastdate" : null,
+         "what" : "Bike"
+      },
+      "pk" : 1,
+      "model" : "storage.storage"
+   },
+   {
+      "model" : "storage.storage",
+      "fields" : {
+         "owner" : 5,
+         "extra_info" : "Have no room for this at home.",
+         "extends" : null,
+         "duration" : 300,
+         "state" : "R",
+         "location" : "Floor in the wood workshop",
+         "what" : "Pallets",
+         "lastdate" : null,
+         "requested" : "2019-01-02"
+      },
+      "pk" : 2
+   },
+   {
+      "fields" : {
+         "what" : "500Liter LPG Gas tank",
+         "lastdate" : null,
+         "location" : "Near the back door",
+         "requested" : "2019-01-02",
+         "owner" : 5,
+         "extends" : null,
+         "extra_info" : "No room for this at home.",
+         "duration" : 30,
+         "state" : "NO"
+      },
+      "pk" : 3,
+      "model" : "storage.storage"
+   },
+   {
+      "model" : "storage.historicalstorage",
+      "fields" : {
+         "state" : "AG",
+         "extends" : null,
+         "extra_info" : "Working on my bike; waiting for new argon gas. \r\n\r\nShould be done next week.",
+         "owner" : 7,
+         "id" : 1,
+         "history_user" : 1,
+         "duration" : 10,
+         "history_type" : "+",
+         "history_date" : "2019-01-02T20:37:44.609Z",
+         "requested" : "2019-01-02",
+         "location" : "Corridor next to the washbasin",
+         "lastdate" : null,
+         "what" : "Bike",
+         "history_change_reason" : null
+      },
+      "pk" : 1
+   },
+   {
+      "model" : "storage.historicalstorage",
+      "fields" : {
+         "history_date" : "2019-01-02T20:38:39.734Z",
+         "duration" : 300,
+         "history_user" : 1,
+         "history_type" : "+",
+         "location" : "Floor in the wood workshop",
+         "history_change_reason" : null,
+         "what" : "Pallets",
+         "lastdate" : null,
+         "requested" : "2019-01-02",
+         "owner" : 5,
+         "extends" : null,
+         "extra_info" : "Have no room for this at home.",
+         "state" : "R",
+         "id" : 2
+      },
+      "pk" : 2
+   },
+   {
+      "model" : "storage.historicalstorage",
+      "fields" : {
+         "state" : "NO",
+         "owner" : 5,
+         "extends" : null,
+         "extra_info" : "No room for this at home.",
+         "id" : 3,
+         "duration" : 30,
+         "history_user" : 1,
+         "history_type" : "+",
+         "history_date" : "2019-01-02T20:39:19.944Z",
+         "requested" : "2019-01-02",
+         "location" : "Near the back door",
+         "what" : "500Liter LPG Gas tank",
+         "history_change_reason" : null,
+         "lastdate" : null
+      },
+      "pk" : 3
+   },
+   {
+      "model" : "members.historicaltag",
+      "fields" : {
+         "history_date" : "2019-01-02T20:49:01.455Z",
+         "history_change_reason" : null,
+         "owner" : 3,
+         "tag" : "23432432432",
+         "history_user" : 1,
+         "history_type" : "+",
+         "id" : 1
+      },
+      "pk" : 1
+   },
+   {
+      "model" : "members.historicaltag",
+      "fields" : {
+         "tag" : "asfadsfads",
+         "history_user" : 1,
+         "history_type" : "+",
+         "id" : 2,
+         "history_date" : "2019-01-02T20:49:10.218Z",
+         "history_change_reason" : null,
+         "owner" : 5
+      },
+      "pk" : 2
+   },
+   {
+      "model" : "members.historicaltag",
+      "pk" : 3,
+      "fields" : {
+         "history_change_reason" : null,
+         "owner" : 3,
+         "history_date" : "2019-01-02T20:49:17.645Z",
+         "id" : 3,
+         "history_type" : "+",
+         "history_user" : 1,
+         "tag" : "321312"
+      }
+   },
+   {
+      "pk" : 4,
+      "fields" : {
+         "history_date" : "2019-01-02T20:49:26.335Z",
+         "owner" : 6,
+         "history_change_reason" : null,
+         "history_user" : 1,
+         "tag" : "131321",
+         "id" : 4,
+         "history_type" : "+"
+      },
+      "model" : "members.historicaltag"
+   },
+   {
+      "pk" : 5,
+      "fields" : {
+         "history_date" : "2019-01-02T20:49:30.951Z",
+         "history_change_reason" : null,
+         "owner" : 6,
+         "history_user" : 1,
+         "tag" : "3121121",
+         "id" : 4,
+         "history_type" : "~"
+      },
+      "model" : "members.historicaltag"
+   },
+   {
+      "model" : "members.historicaltag",
+      "fields" : {
+         "history_date" : "2019-01-02T20:49:34.860Z",
+         "owner" : 6,
+         "history_change_reason" : null,
+         "history_user" : 1,
+         "tag" : "3121312",
+         "id" : 4,
+         "history_type" : "~"
+      },
+      "pk" : 6
+   },
+   {
+      "fields" : {
+         "history_date" : "2019-01-02T20:49:45.286Z",
+         "history_change_reason" : null,
+         "owner" : 7,
+         "history_user" : 1,
+         "tag" : "31255454",
+         "id" : 4,
+         "history_type" : "~"
+      },
+      "pk" : 7,
+      "model" : "members.historicaltag"
+   },
+   {
+      "fields" : {
+         "history_date" : "2019-01-02T20:49:50.042Z",
+         "owner" : 5,
+         "history_change_reason" : null,
+         "history_user" : 1,
+         "tag" : "5454",
+         "id" : 5,
+         "history_type" : "+"
+      },
+      "pk" : 8,
+      "model" : "members.historicaltag"
+   },
+   {
+      "model" : "members.historicaltag",
+      "pk" : 9,
+      "fields" : {
+         "id" : 6,
+         "history_type" : "+",
+         "history_user" : 1,
+         "tag" : "454454",
+         "owner" : 7,
+         "history_change_reason" : null,
+         "history_date" : "2019-01-02T20:49:55.976Z"
+      }
+   },
+   {
+      "fields" : {
+         "history_date" : "2019-01-02T20:50:02.866Z",
+         "owner" : 8,
+         "history_change_reason" : null,
+         "tag" : "45454",
+         "history_user" : 1,
+         "history_type" : "+",
+         "id" : 7
+      },
+      "pk" : 10,
+      "model" : "members.historicaltag"
+   },
+   {
+      "model" : "members.historicaltag",
+      "fields" : {
+         "tag" : "5444",
+         "history_user" : 1,
+         "history_type" : "+",
+         "id" : 8,
+         "history_date" : "2019-01-02T20:50:10.560Z",
+         "owner" : 2,
+         "history_change_reason" : null
+      },
+      "pk" : 11
+   },
+   {
+      "model" : "members.historicaltag",
+      "fields" : {
+         "owner" : 6,
+         "history_change_reason" : null,
+         "history_date" : "2019-01-02T20:50:49.905Z",
+         "history_type" : "+",
+         "id" : 9,
+         "tag" : "41243242",
+         "history_user" : 1
+      },
+      "pk" : 12
+   },
+   {
+      "model" : "members.historicaltag",
+      "pk" : 13,
+      "fields" : {
+         "history_type" : "+",
+         "id" : 10,
+         "tag" : "1",
+         "history_user" : 1,
+         "owner" : 6,
+         "history_change_reason" : null,
+         "history_date" : "2019-01-02T20:54:22.602Z"
+      }
+   },
+   {
+      "model" : "members.historicaltag",
+      "fields" : {
+         "owner" : 6,
+         "history_change_reason" : null,
+         "history_date" : "2019-01-02T20:54:26.471Z",
+         "history_type" : "~",
+         "id" : 10,
+         "tag" : "12",
+         "history_user" : 1
+      },
+      "pk" : 14
+   },
+   {
+      "model" : "members.historicaltag",
+      "pk" : 15,
+      "fields" : {
+         "history_change_reason" : null,
+         "owner" : 6,
+         "history_date" : "2019-01-02T20:54:27.304Z",
+         "history_type" : "~",
+         "id" : 10,
+         "tag" : "12",
+         "history_user" : 1
+      }
+   },
+   {
+      "pk" : 16,
+      "fields" : {
+         "tag" : "123",
+         "history_user" : 1,
+         "history_type" : "~",
+         "id" : 10,
+         "history_date" : "2019-01-02T20:54:30.470Z",
+         "owner" : 6,
+         "history_change_reason" : null
+      },
+      "model" : "members.historicaltag"
+   },
+   {
+      "model" : "members.historicaltag",
+      "pk" : 17,
+      "fields" : {
+         "owner" : 6,
+         "history_change_reason" : null,
+         "history_date" : "2019-01-02T20:57:47.138Z",
+         "id" : 11,
+         "history_type" : "+",
+         "history_user" : 1,
+         "tag" : "32232"
+      }
+   },
+   {
+      "model" : "members.historicaltag",
+      "fields" : {
+         "owner" : 6,
+         "history_change_reason" : null,
+         "history_date" : "2019-01-02T20:57:55.272Z",
+         "id" : 12,
+         "history_type" : "+",
+         "history_user" : 1,
+         "tag" : "22"
+      },
+      "pk" : 18
+   },
+   {
+      "model" : "members.historicaltag",
+      "fields" : {
+         "history_date" : "2019-01-02T20:58:05.499Z",
+         "owner" : 6,
+         "history_change_reason" : null,
+         "tag" : "444",
+         "history_user" : 1,
+         "history_type" : "+",
+         "id" : 13
+      },
+      "pk" : 19
+   },
+   {
+      "pk" : 1,
+      "fields" : {
+         "tag" : "23432432432",
+         "owner" : 3
+      },
+      "model" : "members.tag"
+   },
+   {
+      "pk" : 2,
+      "fields" : {
+         "owner" : 5,
+         "tag" : "asfadsfads"
+      },
+      "model" : "members.tag"
+   },
+   {
+      "pk" : 3,
+      "fields" : {
+         "tag" : "321312",
+         "owner" : 3
+      },
+      "model" : "members.tag"
+   },
+   {
+      "fields" : {
+         "tag" : "31255454",
+         "owner" : 7
+      },
+      "pk" : 4,
+      "model" : "members.tag"
+   },
+   {
+      "fields" : {
+         "tag" : "5454",
+         "owner" : 5
+      },
+      "pk" : 5,
+      "model" : "members.tag"
+   },
+   {
+      "fields" : {
+         "owner" : 7,
+         "tag" : "454454"
+      },
+      "pk" : 6,
+      "model" : "members.tag"
+   },
+   {
+      "model" : "members.tag",
+      "pk" : 7,
+      "fields" : {
+         "tag" : "45454",
+         "owner" : 8
+      }
+   },
+   {
+      "model" : "members.tag",
+      "pk" : 8,
+      "fields" : {
+         "owner" : 2,
+         "tag" : "5444"
+      }
+   },
+   {
+      "model" : "members.tag",
+      "pk" : 9,
+      "fields" : {
+         "owner" : 6,
+         "tag" : "41243242"
+      }
+   },
+   {
+      "pk" : 10,
+      "fields" : {
+         "owner" : 6,
+         "tag" : "123"
+      },
+      "model" : "members.tag"
+   },
+   {
+      "model" : "members.tag",
+      "pk" : 11,
+      "fields" : {
+         "tag" : "32232",
+         "owner" : 6
+      }
+   },
+   {
+      "fields" : {
+         "owner" : 6,
+         "tag" : "22"
+      },
+      "pk" : 12,
+      "model" : "members.tag"
+   },
+   {
+      "model" : "members.tag",
+      "fields" : {
+         "tag" : "444",
+         "owner" : 6
+      },
+      "pk" : 13
+   },
+   {
+      "model" : "acl.historicalpermittype",
+      "pk" : 1,
+      "fields" : {
+         "description" : "",
+         "history_change_reason" : null,
+         "id" : 1,
+         "history_date" : "2019-01-02T20:25:25.712Z",
+         "name" : "metalstuff",
+         "permit" : null,
+         "history_user" : null,
+         "history_type" : "+"
+      }
+   },
+   {
+      "model" : "acl.historicalpermittype",
+      "fields" : {
+         "history_date" : "2019-01-02T20:25:25.731Z",
+         "permit" : null,
+         "name" : "metalstuff",
+         "history_user" : null,
+         "history_type" : "~",
+         "description" : "Permit to use metalstuff",
+         "history_change_reason" : "Added during bulk import.",
+         "id" : 1
+      },
+      "pk" : 2
+   },
+   {
+      "model" : "acl.historicalpermittype",
+      "pk" : 3,
+      "fields" : {
+         "id" : 1,
+         "history_change_reason" : "Added during bulk import.",
+         "description" : "Permit to use metalstuff",
+         "history_type" : "~",
+         "history_user" : null,
+         "name" : "metalstuff",
+         "history_date" : "2019-01-02T20:25:25.781Z",
+         "permit" : null
+      }
+   },
+   {
+      "pk" : 4,
+      "fields" : {
+         "permit" : null,
+         "history_date" : "2019-01-02T20:25:25.825Z",
+         "name" : "tablesaw",
+         "history_user" : null,
+         "history_type" : "+",
+         "description" : "",
+         "history_change_reason" : null,
+         "id" : 2
+      },
+      "model" : "acl.historicalpermittype"
+   },
+   {
+      "fields" : {
+         "history_user" : null,
+         "history_type" : "~",
+         "history_date" : "2019-01-02T20:25:25.837Z",
+         "name" : "tablesaw",
+         "permit" : null,
+         "id" : 2,
+         "description" : "Permit to use tablesaw",
+         "history_change_reason" : "Added during bulk import."
+      },
+      "pk" : 5,
+      "model" : "acl.historicalpermittype"
+   },
+   {
+      "model" : "acl.historicalpermittype",
+      "fields" : {
+         "permit" : null,
+         "history_date" : "2019-01-02T20:25:26.503Z",
+         "name" : "Wood Instruction",
+         "history_user" : null,
+         "history_type" : "+",
+         "description" : "",
+         "history_change_reason" : null,
+         "id" : 3
+      },
+      "pk" : 6
+   },
+   {
+      "model" : "acl.historicalpermittype",
+      "fields" : {
+         "history_change_reason" : null,
+         "description" : "Can issue wood machine entitlement",
+         "id" : 3,
+         "permit" : null,
+         "history_date" : "2019-01-02T20:25:26.514Z",
+         "name" : "Wood Instruction",
+         "history_type" : "~",
+         "history_user" : null
+      },
+      "pk" : 7
+   },
+   {
+      "fields" : {
+         "history_user" : null,
+         "history_type" : "~",
+         "history_date" : "2019-01-02T20:25:26.643Z",
+         "permit" : 3,
+         "name" : "tablesaw",
+         "id" : 2,
+         "description" : "The tablesaw permit",
+         "history_change_reason" : null
+      },
+      "pk" : 8,
+      "model" : "acl.historicalpermittype"
+   },
+   {
+      "pk" : 9,
+      "fields" : {
+         "history_type" : "+",
+         "history_user" : null,
+         "name" : "doors",
+         "history_date" : "2019-01-02T20:25:26.684Z",
+         "permit" : null,
+         "id" : 4,
+         "history_change_reason" : null,
+         "description" : ""
+      },
+      "model" : "acl.historicalpermittype"
+   },
+   {
+      "model" : "acl.historicalpermittype",
+      "fields" : {
+         "permit" : 3,
+         "history_date" : "2019-01-02T20:25:26.697Z",
+         "name" : "doors",
+         "history_type" : "~",
+         "history_user" : null,
+         "history_change_reason" : null,
+         "description" : "The doors permit",
+         "id" : 4
+      },
+      "pk" : 10
+   },
+   {
+      "fields" : {
+         "history_date" : "2019-01-02T20:25:26.870Z",
+         "name" : "tablesaw",
+         "permit" : 3,
+         "history_type" : "~",
+         "history_user" : null,
+         "history_change_reason" : null,
+         "description" : "The tablesaw permit",
+         "id" : 2
+      },
+      "pk" : 11,
+      "model" : "acl.historicalpermittype"
+   },
+   {
+      "model" : "acl.historicalpermittype",
+      "pk" : 12,
+      "fields" : {
+         "history_type" : "~",
+         "history_user" : null,
+         "name" : "doors",
+         "history_date" : "2019-01-02T20:25:26.908Z",
+         "permit" : 3,
+         "id" : 4,
+         "history_change_reason" : null,
+         "description" : "The doors permit"
+      }
+   },
+   {
+      "fields" : {
+         "description" : "",
+         "history_change_reason" : null,
+         "id" : 5,
+         "history_date" : "2019-01-02T20:25:26.944Z",
+         "name" : "instruct",
+         "permit" : null,
+         "history_user" : null,
+         "history_type" : "+"
+      },
+      "pk" : 13,
+      "model" : "acl.historicalpermittype"
+   },
+   {
+      "model" : "acl.historicalpermittype",
+      "pk" : 14,
+      "fields" : {
+         "description" : "The instruct permit",
+         "history_change_reason" : null,
+         "id" : 5,
+         "name" : "instruct",
+         "history_date" : "2019-01-02T20:25:26.956Z",
+         "permit" : 3,
+         "history_user" : null,
+         "history_type" : "~"
+      }
+   },
+   {
+      "model" : "acl.historicalpermittype",
+      "pk" : 15,
+      "fields" : {
+         "history_date" : "2019-01-02T20:25:26.996Z",
+         "name" : "metalinstruct",
+         "permit" : null,
+         "history_user" : null,
+         "history_type" : "+",
+         "description" : "",
+         "history_change_reason" : null,
+         "id" : 6
+      }
+   },
+   {
+      "fields" : {
+         "description" : "The metalinstruct permit",
+         "history_change_reason" : null,
+         "id" : 6,
+         "history_date" : "2019-01-02T20:25:27.008Z",
+         "name" : "metalinstruct",
+         "permit" : 3,
+         "history_user" : null,
+         "history_type" : "~"
+      },
+      "pk" : 16,
+      "model" : "acl.historicalpermittype"
+   },
+   {
+      "fields" : {
+         "history_user" : null,
+         "history_type" : "~",
+         "permit" : 3,
+         "history_date" : "2019-01-02T20:25:27.179Z",
+         "name" : "tablesaw",
+         "id" : 2,
+         "description" : "The tablesaw permit",
+         "history_change_reason" : null
+      },
+      "pk" : 17,
+      "model" : "acl.historicalpermittype"
+   },
+   {
+      "fields" : {
+         "name" : "doors",
+         "history_date" : "2019-01-02T20:25:27.217Z",
+         "permit" : 3,
+         "history_type" : "~",
+         "history_user" : null,
+         "history_change_reason" : null,
+         "description" : "The doors permit",
+         "id" : 4
+      },
+      "pk" : 18,
+      "model" : "acl.historicalpermittype"
+   },
+   {
+      "model" : "acl.historicalpermittype",
+      "fields" : {
+         "history_type" : "~",
+         "history_user" : null,
+         "name" : "doors",
+         "history_date" : "2019-01-02T20:25:27.374Z",
+         "permit" : 3,
+         "id" : 4,
+         "history_change_reason" : null,
+         "description" : "The doors permit"
+      },
+      "pk" : 19
+   },
+   {
+      "model" : "acl.historicalpermittype",
+      "pk" : 20,
+      "fields" : {
+         "history_type" : "~",
+         "history_user" : null,
+         "history_date" : "2019-01-02T20:25:27.522Z",
+         "name" : "doors",
+         "permit" : 3,
+         "id" : 4,
+         "history_change_reason" : null,
+         "description" : "The doors permit"
+      }
+   },
+   {
+      "model" : "acl.historicalpermittype",
+      "pk" : 21,
+      "fields" : {
+         "id" : 4,
+         "history_change_reason" : null,
+         "description" : "The doors permit",
+         "history_type" : "~",
+         "history_user" : null,
+         "permit" : 3,
+         "history_date" : "2019-01-02T20:25:27.692Z",
+         "name" : "doors"
+      }
+   },
+   {
+      "model" : "acl.historicalpermittype",
+      "fields" : {
+         "id" : 1,
+         "history_change_reason" : null,
+         "description" : "The metalstuff permit",
+         "history_type" : "~",
+         "history_user" : null,
+         "history_date" : "2019-01-02T20:25:27.735Z",
+         "name" : "metalstuff",
+         "permit" : 3
+      },
+      "pk" : 22
+   },
+   {
+      "model" : "acl.historicalpermittype",
+      "fields" : {
+         "history_change_reason" : null,
+         "description" : "The metalinstruct permit",
+         "id" : 6,
+         "history_date" : "2019-01-02T20:25:27.779Z",
+         "name" : "metalinstruct",
+         "permit" : 3,
+         "history_type" : "~",
+         "history_user" : null
+      },
+      "pk" : 23
+   },
+   {
+      "model" : "acl.historicalpermittype",
+      "fields" : {
+         "history_type" : "~",
+         "history_user" : null,
+         "name" : "doors",
+         "history_date" : "2019-01-02T20:25:27.946Z",
+         "permit" : 3,
+         "id" : 4,
+         "history_change_reason" : null,
+         "description" : "The doors permit"
+      },
+      "pk" : 24
+   },
+   {
+      "pk" : 25,
+      "fields" : {
+         "name" : "metalstuff",
+         "history_date" : "2019-01-02T20:25:27.985Z",
+         "permit" : 3,
+         "history_type" : "~",
+         "history_user" : null,
+         "history_change_reason" : null,
+         "description" : "The metalstuff permit",
+         "id" : 1
+      },
+      "model" : "acl.historicalpermittype"
+   },
+   {
+      "fields" : {
+         "id" : 5,
+         "description" : "The instruct permit",
+         "history_change_reason" : null,
+         "history_user" : 1,
+         "history_type" : "-",
+         "permit" : 3,
+         "history_date" : "2019-01-02T20:27:08.560Z",
+         "name" : "instruct"
+      },
+      "pk" : 26,
+      "model" : "acl.historicalpermittype"
+   },
+   {
+      "model" : "acl.historicalpermittype",
+      "fields" : {
+         "history_type" : "~",
+         "history_user" : 1,
+         "history_date" : "2019-01-02T20:27:33.583Z",
+         "permit" : null,
+         "name" : "metalinstruct",
+         "id" : 6,
+         "history_change_reason" : null,
+         "description" : "Can give metal instructions"
+      },
+      "pk" : 27
+   },
+   {
+      "model" : "acl.historicalpermittype",
+      "pk" : 28,
+      "fields" : {
+         "history_date" : "2019-01-02T20:27:54.303Z",
+         "name" : "metalinstruct",
+         "permit" : null,
+         "history_type" : "-",
+         "history_user" : 1,
+         "history_change_reason" : null,
+         "description" : "Can give metal instructions",
+         "id" : 6
+      }
+   },
+   {
+      "model" : "acl.historicalpermittype",
+      "fields" : {
+         "history_change_reason" : null,
+         "description" : "Can approve door access",
+         "id" : 7,
+         "name" : "Door Approval",
+         "history_date" : "2019-01-02T20:28:51.477Z",
+         "permit" : null,
+         "history_type" : "+",
+         "history_user" : 1
+      },
+      "pk" : 29
+   },
+   {
+      "pk" : 30,
+      "fields" : {
+         "id" : 4,
+         "description" : "The doors permit",
+         "history_change_reason" : null,
+         "history_user" : 1,
+         "history_type" : "~",
+         "history_date" : "2019-01-02T20:28:55.179Z",
+         "permit" : 7,
+         "name" : "doors"
+      },
+      "model" : "acl.historicalpermittype"
+   },
+   {
+      "pk" : 31,
+      "fields" : {
+         "description" : "Can work with metal",
+         "history_change_reason" : null,
+         "id" : 1,
+         "history_date" : "2019-01-02T20:29:35.990Z",
+         "name" : "metalstuff",
+         "permit" : null,
+         "history_user" : 1,
+         "history_type" : "~"
+      },
+      "model" : "acl.historicalpermittype"
+   },
+   {
+      "fields" : {
+         "name" : "Frontroom",
+         "history_date" : "2019-01-02T20:25:25.666Z",
+         "description" : "",
+         "history_change_reason" : null,
+         "history_user" : null,
+         "history_type" : "+",
+         "id" : 1
+      },
+      "pk" : 1,
+      "model" : "acl.historicallocation"
+   },
+   {
+      "pk" : 2,
+      "fields" : {
+         "history_user" : null,
+         "id" : 1,
+         "history_type" : "~",
+         "description" : "",
+         "name" : "Frontroom",
+         "history_date" : "2019-01-02T20:25:25.685Z",
+         "history_change_reason" : "Added during bulk import."
+      },
+      "model" : "acl.historicallocation"
+   },
+   {
+      "fields" : {
+         "name" : "Metalshop",
+         "history_date" : "2019-01-02T20:25:25.738Z",
+         "description" : "",
+         "history_change_reason" : null,
+         "history_user" : null,
+         "history_type" : "+",
+         "id" : 2
+      },
+      "pk" : 3,
+      "model" : "acl.historicallocation"
+   },
+   {
+      "model" : "acl.historicallocation",
+      "fields" : {
+         "history_change_reason" : "Added during bulk import.",
+         "description" : "",
+         "name" : "Metalshop",
+         "history_date" : "2019-01-02T20:25:25.750Z",
+         "id" : 2,
+         "history_type" : "~",
+         "history_user" : null
+      },
+      "pk" : 4
+   },
+   {
+      "pk" : 5,
+      "fields" : {
+         "description" : "",
+         "history_date" : "2019-01-02T20:25:25.797Z",
+         "name" : "Metalshop",
+         "history_change_reason" : "Added during bulk import.",
+         "history_user" : null,
+         "id" : 2,
+         "history_type" : "~"
+      },
+      "model" : "acl.historicallocation"
+   },
+   {
+      "model" : "acl.historicallocation",
+      "pk" : 6,
+      "fields" : {
+         "history_user" : null,
+         "id" : 2,
+         "history_type" : "~",
+         "description" : "",
+         "name" : "Metalshop",
+         "history_date" : "2019-01-02T20:25:25.850Z",
+         "history_change_reason" : "Added during bulk import."
+      }
+   },
+   {
+      "fields" : {
+         "history_change_reason" : null,
+         "description" : "Wood area near the back of the space.",
+         "history_date" : "2019-01-02T20:32:58.362Z",
+         "name" : "Woodshop",
+         "id" : 3,
+         "history_type" : "+",
+         "history_user" : 1
+      },
+      "pk" : 7,
+      "model" : "acl.historicallocation"
+   },
+   {
+      "model" : "acl.historicallocation",
+      "pk" : 8,
+      "fields" : {
+         "history_type" : "~",
+         "id" : 2,
+         "history_user" : 1,
+         "history_change_reason" : null,
+         "name" : "Metalshop",
+         "history_date" : "2019-01-02T20:45:01.518Z",
+         "description" : "Area near the big CNC machine"
+      }
+   },
+   {
+      "model" : "acl.historicallocation",
+      "pk" : 9,
+      "fields" : {
+         "history_date" : "2019-01-02T20:45:12.152Z",
+         "name" : "Frontroom",
+         "description" : "I.e. where you come in.",
+         "history_change_reason" : null,
+         "history_user" : 1,
+         "history_type" : "~",
+         "id" : 1
+      }
+   },
+   {
+      "pk" : 1,
+      "fields" : {
+         "description" : "",
+         "location" : null,
+         "history_change_reason" : null,
+         "id" : 1,
+         "history_date" : "2019-01-02T20:25:25.693Z",
+         "requires_permit" : null,
+         "name" : "3D-printer",
+         "requires_form" : false,
+         "history_user" : null,
+         "requires_instruction" : false,
+         "history_type" : "+"
+      },
+      "model" : "acl.historicalmachine"
+   },
+   {
+      "model" : "acl.historicalmachine",
+      "fields" : {
+         "history_change_reason" : "Added during bulk import.",
+         "location" : 1,
+         "description" : "3D-printer",
+         "id" : 1,
+         "history_date" : "2019-01-02T20:25:25.705Z",
+         "requires_form" : false,
+         "requires_permit" : null,
+         "name" : "3D-printer",
+         "history_type" : "~",
+         "history_user" : null,
+         "requires_instruction" : true
+      },
+      "pk" : 2
+   },
+   {
+      "pk" : 3,
+      "fields" : {
+         "requires_form" : false,
+         "history_date" : "2019-01-02T20:25:25.757Z",
+         "requires_permit" : null,
+         "name" : "metalmill",
+         "history_type" : "+",
+         "history_user" : null,
+         "requires_instruction" : false,
+         "history_change_reason" : null,
+         "description" : "",
+         "location" : null,
+         "id" : 2
+      },
+      "model" : "acl.historicalmachine"
+   },
+   {
+      "pk" : 4,
+      "fields" : {
+         "id" : 2,
+         "description" : "Abene VHF3 Metaalfrees machine",
+         "location" : 2,
+         "history_change_reason" : "Added during bulk import.",
+         "requires_instruction" : true,
+         "history_user" : null,
+         "history_type" : "~",
+         "requires_permit" : null,
+         "history_date" : "2019-01-02T20:25:25.769Z",
+         "name" : "metalmill",
+         "requires_form" : true
+      },
+      "model" : "acl.historicalmachine"
+   },
+   {
+      "model" : "acl.historicalmachine",
+      "pk" : 5,
+      "fields" : {
+         "id" : 3,
+         "history_change_reason" : null,
+         "description" : "",
+         "location" : null,
+         "history_type" : "+",
+         "requires_instruction" : false,
+         "history_user" : null,
+         "history_date" : "2019-01-02T20:25:25.805Z",
+         "requires_permit" : null,
+         "requires_form" : false,
+         "name" : "metallathe"
+      }
+   },
+   {
+      "model" : "acl.historicalmachine",
+      "pk" : 6,
+      "fields" : {
+         "location" : 2,
+         "description" : "Huvema HU760 Draaibank",
+         "history_change_reason" : "Added during bulk import.",
+         "id" : 3,
+         "history_date" : "2019-01-02T20:25:25.818Z",
+         "requires_permit" : null,
+         "name" : "metallathe",
+         "requires_form" : true,
+         "requires_instruction" : true,
+         "history_user" : null,
+         "history_type" : "~"
+      }
+   },
+   {
+      "fields" : {
+         "requires_permit" : null,
+         "history_date" : "2019-01-02T20:25:25.857Z",
+         "requires_form" : false,
+         "name" : "tablesaw",
+         "history_user" : null,
+         "requires_instruction" : false,
+         "history_type" : "+",
+         "description" : "",
+         "location" : null,
+         "history_change_reason" : null,
+         "id" : 4
+      },
+      "pk" : 7,
+      "model" : "acl.historicalmachine"
+   },
+   {
+      "fields" : {
+         "history_date" : "2019-01-02T20:25:25.870Z",
+         "requires_form" : true,
+         "requires_permit" : null,
+         "name" : "tablesaw",
+         "history_user" : null,
+         "requires_instruction" : true,
+         "history_type" : "~",
+         "description" : "Huvema HU760 Draaibank",
+         "location" : 2,
+         "history_change_reason" : "Added during bulk import.",
+         "id" : 4
+      },
+      "pk" : 8,
+      "model" : "acl.historicalmachine"
+   },
+   {
+      "model" : "acl.historicalmachine",
+      "fields" : {
+         "history_date" : "2019-01-02T20:25:26.656Z",
+         "requires_permit" : 2,
+         "requires_form" : true,
+         "name" : "tablesaw",
+         "history_user" : null,
+         "requires_instruction" : true,
+         "history_type" : "~",
+         "location" : 2,
+         "description" : "The tablesaw machine",
+         "history_change_reason" : null,
+         "id" : 4
+      },
+      "pk" : 9
+   },
+   {
+      "model" : "acl.historicalmachine",
+      "fields" : {
+         "id" : 5,
+         "history_change_reason" : null,
+         "description" : "",
+         "location" : null,
+         "history_type" : "+",
+         "requires_instruction" : false,
+         "history_user" : null,
+         "history_date" : "2019-01-02T20:25:26.705Z",
+         "requires_form" : false,
+         "requires_permit" : null,
+         "name" : "doors"
+      },
+      "pk" : 10
+   },
+   {
+      "model" : "acl.historicalmachine",
+      "pk" : 11,
+      "fields" : {
+         "history_date" : "2019-01-02T20:25:26.717Z",
+         "requires_permit" : 4,
+         "name" : "doors",
+         "requires_form" : true,
+         "history_type" : "~",
+         "history_user" : null,
+         "requires_instruction" : true,
+         "history_change_reason" : null,
+         "description" : "The doors machine",
+         "location" : null,
+         "id" : 5
+      }
+   },
+   {
+      "model" : "acl.historicalmachine",
+      "pk" : 12,
+      "fields" : {
+         "location" : 2,
+         "description" : "The tablesaw machine",
+         "history_change_reason" : null,
+         "id" : 4,
+         "history_date" : "2019-01-02T20:25:26.883Z",
+         "requires_permit" : 2,
+         "requires_form" : true,
+         "name" : "tablesaw",
+         "history_user" : null,
+         "requires_instruction" : true,
+         "history_type" : "~"
+      }
+   },
+   {
+      "model" : "acl.historicalmachine",
+      "fields" : {
+         "id" : 5,
+         "location" : null,
+         "description" : "The doors machine",
+         "history_change_reason" : null,
+         "requires_instruction" : true,
+         "history_user" : null,
+         "history_type" : "~",
+         "requires_form" : true,
+         "history_date" : "2019-01-02T20:25:26.923Z",
+         "requires_permit" : 4,
+         "name" : "doors"
+      },
+      "pk" : 13
+   },
+   {
+      "model" : "acl.historicalmachine",
+      "pk" : 14,
+      "fields" : {
+         "name" : "instruct",
+         "history_date" : "2019-01-02T20:25:26.964Z",
+         "requires_permit" : null,
+         "requires_form" : false,
+         "history_type" : "+",
+         "history_user" : null,
+         "requires_instruction" : false,
+         "history_change_reason" : null,
+         "location" : null,
+         "description" : "",
+         "id" : 6
+      }
+   },
+   {
+      "model" : "acl.historicalmachine",
+      "fields" : {
+         "id" : 6,
+         "description" : "The instruct machine",
+         "location" : null,
+         "history_change_reason" : null,
+         "requires_instruction" : true,
+         "history_user" : null,
+         "history_type" : "~",
+         "history_date" : "2019-01-02T20:25:26.976Z",
+         "requires_permit" : 5,
+         "name" : "instruct",
+         "requires_form" : true
+      },
+      "pk" : 15
+   },
+   {
+      "model" : "acl.historicalmachine",
+      "fields" : {
+         "location" : null,
+         "description" : "",
+         "history_change_reason" : null,
+         "id" : 7,
+         "history_date" : "2019-01-02T20:25:27.016Z",
+         "requires_permit" : null,
+         "name" : "metalinstruct",
+         "requires_form" : false,
+         "requires_instruction" : false,
+         "history_user" : null,
+         "history_type" : "+"
+      },
+      "pk" : 16
+   },
+   {
+      "model" : "acl.historicalmachine",
+      "fields" : {
+         "requires_permit" : 6,
+         "history_date" : "2019-01-02T20:25:27.028Z",
+         "name" : "metalinstruct",
+         "requires_form" : true,
+         "history_type" : "~",
+         "requires_instruction" : true,
+         "history_user" : null,
+         "history_change_reason" : null,
+         "description" : "The metalinstruct machine",
+         "location" : null,
+         "id" : 7
+      },
+      "pk" : 17
+   },
+   {
+      "model" : "acl.historicalmachine",
+      "fields" : {
+         "requires_instruction" : true,
+         "history_user" : null,
+         "history_type" : "~",
+         "history_date" : "2019-01-02T20:25:27.192Z",
+         "requires_permit" : 2,
+         "name" : "tablesaw",
+         "requires_form" : true,
+         "id" : 4,
+         "location" : 2,
+         "description" : "The tablesaw machine",
+         "history_change_reason" : null
+      },
+      "pk" : 18
+   },
+   {
+      "fields" : {
+         "id" : 5,
+         "location" : null,
+         "description" : "The doors machine",
+         "history_change_reason" : null,
+         "history_user" : null,
+         "requires_instruction" : true,
+         "history_type" : "~",
+         "history_date" : "2019-01-02T20:25:27.227Z",
+         "requires_form" : true,
+         "requires_permit" : 4,
+         "name" : "doors"
+      },
+      "pk" : 19,
+      "model" : "acl.historicalmachine"
+   },
+   {
+      "fields" : {
+         "description" : "The doors machine",
+         "location" : null,
+         "history_change_reason" : null,
+         "id" : 5,
+         "requires_permit" : 4,
+         "history_date" : "2019-01-02T20:25:27.385Z",
+         "name" : "doors",
+         "requires_form" : true,
+         "history_user" : null,
+         "requires_instruction" : true,
+         "history_type" : "~"
+      },
+      "pk" : 20,
+      "model" : "acl.historicalmachine"
+   },
+   {
+      "model" : "acl.historicalmachine",
+      "fields" : {
+         "history_user" : null,
+         "requires_instruction" : true,
+         "history_type" : "~",
+         "requires_permit" : 4,
+         "history_date" : "2019-01-02T20:25:27.537Z",
+         "requires_form" : true,
+         "name" : "doors",
+         "id" : 5,
+         "location" : null,
+         "description" : "The doors machine",
+         "history_change_reason" : null
+      },
+      "pk" : 21
+   },
+   {
+      "model" : "acl.historicalmachine",
+      "pk" : 22,
+      "fields" : {
+         "history_type" : "~",
+         "requires_instruction" : true,
+         "history_user" : null,
+         "requires_permit" : 4,
+         "history_date" : "2019-01-02T20:25:27.706Z",
+         "name" : "doors",
+         "requires_form" : true,
+         "id" : 5,
+         "history_change_reason" : null,
+         "description" : "The doors machine",
+         "location" : null
+      }
+   },
+   {
+      "fields" : {
+         "name" : "metalstuff",
+         "history_date" : "2019-01-02T20:25:27.742Z",
+         "requires_permit" : null,
+         "requires_form" : false,
+         "requires_instruction" : false,
+         "history_user" : null,
+         "history_type" : "+",
+         "location" : null,
+         "description" : "",
+         "history_change_reason" : null,
+         "id" : 8
+      },
+      "pk" : 23,
+      "model" : "acl.historicalmachine"
+   },
+   {
+      "pk" : 24,
+      "fields" : {
+         "history_user" : null,
+         "requires_instruction" : true,
+         "history_type" : "~",
+         "history_date" : "2019-01-02T20:25:27.753Z",
+         "requires_permit" : 1,
+         "requires_form" : true,
+         "name" : "metalstuff",
+         "id" : 8,
+         "description" : "The metalstuff machine",
+         "location" : null,
+         "history_change_reason" : null
+      },
+      "model" : "acl.historicalmachine"
+   },
+   {
+      "pk" : 25,
+      "fields" : {
+         "location" : null,
+         "description" : "The metalinstruct machine",
+         "history_change_reason" : null,
+         "id" : 7,
+         "history_date" : "2019-01-02T20:25:27.792Z",
+         "requires_form" : true,
+         "requires_permit" : 6,
+         "name" : "metalinstruct",
+         "requires_instruction" : true,
+         "history_user" : null,
+         "history_type" : "~"
+      },
+      "model" : "acl.historicalmachine"
+   },
+   {
+      "model" : "acl.historicalmachine",
+      "fields" : {
+         "id" : 5,
+         "location" : null,
+         "description" : "The doors machine",
+         "history_change_reason" : null,
+         "requires_instruction" : true,
+         "history_user" : null,
+         "history_type" : "~",
+         "history_date" : "2019-01-02T20:25:27.959Z",
+         "requires_permit" : 4,
+         "name" : "doors",
+         "requires_form" : true
+      },
+      "pk" : 26
+   },
+   {
+      "pk" : 27,
+      "fields" : {
+         "history_date" : "2019-01-02T20:25:27.997Z",
+         "requires_permit" : 1,
+         "name" : "metalstuff",
+         "requires_form" : true,
+         "history_user" : null,
+         "requires_instruction" : true,
+         "history_type" : "~",
+         "location" : null,
+         "description" : "The metalstuff machine",
+         "history_change_reason" : null,
+         "id" : 8
+      },
+      "model" : "acl.historicalmachine"
+   },
+   {
+      "pk" : 28,
+      "fields" : {
+         "location" : null,
+         "description" : "The instruct machine",
+         "history_change_reason" : null,
+         "id" : 6,
+         "history_date" : "2019-01-02T20:27:08.558Z",
+         "requires_form" : true,
+         "requires_permit" : 5,
+         "name" : "instruct",
+         "requires_instruction" : true,
+         "history_user" : 1,
+         "history_type" : "-"
+      },
+      "model" : "acl.historicalmachine"
+   },
+   {
+      "fields" : {
+         "requires_instruction" : true,
+         "history_user" : 1,
+         "history_type" : "-",
+         "history_date" : "2019-01-02T20:27:54.301Z",
+         "requires_permit" : 6,
+         "name" : "metalinstruct",
+         "requires_form" : true,
+         "id" : 7,
+         "location" : null,
+         "description" : "The metalinstruct machine",
+         "history_change_reason" : null
+      },
+      "pk" : 29,
+      "model" : "acl.historicalmachine"
+   },
+   {
+      "model" : "acl.historicalmachine",
+      "pk" : 30,
+      "fields" : {
+         "history_date" : "2019-01-02T20:32:06.294Z",
+         "requires_permit" : 1,
+         "name" : "Bandsaw for metal",
+         "requires_form" : false,
+         "history_type" : "~",
+         "requires_instruction" : true,
+         "history_user" : 1,
+         "history_change_reason" : null,
+         "description" : "Metal bandaw, requries instructions by someone who has 'metalstuff'  instructions.",
+         "location" : 2,
+         "id" : 8
+      }
+   },
+   {
+      "model" : "acl.historicalmachine",
+      "fields" : {
+         "id" : 5,
+         "history_change_reason" : null,
+         "description" : "Allowed to open the doors to the space.",
+         "location" : null,
+         "history_type" : "~",
+         "history_user" : 1,
+         "requires_instruction" : true,
+         "history_date" : "2019-01-02T20:32:37.190Z",
+         "requires_permit" : 4,
+         "name" : "doors",
+         "requires_form" : false
+      },
+      "pk" : 31
+   },
+   {
+      "pk" : 32,
+      "fields" : {
+         "history_date" : "2019-01-02T20:33:13.478Z",
+         "requires_permit" : 2,
+         "name" : "tablesaw",
+         "requires_form" : true,
+         "history_type" : "~",
+         "requires_instruction" : true,
+         "history_user" : 1,
+         "history_change_reason" : null,
+         "location" : 3,
+         "description" : "The tablesaw machine, requires instructions and the waiver form to be on file.",
+         "id" : 4
+      },
+      "model" : "acl.historicalmachine"
+   },
+   {
+      "model" : "acl.historicalmachine",
+      "pk" : 33,
+      "fields" : {
+         "history_change_reason" : null,
+         "location" : 2,
+         "description" : "Huvema HU760 Draaibank, Reqires instructions by someone who had instruction on this machine.",
+         "id" : 3,
+         "requires_permit" : null,
+         "history_date" : "2019-01-02T20:33:49.693Z",
+         "requires_form" : true,
+         "name" : "metallathe",
+         "history_type" : "~",
+         "requires_instruction" : true,
+         "history_user" : 1
+      }
+   },
+   {
+      "model" : "acl.historicalmachine",
+      "fields" : {
+         "history_type" : "~",
+         "requires_instruction" : true,
+         "history_user" : 1,
+         "requires_form" : false,
+         "history_date" : "2019-01-02T20:34:10.729Z",
+         "requires_permit" : null,
+         "name" : "3D-printer",
+         "id" : 1,
+         "history_change_reason" : null,
+         "description" : "3D-printer, requires instructions by someone who had instructions on this machine.",
+         "location" : 1
+      },
+      "pk" : 34
+   },
+   {
+      "model" : "acl.historicalmachine",
+      "fields" : {
+         "history_user" : 1,
+         "requires_instruction" : false,
+         "history_type" : "+",
+         "name" : "Hammer",
+         "history_date" : "2019-01-02T20:34:38.985Z",
+         "requires_permit" : null,
+         "requires_form" : false,
+         "id" : 9,
+         "location" : null,
+         "description" : "General hammer, can be used without ado",
+         "history_change_reason" : null
+      },
+      "pk" : 35
+   },
+   {
+      "model" : "acl.historicalentitlement",
+      "pk" : 1,
+      "fields" : {
+         "history_date" : "2019-01-02T20:25:26.630Z",
+         "permit" : 3,
+         "history_user" : null,
+         "holder" : 2,
+         "history_type" : "+",
+         "active" : true,
+         "issuer" : 1,
+         "history_change_reason" : null,
+         "id" : 1
+      }
+   },
+   {
+      "pk" : 2,
+      "fields" : {
+         "history_date" : "2019-01-02T20:25:26.677Z",
+         "permit" : 2,
+         "holder" : 2,
+         "history_user" : null,
+         "history_type" : "+",
+         "issuer" : 2,
+         "active" : true,
+         "history_change_reason" : null,
+         "id" : 2
+      },
+      "model" : "acl.historicalentitlement"
+   },
+   {
+      "pk" : 3,
+      "fields" : {
+         "history_change_reason" : null,
+         "active" : true,
+         "issuer" : 2,
+         "id" : 3,
+         "permit" : 4,
+         "history_date" : "2019-01-02T20:25:26.731Z",
+         "history_type" : "+",
+         "history_user" : null,
+         "holder" : 2
+      },
+      "model" : "acl.historicalentitlement"
+   },
+   {
+      "fields" : {
+         "id" : 4,
+         "history_change_reason" : null,
+         "issuer" : 2,
+         "active" : true,
+         "history_type" : "+",
+         "holder" : 3,
+         "history_user" : null,
+         "history_date" : "2019-01-02T20:25:26.897Z",
+         "permit" : 2
+      },
+      "pk" : 4,
+      "model" : "acl.historicalentitlement"
+   },
+   {
+      "model" : "acl.historicalentitlement",
+      "pk" : 5,
+      "fields" : {
+         "history_user" : null,
+         "holder" : 3,
+         "history_type" : "+",
+         "history_date" : "2019-01-02T20:25:26.937Z",
+         "permit" : 4,
+         "id" : 5,
+         "active" : true,
+         "issuer" : 2,
+         "history_change_reason" : null
+      }
+   },
+   {
+      "pk" : 6,
+      "fields" : {
+         "id" : 6,
+         "history_change_reason" : null,
+         "active" : true,
+         "issuer" : 2,
+         "history_type" : "+",
+         "history_user" : null,
+         "holder" : 3,
+         "history_date" : "2019-01-02T20:25:26.989Z",
+         "permit" : 5
+      },
+      "model" : "acl.historicalentitlement"
+   },
+   {
+      "model" : "acl.historicalentitlement",
+      "pk" : 7,
+      "fields" : {
+         "history_date" : "2019-01-02T20:25:27.041Z",
+         "permit" : 6,
+         "history_user" : null,
+         "holder" : 3,
+         "history_type" : "+",
+         "active" : true,
+         "issuer" : 2,
+         "history_change_reason" : null,
+         "id" : 7
+      }
+   },
+   {
+      "pk" : 8,
+      "fields" : {
+         "history_type" : "+",
+         "history_user" : null,
+         "holder" : 4,
+         "history_date" : "2019-01-02T20:25:27.204Z",
+         "permit" : 2,
+         "id" : 8,
+         "history_change_reason" : null,
+         "active" : true,
+         "issuer" : 2
+      },
+      "model" : "acl.historicalentitlement"
+   },
+   {
+      "fields" : {
+         "holder" : 4,
+         "history_user" : null,
+         "history_type" : "+",
+         "history_date" : "2019-01-02T20:25:27.240Z",
+         "permit" : 4,
+         "id" : 9,
+         "issuer" : 2,
+         "active" : true,
+         "history_change_reason" : null
+      },
+      "pk" : 9,
+      "model" : "acl.historicalentitlement"
+   },
+   {
+      "pk" : 10,
+      "fields" : {
+         "active" : true,
+         "issuer" : 2,
+         "history_change_reason" : null,
+         "id" : 10,
+         "history_date" : "2019-01-02T20:25:27.396Z",
+         "permit" : 4,
+         "history_user" : null,
+         "holder" : 5,
+         "history_type" : "+"
+      },
+      "model" : "acl.historicalentitlement"
+   },
+   {
+      "model" : "acl.historicalentitlement",
+      "pk" : 11,
+      "fields" : {
+         "id" : 11,
+         "issuer" : 2,
+         "active" : true,
+         "history_change_reason" : null,
+         "holder" : 6,
+         "history_user" : null,
+         "history_type" : "+",
+         "history_date" : "2019-01-02T20:25:27.549Z",
+         "permit" : 4
+      }
+   },
+   {
+      "fields" : {
+         "history_change_reason" : null,
+         "active" : true,
+         "issuer" : 2,
+         "id" : 12,
+         "history_date" : "2019-01-02T20:25:27.718Z",
+         "permit" : 4,
+         "history_type" : "+",
+         "history_user" : null,
+         "holder" : 7
+      },
+      "pk" : 12,
+      "model" : "acl.historicalentitlement"
+   },
+   {
+      "model" : "acl.historicalentitlement",
+      "fields" : {
+         "history_change_reason" : null,
+         "issuer" : 2,
+         "active" : true,
+         "id" : 13,
+         "history_date" : "2019-01-02T20:25:27.767Z",
+         "permit" : 1,
+         "history_type" : "+",
+         "holder" : 7,
+         "history_user" : null
+      },
+      "pk" : 13
+   },
+   {
+      "fields" : {
+         "issuer" : 2,
+         "active" : true,
+         "history_change_reason" : null,
+         "id" : 14,
+         "history_date" : "2019-01-02T20:25:27.808Z",
+         "permit" : 6,
+         "holder" : 7,
+         "history_user" : null,
+         "history_type" : "+"
+      },
+      "pk" : 14,
+      "model" : "acl.historicalentitlement"
+   },
+   {
+      "model" : "acl.historicalentitlement",
+      "fields" : {
+         "history_user" : null,
+         "holder" : 8,
+         "history_type" : "+",
+         "history_date" : "2019-01-02T20:25:27.971Z",
+         "permit" : 4,
+         "id" : 15,
+         "active" : true,
+         "issuer" : 2,
+         "history_change_reason" : null
+      },
+      "pk" : 15
+   },
+   {
+      "fields" : {
+         "history_type" : "+",
+         "holder" : 8,
+         "history_user" : null,
+         "history_date" : "2019-01-02T20:25:28.014Z",
+         "permit" : 1,
+         "id" : 16,
+         "history_change_reason" : null,
+         "issuer" : 2,
+         "active" : true
+      },
+      "pk" : 16,
+      "model" : "acl.historicalentitlement"
+   },
+   {
+      "model" : "acl.historicalentitlement",
+      "fields" : {
+         "issuer" : 2,
+         "active" : true,
+         "history_change_reason" : null,
+         "id" : 6,
+         "history_date" : "2019-01-02T20:27:08.559Z",
+         "permit" : 5,
+         "holder" : 3,
+         "history_user" : 1,
+         "history_type" : "-"
+      },
+      "pk" : 17
+   },
+   {
+      "fields" : {
+         "history_date" : "2019-01-02T20:27:54.302Z",
+         "permit" : 6,
+         "history_type" : "-",
+         "history_user" : 1,
+         "holder" : 7,
+         "history_change_reason" : null,
+         "active" : true,
+         "issuer" : 2,
+         "id" : 14
+      },
+      "pk" : 18,
+      "model" : "acl.historicalentitlement"
+   },
+   {
+      "model" : "acl.historicalentitlement",
+      "pk" : 19,
+      "fields" : {
+         "holder" : 3,
+         "history_user" : 1,
+         "history_type" : "-",
+         "history_date" : "2019-01-02T20:27:54.303Z",
+         "permit" : 6,
+         "id" : 7,
+         "issuer" : 2,
+         "active" : true,
+         "history_change_reason" : null
+      }
+   },
+   {
+      "fields" : {
+         "history_type" : "-",
+         "history_user" : 1,
+         "holder" : 2,
+         "history_date" : "2019-01-02T20:35:26.254Z",
+         "permit" : 3,
+         "id" : 1,
+         "history_change_reason" : null,
+         "active" : true,
+         "issuer" : 1
+      },
+      "pk" : 20,
+      "model" : "acl.historicalentitlement"
+   },
+   {
+      "fields" : {
+         "history_type" : "+",
+         "holder" : 2,
+         "history_user" : 1,
+         "history_date" : "2019-01-02T20:36:01.137Z",
+         "permit" : 7,
+         "id" : 17,
+         "history_change_reason" : null,
+         "issuer" : 2,
+         "active" : false
+      },
+      "pk" : 21,
+      "model" : "acl.historicalentitlement"
+   },
+   {
+      "model" : "acl.historicalentitlement",
+      "fields" : {
+         "history_user" : 1,
+         "holder" : 3,
+         "history_type" : "+",
+         "permit" : 3,
+         "history_date" : "2019-01-02T20:36:21.981Z",
+         "id" : 18,
+         "active" : false,
+         "issuer" : 2,
+         "history_change_reason" : null
+      },
+      "pk" : 22
+   },
+   {
+      "fields" : {
+         "permit" : 3,
+         "history_date" : "2019-01-02T20:43:58.833Z",
+         "history_user" : 1,
+         "holder" : 3,
+         "history_type" : "~",
+         "active" : true,
+         "issuer" : 2,
+         "history_change_reason" : "Activated through the self-service interface by ('Ad',) Min",
+         "id" : 18
+      },
+      "pk" : 23,
+      "model" : "acl.historicalentitlement"
+   },
+   {
+      "pk" : 2,
+      "fields" : {
+         "holder" : 2,
+         "permit" : 2,
+         "issuer" : 2,
+         "active" : true
+      },
+      "model" : "acl.entitlement"
+   },
+   {
+      "fields" : {
+         "holder" : 2,
+         "active" : true,
+         "issuer" : 2,
+         "permit" : 4
+      },
+      "pk" : 3,
+      "model" : "acl.entitlement"
+   },
+   {
+      "model" : "acl.entitlement",
+      "pk" : 4,
+      "fields" : {
+         "issuer" : 2,
+         "permit" : 2,
+         "active" : true,
+         "holder" : 3
+      }
+   },
+   {
+      "model" : "acl.entitlement",
+      "fields" : {
+         "permit" : 4,
+         "issuer" : 2,
+         "active" : true,
+         "holder" : 3
+      },
+      "pk" : 5
+   },
+   {
+      "fields" : {
+         "active" : true,
+         "issuer" : 2,
+         "permit" : 2,
+         "holder" : 4
+      },
+      "pk" : 8,
+      "model" : "acl.entitlement"
+   },
+   {
+      "pk" : 9,
+      "fields" : {
+         "holder" : 4,
+         "permit" : 4,
+         "issuer" : 2,
+         "active" : true
+      },
+      "model" : "acl.entitlement"
+   },
+   {
+      "fields" : {
+         "holder" : 5,
+         "active" : true,
+         "permit" : 4,
+         "issuer" : 2
+      },
+      "pk" : 10,
+      "model" : "acl.entitlement"
+   },
+   {
+      "model" : "acl.entitlement",
+      "fields" : {
+         "holder" : 6,
+         "permit" : 4,
+         "issuer" : 2,
+         "active" : true
+      },
+      "pk" : 11
+   },
+   {
+      "model" : "acl.entitlement",
+      "fields" : {
+         "holder" : 7,
+         "active" : true,
+         "issuer" : 2,
+         "permit" : 4
+      },
+      "pk" : 12
+   },
+   {
+      "fields" : {
+         "holder" : 7,
+         "permit" : 1,
+         "issuer" : 2,
+         "active" : true
+      },
+      "pk" : 13,
+      "model" : "acl.entitlement"
+   },
+   {
+      "fields" : {
+         "holder" : 8,
+         "active" : true,
+         "issuer" : 2,
+         "permit" : 4
+      },
+      "pk" : 15,
+      "model" : "acl.entitlement"
+   },
+   {
+      "pk" : 16,
+      "fields" : {
+         "permit" : 1,
+         "issuer" : 2,
+         "active" : true,
+         "holder" : 8
+      },
+      "model" : "acl.entitlement"
+   },
+   {
+      "model" : "acl.entitlement",
+      "fields" : {
+         "permit" : 7,
+         "issuer" : 2,
+         "active" : false,
+         "holder" : 2
+      },
+      "pk" : 17
+   },
+   {
+      "pk" : 18,
+      "fields" : {
+         "holder" : 3,
+         "active" : true,
+         "issuer" : 2,
+         "permit" : 3
+      },
+      "model" : "acl.entitlement"
+   },
+   {
+      "model" : "selfservice.historicalwifinetwork",
+      "fields" : {
+         "history_user" : null,
+         "history_type" : "+",
+         "history_date" : "2019-01-02T20:25:28.568Z",
+         "network" : "Members",
+         "password" : "",
+         "id" : 1,
+         "history_change_reason" : null
+      },
+      "pk" : 1
+   },
+   {
+      "model" : "selfservice.historicalwifinetwork",
+      "fields" : {
+         "history_change_reason" : "Added during bulk import.",
+         "network" : "Members",
+         "password" : "1234",
+         "id" : 1,
+         "history_date" : "2019-01-02T20:25:28.580Z",
+         "history_user" : null,
+         "history_type" : "~"
+      },
+      "pk" : 2
+   },
+   {
+      "pk" : 3,
+      "fields" : {
+         "network" : "Members-5G",
+         "password" : "",
+         "id" : 2,
+         "history_change_reason" : null,
+         "history_user" : null,
+         "history_type" : "+",
+         "history_date" : "2019-01-02T20:25:28.586Z"
+      },
+      "model" : "selfservice.historicalwifinetwork"
+   },
+   {
+      "fields" : {
+         "history_type" : "~",
+         "history_user" : null,
+         "history_date" : "2019-01-02T20:25:28.596Z",
+         "id" : 2,
+         "password" : "1234",
+         "network" : "Members-5G",
+         "history_change_reason" : "Added during bulk import."
+      },
+      "pk" : 4,
+      "model" : "selfservice.historicalwifinetwork"
+   },
+   {
+      "model" : "selfservice.historicalwifinetwork",
+      "pk" : 5,
+      "fields" : {
+         "history_date" : "2019-01-02T20:25:28.604Z",
+         "history_type" : "+",
+         "history_user" : null,
+         "history_change_reason" : null,
+         "id" : 3,
+         "network" : "Guests",
+         "password" : ""
+      }
+   },
+   {
+      "fields" : {
+         "id" : 3,
+         "network" : "Guests",
+         "password" : "Welcome",
+         "history_change_reason" : "Added during bulk import.",
+         "history_type" : "~",
+         "history_user" : null,
+         "history_date" : "2019-01-02T20:25:28.614Z"
+      },
+      "pk" : 6,
+      "model" : "selfservice.historicalwifinetwork"
+   },
+   {
+      "pk" : 1,
+      "fields" : {
+         "content_type" : 16,
+         "change_message" : "",
+         "object_id" : "5",
+         "action_flag" : 3,
+         "action_time" : "2019-01-02T20:27:08.543Z",
+         "user" : 1,
+         "object_repr" : "instruct"
+      },
+      "model" : "admin.logentry"
+   },
+   {
+      "model" : "admin.logentry",
+      "pk" : 2,
+      "fields" : {
+         "object_id" : "6",
+         "action_flag" : 2,
+         "content_type" : 16,
+         "change_message" : "[{\"changed\": {\"fields\": [\"description\", \"permit\"]}}]",
+         "user" : 1,
+         "object_repr" : "metalinstruct",
+         "action_time" : "2019-01-02T20:27:33.585Z"
+      }
+   },
+   {
+      "model" : "admin.logentry",
+      "fields" : {
+         "user" : 1,
+         "object_repr" : "metalinstruct",
+         "action_time" : "2019-01-02T20:27:54.284Z",
+         "object_id" : "6",
+         "action_flag" : 3,
+         "content_type" : 16,
+         "change_message" : ""
+      },
+      "pk" : 3
+   },
+   {
+      "model" : "admin.logentry",
+      "fields" : {
+         "change_message" : "[{\"added\": {}}]",
+         "content_type" : 16,
+         "action_flag" : 1,
+         "object_id" : "7",
+         "action_time" : "2019-01-02T20:28:51.479Z",
+         "object_repr" : "Door Approval",
+         "user" : 1
+      },
+      "pk" : 4
+   },
+   {
+      "model" : "admin.logentry",
+      "pk" : 5,
+      "fields" : {
+         "action_flag" : 2,
+         "object_id" : "4",
+         "change_message" : "[{\"changed\": {\"fields\": [\"permit\"]}}]",
+         "content_type" : 16,
+         "object_repr" : "doors",
+         "user" : 1,
+         "action_time" : "2019-01-02T20:28:55.180Z"
+      }
+   },
+   {
+      "fields" : {
+         "object_repr" : "metalstuff",
+         "user" : 1,
+         "action_time" : "2019-01-02T20:29:35.992Z",
+         "action_flag" : 2,
+         "object_id" : "1",
+         "change_message" : "[{\"changed\": {\"fields\": [\"description\", \"permit\"]}}]",
+         "content_type" : 16
+      },
+      "pk" : 6,
+      "model" : "admin.logentry"
+   },
+   {
+      "model" : "admin.logentry",
+      "pk" : 7,
+      "fields" : {
+         "object_id" : "2",
+         "action_flag" : 2,
+         "content_type" : 5,
+         "change_message" : "[{\"changed\": {\"fields\": [\"email_confirmed\", \"is_staff\"]}}]",
+         "user" : 1,
+         "object_repr" : "Theo Trustuee",
+         "action_time" : "2019-01-02T20:30:12.451Z"
+      }
+   },
+   {
+      "model" : "admin.logentry",
+      "fields" : {
+         "change_message" : "[{\"changed\": {\"fields\": [\"name\", \"description\", \"location\", \"requires_form\"]}}]",
+         "content_type" : 15,
+         "action_flag" : 2,
+         "object_id" : "8",
+         "action_time" : "2019-01-02T20:32:06.295Z",
+         "object_repr" : "Bandsaw for metal",
+         "user" : 1
+      },
+      "pk" : 8
+   },
+   {
+      "model" : "admin.logentry",
+      "fields" : {
+         "action_flag" : 2,
+         "object_id" : "5",
+         "change_message" : "[{\"changed\": {\"fields\": [\"description\", \"requires_form\"]}}]",
+         "content_type" : 15,
+         "object_repr" : "doors",
+         "user" : 1,
+         "action_time" : "2019-01-02T20:32:37.192Z"
+      },
+      "pk" : 9
+   },
+   {
+      "model" : "admin.logentry",
+      "fields" : {
+         "object_repr" : "Woodshop",
+         "user" : 1,
+         "action_time" : "2019-01-02T20:32:58.362Z",
+         "action_flag" : 1,
+         "object_id" : "3",
+         "change_message" : "[{\"added\": {}}]",
+         "content_type" : 14
+      },
+      "pk" : 10
+   },
+   {
+      "fields" : {
+         "user" : 1,
+         "object_repr" : "tablesaw",
+         "action_time" : "2019-01-02T20:33:13.479Z",
+         "object_id" : "4",
+         "action_flag" : 2,
+         "content_type" : 15,
+         "change_message" : "[{\"changed\": {\"fields\": [\"description\", \"location\"]}}]"
+      },
+      "pk" : 11,
+      "model" : "admin.logentry"
+   },
+   {
+      "model" : "admin.logentry",
+      "pk" : 12,
+      "fields" : {
+         "content_type" : 15,
+         "change_message" : "[{\"changed\": {\"fields\": [\"description\"]}}]",
+         "object_id" : "3",
+         "action_flag" : 2,
+         "action_time" : "2019-01-02T20:33:49.694Z",
+         "user" : 1,
+         "object_repr" : "metallathe"
+      }
+   },
+   {
+      "fields" : {
+         "user" : 1,
+         "object_repr" : "3D-printer",
+         "action_time" : "2019-01-02T20:34:10.731Z",
+         "object_id" : "1",
+         "action_flag" : 2,
+         "content_type" : 15,
+         "change_message" : "[{\"changed\": {\"fields\": [\"description\"]}}]"
+      },
+      "pk" : 13,
+      "model" : "admin.logentry"
+   },
+   {
+      "model" : "admin.logentry",
+      "pk" : 14,
+      "fields" : {
+         "user" : 1,
+         "object_repr" : "Hammer",
+         "action_time" : "2019-01-02T20:34:38.986Z",
+         "object_id" : "9",
+         "action_flag" : 1,
+         "content_type" : 15,
+         "change_message" : "[{\"added\": {}}]"
+      }
+   },
+   {
+      "model" : "admin.logentry",
+      "fields" : {
+         "action_time" : "2019-01-02T20:35:26.244Z",
+         "user" : 1,
+         "object_repr" : "Theo Trustuee@Wood Instruction(Active:True)",
+         "content_type" : 9,
+         "change_message" : "",
+         "object_id" : "1",
+         "action_flag" : 3
+      },
+      "pk" : 15
+   },
+   {
+      "fields" : {
+         "action_flag" : 1,
+         "object_id" : "17",
+         "change_message" : "[{\"added\": {}}]",
+         "content_type" : 9,
+         "object_repr" : "Theo Trustuee@Door Approval(Active:False)",
+         "user" : 1,
+         "action_time" : "2019-01-02T20:36:01.138Z"
+      },
+      "pk" : 16,
+      "model" : "admin.logentry"
+   },
+   {
+      "fields" : {
+         "action_time" : "2019-01-02T20:36:21.982Z",
+         "user" : 1,
+         "object_repr" : "Ida Instructor@Wood Instruction(Active:False)",
+         "content_type" : 9,
+         "change_message" : "[{\"added\": {}}]",
+         "object_id" : "18",
+         "action_flag" : 1
+      },
+      "pk" : 17,
+      "model" : "admin.logentry"
+   },
+   {
+      "model" : "admin.logentry",
+      "pk" : 18,
+      "fields" : {
+         "content_type" : 2,
+         "change_message" : "[{\"added\": {}}]",
+         "object_id" : "1",
+         "action_flag" : 1,
+         "action_time" : "2019-01-02T20:37:44.612Z",
+         "user" : 1,
+         "object_repr" : "Bike@Corridor next to the washbasin"
+      }
+   },
+   {
+      "model" : "admin.logentry",
+      "fields" : {
+         "change_message" : "[{\"added\": {}}]",
+         "content_type" : 2,
+         "action_flag" : 1,
+         "object_id" : "2",
+         "action_time" : "2019-01-02T20:38:39.736Z",
+         "object_repr" : "Pallets@Floor in the wood workshop",
+         "user" : 1
+      },
+      "pk" : 19
+   },
+   {
+      "fields" : {
+         "object_id" : "3",
+         "action_flag" : 1,
+         "content_type" : 2,
+         "change_message" : "[{\"added\": {}}]",
+         "user" : 1,
+         "object_repr" : "500Liter LPG Gas tank@Near the back door",
+         "action_time" : "2019-01-02T20:39:19.946Z"
+      },
+      "pk" : 20,
+      "model" : "admin.logentry"
+   },
+   {
+      "model" : "admin.logentry",
+      "pk" : 21,
+      "fields" : {
+         "action_flag" : 2,
+         "object_id" : "2",
+         "change_message" : "[{\"changed\": {\"fields\": [\"description\"]}}]",
+         "content_type" : 14,
+         "object_repr" : "Metalshop",
+         "user" : 1,
+         "action_time" : "2019-01-02T20:45:01.519Z"
+      }
+   },
+   {
+      "model" : "admin.logentry",
+      "fields" : {
+         "content_type" : 14,
+         "change_message" : "[{\"changed\": {\"fields\": [\"description\"]}}]",
+         "object_id" : "1",
+         "action_flag" : 2,
+         "action_time" : "2019-01-02T20:45:12.153Z",
+         "user" : 1,
+         "object_repr" : "Frontroom"
+      },
+      "pk" : 22
+   },
+   {
+      "fields" : {
+         "change_message" : "[{\"added\": {}}]",
+         "content_type" : 8,
+         "action_flag" : 1,
+         "object_id" : "1",
+         "action_time" : "2019-01-02T20:49:01.457Z",
+         "object_repr" : "23432432432 (Ida Instructor)",
+         "user" : 1
+      },
+      "pk" : 23,
+      "model" : "admin.logentry"
+   },
+   {
+      "pk" : 24,
+      "fields" : {
+         "user" : 1,
+         "object_repr" : "asfadsfads (Peter Plain)",
+         "action_time" : "2019-01-02T20:49:10.219Z",
+         "object_id" : "2",
+         "action_flag" : 1,
+         "content_type" : 8,
+         "change_message" : "[{\"added\": {}}]"
+      },
+      "model" : "admin.logentry"
+   },
+   {
+      "model" : "admin.logentry",
+      "fields" : {
+         "action_time" : "2019-01-02T20:49:17.646Z",
+         "object_repr" : "321312 (Ida Instructor)",
+         "user" : 1,
+         "change_message" : "[{\"added\": {}}]",
+         "content_type" : 8,
+         "action_flag" : 1,
+         "object_id" : "3"
+      },
+      "pk" : 25
+   },
+   {
+      "model" : "admin.logentry",
+      "pk" : 26,
+      "fields" : {
+         "action_time" : "2019-01-02T20:49:26.336Z",
+         "user" : 1,
+         "object_repr" : "131321 (Tom LotsATags)",
+         "content_type" : 8,
+         "change_message" : "[{\"added\": {}}]",
+         "object_id" : "4",
+         "action_flag" : 1
+      }
+   },
+   {
+      "fields" : {
+         "user" : 1,
+         "object_repr" : "3121121 (Tom LotsATags)",
+         "action_time" : "2019-01-02T20:49:30.952Z",
+         "object_id" : "4",
+         "action_flag" : 2,
+         "content_type" : 8,
+         "change_message" : "[{\"changed\": {\"fields\": [\"tag\"]}}]"
+      },
+      "pk" : 27,
+      "model" : "admin.logentry"
+   },
+   {
+      "model" : "admin.logentry",
+      "pk" : 28,
+      "fields" : {
+         "object_repr" : "3121312 (Tom LotsATags)",
+         "user" : 1,
+         "action_time" : "2019-01-02T20:49:34.861Z",
+         "action_flag" : 2,
+         "object_id" : "4",
+         "change_message" : "[{\"changed\": {\"fields\": [\"tag\"]}}]",
+         "content_type" : 8
+      }
+   },
+   {
+      "model" : "admin.logentry",
+      "pk" : 29,
+      "fields" : {
+         "content_type" : 8,
+         "change_message" : "[{\"changed\": {\"fields\": [\"owner\", \"tag\"]}}]",
+         "object_id" : "4",
+         "action_flag" : 2,
+         "action_time" : "2019-01-02T20:49:45.288Z",
+         "user" : 1,
+         "object_repr" : "31255454 (Mary Metal)"
+      }
+   },
+   {
+      "pk" : 30,
+      "fields" : {
+         "action_flag" : 1,
+         "object_id" : "5",
+         "change_message" : "[{\"added\": {}}]",
+         "content_type" : 8,
+         "object_repr" : "5454 (Peter Plain)",
+         "user" : 1,
+         "action_time" : "2019-01-02T20:49:50.043Z"
+      },
+      "model" : "admin.logentry"
+   },
+   {
+      "fields" : {
+         "object_repr" : "454454 (Mary Metal)",
+         "user" : 1,
+         "action_time" : "2019-01-02T20:49:55.977Z",
+         "action_flag" : 1,
+         "object_id" : "6",
+         "change_message" : "[{\"added\": {}}]",
+         "content_type" : 8
+      },
+      "pk" : 31,
+      "model" : "admin.logentry"
+   },
+   {
+      "model" : "admin.logentry",
+      "pk" : 32,
+      "fields" : {
+         "content_type" : 8,
+         "change_message" : "[{\"added\": {}}]",
+         "object_id" : "7",
+         "action_flag" : 1,
+         "action_time" : "2019-01-02T20:50:02.867Z",
+         "user" : 1,
+         "object_repr" : "45454 (Mike Newmetal)"
+      }
+   },
+   {
+      "pk" : 33,
+      "fields" : {
+         "object_repr" : "5444 (Theo Trustuee)",
+         "user" : 1,
+         "action_time" : "2019-01-02T20:50:10.561Z",
+         "action_flag" : 1,
+         "object_id" : "8",
+         "change_message" : "[{\"added\": {}}]",
+         "content_type" : 8
+      },
+      "model" : "admin.logentry"
+   },
+   {
+      "model" : "admin.logentry",
+      "fields" : {
+         "action_time" : "2019-01-02T20:50:49.906Z",
+         "user" : 1,
+         "object_repr" : "41243242 (Tom LotsATags)",
+         "content_type" : 8,
+         "change_message" : "[{\"added\": {}}]",
+         "object_id" : "9",
+         "action_flag" : 1
+      },
+      "pk" : 34
+   },
+   {
+      "model" : "admin.logentry",
+      "pk" : 35,
+      "fields" : {
+         "user" : 1,
+         "object_repr" : "1 (Tom LotsATags)",
+         "action_time" : "2019-01-02T20:54:22.603Z",
+         "object_id" : "10",
+         "action_flag" : 1,
+         "content_type" : 8,
+         "change_message" : "[{\"added\": {}}]"
+      }
+   },
+   {
+      "pk" : 36,
+      "fields" : {
+         "action_time" : "2019-01-02T20:54:26.472Z",
+         "object_repr" : "12 (Tom LotsATags)",
+         "user" : 1,
+         "change_message" : "[{\"changed\": {\"fields\": [\"tag\"]}}]",
+         "content_type" : 8,
+         "action_flag" : 2,
+         "object_id" : "10"
+      },
+      "model" : "admin.logentry"
+   },
+   {
+      "model" : "admin.logentry",
+      "fields" : {
+         "content_type" : 8,
+         "change_message" : "[]",
+         "object_id" : "10",
+         "action_flag" : 2,
+         "action_time" : "2019-01-02T20:54:27.305Z",
+         "user" : 1,
+         "object_repr" : "12 (Tom LotsATags)"
+      },
+      "pk" : 37
+   },
+   {
+      "fields" : {
+         "object_repr" : "123 (Tom LotsATags)",
+         "user" : 1,
+         "action_time" : "2019-01-02T20:54:30.471Z",
+         "action_flag" : 2,
+         "object_id" : "10",
+         "change_message" : "[{\"changed\": {\"fields\": [\"tag\"]}}]",
+         "content_type" : 8
+      },
+      "pk" : 38,
+      "model" : "admin.logentry"
+   },
+   {
+      "pk" : 39,
+      "fields" : {
+         "content_type" : 8,
+         "change_message" : "[{\"added\": {}}]",
+         "object_id" : "11",
+         "action_flag" : 1,
+         "action_time" : "2019-01-02T20:57:47.139Z",
+         "user" : 1,
+         "object_repr" : "32232 (Tom LotsATags)"
+      },
+      "model" : "admin.logentry"
+   },
+   {
+      "pk" : 40,
+      "fields" : {
+         "action_time" : "2019-01-02T20:57:55.274Z",
+         "object_repr" : "22 (Tom LotsATags)",
+         "user" : 1,
+         "change_message" : "[{\"added\": {}}]",
+         "content_type" : 8,
+         "action_flag" : 1,
+         "object_id" : "12"
+      },
+      "model" : "admin.logentry"
+   },
+   {
+      "model" : "admin.logentry",
+      "fields" : {
+         "action_time" : "2019-01-02T20:58:05.501Z",
+         "object_repr" : "444 (Tom LotsATags)",
+         "user" : 1,
+         "change_message" : "[{\"added\": {}}]",
+         "content_type" : 8,
+         "action_flag" : 1,
+         "object_id" : "13"
+      },
+      "pk" : 41
+   }
+]
