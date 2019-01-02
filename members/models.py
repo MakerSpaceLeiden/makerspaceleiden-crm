@@ -61,5 +61,5 @@ class Tag(models.Model):
     history = HistoricalRecords()
 
     def __str__(self):
-        return self.tag + ' (' + self.owner.user.str() + ')'
+        return self.tag + ' (' + str(self.owner) + ')'
 
