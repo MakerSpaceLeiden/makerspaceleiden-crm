@@ -53,6 +53,16 @@
 - Some 10's of machines
 - Low 100's of users
 
+## Email 'rules'
+
+- User changes his/her details -> email trustees
+- Someone adds instructions -> email trustees ? deelnemers ?
+- Any mutations on storage space - email deelnemers
+  Email owner separare if the change is made by someone else but the owner.
+  Email trusteeds if > 30 days or extension on a auto-approve 30 days.
+- Box changes - email trusteeds
+  Email owner separare if the change is made by someone else but the owner.
+
 # Current design
 
 - Normal Django users; Members adds a field to that (form on file). May
@@ -66,45 +76,14 @@
 
 - Permits
 	E.g. allowed to open doors.
-
-- Instructions
-	member can give & record instructions
-	but only on the things they have received instruction on.
+	May require a permit to be issued (one deep)
 
 - Entitlements
-	heavier version of an instruction - connects a member to
-	an permit. Permits can span multiple devices (unlike
-	instructions). 
-
-	- Assumption is that only a few peple add these.
-
-- Issues
-	Members extenion of Users is messy.
+	of a specific permi
+	Assigned to a user (owner) by an issuer.
+	issuer must have the entitlement himself.
+	issuer must ALSO have the permit specified in the permit,
+	i.e. the instruction permit, if so specified (one deep)
 
 ## issues with the current design
 	
-- Instructions and permits too similar.
-- Unclear approval workflow for Entitlements; e.g. explicit
-ok from both instructor and trustee ? Or do we use
-the second layer instructions for this ?
-
-# Redesign ideas
-
-- Drop the Instruction class and replace it by
-
-	- PermitTypes get issuer permit required. I.e. what entitelemt an issuer must have before giving an entitlement.
-		- not ideal - smells of recursion ?!
-		- can this just be a flag ?
-
-        - Entitlements get an extra flag - 'activate`' (managed by trustees)
-		it is set by default to YES for everything except when it is for a 'form needed' permitType
-
-	- Entitlements become the new instructions
-	
-		- but check the Entitlement or holder too issue that permit too at time of issue.
-	
-	- Make a type of default 'any member' permit for every machine and on the issuer of most entitlements. 
-	Or give any member the 'member' entitlement. So this entitlement acts as a 'is a full member'.
-	
-Or on other words - Entitlement becomes more of a 'tag'.
-

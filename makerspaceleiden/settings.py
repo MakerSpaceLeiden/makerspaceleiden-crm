@@ -26,6 +26,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = [ '10.11.0.158', '*' ]
 
+# Allow users to create their own entitlement as a one off
+# bootstrapping thing.
+#
+GRAND_AMNESTY = True
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -33,17 +38,12 @@ INSTALLED_APPS = [
     'simple_history',
     'qrcode',
 
-#    'selfservice',
-#    'storage',
-#    'members',
-#    'memberbox',
-#    'acl',
-
     'storage.apps.StorageConfig',
     'memberbox.apps.MemberboxConfig',
     'members.apps.UserConfig',
     'acl.apps.AclConfig',
     'selfservice.apps.SelfserviceConfig',
+    'ufo.apps.UfoConfig',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -81,12 +81,19 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django_settings_export.settings_export',
             ],
         },
     },
 ]
 
+SETTINGS_EXPORT = [ 'GRAND_AMNESTY', ]
+
 WSGI_APPLICATION = 'makerspaceleiden.wsgi.application'
+
+MAILINGLIST='deelnemers@makerspaceleiden.nl'
+FROM_EMAIL="noc@makerspaceleiden.nl"
+BASE='https://makerspaceleiden.nl/crm'
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
@@ -148,3 +155,11 @@ STATICFILES_DIRS = [ ]
 
 AUTH_USER_MODEL = 'members.User'
 
+MEDIA_ROOT="/tmp"
+# MEDIA_ROOT =  os.path.join(BASE_DIR, 'media') 
+MEDIA_URL = '/media/'
+
+MAX_ZIPFILE=32*1024*1024
+MIN_IMAGE_SIZE=2*1024
+MAX_IMAGE_SIZE=8*1024*1024
+MAX_IMAGE_WIDTH=1280

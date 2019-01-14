@@ -44,7 +44,7 @@
 	<tr>
 	<th></th>
     	{% for machine in machines %}
-		<th>{{ machine }}</th>
+	<th><a href="{{machine.id}}">{{ machine }}</a></th>
     	{% endfor %}
 	</tr>
     	{% for member in members %}

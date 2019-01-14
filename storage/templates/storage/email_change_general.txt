@@ -1,0 +1,45 @@
+Dear All,
+
+{{ user }} has {% if rq.created %}requested{% else %}updated the information for{% endif %} storage for:
+
+	  {{ rq.what }}
+
+   Owner: {{ rq.owner }}
+Location: {{ rq.location }}
+   Until: {{ rq.lastdate }} ({{ rq.duration }} days)
+
+          {{ rq.extra_info }}
+{% if rq.state == 'R' %}
+This request requires the approval from the members of this mailing list. Until then
+it will stay in the 'requested' state; while {{ owner }} will need to wait 
+before storing {{ what }} at the space.
+{% elif rq.state == 'AG' %}
+As this is (the first) request for short term storage of this item; it has been
+automatically approved for thirty days.
+{% elif rq.state == '1st' %}
+This is is a request for an extension of the initial 30 days. It will be automatically
+approved in 5 days unless objections are raised.
+{% elif rq.state == 'OK' %}
+This request has been approved (by the deelnemers@ or the trustees).
+{% elif rq.state == 'NO' %}
+This request has been rejected. If already at the space {{what}}
+should be removed from the space as soon as possible (and becomes
+fair game to re-use or throw in the bin after 5 days).
+{% elif srq.tate == 'R' %}
+This request ha been rescinded -- the storage spae is no longer needed.
+{% endif %}
+You can see the full record at:
+
+	<{{ base }}{% url 'showstorage' pk=rq.id  %}>
+
+and any past history at:
+
+	<{{ base }}{% url 'showhistory' pk=rq.id  %}>
+
+And a full overview of {{ owner }} his storage can be seen at:
+
+	<{{ base }}{% url 'storage' user_pk=rq.owner.id  %}>
+
+Thanks,
+
+Your Caring Makerbot.

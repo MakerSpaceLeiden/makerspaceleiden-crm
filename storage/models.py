@@ -2,6 +2,10 @@ from django.db import models
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from simple_history.models import HistoricalRecords
+from django.template.loader import render_to_string, get_template
+from django.core.mail import EmailMessage
+from django.conf import settings
+
 from members.models import User
 
 import datetime
@@ -70,7 +74,7 @@ class Storage(models.Model):
         n.extends = self
         n.save()
 
-    def apply_rules(self):
+    def apply_rules(self,user=None):
         s = self.state
 
         if self.state == '':

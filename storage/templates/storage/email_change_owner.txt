@@ -1,0 +1,38 @@
+Dear {{ rq.owner }},
+
+{{ user }} has {% if created %}requested{% else %}updated the information for{% endif %} storage 
+that you, as the owner, are now responsible for:
+
+	  {{ rq.what }}
+
+   Owner: {{ rq.owner }}
+Location: {{ rq.location }}
+   Until: {{ rq.lastdate }} ({{ rq.duration }} days)
+
+          {{ rq.extra_info }}
+
+{% if rq.state == 'R' %}
+This request requires the approval from the members of this mailing list. 
+
+Until then you will need to wait. If've you've already stored it at the space; then
+you should really remove it again; and beware that others may recycle or bin it if
+they find it to be in the way or useful for their project.
+{% elif rq.state == 'AG' %}
+As this is (the first) request for short term storage of this item; it has been
+automatically approved for thirty days.
+{% elif rq.state == '1st' %}
+This is is a request for an extension of the initial 30 days. It will be automatically
+approved in 5 days unless objections are raised.
+{% elif rq.state == 'OK' %}
+This request has been approved (by the deelnemers@ or the trustees).
+{% elif rq.state == 'NO' %}
+This request has been rejected. If already at the space {{what}}
+should be removed from the space as soon as possible (and becomes
+fair game to re-use or throw in the bin after 5 days).
+{% elif rq.state == 'R' %}
+This request ha been rescinded -- the storage spae is no longer needed.
+{% endif %}
+
+Thanks,
+
+Your Caring Makerbot.

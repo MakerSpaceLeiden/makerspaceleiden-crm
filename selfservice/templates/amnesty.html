@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% if saved %}
+  <p>Your permissions have been saved. Some may require approval
+  from the trustees; or a cross check that the liability waiver
+  form is on file.
+  </p>
+  Thanks for help us grow the makerspace ! 
+  <hr>
+  <a href="..">back to the home page</a>
+{% else %}
+  This form is to populate the initial permissions and instructions.
+  <p/>
+  It will be removed in a few days - after which the normal recording
+  rules apply.
+  <p/>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    <table>
+        {{ form.as_table }}
+    </table>
+    <button type="submit">Save</button>
+    <a href="{% url 'index' %}">Cancel</a>
+  </form>
+{% endif %}
+
+{% endblock %}
+

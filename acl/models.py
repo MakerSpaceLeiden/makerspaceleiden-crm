@@ -67,8 +67,8 @@ class Entitlement(models.Model):
         pass
 
     def save(self, *args, **kwargs):
-
         # rely on the contraints to bomb out if there is nothing in kwargs and self. and self.
+        #
         if not self.issuer and request in kwargs:
                   self.issuer = kwargs['request'].user
               
@@ -77,6 +77,21 @@ class Entitlement(models.Model):
         if 'request' in kwargs:
           if issuer_permit and not PermitType.objects.filter(permit=issuer_permit,holder=request.user):
              raise EntitlementViolation("issuer of this entitelment lacks the entitlement to issue it.")
-           
+       
+        if self.active == None:
+            # See if we can fetch an older approval for same that may already have
+            # been activated. And grandfather it in.
+            try:
+               e = Entitlement.objects.get(permit = self.permit, holder = self.holder);
+               self.active = e.active
+            except EntitlementNotFound:
+                pass
+
+        # Notify the super users if this requires approval. Is this a good
+        # place ? Or should bwe do this on a crontab ?
+        #
+        if not self.active and self.permit.permit:
+            print("Should we send an email to notify Super users ?")
+
         return super(Entitlement, self).save(*args, **kwargs)
 

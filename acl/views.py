@@ -18,6 +18,7 @@ from memberbox.models import Memberbox
 
 def matrix_mm(machine,mbr):
        out = { 'xs' : False, 'instructions_needed' : False, 'tags' : [] }
+       out['mid'] = machine.id
 
        out['requires_instruction'] = machine.requires_instruction
        out['requires_permit'] = machine.requires_permit

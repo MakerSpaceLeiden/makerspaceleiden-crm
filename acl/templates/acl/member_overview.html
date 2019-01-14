@@ -1,11 +1,18 @@
 {% extends 'base.html' %}
 
+{% load qr_tags  %}
+
 {% block content %}
 
 {% if lst %}
 <table>
-	<tr><td colspan=2><h3>Personal details</h3></tr>
-	<tr><td align=right>First name</td><td>{{ member.first_name}}</td></tr>
+	<tr>
+		<td colspan=2><h3>Personal details</h3></td>
+	</tr>
+	<tr>
+		<td align=right>First name</td><td>{{ member.first_name}}</td>
+		<td valign=top rowspan=3>{% qr_from_text member.id "s" %}<br/>private box label</td>
+	</tr>
 	<tr><td align=right>Last name</td><td>{{ member.last_name}}</td></tr>
 	<tr><td align=right>Email (usernme)</td><td>{{ member.email}}</td></tr>
 	<tr><td align=right>Waiver on file</td><td>
@@ -80,7 +87,7 @@
 	<tr><td colspan=2><h3>Entitlements</h3></tr>
 	{% for machine,info in lst.items %}
 	<tr>
-		<td align=right>{{ machine }}</td>
+		<td align=right><a href="{% url 'machine_overview' machine_id=info.mid %}">{{ machine }}</a></td>
 		<td>
                 {%if info.xs == True %}
 		<b>

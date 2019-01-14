@@ -18,8 +18,10 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils import six
 from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
-import logging
 
+from django.conf import settings
+
+import logging
 
 from members.models import Tag,User
 from acl.models import Machine,Entitlement,PermitType
@@ -88,9 +90,7 @@ def recordinstructions(request):
 
     # Only show machine we are entitled for ourselves.
     #
-    machines = Machine.objects.all().filter(requires_permit__isRequiredToOperate__holder=member)
     machines = Machine.objects.all().filter(requires_permit__isRequiredToOperate__holder=member).filter(Q(requires_permit__permit=None) | Q(requires_permit__permit__isRequiredToOperate__holder=member) | Q(requires_permit = None))
-    print(machines)
 
     ps =[]
     for m in members:
@@ -264,3 +264,46 @@ def signup(request):
     else:
         form = SignUpForm()
     return render(request, 'signup.html', {'form': form})
+
+class AmnestyForm(forms.Form):
+
+    def __init__(self, *args, **kwargs):
+        machines = kwargs.pop('machines')
+        super(AmnestyForm, self).__init__(*args, **kwargs)
+        for m in machines:
+            self.fields['machine_%s' % m.id ] = forms.BooleanField(label=m.name, required=False)
+
+@login_required
+def amnesty(request):
+    machines = Machine.objects.exclude(requires_permit = None)
+    machines_entitled = Machine.objects.all().filter(requires_permit__isRequiredToOperate__holder=request.user)
+
+    context = { 'title': 'Amnesty' }
+
+    form = AmnestyForm(request.POST or None, machines=machines)
+    if form.is_valid():
+        permits = []
+        for m in machines:
+            if m in machines_entitled:
+                continue
+            if not m.requires_permit or m.requires_permit in permits:
+                continue
+            permits.append(m.requires_permit)
+        for p in permits:    
+            e,created = Entitlement.objects.get_or_create(holder = request.user, 
+                    issuer = request.user, permit = p);
+            if created:
+               e.changeReason = 'Added through the grand amnesty interface by {0}'.format(request.user)
+               e.active = True
+               e.save()
+               context['saved'] = True
+            # return redirect('userdetails')
+
+    for m in machines_entitled:
+         form.fields['machine_%s' % m.id ].initial = True
+         form.fields['machine_%s' % m.id ].disabled = True
+         form.fields['machine_%s' % m.id ].help_text = 'Already listed - cannot be edited.'
+
+    context['form'] = form
+
+    return render(request, 'amnesty.html', context)

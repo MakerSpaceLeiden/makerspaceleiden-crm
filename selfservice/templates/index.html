@@ -20,6 +20,10 @@ There are no wifi network passwords for members at the moment.
 <p>
 <ul>
 	<li><a href="{% url 'overview' member_id=member.id %}">Your data</a>
+{%if settings.GRAND_AMNESTY %}
+	<li><a href="{% url 'amnesty' %}">Grand amnesty</a>
+{%endif %}
+
 	<li><a href="{% url 'overview' %}">All members </a>
 	<li><a href="{% url 'machine_overview' %}">All machines (slow)</a>
 	<p/>

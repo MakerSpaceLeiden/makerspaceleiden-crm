@@ -6,6 +6,7 @@ urlpatterns = [
     path('<int:user_pk>', views.index, name='storage'),
 
     path('add', views.create, name='addstorage'),
+    path('show/<int:pk>', views.showstorage, name='showstorage'),
     path('modify/<int:pk>', views.modify, name='changestorage'),
     path('delete/<int:pk>', views.delete, name='deletestorage'),
 

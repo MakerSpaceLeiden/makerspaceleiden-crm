@@ -15,6 +15,9 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_protect
 from django.db.models import Q
 from simple_history.admin import SimpleHistoryAdmin
+from django.template.loader import render_to_string, get_template
+from django.core.mail import EmailMessage
+from django.conf import settings
 
 import datetime
 
@@ -25,6 +28,21 @@ from .forms import StorageForm,ConfirmForm
 
 import logging
 logger = logging.getLogger(__name__)
+
+
+def sendStorageEmail(storedObject, user, isCreated, to, template):
+    subject = "[makerbot] Storage request for %s" % storedObject.what
+    if storedObject.state == 'AG':
+           subject += '(Auto approved, shorter than 30 days)'
+
+    message = render_to_string(template, {
+           'created': isCreated,
+           'rq': storedObject,
+           'user': user,
+           'base': settings.BASE,
+    })
+    EmailMessage(subject, message, to=[to], from_email=settings.FROM_EMAIL).send()
+
 
 @login_required
 def index(request,user_pk):
@@ -74,20 +92,33 @@ def index(request,user_pk):
 
 @login_required
 @csrf_protect
+def showstorage(request, storageid):
+    # not implemented yet.
+    return redirect('storage')
+
+@login_required
+@csrf_protect
 def create(request):
     form = StorageForm(request.POST or None, initial = { 'owner': request.user.id })
     form.fields['duration'].help_text= "days. Short requests (month or less) are automatically approved."
-    logger.error("WE have:" +str(request.POST))
+
     if form.is_valid():
        try:
            logger.error("Ok!")
            s = form.save(commit=False)
            s.changeReason = 'Created through the self-service interface by {0}'.format(request.user)
            s.save()
-           s.apply_rules()
+           s.apply_rules(request.user)
+
+           sendStorageEmail(s, request.user, True, 
+                   settings.MAILINGLIST, 'storage/email_change_general.txt')
+           if request.user != s.owner:
+                   sendStorageEmail(s, request.user, True, 
+                      s.owner.email, 'storage/email_change_owner.txt')
+
            return redirect('storage')
        except Exception as e:
-           logger.error("Unexpected error during create of new box : {0}".format(e))
+           logger.error("Unexpected error during create of new storage : {0}".format(e))
     else:
        logger.error("nope: " + str(form.errors))
        logger.error("nope: " + str(form.non_field_errors))
@@ -107,38 +138,45 @@ def create(request):
 @csrf_protect
 def modify(request,pk):
     try:
-         box = Storage.objects.get(pk=pk)
+         storage = Storage.objects.get(pk=pk)
     except Storage.DoesNotExist:
-         return HttpResponse("Eh - what box ??",status=404,content_type="text/plain")
+         return HttpResponse("Eh - what storage ??",status=404,content_type="text/plain")
 
-    if not box.editable() and not box.location_updatable():
+    if not storage.editable() and not storage.location_updatable():
          return HttpResponse("Eh - no can do ??",status=403,content_type="text/plain")
 
-    form = StorageForm(request.POST or None, instance = box)
+    form = StorageForm(request.POST or None, instance = storage)
 
     if form.is_valid():
        logger.error("saving")
        try:
-           box = form.save(commit=False)
-           box.changeReason = 'Updated through the self-service interface by {0}'.format(request.user)
-           box.save()
-           box.apply_rules()
+           storage = form.save(commit=False)
+           storage.changeReason = 'Updated through the self-service interface by {0}'.format(request.user)
+           storage.save()
+           storage.apply_rules(request.user)
+
+           sendStorageEmail(storage, request.user, False, 
+                   settings.MAILINGLIST, 'storage/email_change_general.txt')
+           if request.user != storage.owner:
+                   sendStorageEmail(storage, request.user, False, 
+                      storage.owner.email, 'storage/email_change_owner.txt')
+
            return redirect('storage')
 
        except Exception as e:
-         logger.error("Unexpected error during save of box: {0}".format(e))
+         logger.error("Unexpected error during save of storage: {0}".format(e))
     else:
        logger.error("nope")
 
     context = {
-        'label': 'Update box location and details',
+        'label': 'Update storage location and details',
         'action': 'Update',
-        'title': 'Update box details',
+        'title': 'Update storage details',
         'is_logged_in': request.user.is_authenticated,
         'user' : request.user,
-        'owner' : box.owner,
+        'owner' : storage.owner,
         'form':  form,
-        'box': box,
+        'storage': storage,
     }
 
     return render(request, 'storage/crud.html', context)
@@ -147,9 +185,9 @@ def modify(request,pk):
 @csrf_protect
 def delete(request,pk):
     try:
-         box = Storage.objects.get(pk=pk)
+         storage = Storage.objects.get(pk=pk)
     except Storage.DoesNotExist:
-         return HttpResponse("Eh - what box ??",status=404,content_type="text/plain")
+         return HttpResponse("Eh - what storage ??",status=404,content_type="text/plain")
 
     form = ConfirmForm(request.POST or None, initial = {'pk':pk})
     if not request.POST:
@@ -159,9 +197,9 @@ def delete(request,pk):
             'action': 'Delete',
             'is_logged_in': request.user.is_authenticated,
             'user' : request.user,
-            'owner' : box.owner,
+            'owner' : storage.owner,
             'form':  form,
-            'box': box,
+            'storage': storage,
             'delete': True,
          }
          return render(request, 'storage/crud.html', context)
@@ -169,15 +207,15 @@ def delete(request,pk):
     if not form.is_valid():
          return HttpResponse("Eh - confused ?!",status=403,content_type="text/plain")
 
-    if box.owner != request.user and form.cleaned_data['pk'] != pk:
-         return HttpResponse("Eh - not your box ?!",status=403,content_type="text/plain")
+    if storage.owner != request.user and form.cleaned_data['pk'] != pk:
+         return HttpResponse("Eh - not your storage ?!",status=403,content_type="text/plain")
 
     try:
-       box.changeReason = 'Set to done via the self-service interface by {0}'.format(request.user)
-       box.state = 'D'
-       box.save()
+       storage.changeReason = 'Set to done via the self-service interface by {0}'.format(request.user)
+       storage.state = 'D'
+       storage.save()
     except Exception as e:
-         logger.error("Unexpected error during delete of box: {0}".format(e))
+         logger.error("Unexpected error during delete of storage: {0}".format(e))
          return HttpResponse("Box fail",status=400,content_type="text/plain")
 
     return redirect('storage')
@@ -194,15 +232,15 @@ class MySimpleHistoryAdmin(SimpleHistoryAdmin):
 @csrf_protect
 def showhistory(request,pk,rev=None):
     try:
-         box = Storage.objects.get(pk=pk)
+         storage = Storage.objects.get(pk=pk)
     except Storage.DoesNotExist:
-         return HttpResponse("Eh - what box ??",status=404,content_type="text/plain")
+         return HttpResponse("Eh - what storage ??",status=404,content_type="text/plain")
     context = {
        'title': 'View history',
 #       'opts': { 'admin_url': { 'simple_history': 'xxx' } },
     }
     if rev:
-      revInfo = box.history.get(pk = rev)
+      revInfo = storage.history.get(pk = rev)
       historic = revInfo.instance
       logger.error("===>" + str(historic))
       form = StorageForm(None, instance = historic)
@@ -213,7 +251,7 @@ def showhistory(request,pk,rev=None):
             'action': None,
             'is_logged_in': request.user.is_authenticated,
             'user' : request.user,
-            'owner' : box.owner,
+            'owner' : storage.owner,
             'form':  form,
             'box':  historic,
             'history': True,
