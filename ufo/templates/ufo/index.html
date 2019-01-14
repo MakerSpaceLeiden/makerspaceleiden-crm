@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% if lst %}
+<table>
+  {% for item in lst %}
+  <tr valign=top>
+        <td rowspan=2 valign=top>{{ item.get_state_display }}</td>
+	<td rowspan=2 valign=top><a href="/media/{{ item.image }}"><img src="/media/{{ item.image }}" width=120/></a></td>
+  	<td>{{ item.description }}</td>
+	{%if item.owner %}
+  	<td>{{ item.owner }}</td>
+	{%endif%}
+  </tr><tr>
+	<td colspan=3>
+		<b><a href="{% url 'mine' pk=item.id %}">[Claim this]</a><b>
+		-- 
+		<a href="{% url 'showufo' pk=item.id %}">[view]</a>
+		<a href="{% url 'changeufo' pk=item.id %}">[modify]</a>
+		<a href="{% url 'deleteufo' pk=item.id %}">[delete]</a>
+	</td>
+  </tr>
+  {% endfor %}
+</table>
+{% else %}
+No free floating objects that need a home. At the moment.
+{% endif %}
+<p/>
+<a href="{% url 'addufo' %}">[ add one ]</a>
+<p/>
+{% if days %}
+<b>Note: Only showing the last {{ days }} day(s) for items that are already claimed.</b> (And all unclaimed items).
+{% endif %}
+<p/>
+Show only data relevant for 
+<a href="7">last week</a>,
+<a href="30">last month</a> or 
+<a href="0">all times</a>
+<p/>
+
+
+{% endblock %}

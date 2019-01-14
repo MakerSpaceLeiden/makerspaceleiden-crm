@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<a href="/media/{{ item.image }}"><img src="/media/{{ item.image }}" width=600/></a>
+<br>
+{{ item.description }}
+<p/>
+{%if item.owner %}
+Person now responsible: {{ item.owner }}
+{%endif%}
+<p/>
+<a href="{% url 'changeufo' pk=item.id %}">[modify]</a>
+<a href="{% url 'deleteufo' pk=item.id %}">[delete]</a>
+
+{% endblock %}

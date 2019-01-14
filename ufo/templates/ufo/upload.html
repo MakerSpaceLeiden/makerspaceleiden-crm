@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{%if lst %}
+Upload completed.
+{% if skipped %}
+Files failed:
+<ol>
+	{% for msg in skipped %}
+	<li> {{ msg }} </li>
+	{% endfor %}
+</ol>
+{% endif %}
+<p/>
+Images uploaded OK:
+{% for item in lst %}<img src="/media/small_{{ item.image }}" width=30/>{% endfor %}
+<p/>
+<hr>
+<a href="{% url "ufo" %}">back</a> to the overview.
+{% else %}
+  <form method="post"  enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">{{ action }}</button>
+  </form>
+<hr>
+<p>
+<a href="{% url "ufo" %}">back</a> to the overview.
+<p>
+{% endif %}
+{% endblock %}
