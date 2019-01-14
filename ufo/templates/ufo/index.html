@@ -2,7 +2,10 @@
 
 {% block content %}
 
+<a href="{% url 'addufo' %}">[ add one ]</a> or do a <a href="{% url 'uploadufo' %}">[ bulk upload ]</a> by means of a zip file of images.
+
 {% if lst %}
+<p/>
 <table>
   {% for item in lst %}
   <tr valign=top>
@@ -23,12 +26,6 @@
   </tr>
   {% endfor %}
 </table>
-{% else %}
-No free floating objects that need a home. At the moment.
-{% endif %}
-<p/>
-<a href="{% url 'addufo' %}">[ add one ]</a>
-<p/>
 {% if days %}
 <b>Note: Only showing the last {{ days }} day(s) for items that are already claimed.</b> (And all unclaimed items).
 {% endif %}
@@ -37,6 +34,10 @@ Show only data relevant for
 <a href="7">last week</a>,
 <a href="30">last month</a> or 
 <a href="0">all times</a>
+<p/>
+{% else %}
+No free floating objects that need a home. At the moment.
+{% endif %}
 <p/>
 
 

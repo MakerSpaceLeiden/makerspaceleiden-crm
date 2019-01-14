@@ -13,15 +13,17 @@ Files failed:
 {% endif %}
 <p/>
 Images uploaded OK:
-{% for item in lst %}<img src="/media/small_{{ item.image }}" width=30/>{% endfor %}
+{% for item in lst %}<img src="/media/small_{{ item.image }}" width=30/> {% endfor %}
 <p/>
 <hr>
 <a href="{% url "ufo" %}">back</a> to the overview.
 {% else %}
   <form method="post"  enctype="multipart/form-data">
+<table>
     {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">{{ action }}</button>
+    {{ form.as_table }}
+    <tr><td></td><td><button type="submit">{{ action }}</button></td></tr>
+</table>
   </form>
 <hr>
 <p>

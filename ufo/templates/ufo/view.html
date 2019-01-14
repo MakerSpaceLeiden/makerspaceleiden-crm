@@ -10,7 +10,10 @@
 Person now responsible: {{ item.owner }}
 {%endif%}
 <p/>
-<a href="{% url 'changeufo' pk=item.id %}">[modify]</a>
+Item can be claimed until {{ item.deadline }} - and it will be disposed if not claimed {{item.dispose_by_date}}.
+<p/>
+<a href="{% url 'mine' pk=item.id %}">[claim as mine]</a>
+<a href="{% url 'changeufo' pk=item.id %}">[add more details or edit]</a>
 <a href="{% url 'deleteufo' pk=item.id %}">[delete]</a>
 
 {% endblock %}

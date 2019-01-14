@@ -1,0 +1,11 @@
+Folks,
+
+This is to let you know that {{ user }} has just changed the details for
+an UFO. Details below.
+
+Your friendly makerbot.
+
+URL:            <{{ base }}{% url 'ufo' pk=item.id  %}>
+Description:	{{ item.description }}
+Owner/resp.:	{{ item.owner }}
+		{{ item.state}}

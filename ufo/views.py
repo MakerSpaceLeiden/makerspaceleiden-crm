@@ -25,19 +25,19 @@ from .admin import UfoAdmin
 
 import datetime
 import uuid
-import logging
 import zipfile
+import os
 
 import re
 from PIL import Image
 from resizeimage import resizeimage
 
+import logging
 logger = logging.getLogger(__name__)
 
 from .models import Ufo
 from .forms import UfoForm, NewUfoForm, UfoZipUploadForm
 
-@login_required
 def index(request,days=30):
     lst = Ufo.objects.all()
     if days > 0:
@@ -50,19 +50,20 @@ def index(request,days=30):
        }
     return render(request, 'ufo/index.html', context)
 
+@login_required
 def create(request):
     form = NewUfoForm(request.POST or None, request.FILES, initial = { 'state': 'UNK' })
     logger.error(request.POST)
     logger.error(request.FILES)
     if form.is_valid():
         try:
-            item = form.save(commit=False)
+            item = form.save(commit = False)
 
             item.state = 'UNK'
             if not item.description:
                 item.description = "Added by {}".format(request.user)
 
-            # item.changeReason("Created by {} through the self-service portal.".format(request.user))
+            item.changeReason = "Created by {} through the self-service portal.".format(request.user)
             item.save()
             return redirect('ufo')
 
@@ -87,17 +88,49 @@ def show(request,pk):
     return render(request, 'ufo/view.html', context)
 
 
+# Note - we do this here; rather than in the model - as this
+# lets admins change things through the database interface
+# silently. Which can help when sheparding the community.
+#
+def alertOwnerToChange(item, oldOwner, newOwnerIfAny, userThatMadeTheChange):
+    subject = "[makerbot] Change to an UFO %s" % item.description
+
+    # We use a dict rather than an array to prune any duplicates.
+    #
+    to = { oldOwner.email: True, userThatMadeTheChange.email: True }
+    context = {
+           'item': item,
+           'oldOwner': oldOwner,
+           'user': userThatMadeTheChange,
+    }
+    if newOwnerIfAny:
+        context['newOwner'] = newOwnerIfAny
+        to[ newOwner.email ] = True
+
+    message = render_to_string('ufo/email_notification.txt', context)
+    EmailMessage(subject, message, to=to.keys, from_email=settings.FROM_EMAIL).send()
+
+
+    pass
+
+@login_required
 def modify(request,pk):
-    item = Ufo.objects.get(pk=pk)
-    form = UfoForm(request.POST or None, instance = item)
+    oitem = Ufo.objects.get(pk=pk)
+
+    form = UfoForm(request.POST or None, instance = oitem)
     if form.is_valid() and request.POST:
         try:
-            item = form.save(commit=False)
-            item.changeReason("Changed by {} via self service portal".format(request.user))
+            item = form.save(commit = False)
+            item.changeReason = "Changed by {} via self service portal".format(request.user)
             item.save()
         except Exception as e:
             logger.error("Unexpected error during update of ufo: {}".format(e))
         return redirect('ufo')
+
+    if item.owner != oitem.owner:
+        alertOwnersToChange(item, oitem.owner, item.owner, request.user)
+    elif item.state != OK:
+        alertOwnersToChange(item, item.owner, item.owner, request.user)
 
     context = {
         'title': 'Update an Uknown Floating Objects',
@@ -108,15 +141,20 @@ def modify(request,pk):
 
     return render(request, 'ufo/crud.html', context)
 
+@login_required
 def mine(request,pk):
     item = Ufo.objects.get(pk=pk)
-    item.changeReason("claimed as 'mine' by {} via self service portal".format(request.user))
+    item.changeReason = "claimed as 'mine' by {} via self service portal".format(request.user)
+    if item.owner != request.user:
+        alertOwnersToChange(item, item.owner, request.user)
     item.owner = request.user
     item.state = 'OK'
     item.save()
 
     return redirect('ufo')
 
+@login_required
+# Limit this to admins ?
 def delete(request,pk):
     item = Ufo.objects.get(pk=pk)
 
@@ -150,10 +188,11 @@ def delete(request,pk):
 
     return redirect('ufo')
 
+@login_required
 def upload_zip(request):
     form = UfoZipUploadForm(request.POST or None, request.FILES)
     if request.method == 'POST':
-        if form.is_valid():
+        if form.is_valid() and 'zipfile' in request.FILES:
             if request.FILES['zipfile'].size > settings.MAX_ZIPFILE:
                 return HttpResponse("Upload too large",status=500,content_type="text/plain")
 
@@ -226,15 +265,21 @@ def upload_zip(request):
                     except Exception as e:
                       pass
                     continue
-                         
-                ufo = Ufo(description="Auto", image=fp,state='UNK');
+                        
+                ufo = Ufo(description="Auto upload", image=fp,state='UNK');
+
+                for f in [ 'description', 'deadline', 'dispose_by_date' ]:
+                     if form.cleaned_data[f]:
+                        setattr(ufo, f, form.cleaned_data[f])
+
+                ufo.changeReason = "Part of a bulk upload by {}".format(request.user)
                 ufo.save()
 
                 lst.append(ufo)
             try:
                os.remove(tmpZip)
             except:
-                logger.error("Error during cleanup of {}: {}".format(tmpZip),e)
+                logger.error("Error during cleanup of {}: {}".format(tmpZip,e))
 
             return render(request, 'ufo/upload.html', { 
                'action': 'Done', 

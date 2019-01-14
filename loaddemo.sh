@@ -1,22 +1,23 @@
 #!/bin/sh
 set -e
+VERSION=3.7
 
-python3.7 -mvenv venv
+python${VERSION}  -mvenv venv
 . venv/bin/activate
 
-pip3.7 install -r requirements.txt 
+pip${VERSION} install -r requirements.txt 
 
 test db.sqlite3 && rm db.sqlite3
 
-python3.7 manage.py makemigrations
-python3.7 manage.py migrate
+python${VERSION} manage.py makemigrations
+python${VERSION} manage.py migrate
 
 if test -f demo/example.json; then
-	python3.7 manage.py loaddata demo/example.json
+	python${VERSION} manage.py loaddata demo/example.json
 else
-	python3.7 manage.py import-wifi < demo/wifi.csv
-	python3.7 manage.py import-machines < demo/mac.csv 
-	python3.7 manage.py import-consolidated < demo/consolidated.txt 
+	python${VERSION} manage.py import-wifi < demo/wifi.csv
+	python${VERSION} manage.py import-machines < demo/mac.csv 
+	python${VERSION} manage.py import-consolidated < demo/consolidated.txt 
 fi
 
-python3.7 manage.py runserver
+python${VERSION} manage.py runserver

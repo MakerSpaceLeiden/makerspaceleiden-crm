@@ -1,0 +1,18 @@
+name,i,f,permit,description,location
+12 Ton hydraulic pers,1,0,,12 Ton hydraulic pers,Metalshop
+3D-printer,1,0,,3D-printer,Frontroom
+mitresaw,1,0,,AfkortZaag,Woodshop
+Combi-tacker,0,0,,Combi-tacker,Woodshop
+Jigsaw,1,0,,Decoupeerzaag (Electric Jigsaw),Woodshop
+Desoldeerbout,1,0,,Desoldeerbout,Electronics
+Drillpress-wood,1,0,,Drill press / boorkolom,Woodshop
+Drillpress-metal,1,0,,Drill press / boorkolom,Metalshop
+Scrollsaw,1,0,,Electrische figuurzaag (Scrollsaw),Woodshop
+Metallathe,1,1,metallathe,Huvema HU760 Draaibank,Metalshop
+Grinder,1,1,,Large Grinder,Metalshop
+Tablesaw,1,1,tablesaw,Circlezaagtafel houtwerkplaats,Woodshop
+Woodlathe,1,0,woodlathe,Houtdraaibank,Woodshop
+Jointer,1,1,jointer,Vlakbank,Woodshop
+Planer,1,1,planer,Vandiktebank,Woodshop
+Bandsaw,1,1,bandsaw,Grote Lintzaag,Woodshop
+Frontdoor,0,1,doors,Front door / green door,Doors
