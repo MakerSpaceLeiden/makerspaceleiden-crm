@@ -7,5 +7,4 @@ qrcode
 django-qrcode
 django-settings-export
 Pillow
-django-cleanup
 python-resize-image
