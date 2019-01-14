@@ -1,0 +1,17 @@
+{% autoescape off %}
+This is an invite for the member management system of the Maker Spae leiden.
+
+Your username will be your email ({{ user.get_username }}). Click on
+the link below to set your password:
+
+{{ protocol }}://{{ domain }}{% url 'password_reset_confirm' uidb64=uid token=token %}
+
+If clicking the link above doesn't work, please copy and paste the URL in a new browser
+window instead.
+
+If you have any trouble getting this to work - simply reply to this email.
+
+Your friendly makerbot.
+
+{% endautoescape %}
+
