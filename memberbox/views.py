@@ -30,7 +30,7 @@ def index(request):
     floating = []
     yours = Memberbox.objects.filter(owner = request.user).order_by('location')
     for box in Memberbox.objects.order_by('location'):
-      m=re.search(r'^([LR]{1})(\d{1})(\d{1})$', box.location)
+      m=re.search(r'^([LR]{1})(\d{1})(\d{1})$', box.location.upper())
       if m:
         k = m.group(1)
         r = int(m.group(2))
