@@ -91,34 +91,29 @@ def show(request,pk):
 # lets admins change things through the database interface
 # silently. Which can help when sheparding the community.
 #
-def alertOwnersToChange(item, oldOwner, newOwnerIfAny = None, userThatMadeTheChange = None):
+def alertOwnersToChange(item, userThatMadeTheChange, toinform):
     subject = "[makerbot] Change to an UFO %s" % item.description
 
     # We use a dict rather than an array to prune any duplicates.
     #
-    to = {}
-    if oldOwner:
-      to[ oldOwner.email ] = True
-    if userThatMadeTheChange:
-      to[ userThatMadeTheChange.email ] =  True
+    to = { userThatMadeTheChange.email: True }
+    for person in toinform:
+      to[person.email]=True
+    to = to.keys()
 
     context = {
            'item': item,
-           'oldOwner': oldOwner,
            'user': userThatMadeTheChange,
            'base': settings.BASE,
     }
-    if newOwnerIfAny:
-        context['newOwner'] = newOwnerIfAny
-        to[ newOwnerIfAny.email ] = True
 
     message = render_to_string('ufo/email_notification.txt', context)
-    to = to.keys()
     EmailMessage(subject, message, to=to, from_email=settings.FROM_EMAIL).send()
 
 @login_required
 def modify(request,pk):
     oitem = Ufo.objects.get(pk=pk)
+    toinform = [ oitem.owner ]
 
     context = {
         'title': 'Update an Uknown Floating Objects',
@@ -134,10 +129,10 @@ def modify(request,pk):
         except Exception as e:
             logger.error("Unexpected error during update of ufo: {}".format(e))
 
-        if item.owner != oitem.owner:
-            alertOwnersToChange(item, oitem.owner, item.owner, request.user)
-        elif item.state != 'OK':
-            alertOwnersToChange(item, item.owner, item.owner, request.user)
+        toinform.append(item.owner)
+ 
+        alertOwnersToChange(item, request.user, toinform)
+
         context['item']=item
 
         return redirect('ufo')
@@ -151,7 +146,7 @@ def mine(request,pk):
     item = Ufo.objects.get(pk=pk)
     item.changeReason = "claimed as 'mine' by {} via self service portal".format(request.user)
     if item.owner != request.user:
-        alertOwnersToChange(item, item.owner, request.user, request.user)
+        alertOwnersToChange(item, request.user, [ item.owner ])
     item.owner = request.user
     item.state = 'OK'
     item.save()
