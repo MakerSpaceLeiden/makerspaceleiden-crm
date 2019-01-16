@@ -98,7 +98,8 @@ def alertOwnersToChange(item, userThatMadeTheChange, toinform):
     #
     to = { userThatMadeTheChange.email: True }
     for person in toinform:
-      to[person.email]=True
+      if person:
+        to[person.email]=True
     to = to.keys()
 
     if settings.ALSO_INFORM_EMAIL_ADDRESSES:
