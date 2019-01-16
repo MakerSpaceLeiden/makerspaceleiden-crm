@@ -111,3 +111,6 @@ static
 initial_populate
 */migrations/0*.py
 *.swp
+
+makerspaceleiden/local.py
+
