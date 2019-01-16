@@ -5,7 +5,7 @@ an UFO. Details below.
 
 Your friendly makerbot.
 
-URL:            <{{ base }}{% url 'ufo' pk=item.id  %}>
+URL:            <{{ base }}{% url 'showufo' pk=item.id  %}>
 Description:	{{ item.description }}
 Owner/resp.:	{{ item.owner }}
 		{{ item.state}}

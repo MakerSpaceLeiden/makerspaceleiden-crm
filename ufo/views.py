@@ -87,35 +87,43 @@ def show(request,pk):
         }
     return render(request, 'ufo/view.html', context)
 
-
 # Note - we do this here; rather than in the model - as this
 # lets admins change things through the database interface
 # silently. Which can help when sheparding the community.
 #
-def alertOwnerToChange(item, oldOwner, newOwnerIfAny, userThatMadeTheChange):
+def alertOwnersToChange(item, oldOwner, newOwnerIfAny = None, userThatMadeTheChange = None):
     subject = "[makerbot] Change to an UFO %s" % item.description
 
     # We use a dict rather than an array to prune any duplicates.
     #
-    to = { oldOwner.email: True, userThatMadeTheChange.email: True }
+    to = {}
+    if oldOwner:
+      to[ oldOwner.email ] = True
+    if userThatMadeTheChange:
+      to[ userThatMadeTheChange.email ] =  True
+
     context = {
            'item': item,
            'oldOwner': oldOwner,
            'user': userThatMadeTheChange,
+           'base': settings.BASE,
     }
     if newOwnerIfAny:
         context['newOwner'] = newOwnerIfAny
-        to[ newOwner.email ] = True
+        to[ newOwnerIfAny.email ] = True
 
     message = render_to_string('ufo/email_notification.txt', context)
-    EmailMessage(subject, message, to=to.keys, from_email=settings.FROM_EMAIL).send()
-
-
-    pass
+    to = to.keys()
+    EmailMessage(subject, message, to=to, from_email=settings.FROM_EMAIL).send()
 
 @login_required
 def modify(request,pk):
     oitem = Ufo.objects.get(pk=pk)
+
+    context = {
+        'title': 'Update an Uknown Floating Objects',
+        'action': 'Update',
+        }
 
     form = UfoForm(request.POST or None, instance = oitem)
     if form.is_valid() and request.POST:
@@ -125,19 +133,16 @@ def modify(request,pk):
             item.save()
         except Exception as e:
             logger.error("Unexpected error during update of ufo: {}".format(e))
+
+        if item.owner != oitem.owner:
+            alertOwnersToChange(item, oitem.owner, item.owner, request.user)
+        elif item.state != 'OK':
+            alertOwnersToChange(item, item.owner, item.owner, request.user)
+        context['item']=item
+
         return redirect('ufo')
 
-    if item.owner != oitem.owner:
-        alertOwnersToChange(item, oitem.owner, item.owner, request.user)
-    elif item.state != OK:
-        alertOwnersToChange(item, item.owner, item.owner, request.user)
-
-    context = {
-        'title': 'Update an Uknown Floating Objects',
-        'form': form,
-        'item': item,
-        'action': 'Update',
-        }
+    context['form'] = form
 
     return render(request, 'ufo/crud.html', context)
 
@@ -146,7 +151,7 @@ def mine(request,pk):
     item = Ufo.objects.get(pk=pk)
     item.changeReason = "claimed as 'mine' by {} via self service portal".format(request.user)
     if item.owner != request.user:
-        alertOwnersToChange(item, item.owner, request.user)
+        alertOwnersToChange(item, item.owner, request.user, request.user)
     item.owner = request.user
     item.state = 'OK'
     item.save()
