@@ -166,6 +166,11 @@ MAX_IMAGE_WIDTH=1280
 UFO_DEADLINE_DAYS=14
 UFO_DISPOSE_DAYS=7
 
+# Set to a list to be kept informed of things like UFO
+# deadlines and what not.
+#
+ALSO_INFORM_EMAIL_ADDRESSES = []
+
 try:
     from .local import *
 except ImportError:
