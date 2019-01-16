@@ -6,7 +6,7 @@ from simple_history.models import HistoricalRecords
 from members.models import User
 
 class PermitType(models.Model):
-    name = models.CharField(max_length=20, unique=True)
+    name = models.CharField(max_length=40, unique=True)
     description =  models.CharField(max_length=200)
     permit = models.ForeignKey(
 	'self', 
@@ -22,7 +22,7 @@ class PermitType(models.Model):
 
 
 class Location(models.Model):
-    name = models.CharField(max_length=20, unique=True)
+    name = models.CharField(max_length=40, unique=True)
     description =  models.CharField(max_length=200,blank=True)
     history = HistoricalRecords()
 
@@ -30,7 +30,7 @@ class Location(models.Model):
         return self.name
 
 class Machine(models.Model):
-    name = models.CharField(max_length=20, unique=True)
+    name = models.CharField(max_length=40, unique=True)
     description =  models.CharField(max_length=200,blank=True)
     location = models.ForeignKey(Location,related_name="is_located",on_delete=models.CASCADE, blank=True, null=True)
     requires_instruction = models.BooleanField(default=False)

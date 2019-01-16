@@ -58,6 +58,10 @@ class Command(BaseCommand):
            member.save()
            print("Member={}".format(member))
 
+           for tag in tags.split():
+              Tag.objects.get_or_create(owner=member, tag=tag)
+              print("	tag: {}".format(tag))
+
            if not user0:
                 user0 = member
                 entit = Entitlement(permit = woodpermit, holder = user0, issuer = admin, active = True)

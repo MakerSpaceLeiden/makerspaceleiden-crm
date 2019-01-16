@@ -15,7 +15,7 @@ import re
 import logging
 logger = logging.getLogger(__name__)
 
-def ufo_generate_unique_name():
+def ufo_generate_unique_name(instance,filename):
    return "ufo/"+str(uuid.uuid4())
 
 def validate_unique_name(leaf_filename):
