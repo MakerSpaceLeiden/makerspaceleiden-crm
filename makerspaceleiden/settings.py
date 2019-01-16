@@ -156,7 +156,6 @@ STATICFILES_DIRS = [ ]
 AUTH_USER_MODEL = 'members.User'
 
 MEDIA_ROOT="/tmp"
-# MEDIA_ROOT =  os.path.join(BASE_DIR, 'media') 
 MEDIA_URL = '/media/'
 
 MAX_ZIPFILE=48*1024*1024
@@ -167,3 +166,7 @@ MAX_IMAGE_WIDTH=1280
 UFO_DEADLINE_DAYS=14
 UFO_DISPOSE_DAYS=7
 
+try:
+    from .local import *
+except ImportError:
+  pass

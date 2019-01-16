@@ -1,19 +1,19 @@
-theo.trustee@makerspace.com
+theo.trustee@makerspaceleiden.nl
 	1-2-3
 	Theo Trustee
 	tablesaw jointer planer bandsaw woodlathe grinder doors
 	+31715149999
-mary.maker@makerspace.com
+mary.maker@makerspaceleiden.nl
 	1-2-4
 	Mary Maker
 	tablesaw jointer planer bandsaw woodlathe grinder doors
 	+31715149999
-leo.tags@makerspace.com
+leo.tags@makerspaceleiden.nl
 	1-2-5 1-2-7 1-2-8 1-2-9 3-2-1 4-2-1 5-2-1 6-2-1
 	Leo Tags
 	doors
 	+31715149999
-peter.wood@makerspace.com
+peter.wood@makerspaceleiden.nl
 	1-9-2
 	Peter Wood
  	tablesaw doors
