@@ -2,10 +2,12 @@
 
 {% block content %}
   <h2>{{ label }}</h2>
+<table>
   <form method="post">
     {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">{{ action }}</button>
+    {{ form.as_table }}
+    <tr><td></td><td><button type="submit">{{ action }}</button></td></tr>
+</table>
   </form>
   </p>
 

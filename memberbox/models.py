@@ -5,8 +5,10 @@ from simple_history.models import HistoricalRecords
 from members.models import User
 
 class Memberbox(models.Model):
-    location = models.CharField(max_length=40, unique=True) # label = "Use left/right - shelf (top=1) - postion. E.g. R24 is the right set of shelves, second row from the top; 4th bin from the left.")
-    extra_info = models.CharField(max_length=200)
+    location = models.CharField(max_length=40, unique=True, 
+            help_text = "Use left/right - shelf (top=1) - postion. E.g. R24 is the right set of shelves, second bin on the 4th row from the bottom. Or use any other descriptive string (e.g. 'behind the bandsaw')")
+    extra_info = models.CharField(max_length=200,
+            help_text = "Such as 'plastic bin'. Especially important if you are keeping things in an odd place.")
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     history = HistoricalRecords()
 
