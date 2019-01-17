@@ -1,0 +1,771 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+CAUTION: Do not modify this file unless you know what you are doing.
+         Unexpected results may occur if the code is changed deliberately.
+-->
+<dbmodel pgmodeler-ver="0.9.2-alpha1" last-position="0,0" last-zoom="1" max-obj-count="34"
+	 default-schema="public" default-owner="postgres">
+<role name="vault"
+      inherit="true"
+      login="true"
+      bypassrls="true"
+      encrypted="true"
+      password="********">
+</role>
+
+<role name="msl"
+      inherit="true"
+      login="true"
+      bypassrls="true"
+      encrypted="true"
+      password="********">
+</role>
+
+<database name="msl" encoding="UTF8" lc-collate="C" lc-ctype="C" is-template="false" allow-conns="true">
+	<role name="postgres"/>
+	<tablespace name="pg_default"/>
+</database>
+
+<schema name="public" layer="0" rect-visible="true" fill-color="#e1e1e1" sql-disabled="true">
+</schema>
+
+<sequence name="django_migrations_id_seq" cycle="false" start="1" increment="1" min-value="1" max-value="9223372036854775807" cache="1">
+	<schema name="public"/>
+	<role name="msl"/>
+</sequence>
+
+<sequence name="django_content_type_id_seq" cycle="false" start="1" increment="1" min-value="1" max-value="9223372036854775807" cache="1">
+	<schema name="public"/>
+	<role name="msl"/>
+</sequence>
+
+<sequence name="auth_permission_id_seq" cycle="false" start="1" increment="1" min-value="1" max-value="9223372036854775807" cache="1">
+	<schema name="public"/>
+	<role name="msl"/>
+</sequence>
+
+<sequence name="auth_group_id_seq" cycle="false" start="1" increment="1" min-value="1" max-value="9223372036854775807" cache="1">
+	<schema name="public"/>
+	<role name="msl"/>
+</sequence>
+
+<sequence name="auth_group_permissions_id_seq" cycle="false" start="1" increment="1" min-value="1" max-value="9223372036854775807" cache="1">
+	<schema name="public"/>
+	<role name="msl"/>
+</sequence>
+
+<sequence name="members_user_id_seq" cycle="false" start="1" increment="1" min-value="1" max-value="9223372036854775807" cache="1">
+	<schema name="public"/>
+	<role name="msl"/>
+</sequence>
+
+<table name="members_user" layer="0" collapse-mode="2" max-obj-count="14">
+	<schema name="public"/>
+	<role name="msl"/>
+	<position x="820" y="360"/>
+	<column name="id" not-null="true" sequence="public.members_user_id_seq">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="password" not-null="true">
+		<type name="character varying" length="128"/>
+	</column>
+	<column name="last_login">
+		<type name="timestamp with time zone" length="0" with-timezone="true"/>
+	</column>
+	<column name="is_superuser" not-null="true">
+		<type name="boolean" length="0"/>
+	</column>
+	<column name="first_name" not-null="true">
+		<type name="character varying" length="30"/>
+	</column>
+	<column name="last_name" not-null="true">
+		<type name="character varying" length="150"/>
+	</column>
+	<column name="is_staff" not-null="true">
+		<type name="boolean" length="0"/>
+	</column>
+	<column name="is_active" not-null="true">
+		<type name="boolean" length="0"/>
+	</column>
+	<column name="date_joined" not-null="true">
+		<type name="timestamp with time zone" length="0" with-timezone="true"/>
+	</column>
+	<column name="email" not-null="true">
+		<type name="character varying" length="254"/>
+	</column>
+	<column name="form_on_file" not-null="true">
+		<type name="boolean" length="0"/>
+	</column>
+	<column name="email_confirmed" not-null="true">
+		<type name="boolean" length="0"/>
+	</column>
+	<constraint name="members_user_pkey" type="pk-constr" table="public.members_user">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="members_user_email_key" type="uq-constr" table="public.members_user">
+		<columns names="email" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<sequence name="members_user_groups_id_seq" cycle="false" start="1" increment="1" min-value="1" max-value="9223372036854775807" cache="1">
+	<schema name="public"/>
+	<role name="msl"/>
+</sequence>
+
+<sequence name="members_user_user_permissions_id_seq" cycle="false" start="1" increment="1" min-value="1" max-value="9223372036854775807" cache="1">
+	<schema name="public"/>
+	<role name="msl"/>
+</sequence>
+
+<sequence name="members_historicaltag_history_id_seq" cycle="false" start="1" increment="1" min-value="1" max-value="9223372036854775807" cache="1">
+	<schema name="public"/>
+	<role name="msl"/>
+</sequence>
+
+<sequence name="members_historicaluser_history_id_seq" cycle="false" start="1" increment="1" min-value="1" max-value="9223372036854775807" cache="1">
+	<schema name="public"/>
+	<role name="msl"/>
+</sequence>
+
+<sequence name="members_tag_id_seq" cycle="false" start="1" increment="1" min-value="1" max-value="9223372036854775807" cache="1">
+	<schema name="public"/>
+	<role name="msl"/>
+</sequence>
+
+<table name="members_tag" layer="0" collapse-mode="2" max-obj-count="3">
+	<schema name="public"/>
+	<role name="msl"/>
+	<position x="20" y="300"/>
+	<column name="id" not-null="true" sequence="public.members_tag_id_seq">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="tag" not-null="true">
+		<type name="character varying" length="30"/>
+	</column>
+	<column name="owner_id" not-null="true">
+		<type name="integer" length="0"/>
+	</column>
+	<constraint name="members_tag_pkey" type="pk-constr" table="public.members_tag">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<index name="members_user_email_fb50dde1_like" table="public.members_user"
+	 concurrent="false" unique="false" fast-update="false" buffering="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="email"/>
+		</idxelement>
+</index>
+
+<index name="members_tag_owner_id_0c57a646" table="public.members_tag"
+	 concurrent="false" unique="false" fast-update="false" buffering="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="owner_id"/>
+		</idxelement>
+</index>
+
+<sequence name="acl_entitlement_id_seq" cycle="false" start="1" increment="1" min-value="1" max-value="9223372036854775807" cache="1">
+	<schema name="public"/>
+	<role name="msl"/>
+</sequence>
+
+<table name="acl_entitlement" layer="0" collapse-mode="2" max-obj-count="6">
+	<schema name="public"/>
+	<role name="msl"/>
+	<position x="1300" y="320"/>
+	<column name="id" not-null="true" sequence="public.acl_entitlement_id_seq">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="active" not-null="true">
+		<type name="boolean" length="0"/>
+	</column>
+	<column name="holder_id" not-null="true">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="issuer_id" not-null="true">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="permit_id" not-null="true">
+		<type name="integer" length="0"/>
+	</column>
+	<constraint name="acl_entitlement_pkey" type="pk-constr" table="public.acl_entitlement">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<sequence name="acl_historicalentitlement_history_id_seq" cycle="false" start="1" increment="1" min-value="1" max-value="9223372036854775807" cache="1">
+	<schema name="public"/>
+	<role name="msl"/>
+</sequence>
+
+<sequence name="acl_historicallocation_history_id_seq" cycle="false" start="1" increment="1" min-value="1" max-value="9223372036854775807" cache="1">
+	<schema name="public"/>
+	<role name="msl"/>
+</sequence>
+
+<sequence name="acl_historicalmachine_history_id_seq" cycle="false" start="1" increment="1" min-value="1" max-value="9223372036854775807" cache="1">
+	<schema name="public"/>
+	<role name="msl"/>
+</sequence>
+
+<sequence name="acl_historicalpermittype_history_id_seq" cycle="false" start="1" increment="1" min-value="1" max-value="9223372036854775807" cache="1">
+	<schema name="public"/>
+	<role name="msl"/>
+</sequence>
+
+<sequence name="acl_location_id_seq" cycle="false" start="1" increment="1" min-value="1" max-value="9223372036854775807" cache="1">
+	<schema name="public"/>
+	<role name="msl"/>
+</sequence>
+
+<table name="acl_location" layer="0" collapse-mode="2" max-obj-count="3">
+	<schema name="public"/>
+	<role name="msl"/>
+	<position x="480" y="100"/>
+	<column name="id" not-null="true" sequence="public.acl_location_id_seq">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="name" not-null="true">
+		<type name="character varying" length="40"/>
+	</column>
+	<column name="description" not-null="true">
+		<type name="character varying" length="200"/>
+	</column>
+	<constraint name="acl_location_pkey" type="pk-constr" table="public.acl_location">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="acl_location_name_key" type="uq-constr" table="public.acl_location">
+		<columns names="name" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<sequence name="acl_machine_id_seq" cycle="false" start="1" increment="1" min-value="1" max-value="9223372036854775807" cache="1">
+	<schema name="public"/>
+	<role name="msl"/>
+</sequence>
+
+<table name="acl_machine" layer="0" collapse-mode="2" max-obj-count="8">
+	<schema name="public"/>
+	<role name="msl"/>
+	<position x="880" y="20"/>
+	<column name="id" not-null="true" sequence="public.acl_machine_id_seq">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="name" not-null="true">
+		<type name="character varying" length="40"/>
+	</column>
+	<column name="description" not-null="true">
+		<type name="character varying" length="200"/>
+	</column>
+	<column name="requires_instruction" not-null="true">
+		<type name="boolean" length="0"/>
+	</column>
+	<column name="requires_form" not-null="true">
+		<type name="boolean" length="0"/>
+	</column>
+	<column name="location_id">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="requires_permit_id">
+		<type name="integer" length="0"/>
+	</column>
+	<constraint name="acl_machine_pkey" type="pk-constr" table="public.acl_machine">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="acl_machine_name_key" type="uq-constr" table="public.acl_machine">
+		<columns names="name" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<sequence name="acl_permittype_id_seq" cycle="false" start="1" increment="1" min-value="1" max-value="9223372036854775807" cache="1">
+	<schema name="public"/>
+	<role name="msl"/>
+</sequence>
+
+<table name="acl_permittype" layer="0" collapse-mode="2" max-obj-count="4">
+	<schema name="public"/>
+	<role name="msl"/>
+	<position x="1460" y="80"/>
+	<column name="id" not-null="true" sequence="public.acl_permittype_id_seq">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="name" not-null="true">
+		<type name="character varying" length="40"/>
+	</column>
+	<column name="description" not-null="true">
+		<type name="character varying" length="200"/>
+	</column>
+	<column name="permit_id">
+		<type name="integer" length="0"/>
+	</column>
+	<constraint name="acl_permittype_pkey" type="pk-constr" table="public.acl_permittype">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="acl_permittype_name_key" type="uq-constr" table="public.acl_permittype">
+		<columns names="name" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<index name="acl_machine_location_id_a5646216" table="public.acl_machine"
+	 concurrent="false" unique="false" fast-update="false" buffering="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="location_id"/>
+		</idxelement>
+</index>
+
+<index name="acl_permittype_permit_id_602721e4" table="public.acl_permittype"
+	 concurrent="false" unique="false" fast-update="false" buffering="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="permit_id"/>
+		</idxelement>
+</index>
+
+<index name="acl_machine_requires_permit_id_1bb32cae" table="public.acl_machine"
+	 concurrent="false" unique="false" fast-update="false" buffering="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="requires_permit_id"/>
+		</idxelement>
+</index>
+
+<index name="acl_entitlement_holder_id_f337fa0f" table="public.acl_entitlement"
+	 concurrent="false" unique="false" fast-update="false" buffering="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="holder_id"/>
+		</idxelement>
+</index>
+
+<index name="acl_entitlement_issuer_id_56c8847d" table="public.acl_entitlement"
+	 concurrent="false" unique="false" fast-update="false" buffering="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="issuer_id"/>
+		</idxelement>
+</index>
+
+<index name="acl_entitlement_permit_id_16200f73" table="public.acl_entitlement"
+	 concurrent="false" unique="false" fast-update="false" buffering="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="permit_id"/>
+		</idxelement>
+</index>
+
+<sequence name="django_admin_log_id_seq" cycle="false" start="1" increment="1" min-value="1" max-value="9223372036854775807" cache="1">
+	<schema name="public"/>
+	<role name="msl"/>
+</sequence>
+
+<sequence name="memberbox_historicalmemberbox_history_id_seq" cycle="false" start="1" increment="1" min-value="1" max-value="9223372036854775807" cache="1">
+	<schema name="public"/>
+	<role name="msl"/>
+</sequence>
+
+<sequence name="memberbox_memberbox_id_seq" cycle="false" start="1" increment="1" min-value="1" max-value="9223372036854775807" cache="1">
+	<schema name="public"/>
+	<role name="msl"/>
+</sequence>
+
+<table name="memberbox_memberbox" layer="0" collapse-mode="2" max-obj-count="4">
+	<schema name="public"/>
+	<role name="msl"/>
+	<position x="180" y="740"/>
+	<column name="id" not-null="true" sequence="public.memberbox_memberbox_id_seq">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="location" not-null="true">
+		<type name="character varying" length="40"/>
+	</column>
+	<column name="extra_info" not-null="true">
+		<type name="character varying" length="200"/>
+	</column>
+	<column name="owner_id" not-null="true">
+		<type name="integer" length="0"/>
+	</column>
+	<constraint name="memberbox_memberbox_pkey" type="pk-constr" table="public.memberbox_memberbox">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="memberbox_memberbox_location_key" type="uq-constr" table="public.memberbox_memberbox">
+		<columns names="location" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<index name="memberbox_memberbox_owner_id_d51955d1" table="public.memberbox_memberbox"
+	 concurrent="false" unique="false" fast-update="false" buffering="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="owner_id"/>
+		</idxelement>
+</index>
+
+<sequence name="selfservice_historicalwifinetwork_history_id_seq" cycle="false" start="1" increment="1" min-value="1" max-value="9223372036854775807" cache="1">
+	<schema name="public"/>
+	<role name="msl"/>
+</sequence>
+
+<sequence name="selfservice_wifinetwork_id_seq" cycle="false" start="1" increment="1" min-value="1" max-value="9223372036854775807" cache="1">
+	<schema name="public"/>
+	<role name="msl"/>
+</sequence>
+
+<table name="selfservice_wifinetwork" layer="0" collapse-mode="2" max-obj-count="3">
+	<schema name="public"/>
+	<role name="msl"/>
+	<position x="880" y="740"/>
+	<column name="id" not-null="true" sequence="public.selfservice_wifinetwork_id_seq">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="network" not-null="true">
+		<type name="character varying" length="30"/>
+	</column>
+	<column name="password" not-null="true">
+		<type name="character varying" length="30"/>
+	</column>
+	<constraint name="selfservice_wifinetwork_pkey" type="pk-constr" table="public.selfservice_wifinetwork">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<sequence name="django_site_id_seq" cycle="false" start="1" increment="1" min-value="1" max-value="9223372036854775807" cache="1">
+	<schema name="public"/>
+	<role name="msl"/>
+</sequence>
+
+<sequence name="storage_historicalstorage_history_id_seq" cycle="false" start="1" increment="1" min-value="1" max-value="9223372036854775807" cache="1">
+	<schema name="public"/>
+	<role name="msl"/>
+</sequence>
+
+<sequence name="storage_storage_id_seq" cycle="false" start="1" increment="1" min-value="1" max-value="9223372036854775807" cache="1">
+	<schema name="public"/>
+	<role name="msl"/>
+</sequence>
+
+<table name="storage_storage" layer="0" collapse-mode="2" max-obj-count="12">
+	<schema name="public"/>
+	<role name="msl"/>
+	<position x="40" y="480"/>
+	<column name="id" not-null="true" sequence="public.storage_storage_id_seq">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="what" not-null="true">
+		<type name="character varying" length="200"/>
+	</column>
+	<column name="location" not-null="true">
+		<type name="character varying" length="50"/>
+	</column>
+	<column name="extra_info" not-null="true">
+		<type name="text" length="0"/>
+	</column>
+	<column name="requested" not-null="true">
+		<type name="date" length="0"/>
+	</column>
+	<column name="duration" not-null="true">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="state" not-null="true">
+		<type name="character varying" length="4"/>
+	</column>
+	<column name="lastdate">
+		<type name="date" length="0"/>
+	</column>
+	<column name="extends_id">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="owner_id" not-null="true">
+		<type name="integer" length="0"/>
+	</column>
+	<constraint name="storage_storage_pkey" type="pk-constr" table="public.storage_storage">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="storage_storage_extends_id_key" type="uq-constr" table="public.storage_storage">
+		<columns names="extends_id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<index name="storage_storage_owner_id_bf853964" table="public.storage_storage"
+	 concurrent="false" unique="false" fast-update="false" buffering="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="owner_id"/>
+		</idxelement>
+</index>
+
+<sequence name="ufo_historicalufo_history_id_seq" cycle="false" start="1" increment="1" min-value="1" max-value="9223372036854775807" cache="1">
+	<schema name="public"/>
+	<role name="msl"/>
+</sequence>
+
+<sequence name="ufo_ufo_id_seq" cycle="false" start="1" increment="1" min-value="1" max-value="9223372036854775807" cache="1">
+	<schema name="public"/>
+	<role name="msl"/>
+</sequence>
+
+<table name="ufo_ufo" layer="0" collapse-mode="2" max-obj-count="9">
+	<schema name="public"/>
+	<role name="msl"/>
+	<position x="20" y="100"/>
+	<column name="id" not-null="true" sequence="public.ufo_ufo_id_seq">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="image" not-null="true">
+		<type name="character varying" length="100"/>
+	</column>
+	<column name="description">
+		<type name="character varying" length="300"/>
+	</column>
+	<column name="state">
+		<type name="character varying" length="4"/>
+	</column>
+	<column name="deadline">
+		<type name="date" length="0"/>
+	</column>
+	<column name="dispose_by_date">
+		<type name="date" length="0"/>
+	</column>
+	<column name="lastChange">
+		<type name="date" length="0"/>
+	</column>
+	<column name="owner_id">
+		<type name="integer" length="0"/>
+	</column>
+	<constraint name="ufo_ufo_pkey" type="pk-constr" table="public.ufo_ufo">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<index name="ufo_ufo_owner_id_00e0075b" table="public.ufo_ufo"
+	 concurrent="false" unique="false" fast-update="false" buffering="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="owner_id"/>
+		</idxelement>
+</index>
+
+<index name="acl_location_name_113ccfa7_like" table="public.acl_location"
+	 concurrent="false" unique="false" fast-update="false" buffering="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="name"/>
+		</idxelement>
+</index>
+
+<index name="acl_machine_name_f3b75853_like" table="public.acl_machine"
+	 concurrent="false" unique="false" fast-update="false" buffering="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="name"/>
+		</idxelement>
+</index>
+
+<index name="acl_permittype_name_a73bc7d1_like" table="public.acl_permittype"
+	 concurrent="false" unique="false" fast-update="false" buffering="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="name"/>
+		</idxelement>
+</index>
+
+<index name="memberbox_memberbox_location_ddd6767d_like" table="public.memberbox_memberbox"
+	 concurrent="false" unique="false" fast-update="false" buffering="false"
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
+			<column name="location"/>
+		</idxelement>
+</index>
+
+<constraint name="members_tag_owner_id_0c57a646_fk_members_user_id" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.members_user"
+	deferrable="true" defer-type="INITIALLY DEFERRED"
+ table="public.members_tag">
+	<columns names="owner_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="acl_entitlement_holder_id_f337fa0f_fk_members_user_id" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.members_user"
+	deferrable="true" defer-type="INITIALLY DEFERRED"
+ table="public.acl_entitlement">
+	<columns names="holder_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="acl_entitlement_issuer_id_56c8847d_fk_members_user_id" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.members_user"
+	deferrable="true" defer-type="INITIALLY DEFERRED"
+ table="public.acl_entitlement">
+	<columns names="issuer_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="acl_entitlement_permit_id_16200f73_fk_acl_permittype_id" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.acl_permittype"
+	deferrable="true" defer-type="INITIALLY DEFERRED"
+ table="public.acl_entitlement">
+	<columns names="permit_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="acl_machine_location_id_a5646216_fk_acl_location_id" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.acl_location"
+	deferrable="true" defer-type="INITIALLY DEFERRED"
+ table="public.acl_machine">
+	<columns names="location_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="acl_machine_requires_permit_id_1bb32cae_fk_acl_permittype_id" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.acl_permittype"
+	deferrable="true" defer-type="INITIALLY DEFERRED"
+ table="public.acl_machine">
+	<columns names="requires_permit_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="acl_permittype_permit_id_602721e4_fk_acl_permittype_id" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.acl_permittype"
+	deferrable="true" defer-type="INITIALLY DEFERRED"
+ table="public.acl_permittype">
+	<columns names="permit_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="memberbox_memberbox_owner_id_d51955d1_fk_members_user_id" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.members_user"
+	deferrable="true" defer-type="INITIALLY DEFERRED"
+ table="public.memberbox_memberbox">
+	<columns names="owner_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="storage_storage_extends_id_042fa1e2_fk_storage_storage_id" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.storage_storage"
+	deferrable="true" defer-type="INITIALLY DEFERRED"
+ table="public.storage_storage">
+	<columns names="extends_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="storage_storage_owner_id_bf853964_fk_members_user_id" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.members_user"
+	deferrable="true" defer-type="INITIALLY DEFERRED"
+ table="public.storage_storage">
+	<columns names="owner_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="ufo_ufo_owner_id_00e0075b_fk_members_user_id" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.members_user"
+	deferrable="true" defer-type="INITIALLY DEFERRED"
+ table="public.ufo_ufo">
+	<columns names="owner_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<relationship name="rel_members_tag_members_user" type="relfk" layer="0"
+	 custom-color="#8765e3"
+	 src-table="public.members_tag"
+	 dst-table="public.members_user" reference-fk="members_tag_owner_id_0c57a646_fk_members_user_id"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_acl_entitlement_members_user" type="relfk" layer="0"
+	 custom-color="#f8badb"
+	 src-table="public.acl_entitlement"
+	 dst-table="public.members_user" reference-fk="acl_entitlement_holder_id_f337fa0f_fk_members_user_id"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_acl_entitlement_members_user1" type="relfk" layer="0"
+	 custom-color="#cdd4bc"
+	 src-table="public.acl_entitlement"
+	 dst-table="public.members_user" reference-fk="acl_entitlement_issuer_id_56c8847d_fk_members_user_id"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_acl_entitlement_acl_permittype" type="relfk" layer="0"
+	 custom-color="#e4e692"
+	 src-table="public.acl_entitlement"
+	 dst-table="public.acl_permittype" reference-fk="acl_entitlement_permit_id_16200f73_fk_acl_permittype_id"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_acl_machine_acl_location" type="relfk" layer="0"
+	 custom-color="#74e0b2"
+	 src-table="public.acl_machine"
+	 dst-table="public.acl_location" reference-fk="acl_machine_location_id_a5646216_fk_acl_location_id"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_acl_machine_acl_permittype" type="relfk" layer="0"
+	 custom-color="#210143"
+	 src-table="public.acl_machine"
+	 dst-table="public.acl_permittype" reference-fk="acl_machine_requires_permit_id_1bb32cae_fk_acl_permittype_id"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_acl_permittype_acl_permittype" type="relfk" layer="0"
+	 custom-color="#dd13af"
+	 src-table="public.acl_permittype"
+	 dst-table="public.acl_permittype" reference-fk="acl_permittype_permit_id_602721e4_fk_acl_permittype_id"
+	 src-required="false" dst-required="false">
+	<line>
+		<position x="1838.6" y="131.05"/>
+	<position x="1838.6" y="69"/>
+	<position x="1705.06" y="69"/>
+	</line>
+</relationship>
+
+<relationship name="rel_memberbox_memberbox_members_user" type="relfk" layer="0"
+	 custom-color="#c9c909"
+	 src-table="public.memberbox_memberbox"
+	 dst-table="public.members_user" reference-fk="memberbox_memberbox_owner_id_d51955d1_fk_members_user_id"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_storage_storage_storage_storage" type="relfk" layer="0"
+	 custom-color="#a6fb19"
+	 src-table="public.storage_storage"
+	 dst-table="public.storage_storage" reference-fk="storage_storage_extends_id_042fa1e2_fk_storage_storage_id"
+	 src-required="false" dst-required="false">
+	<line>
+		<position x="433.22" y="556.25"/>
+	<position x="433.22" y="469"/>
+	<position x="294.814" y="469"/>
+	</line>
+	<label ref-type="src-label">
+		<position x="12.7797" y="10.675"/>
+	</label>
+	<label ref-type="dst-label">
+		<position x="0" y="0"/>
+	</label>
+	<label ref-type="name-label">
+		<position x="0" y="0"/>
+	</label>
+</relationship>
+
+<relationship name="rel_storage_storage_members_user" type="relfk" layer="0"
+	 custom-color="#473d41"
+	 src-table="public.storage_storage"
+	 dst-table="public.members_user" reference-fk="storage_storage_owner_id_bf853964_fk_members_user_id"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_ufo_ufo_members_user" type="relfk" layer="0"
+	 custom-color="#ffd5c6"
+	 src-table="public.ufo_ufo"
+	 dst-table="public.members_user" reference-fk="ufo_ufo_owner_id_00e0075b_fk_members_user_id"
+	 src-required="false" dst-required="false"/>
+
+<permission>
+	<object name="msl" type="database"/>
+	<privileges connect="true" temporary="true"/>
+</permission>
+<permission>
+	<object name="msl" type="database"/>
+	<roles names="postgres"/>
+	<privileges create="true" connect="true" temporary="true"/>
+</permission>
+<permission>
+	<object name="msl" type="database"/>
+	<roles names="msl"/>
+	<privileges create="true" connect="true" temporary="true"/>
+</permission>
+</dbmodel>
