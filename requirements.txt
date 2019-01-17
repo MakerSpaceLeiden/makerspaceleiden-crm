@@ -8,6 +8,8 @@ django-qrcode
 django-settings-export
 Pillow
 python-resize-image
+django-stdimage
+django-dynamic-filenames
 
 # When using Postgress as the backing DB
 psycopg2-binary

@@ -2,7 +2,7 @@
 
 {% block content %}
 
-<a href="/media/{{ item.image }}"><img src="/media/{{ item.image }}" width=600/></a>
+<a href="{{ item.image.url }}"><img alt="" src="{{ item.image.large.url }}"/></a>
 <br>
 {{ item.description }}
 <p/>

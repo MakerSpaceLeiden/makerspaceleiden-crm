@@ -112,7 +112,14 @@ def alertOwnersToChange(item, userThatMadeTheChange, toinform):
     }
 
     message = render_to_string('ufo/email_notification.txt', context)
-    EmailMessage(subject, message, to=to, from_email=settings.FROM_EMAIL).send()
+    email = EmailMessage(subject, message, to=to, from_email=settings.FROM_EMAIL)
+    if item.image:
+       ext = item.image.name.split('.')[-1]
+       print("ext: " + ext)
+       print(item.image)
+       # email.attach( "ufo_thumbnail_{:06}.{}".format(item.pk,ext), settings.MEDIA_ROOT+"/"+item.image.name, "image/ext",)
+       email.attach(item.image.name, item.image.read(), "image/"+ext)
+    email.send()
 
 @login_required
 def modify(request,pk):
@@ -122,6 +129,7 @@ def modify(request,pk):
     context = {
         'title': 'Update an Uknown Floating Objects',
         'action': 'Update',
+	'item': oitem,
         }
 
     form = UfoForm(request.POST or None, instance = oitem)
@@ -235,49 +243,25 @@ def upload_zip(request):
                     skipped.append("{0}: skipped, does not have an image extension.".format(f))
                     continue
 
-                fp = "ufo/"+str(uuid.uuid4())+"."+extension
-                fname = settings.MEDIA_ROOT+"/"+fp
-                tname = settings.MEDIA_ROOT+"/small_"+fp
+                fp = str(uuid.uuid4())+"."+extension
+
+                ufo = Ufo(description="Auto upload",state='UNK')
 
                 try:
                   with z.open(f) as fh:
-                    with open(fname,"wb+") as dst:
-                     dst.write(fh.read())
+                     ufo.image.save(fp,fh)
                 except Exception as e:
                     logger.error("Error during zip extract: {}".format(e))
                     skipped.append("{0}: skipped, could not be extracted.".format(f))
-                    try:
-                      os.remove(fname)
-                    except Exception as e:
-                      pass
                     continue
-                
-
-                try:
-                   with open(fname,"rb") as dst:
-                     with Image.open(dst) as img:
-                       tn = resizeimage.resize_thumbnail(img,[200,200])
-                       tn.save(tname,img.format)
-
-                       if img.width > settings.MAX_IMAGE_WIDTH:
-                         resizeimage.resize_width(img,1280).save(fname, img.format)
-                except Exception as e:
-                    skipped.append("{0}: skipped, could not parse the image.".format(f))
-                    try:
-                      os.remove(fname)
-                      os.remove(pname)
-                    except Exception as e:
-                      pass
-                    continue
-                        
-                ufo = Ufo(description="Auto upload", image=fp,state='UNK');
 
                 for f in [ 'description', 'deadline', 'dispose_by_date' ]:
-                     if form.cleaned_data[f]:
+                    if form.cleaned_data[f]:
                         setattr(ufo, f, form.cleaned_data[f])
 
                 ufo.changeReason = "Part of a bulk upload by {}".format(request.user)
                 ufo.save()
+
 
                 lst.append(ufo)
             try:

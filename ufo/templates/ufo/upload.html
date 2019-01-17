@@ -13,7 +13,8 @@ Files failed:
 {% endif %}
 <p/>
 Images uploaded OK:
-{% for item in lst %}<img src="/media/small_{{ item.image }}" width=30/> {% endfor %}
+{% for item in lst %}
+<a href="{{ item.image.url }}"><img alt="" src="{{ item.image.thumbnail.url }}"/></a>{% endfor %}
 <p/>
 <hr>
 <a href="{% url "ufo" %}">back</a> to the overview.

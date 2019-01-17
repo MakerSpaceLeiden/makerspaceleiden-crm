@@ -2,6 +2,12 @@ from django.conf import settings
 # frmm django.contrib.auth import get_user_model
 from simple_history.models import HistoricalRecords
 from django.conf import settings
+from dynamic_filenames import FilePattern
+from stdimage.models import StdImageField
+from stdimage.validators import MinSizeValidator, MaxSizeValidator
+
+from django.db.models.signals import pre_delete, pre_save
+from stdimage.utils import pre_delete_delete_callback, pre_save_delete_callback
 
 from django.db import models
 from members.models import User
@@ -15,13 +21,9 @@ import re
 import logging
 logger = logging.getLogger(__name__)
 
-def ufo_generate_unique_name(instance,filename):
-   return "ufo/"+str(uuid.uuid4())
-
-def validate_unique_name(leaf_filename):
-    regex = re.compile('^ufo/[a-f0-9]{8}-?[a-f0-9]{4}-?4[a-f0-9]{3}-?[89ab][a-f0-9]{3}-?[a-f0-9]{12}\.(png|jpg)$', re.I)
-    match = regex.match(leaf_filename)
-    return bool(match)
+upload_to_pattern = FilePattern(
+    filename_pattern='{app_label:.25}/{model_name:.30}/{uuid:base32}{ext}'
+)
 
 class Ufo(models.Model):
      UFO_STATE = (
@@ -30,10 +32,12 @@ class Ufo(models.Model):
            ('DEL', 'can be disposed'),
            ('DON', 'Donated to the space'),
      )
-     image = models.ImageField(
-#         upload_to=lambda instance, filename: "ufo/"+str(uuid.uuid4())
-         upload_to=ufo_generate_unique_name
-         )
+     image = StdImageField(upload_to=upload_to_pattern,variations={
+        'thumbnail': (100, 100, True),
+        'medium': (300, 200),
+        'large': (600, 400),
+     }, validators=[MinSizeValidator(100, 100),MaxSizeValidator(8000,8000)])
+
      description = models.CharField(max_length=300, blank=True, null=True)
 
      state = models.CharField(max_length=4, choices=UFO_STATE, default='UNK', blank=True, null = True)
@@ -60,25 +64,6 @@ class Ufo(models.Model):
 
          return super(Ufo,self).save(*args, **kwargs)
 
-     def delete(self, * args, ** kwargs):
-         # Verify that we have what we thing we have - before we dare to 
-         # use that value for an actual delete on this.
-         #
-         if not validate_unique_name(self.image.name):
-             raise ValueError('The UFO filename does not match the required structure. Not deleting.')
-
-         for p  in [ '', 'small_' ]:
-            # We're using the relative path rather than the full
-            # path so we can control the prefix.
-            #
-            f = settings.MEDIA_ROOT + '/' + p + self.image.name
-
-            if not os.path.isfile(f):
-                raise ValueError('The UFO image is not a file. Not deleting.')
-                return None
-
-            # Allow remove to raise its own exception.
-            #
-            os.remove(f)
-
-         return super(Ufo,self).delete(*args, **kwargs)
+# Handle image cleanup.
+pre_delete.connect(pre_delete_delete_callback, sender=Ufo)
+pre_save.connect(pre_save_delete_callback, sender=Ufo)
