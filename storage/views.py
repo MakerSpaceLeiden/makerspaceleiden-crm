@@ -104,7 +104,6 @@ def create(request):
 
     if form.is_valid():
        try:
-           logger.error("Ok!")
            s = form.save(commit=False)
            s.changeReason = 'Created through the self-service interface by {0}'.format(request.user)
            s.save()
@@ -119,9 +118,6 @@ def create(request):
            return redirect('storage')
        except Exception as e:
            logger.error("Unexpected error during create of new storage : {0}".format(e))
-    else:
-       logger.error("nope: " + str(form.errors))
-       logger.error("nope: " + str(form.non_field_errors))
 
     context = {
         'label': 'Request a storage excemption',
@@ -148,7 +144,6 @@ def modify(request,pk):
     form = StorageForm(request.POST or None, instance = storage)
 
     if form.is_valid():
-       logger.error("saving")
        try:
            storage = form.save(commit=False)
            storage.changeReason = 'Updated through the self-service interface by {0}'.format(request.user)
@@ -165,8 +160,6 @@ def modify(request,pk):
 
        except Exception as e:
          logger.error("Unexpected error during save of storage: {0}".format(e))
-    else:
-       logger.error("nope")
 
     context = {
         'label': 'Update storage location and details',
@@ -242,9 +235,7 @@ def showhistory(request,pk,rev=None):
     if rev:
       revInfo = storage.history.get(pk = rev)
       historic = revInfo.instance
-      logger.error("===>" + str(historic))
       form = StorageForm(None, instance = historic)
-      logger.error("===>" + str(form))
       context = {
             'title': 'Historic record',
             'label': revInfo,
