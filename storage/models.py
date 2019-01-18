@@ -5,6 +5,11 @@ from simple_history.models import HistoricalRecords
 from django.template.loader import render_to_string, get_template
 from django.core.mail import EmailMessage
 from django.conf import settings
+from stdimage.models import StdImageField
+from django.db.models.signals import pre_delete, pre_save
+from stdimage.utils import pre_delete_delete_callback, pre_save_delete_callback
+from makerspaceleiden.utils import upload_to_pattern
+from django.urls import reverse
 
 from members.models import User
 
@@ -20,6 +25,8 @@ class Storage(models.Model):
 	('EX','Expired'),
     	('D', 'Rescinded'),
      )
+    image = StdImageField(upload_to=upload_to_pattern, blank=True, null=True,
+             variations=settings.IMG_VARIATIONS,validators=settings.IMG_VALIDATORS)
 
     what = models.CharField(max_length=200)
     location = models.CharField(max_length=50)
@@ -45,9 +52,9 @@ class Storage(models.Model):
         return self.enddate() < datetime.date.today()
 
     def location_updatable(self): # we can update the location 
-        return self.state in ('OK', 'R', '1st', 'AG' )
+        return self.state in ('AG', 'OK', 'R', '1st', 'AG' )
 
-    def justification_updatable(self): # we can update the location 
+    def justification_updatable(self): # we can update the justification
         return self.state in ('R', '1st')
 
     def extendable(self): # we can ask for an extention (anew)
@@ -64,6 +71,9 @@ class Storage(models.Model):
 
     class AgainstTheRules(Exception):
         pass
+
+    def url(self):
+       return  settings.BASE + reverse('showstorage', kwargs = { 'pk' :  self.id })
 
     def file_for_extension(self):
         if not self.extendable:
@@ -96,3 +106,8 @@ class Storage(models.Model):
            self.save()
 
         return
+
+# Handle image cleanup.
+pre_delete.connect(pre_delete_delete_callback, sender=Storage)
+pre_save.connect(pre_save_delete_callback, sender=Storage)
+

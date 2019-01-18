@@ -2,7 +2,6 @@ from django.conf import settings
 # frmm django.contrib.auth import get_user_model
 from simple_history.models import HistoricalRecords
 from django.conf import settings
-from dynamic_filenames import FilePattern
 from stdimage.models import StdImageField
 from stdimage.validators import MinSizeValidator, MaxSizeValidator
 
@@ -11,7 +10,7 @@ from stdimage.utils import pre_delete_delete_callback, pre_save_delete_callback
 
 from django.db import models
 from members.models import User
-
+from makerspaceleiden.utils import upload_to_pattern
 import datetime
 import uuid
 import os
@@ -20,10 +19,6 @@ import re
 
 import logging
 logger = logging.getLogger(__name__)
-
-upload_to_pattern = FilePattern(
-    filename_pattern='{app_label:.25}/{model_name:.30}/{uuid:base32}{ext}'
-)
 
 class Ufo(models.Model):
      UFO_STATE = (
