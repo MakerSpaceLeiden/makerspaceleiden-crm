@@ -1,0 +1,16 @@
+Folks,
+<p/>
+{{ user }} just did a bulk upload of lots of unclaimed objects.
+<p/>
+{% if item.description %}
+With the description: {{ item.description }}.
+{% endif %}
+A list of those is show below (click on an image to see the full details or to claim it).
+<p/>
+Your friendly makerbot.
+<p/>
+<hr>
+{% for item in items %}
+<a href="<{{ base }}{% url 'showufo' pk=item.id  %}"><img src="cid:{{item.id}}"/></a>
+<br/>
+{%endfor%}

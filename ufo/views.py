@@ -20,19 +20,24 @@ from django.template.loader import render_to_string, get_template
 from django.core.mail import EmailMessage
 from django.conf import settings
 from django.contrib.admin.sites import AdminSite
-from .admin import UfoAdmin
+from django.core.exceptions import ObjectDoesNotExist
+from django.core.mail import EmailMultiAlternatives
+
+from email.mime.text import MIMEText
+from email.mime.image import MIMEImage
+from email.mime.multipart import MIMEMultipart
 
 import datetime
 import uuid
 import zipfile
 import os
-
 import re
 
 import logging
 logger = logging.getLogger(__name__)
 
 from .models import Ufo
+from .admin import UfoAdmin
 from .forms import UfoForm, NewUfoForm, UfoZipUploadForm
 
 # Note - we do this here; rather than in the model its save() - as this
@@ -63,13 +68,25 @@ def alertOwnersToChange(itemOrItems, userThatMadeTheChange = None, toinform = []
     if isinstance(itemOrItems,list):
           context['items'] = itemOrItems
           subject = "[makerbot] Upload of %d UFOs" % len(itemOrItems)
-          message = render_to_string('ufo/email_notification_bulk.txt', context)
+
+          # msg = MIMEMultipart('alternative')
+          # part1 = MIMEText(render_to_string('ufo/email_notification_bulk.txt', context) , 'plain')
+          # part2 = MIMEText(render_to_string('ufo/email_notification_bulk.html', context) , 'html')
+          # msg.attach(part1)
+          # msg.attach(part2)
+          plain =render_to_string('ufo/email_notification_bulk.txt', context)
+          html = render_to_string('ufo/email_notification_bulk.html', context)
+
+          # We should change from mixed to related - to not show the attachments when HTML is shown.
+          #
+          email = EmailMultiAlternatives(subject, plain, to=to, from_email=settings.FROM_EMAIL)
+          email.attach_alternative(html,"text/html")
     else:
           context['item'] = itemOrItems
           subject = "[makerbot] Change to an UFO %s" % itemOrItems.description
           message = render_to_string('ufo/email_notification.txt', context)
 
-    email = EmailMessage(subject, message, to=to, from_email=settings.FROM_EMAIL)
+          email = EmailMessage(subject, message, to=to, from_email=settings.FROM_EMAIL)
 
     # Note that we want the images to be (much) smaller if we are doing
     # lot of them (e.g. in case of a zip upload) - than if it is just
@@ -78,10 +95,17 @@ def alertOwnersToChange(itemOrItems, userThatMadeTheChange = None, toinform = []
     if isinstance(itemOrItems,list):
        for i in itemOrItems:
            ext = i.image.name.split('.')[-1]
-           email.attach(i.image.name, i.image.thumbnail.read(), "image/"+ext)
+           attachment = MIMEImage(i.image.thumbnail.read(), "image/"+ext)
+           attachment.add_header('Content-ID',str(i.pk))
+           attachment.add_header('Content-Disposition', 'inline; filename="' + i.image.name +'"')
+           email.attach(attachment)
+           # email.attach(i.image.name, i.image.thumbnail.read(), "image/"+ext)
     else:
        ext = itemOrItems.image.name.split('.')[-1]
-       email.attach(itemOrItems.image.name, itemOrItems.image.medium.read(), "image/"+ext)
+       # attachment = MIMEImage(itemOrItems.image.medium.read(), "image/"+ext)
+       # attachment.add_header('Content-ID',itemOrItems.pk)
+       email.attach(attachment)
+       # email.attach(itemOrItems.image.name, itemOrItems.image.medium.read(), "image/"+ext)
 
     email.send()
 
@@ -182,7 +206,11 @@ def mine(request,pk):
 @login_required
 # Limit this to admins ?
 def delete(request,pk):
-    item = Ufo.objects.get(pk=pk)
+    try:
+       item = Ufo.objects.get(pk=pk)
+    except ObjectDoesNotExist as e:
+       return HttpResponse("Not found",status=404,content_type="text/plain")
+
 
     form = UfoForm(request.POST or None, instance = item)
     for f in form.fields:

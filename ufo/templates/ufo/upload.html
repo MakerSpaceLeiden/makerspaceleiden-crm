@@ -4,7 +4,7 @@
 {%if lst %}
 Upload completed.
 {% if skipped %}
-Files failed:
+Files that failed:
 <ol>
 	{% for msg in skipped %}
 	<li> {{ msg }} </li>
@@ -13,10 +13,11 @@ Files failed:
 {% endif %}
 <p/>
 Images uploaded OK:
+<hr/>
 {% for item in lst %}
-<a href="{{ item.image.url }}"><img alt="" src="{{ item.image.thumbnail.url }}"/></a>{% endfor %}
+<a href="{% url 'showufo' pk=item.id  %%}"><img alt="" src="{{ item.image.thumbnail.url }}"/></a>{% endfor %}
 <p/>
-<hr>
+<hr/>
 <a href="{% url "ufo" %}">back</a> to the overview.
 {% else %}
   <form method="post"  enctype="multipart/form-data">

@@ -2,13 +2,8 @@ Folks,
 
 {{ user }} just did a bulk upload of lots of unclaimed objects.
 
-Details below.
+{% if item.description %}
+With the description: {{ item.description }}
+{% endif %}
 
 Your friendly makerbot.
-
-{% for item in items %}
-URL:            <{{ base }}{% url 'showufo' pk=item.id  %}>
-Description:	{{ item.description }}
-Owner/resp.:	{{ item.owner }}
-		{{ item.get_state_display }}
-{%endfor%}
