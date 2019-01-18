@@ -86,10 +86,9 @@ def index(request):
 
 @login_required
 def create(request):
-
-    form = NewMemberboxForm(request.POST or None, initial = { 'owner': request.user.id })
-    if form.is_valid():
-       logger.error("saving")
+    if request.method == "POST":
+      form = NewMemberboxForm(request.POST or None, request.FILES, initial = { 'owner': request.user.id })
+      if form.is_valid():
        try:
            form.changeReason = 'Created through the self-service interface by {0}'.format(request.user)
            form.save()
@@ -99,7 +98,7 @@ def create(request):
        except Exception as e:
          logger.error("Unexpected error during create of new box : {0}".format(e))
     else:
-       logger.error("nope")
+      form = NewMemberboxForm(initial = { 'owner': request.user.id })
 
     context = {
         'label': 'Describe a new box',
@@ -119,8 +118,9 @@ def modify(request,pk):
     except Memberbox.DoesNotExist:
          return HttpResponse("Eh - what box ??",status=404,content_type="text/plain")
 
-    form = MemberboxForm(request.POST or None, instance = box)
-    if form.is_valid():
+    if request.method == "POST":
+     form = MemberboxForm(request.POST or None, request.FILES, instance = box)
+     if form.is_valid():
        logger.error("saving")
        try:
            box.changeReason = 'Updated through the self-service interface by {0}'.format(request.user)
@@ -132,7 +132,7 @@ def modify(request,pk):
        except Exception as e:
          logger.error("Unexpected error during save of box: {0}".format(e))
     else:
-       logger.error("nope")
+     form = MemberboxForm(request.POST or None, instance = box)
 
     context = {
         'label': 'Update box location and details',

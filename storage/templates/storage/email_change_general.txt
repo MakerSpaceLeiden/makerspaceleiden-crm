@@ -1,6 +1,6 @@
 Dear All,
 
-{{ user }} has {% if rq.created %}requested{% else %}updated the information for{% endif %} storage for:
+{{ user }} has {% if created %}requested{% else %}updated the information for{% endif %} storage for:
 
 	  {{ rq.what }}
 

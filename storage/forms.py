@@ -12,22 +12,25 @@ class ConfirmForm(forms.Form):
 class StorageForm(ModelForm):
     class Meta:
        model = Storage
-       fields = [ 'owner', 'what', 'location', 'extra_info', 'duration' ]
+       fields = [ 'owner', 'what', 'image', 'location', 'extra_info', 'duration' ]
        labels = { 
           'extra_info': 'Justification or explanation',
        }
-       help_text = {
-          'duration': 'days; short storage request (under 30 days) get automatic approval.',
+       help_texts = {
+          'image': 'Optional - but highly recommended!',
+          'location': "E.g. 'on the project table', 'on top of the CV cabinet', etc",
+          'duration': 'In days; short storage request (under 30 days) get automatic approval.',
        }
-    def __init__(self, storageOrFormOrNone, *args, **kwargs):
-       super(ModelForm, self).__init__(storageOrFormOrNone, *args, **kwargs)
 
+    def __init__(self, *args, **kwargs):
+       super(ModelForm, self).__init__(*args, **kwargs)
        storage = None
+
        if kwargs is not None and 'instance' in kwargs:
           storage = kwargs['instance']
 
-       if storageOrFormOrNone and isinstance(storageOrFormOrNone,Storage):
-          storage = storageOrFormOrNone
+       # if storageOrFormOrNone and isinstance(storageOrFormOrNone,Storage):
+       #   storage = storageOrFormOrNone
 
        if not storage:
           return
@@ -36,7 +39,7 @@ class StorageForm(ModelForm):
           del self.fields['owner']
 
        if not storage.location_updatable():
-          del self.fields['location'] 
+           del self.fields['location'] 
 
        if not storage.justification_updatable():
           del self.fields['extra_info'] 
@@ -44,5 +47,3 @@ class StorageForm(ModelForm):
        if not storage.editable():
           del self.fields['what'] 
           del self.fields['duration'] 
-
-       logger.error("2- Got "+",".join(self.fields.keys()))

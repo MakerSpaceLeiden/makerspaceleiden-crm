@@ -2,22 +2,22 @@
 
 {% block content %}
   <h2>{{ label }}</h2>
-  <form method="post">
+  <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     <table>
     {% if delete or not form.fields.what %}
-    <tr><td>What:</td><td><b>{{ box.what}}</b></td></tr>
+    <tr><td>What:</td><td><b>{{ storage.what}}</b></td></tr>
     {% endif %}
-    {% if box %}
-    <tr><td>Owner</td><td>{{ box.owner }}</td></tr>
-    <tr><td>Period:</td><td>{{ box.requested }} + {{ box.duration }} days = {{ box.enddate }}</td></tr>
+    {% if storage %}
+    <tr><td>Owner</td><td>{{ storage.owner }}</td></tr>
+    <tr><td>Period:</td><td>{{ storage.requested }} + {{ storage.duration }} days = {{ storage.enddate }}</td></tr>
     {% endif %}
     {%if action %}
     {{ form.as_table }}
     <tr><td><a href="{% url "storage" %}">cancel</a></td><td><button type="submit">{{ action }}</button></td></td>
     {% else %}
-    <tr><td>Location</td><td>{{ box.location}}</td></tr>
-    <tr><td>Justifcaton:</td><td>{{ box.extra_info }}</td></tr>
+    <tr><td>Location</td><td>{{ storage.location}}</td></tr>
+    <tr><td>Justifcaton:</td><td>{{ storage.extra_info }}</td></tr>
     {% endif %}
     </table>
   </form>
@@ -26,7 +26,7 @@
 <hr>
 <p>
 {% if history %}
-<a href="{% url "showhistory" pk=box.id %}">back</a> to the history overview.
+<a href="{% url "showhistory" pk=storage.id %}">back</a> to the history overview.
 {% else %}
 <a href="{% url "storage" %}">back</a> to the storage overview.
 {% endif %}

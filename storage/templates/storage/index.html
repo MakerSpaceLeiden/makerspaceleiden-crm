@@ -33,7 +33,7 @@
 	<td><code>{{ item.id }}<code></td>
         <td>
 	{{ item.get_state_display }}
-	<center>{% qr_from_text item.id "s" %}
+	<center>{% qr_from_text item.url "s" %}
 	</center>
         </td>
         <td>{{ item.what}}<br/>
@@ -44,6 +44,12 @@
                 <a href="{% url 'storage' user_pk=item.owner.id %}">
 {% endif %}
 			    {{ item.owner }}</a></i><br/>
+{%if item.image %}
+          <a href="{{ item.image.url }}"><img alt="" src="{{ item.image.medium.url }}"
+{%else %}
+no img
+{%endif %}
+
         </td>
         <td>
 	  <b>{{ item.location }}</b></br>

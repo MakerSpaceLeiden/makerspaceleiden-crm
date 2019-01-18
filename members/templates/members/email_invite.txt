@@ -1,4 +1,6 @@
 {% autoescape off %}
+Dear {{ user.first_name }},
+
 This is an invite for the member management system of the Maker Spae leiden.
 
 Your username will be your email ({{ user.get_username }}). Click on

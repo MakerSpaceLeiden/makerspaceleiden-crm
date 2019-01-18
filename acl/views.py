@@ -133,7 +133,7 @@ def member_overview(request,member_id = None):
        lst[ mchn.name ] = matrix_mm(mchn, member)
 
     context = {
-       'title': "XS matrix " + member.first_name + ' ' + member.last_name,
+       'title': member.first_name + ' ' + member.last_name,
        'member': member,
        'machines': machines,
        'storage': storage,

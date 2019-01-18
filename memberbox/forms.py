@@ -7,12 +7,15 @@ import re
 class NewMemberboxForm(ModelForm):
     class Meta:
        model = Memberbox
-       fields = [ 'location', 'extra_info', 'owner' ]
+       fields = [ 'image', 'location', 'extra_info', 'owner' ]
+       help_texts = {
+          'image': 'Optional - and you can always add it later (recommended though)',
+       }
 
 class MemberboxForm(ModelForm):
     class Meta:
        model = Memberbox
-       fields = [ 'location', 'extra_info' ]
+       fields = [ 'image', 'location', 'extra_info' ]
 
     # Try to keep the boxes in the cupboard all in uppercase
     # and let other things be whatever they got entered as.

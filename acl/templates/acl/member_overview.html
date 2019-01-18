@@ -5,13 +5,14 @@
 {% block content %}
 
 {% if lst %}
+
 <table>
 	<tr>
 		<td colspan=2><h3>Personal details</h3></td>
 	</tr>
-	<tr>
+	<tr valign=top>
 		<td align=right>First name</td><td>{{ member.first_name}}</td>
-		<td valign=top rowspan=3>{% qr_from_text member.id "s" %}<br/>private box label</td>
+		<td valign=top rowspan=5><center>{% qr_from_text member.url "m" %}<br/>private box label</center></td>
 	</tr>
 	<tr><td align=right>Last name</td><td>{{ member.last_name}}</td></tr>
 	<tr><td align=right>Email (usernme)</td><td>{{ member.email}}</td></tr>
@@ -47,7 +48,10 @@
 			{% else %}
 				{{ box }}
 			{% endif %}
-			<p>
+			{% if box.image %}
+				<br><a href="{{ box.image.url }}"><img alt="" src="{{ box.image.thumbnail.url }}"/></a>
+			{% endif %}
+			<br>
 			<a href="{% url 'changebox' pk=box.id %}">[update]</a>
 	{%if member == user %}
 			<a href="{% url 'deletebox' pk=box.id %}">[delete]</a>
@@ -70,6 +74,10 @@
 			{{ box.duration }} days until {{ box.enddate }}<br>
 			<b>{{ box.get_state_display }}</b><br>
 			{{ box.extra_info }}<br>
+			{% if box.image %}
+                                 <a href="{% url 'storage' user_pk=box.owner.id %}"><img alt="" src="{{ box.image.thumbnail.url }}"/></a><br/>
+			{% endif %}
+			<a href="{% url 'showstorage' pk=box.id %}">[view]</a>
 			<a href="{% url 'changestorage' pk=box.id %}">[update]</a>
 	{%if member == user %}
 			<a href="{% url 'deletestorage' pk=box.id %}">[delete]</a>

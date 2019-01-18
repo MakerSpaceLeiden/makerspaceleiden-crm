@@ -35,12 +35,15 @@ def sendStorageEmail(storedObject, user, isCreated, to, template):
     if storedObject.state == 'AG':
            subject += '(Auto approved, shorter than 30 days)'
 
-    message = render_to_string(template, {
-           'created': isCreated,
+    context = {
            'rq': storedObject,
            'user': user,
            'base': settings.BASE,
-    })
+    }
+    if isCreated:
+     context['created'] = True
+
+    message = render_to_string(template, context)
     EmailMessage(subject, message, to=[to], from_email=settings.DEFAULT_FROM_EMAIL).send()
 
 
@@ -92,17 +95,16 @@ def index(request,user_pk):
 
 @login_required
 @csrf_protect
-def showstorage(request, storageid):
+def showstorage(request, pk):
     # not implemented yet.
     return redirect('storage')
 
 @login_required
 @csrf_protect
 def create(request):
-    form = StorageForm(request.POST or None, initial = { 'owner': request.user.id })
-    form.fields['duration'].help_text= "days. Short requests (month or less) are automatically approved."
-
-    if form.is_valid():
+    if request.method == "POST":
+     form = StorageForm(request.POST or None, request.FILES, initial = { 'owner': request.user })
+     if form.is_valid():
        try:
            s = form.save(commit=False)
            s.changeReason = 'Created through the self-service interface by {0}'.format(request.user)
@@ -118,6 +120,8 @@ def create(request):
            return redirect('storage')
        except Exception as e:
            logger.error("Unexpected error during create of new storage : {0}".format(e))
+    else:
+      form = StorageForm(initial = { 'owner': request.user })
 
     context = {
         'label': 'Request a storage excemption',
@@ -141,9 +145,9 @@ def modify(request,pk):
     if not storage.editable() and not storage.location_updatable():
          return HttpResponse("Eh - no can do ??",status=403,content_type="text/plain")
 
-    form = StorageForm(request.POST or None, instance = storage)
-
-    if form.is_valid():
+    if request.method == "POST":
+      form = StorageForm(request.POST or None, request.FILES, instance = storage)
+      if form.is_valid():
        try:
            storage = form.save(commit=False)
            storage.changeReason = 'Updated through the self-service interface by {0}'.format(request.user)
@@ -160,7 +164,8 @@ def modify(request,pk):
 
        except Exception as e:
          logger.error("Unexpected error during save of storage: {0}".format(e))
-
+    else:
+       form = StorageForm(instance = storage)
     context = {
         'label': 'Update storage location and details',
         'action': 'Update',
@@ -235,7 +240,7 @@ def showhistory(request,pk,rev=None):
     if rev:
       revInfo = storage.history.get(pk = rev)
       historic = revInfo.instance
-      form = StorageForm(None, instance = historic)
+      form = StorageForm(instance = historic)
       context = {
             'title': 'Historic record',
             'label': revInfo,

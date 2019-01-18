@@ -165,9 +165,9 @@ def modify(request,pk):
         'action': 'Update',
 	'item': oitem,
         }
-
-    form = UfoForm(request.POST or None, instance = oitem)
-    if form.is_valid() and request.POST:
+    if request.POST:
+     form = UfoForm(request.POST or None, request.FILES, instance = oitem)
+     if form.is_valid() and request.POST:
         try:
             item = form.save(commit = False)
             item.changeReason = "Changed by {} via self service portal".format(request.user)
@@ -183,6 +183,7 @@ def modify(request,pk):
 
         return redirect('ufo')
 
+    form = UfoForm(instance = oitem)
     context['form'] = form
 
     return render(request, 'ufo/crud.html', context)
