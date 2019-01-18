@@ -13,7 +13,7 @@ Sent invites; to just one user, or all users
 in the system,
 '''
 def reset_password(email, reset = False,
-        from_email=settings.FROM_EMAIL, 
+        from_email=settings.DEFAULT_FROM_EMAIL, 
         template='members/email_invite.txt',
         subject_template='members/email_invite_subject.txt',
         ):
