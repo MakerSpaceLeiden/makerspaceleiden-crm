@@ -32,12 +32,8 @@ class Ufo(models.Model):
            ('DEL', 'can be disposed'),
            ('DON', 'Donated to the space'),
      )
-     image = StdImageField(upload_to=upload_to_pattern,variations={
-        'thumbnail': (100, 100, True),
-        'medium': (300, 200),
-        'large': (600, 400),
-     }, validators=[MinSizeValidator(100, 100),MaxSizeValidator(8000,8000)])
-
+     image = StdImageField(upload_to=upload_to_pattern,
+             variations=settings.IMG_VARIATIONS,validators=settings.IMG_VALIDATORS)
      description = models.CharField(max_length=300, blank=True, null=True)
 
      state = models.CharField(max_length=4, choices=UFO_STATE, default='UNK', blank=True, null = True)

@@ -163,6 +163,19 @@ MIN_IMAGE_SIZE=2*1024
 MAX_IMAGE_SIZE=8*1024*1024
 MAX_IMAGE_WIDTH=1280
 
+from stdimage.validators import MinSizeValidator, MaxSizeValidator
+
+IMG_VALIDATORS=[MinSizeValidator(100, 100),MaxSizeValidator(8000,8000)]
+
+# Note: the labels are effectively 'hardcoded' in the templates
+# and code; the sizes are free to edit.
+#
+IMG_VARIATIONS={
+        'thumbnail': (100, 100, True),
+        'medium': (300, 200),
+        'large': (600, 400),
+     }
+
 UFO_DEADLINE_DAYS=14
 UFO_DISPOSE_DAYS=7
 
