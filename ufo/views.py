@@ -20,7 +20,6 @@ from django.template.loader import render_to_string, get_template
 from django.core.mail import EmailMessage
 from django.conf import settings
 from django.contrib.admin.sites import AdminSite
-from simple_history.admin import SimpleHistoryAdmin
 from .admin import UfoAdmin
 
 import datetime
@@ -29,14 +28,63 @@ import zipfile
 import os
 
 import re
-from PIL import Image
-from resizeimage import resizeimage
 
 import logging
 logger = logging.getLogger(__name__)
 
 from .models import Ufo
 from .forms import UfoForm, NewUfoForm, UfoZipUploadForm
+
+# Note - we do this here; rather than in the model its save() - as this
+# lets admins change things through the database interface silently. 
+# Which can help when sheparding the community.
+#
+def alertOwnersToChange(itemOrItems, userThatMadeTheChange = None, toinform = []):
+
+    to = {}
+    if userThatMadeTheChange:
+       to[ userThatMadeTheChange.email ] = True 
+    
+    if settings.ALSO_INFORM_EMAIL_ADDRESSES:
+       toinform.extend(settings.ALSO_INFORM_EMAIL_ADDRESSES)
+
+    for person in toinform:
+      if person:
+        to[person.email]=True
+
+    # We use a dict rather than an array to prune any duplicates.
+    to = to.keys()
+
+    context = {
+           'user': userThatMadeTheChange,
+           'base': settings.BASE,
+    }
+
+    if isinstance(itemOrItems,list):
+          context['items'] = itemOrItems
+          subject = "[makerbot] Upload of %d UFOs" % len(itemOrItems)
+          message = render_to_string('ufo/email_notification_bulk.txt', context)
+    else:
+          context['item'] = itemOrItems
+          subject = "[makerbot] Change to an UFO %s" % itemOrItems.description
+          message = render_to_string('ufo/email_notification.txt', context)
+
+    email = EmailMessage(subject, message, to=to, from_email=settings.FROM_EMAIL)
+
+    # Note that we want the images to be (much) smaller if we are doing
+    # lot of them (e.g. in case of a zip upload) - than if it is just
+    # a single one.
+    #
+    if isinstance(itemOrItems,list):
+       for i in itemOrItems:
+           ext = i.image.name.split('.')[-1]
+           email.attach(i.image.name, i.image.thumbnail.read(), "image/"+ext)
+    else:
+       ext = itemOrItems.image.name.split('.')[-1]
+       email.attach(itemOrItems.image.name, itemOrItems.image.medium.read(), "image/"+ext)
+
+    email.send()
+
 
 def index(request,days=30):
     lst = Ufo.objects.all()
@@ -53,8 +101,6 @@ def index(request,days=30):
 @login_required
 def create(request):
     form = NewUfoForm(request.POST or None, request.FILES, initial = { 'state': 'UNK' })
-    logger.error(request.POST)
-    logger.error(request.FILES)
     if form.is_valid():
         try:
             item = form.save(commit = False)
@@ -65,6 +111,8 @@ def create(request):
 
             item.changeReason = "Created by {} through the self-service portal.".format(request.user)
             item.save()
+
+            alertOwnersToChange(item, request.user, [ item.owner ])
             return redirect('ufo')
 
         except Exception as e:
@@ -86,40 +134,6 @@ def show(request,pk):
         'item': item,
         }
     return render(request, 'ufo/view.html', context)
-
-# Note - we do this here; rather than in the model - as this
-# lets admins change things through the database interface
-# silently. Which can help when sheparding the community.
-#
-def alertOwnersToChange(item, userThatMadeTheChange, toinform):
-    subject = "[makerbot] Change to an UFO %s" % item.description
-
-    # We use a dict rather than an array to prune any duplicates.
-    #
-    to = { userThatMadeTheChange.email: True }
-    for person in toinform:
-      if person:
-        to[person.email]=True
-    to = to.keys()
-
-    if settings.ALSO_INFORM_EMAIL_ADDRESSES:
-       to.extend(settings.ALSO_INFORM_EMAIL_ADDRESSES)
-
-    context = {
-           'item': item,
-           'user': userThatMadeTheChange,
-           'base': settings.BASE,
-    }
-
-    message = render_to_string('ufo/email_notification.txt', context)
-    email = EmailMessage(subject, message, to=to, from_email=settings.FROM_EMAIL)
-    if item.image:
-       ext = item.image.name.split('.')[-1]
-       print("ext: " + ext)
-       print(item.image)
-       # email.attach( "ufo_thumbnail_{:06}.{}".format(item.pk,ext), settings.MEDIA_ROOT+"/"+item.image.name, "image/ext",)
-       email.attach(item.image.name, item.image.read(), "image/"+ext)
-    email.send()
 
 @login_required
 def modify(request,pk):
@@ -143,7 +157,7 @@ def modify(request,pk):
 
         toinform.append(item.owner)
  
-        alertOwnersToChange(item, request.user, toinform)
+        alertOwnersToChange(item, request.user, [ toinform ])
 
         context['item']=item
 
@@ -243,12 +257,11 @@ def upload_zip(request):
                     skipped.append("{0}: skipped, does not have an image extension.".format(f))
                     continue
 
-                fp = str(uuid.uuid4())+"."+extension
-
                 ufo = Ufo(description="Auto upload",state='UNK')
 
                 try:
                   with z.open(f) as fh:
+                     fp = str(uuid.uuid4())+"."+extension
                      ufo.image.save(fp,fh)
                 except Exception as e:
                     logger.error("Error during zip extract: {}".format(e))
@@ -262,12 +275,14 @@ def upload_zip(request):
                 ufo.changeReason = "Part of a bulk upload by {}".format(request.user)
                 ufo.save()
 
-
                 lst.append(ufo)
             try:
                os.remove(tmpZip)
             except:
                 logger.error("Error during cleanup of {}: {}".format(tmpZip,e))
+
+            if lst:
+                alertOwnersToChange(lst, request.user)
 
             return render(request, 'ufo/upload.html', { 
                'action': 'Done', 
