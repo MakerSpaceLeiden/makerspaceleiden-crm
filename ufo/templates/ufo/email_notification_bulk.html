@@ -9,8 +9,13 @@ A list of those is show below (click on an image to see the full details or to c
 <p/>
 Your friendly makerbot.
 <p/>
-<hr>
+
+<hr/><h3>Uploaded</h3>
+<hr/><p>
 {% for item in items %}
-<a href="<{{ base }}{% url 'showufo' pk=item.id  %}"><img src="cid:{{item.id}}"/></a>
-<br/>
+<a href="{{ base }}{% url 'showufo' pk=item.id  %}"><img src="cid:{{item.id}}"/></a>
 {%endfor%}
+<hr/>
+
+Click on any of the above to see more.
+

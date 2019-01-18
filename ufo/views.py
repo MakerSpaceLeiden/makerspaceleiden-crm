@@ -64,29 +64,20 @@ def alertOwnersToChange(itemOrItems, userThatMadeTheChange = None, toinform = []
            'user': userThatMadeTheChange,
            'base': settings.BASE,
     }
+    part2 = None
 
     if isinstance(itemOrItems,list):
           context['items'] = itemOrItems
           subject = "[makerbot] Upload of %d UFOs" % len(itemOrItems)
 
-          # msg = MIMEMultipart('alternative')
-          # part1 = MIMEText(render_to_string('ufo/email_notification_bulk.txt', context) , 'plain')
-          # part2 = MIMEText(render_to_string('ufo/email_notification_bulk.html', context) , 'html')
-          # msg.attach(part1)
-          # msg.attach(part2)
-          plain =render_to_string('ufo/email_notification_bulk.txt', context)
-          html = render_to_string('ufo/email_notification_bulk.html', context)
-
-          # We should change from mixed to related - to not show the attachments when HTML is shown.
-          #
-          email = EmailMultiAlternatives(subject, plain, to=to, from_email=settings.FROM_EMAIL)
-          email.attach_alternative(html,"text/html")
+          part1 = MIMEText(render_to_string('ufo/email_notification_bulk.txt', context) , 'plain')
+          part2 = MIMEMultipart('related')
+          part2.attach(MIMEText(render_to_string('ufo/email_notification_bulk.html', context) , 'html'))
     else:
           context['item'] = itemOrItems
           subject = "[makerbot] Change to an UFO %s" % itemOrItems.description
-          message = render_to_string('ufo/email_notification.txt', context)
-
-          email = EmailMessage(subject, message, to=to, from_email=settings.FROM_EMAIL)
+          part1 = MIMEText(render_to_string('ufo/email_notification.txt', context), 'plain')
+          part2 = MIMEMultipart('mixed')
 
     # Note that we want the images to be (much) smaller if we are doing
     # lot of them (e.g. in case of a zip upload) - than if it is just
@@ -98,15 +89,20 @@ def alertOwnersToChange(itemOrItems, userThatMadeTheChange = None, toinform = []
            attachment = MIMEImage(i.image.thumbnail.read(), "image/"+ext)
            attachment.add_header('Content-ID',str(i.pk))
            attachment.add_header('Content-Disposition', 'inline; filename="' + i.image.name +'"')
-           email.attach(attachment)
+           part2.attach(attachment)
            # email.attach(i.image.name, i.image.thumbnail.read(), "image/"+ext)
     else:
        ext = itemOrItems.image.name.split('.')[-1]
-       # attachment = MIMEImage(itemOrItems.image.medium.read(), "image/"+ext)
-       # attachment.add_header('Content-ID',itemOrItems.pk)
-       email.attach(attachment)
-       # email.attach(itemOrItems.image.name, itemOrItems.image.medium.read(), "image/"+ext)
+       attachment = MIMEImage(itemOrItems.image.medium.read(), "image/"+ext)
+       attachment.add_header('Content-ID',itemOrItems.pk)
+       part2.attach(attachment)
 
+    msg = MIMEMultipart('alternative')
+    msg.attach(part1)
+    msg.attach(part2)
+
+    email = EmailMessage(subject, None, to=to, from_email=settings.FROM_EMAIL)
+    email.attach(msg)
     email.send()
 
 
@@ -282,7 +278,7 @@ def upload_zip(request):
                 elif re.match(".*\.(png)$", f,re.IGNORECASE):
                     extension = 'png'
                 else:
-                    skipped.append("{0}: skipped, does not have an image extension.".format(f))
+                    skipped.append("{0}: skipped, does not have an image extension such as .jp(e)g or .png.".format(f))
                     continue
 
                 ufo = Ufo(description="Auto upload",state='UNK')

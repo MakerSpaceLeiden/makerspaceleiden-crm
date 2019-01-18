@@ -15,7 +15,7 @@ Files that failed:
 Images uploaded OK:
 <hr/>
 {% for item in lst %}
-<a href="{% url 'showufo' pk=item.id  %%}"><img alt="" src="{{ item.image.thumbnail.url }}"/></a>{% endfor %}
+<a href="{% url 'showufo' pk=item.id  %}"><img alt="" src="{{ item.image.thumbnail.url }}"/></a>{% endfor %}
 <p/>
 <hr/>
 <a href="{% url "ufo" %}">back</a> to the overview.
