@@ -41,7 +41,7 @@ def sendStorageEmail(storedObject, user, isCreated, to, template):
            'user': user,
            'base': settings.BASE,
     })
-    EmailMessage(subject, message, to=[to], from_email=settings.FROM_EMAIL).send()
+    EmailMessage(subject, message, to=[to], from_email=settings.DEFAULT_FROM_EMAIL).send()
 
 
 @login_required

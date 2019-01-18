@@ -92,7 +92,8 @@ SETTINGS_EXPORT = [ 'GRAND_AMNESTY', ]
 WSGI_APPLICATION = 'makerspaceleiden.wsgi.application'
 
 MAILINGLIST='deelnemers@makerspaceleiden.nl'
-FROM_EMAIL="noc@makerspaceleiden.nl"
+TRUSTEES='hetbestuur@makerspaceleiden.nl'
+DEFAULT_FROM_EMAIL="noc@makerspaceleiden.nl"
 BASE='https://makerspaceleiden.nl/crm'
 
 # Database
@@ -125,7 +126,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # For DEVLOPMNET  - fake bacend
-
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' 
 
 # Internationalization

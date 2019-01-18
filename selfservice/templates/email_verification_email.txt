@@ -1,5 +1,10 @@
 {% autoescape off %}
-Hi {{ user.username }},
+Hi {{ user.first_name }},
+
+You've requested a change of your email address
+
+from:	{{ user.email }}
+to:	{{ new_email }}
 
 Please click on the link below to confirm your email address change:
 

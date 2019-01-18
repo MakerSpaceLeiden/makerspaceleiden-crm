@@ -101,7 +101,7 @@ def alertOwnersToChange(itemOrItems, userThatMadeTheChange = None, toinform = []
     msg.attach(part1)
     msg.attach(part2)
 
-    email = EmailMessage(subject, None, to=to, from_email=settings.FROM_EMAIL)
+    email = EmailMessage(subject, None, to=to, from_email=settings.DEFAULT_FROM_EMAIL)
     email.attach(msg)
     email.send()
 

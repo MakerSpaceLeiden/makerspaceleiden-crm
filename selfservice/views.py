@@ -18,6 +18,7 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils import six
 from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.mail import EmailMessage
 
 from django.conf import settings
 
@@ -27,6 +28,28 @@ from members.models import Tag,User
 from acl.models import Machine,Entitlement,PermitType
 from selfservice.forms import UserForm, SignUpForm
 from .models import WiFiNetwork
+
+def sentEmailVerification(request,user,new_email,ccOrNone = None):
+            current_site = get_current_site(request)
+            subject = 'Confirm your email adddress ({})'.format(current_site.domain)
+            context = {
+                'request': request,
+                'user': user,
+		'new_email': new_email,
+                'domain': current_site.domain,
+                'uid': urlsafe_base64_encode(force_bytes(user.pk)).decode(),
+                'token': email_check_token.make_token(user),
+            }
+
+            msg = render_to_string('email_verification_email.txt', context)
+            EmailMessage(subject, msg, to=[user.email], from_email=settings.DEFAULT_FROM_EMAIL).send()
+
+            if ccOrNone:
+                subject = '[spacebot] User {} {} is changing is or her email adddress'.format(user.first_name, user.last_name)
+                msg = render_to_string('email_verification_email_inform.txt', context)
+                EmailMessage(subject, msg, to=ccOrNone, from_email=settings.DEFAULT_FROM_EMAIL).send()
+
+            return render(request, 'email_verification_email.html')
 
 class AccountActivationTokenGenerator(PasswordResetTokenGenerator):
     def _make_hash_value(self, user, timestamp):
@@ -166,20 +189,6 @@ def recordinstructions(request):
    
     return render(request, 'record.html', context)
 
-def sentEmailVerification(request,user,new_email):
-            current_site = get_current_site(request)
-            subject = 'Confirm your email adddress ({})'.format(current_site.domain)
-            user.email = new_email
-            message = render_to_string('email_verification_email.txt', {
-                'request': request,
-                'user': user,
-                'domain': current_site.domain,
-                'uid': urlsafe_base64_encode(force_bytes(user.pk)).decode(),
-                'token': email_check_token.make_token(user),
-            })
-            user.email_user(subject, message)
-            return render(request, 'email_verification_email.html')
-
 @login_required
 def confirmemail(request, uidb64, token, newemail):
     try:
@@ -187,13 +196,11 @@ def confirmemail(request, uidb64, token, newemail):
         user = User.objects.get(pk=uid)
         if request.user != user:
            return HttpResponse("You can only change your own records.",status=500,content_type="text/plain")
-        member = user.member
         user.email = newemail
         if email_check_token.check_token(user, token):
            user.email = newemail
+           user.email_confirmed = True
            user.save()
-           user.member.email_confirmed = True
-           member.save()
         else:
            return HttpResponse("Failed to confirm",status=500,content_type="text/plain")
     except (TypeError, ValueError, OverflowError, User.DoesNotExist):
@@ -206,6 +213,7 @@ def confirmemail(request, uidb64, token, newemail):
 def userdetails(request):
     try:
        member = request.user
+       old_email = "{}".format(member.email)
     except User.DoesNotExist:
        return HttpResponse("You are propably not a member-- admin perhaps?",status=500,content_type="text/plain")
 
@@ -214,22 +222,21 @@ def userdetails(request):
          user = UserForm(request.POST, instance = request.user) 
          save_user = user.save(commit=False)
          if user.is_valid():
-             old_email = "{}".format(member.email)
              new_email = "{}".format(user.cleaned_data['email'])
 
              save_user.email = old_email
              save_user.changeReason = 'Updated through the self-service interface by {0}'.format(request.user)
              save_user.save()
 
+             user = UserForm(request.POST, instance = save_user) 
              for f in user.fields:
                user.fields[f].disabled = True
-             request.user = user
 
              if old_email != new_email:
                 member.email_confirmed = False
-                member.changeReason = "Reset email validation flag as the email was changed from {} to {} by the user (self service)".format(old_email, new_email)
+                member.changeReason = "Reset email validation, email changed."
                 member.save()
-                return sentEmailVerification(request,save_user,new_email)
+                return sentEmailVerification(request,save_user,new_email, [ old_email, settings.TRUSTEES ])
 
              return render(request, 'userdetails.html', { 'form' : user, 'saved': True })
        except Exception as e:
@@ -256,7 +263,7 @@ def signup(request):
             user = form.save()
             email = form.cleaned_data.get('email')
             raw_password = form.cleaned_data.get('password1')
-            return sentEmailVerification(request,user,email)
+            return sentEmailVerification(request,user,email,[ settings.TRUSTEES ] )
 
             user = authenticate(email=email, password=raw_password)
             login(request, user)

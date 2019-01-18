@@ -7,6 +7,9 @@ class UserForm(ModelForm):
     class Meta:
        model = User
        fields = [ 'first_name', 'last_name', 'email' ]
+       help_texts = {
+            'email': "When you change this field; you will get a verification email to your new address. And your old address and the trustee's are sent a notice of this change."
+       }
 
 class SignUpForm(UserCreationForm):
     first_name = forms.CharField(max_length=30, required=False, help_text='Optional.')
