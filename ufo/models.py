@@ -4,6 +4,8 @@ from simple_history.models import HistoricalRecords
 from django.conf import settings
 from stdimage.models import StdImageField
 from stdimage.validators import MinSizeValidator, MaxSizeValidator
+from django.urls import reverse
+
 
 from django.db.models.signals import pre_delete, pre_save
 from stdimage.utils import pre_delete_delete_callback, pre_save_delete_callback
@@ -42,7 +44,7 @@ class Ufo(models.Model):
      history = HistoricalRecords()
 
      def url(self):
-       return  settings.BASE + path()
+       return  settings.BASE + self.path()
 
      def path(self):
        return  settings.BASE + reverse('showufo', kwargs = { 'pk' :  self.id })

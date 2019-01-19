@@ -7,6 +7,7 @@ from stdimage.models import StdImageField
 from django.db.models.signals import pre_delete, pre_save
 from stdimage.utils import pre_delete_delete_callback, pre_save_delete_callback
 from makerspaceleiden.utils import upload_to_pattern
+from django.urls import reverse
 
 
 class Memberbox(models.Model):

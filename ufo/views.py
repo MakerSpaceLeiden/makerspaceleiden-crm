@@ -94,7 +94,7 @@ def alertOwnersToChange(itemOrItems, userThatMadeTheChange = None, toinform = []
     else:
        ext = itemOrItems.image.name.split('.')[-1]
        attachment = MIMEImage(itemOrItems.image.medium.read(), "image/"+ext)
-       attachment.add_header('Content-ID',itemOrItems.pk)
+       attachment.add_header('Content-ID',str(itemOrItems.pk))
        part2.attach(attachment)
 
     msg = MIMEMultipart('alternative')
@@ -177,7 +177,7 @@ def modify(request,pk):
 
         toinform.append(item.owner)
  
-        alertOwnersToChange(item, request.user, [ toinform ])
+        alertOwnersToChange(item, request.user, toinform )
 
         context['item']=item
 
@@ -307,7 +307,7 @@ def upload_zip(request):
                 logger.error("Error during cleanup of {}: {}".format(tmpZip,e))
 
             if lst:
-                alertOwnersToChange(lst, request.user)
+                alertOwnersToChange(lst, [ request.user ])
 
             return render(request, 'ufo/upload.html', { 
                'action': 'Done', 
