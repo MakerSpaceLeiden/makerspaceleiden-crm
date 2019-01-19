@@ -72,8 +72,23 @@ class Storage(models.Model):
     class AgainstTheRules(Exception):
         pass
 
+    def path(self):
+       return  reverse('showstorage', kwargs = { 'pk' :  self.id })
+
+    def history_path(self):
+       return  reverse('showhistory', kwargs = { 'pk' :  self.id })
+
+    def owner_path(self):
+       return  reverse('storage', kwargs = { 'user_pk' :  self.owner.id })
+
     def url(self):
-       return  settings.BASE + reverse('showstorage', kwargs = { 'pk' :  self.id })
+       return  settings.BASE + self.path()
+
+    def history_url(self):
+       return  settings.BASE + self.history_path()
+
+    def owner_url(self):
+       return  settings.BASE + self.owner_path()
 
     def file_for_extension(self):
         if not self.extendable:

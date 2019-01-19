@@ -21,7 +21,7 @@
 			<br/>Instructions can be given by:
 			<ol>
 			{% for e in instructors %}
-			<li><a href="{% url 'overview' member_id=e.holder.id %}">{{ e.holder }}</a>
+			<li><a href="{{ e.holder.path }}">{{ e.holder }}</a>
 				{% if e.active %}
 				<!-- active -->
 				{% else %}
@@ -36,7 +36,7 @@
 			</td></tr>
 </table>
 {% else %}
-<h1><hr/>Full XS matrix<hr/></h1>
+<h1><hr/>Full access and instruction matrix<hr/></h1>
 {% endif %}
 
 {% if lst %}
@@ -50,7 +50,7 @@
     	{% for member in members %}
 	<tr>
 	<td align=right>
-	<i><a href="{% url 'overview' member_id=member.id %}">{{member.first_name}} {{member.last_name}}</a></i></td>
+	<i><a href="{{ member.path }}">{{member}}</a></i></td>
 	<!-- very slow - but cannot find a way to do lst.machine.member.xs -->
 	{% for machine,mbrs in lst.items %}
 	   {% for mbr,info in mbrs.items %}

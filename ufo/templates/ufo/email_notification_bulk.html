@@ -13,7 +13,7 @@ Your friendly makerbot.
 <hr/><h3>Uploaded</h3>
 <hr/><p>
 {% for item in items %}
-<a href="{{ base }}{% url 'showufo' pk=item.id  %}"><img src="cid:{{item.id}}"/></a>
+<a href="{{ item.path  }}"><img src="cid:{{item.id}}"/></a>
 {%endfor%}
 <hr/>
 

@@ -5,6 +5,7 @@ from simple_history.models import HistoricalRecords
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import AbstractUser, BaseUserManager 
 from django.utils.translation import ugettext_lazy as _
+from django.urls import reverse_lazy,reverse
 
 class UserManager(BaseUserManager):
     """Define a model manager for User model with no username field."""
@@ -51,9 +52,18 @@ class User(AbstractUser):
     )
     history = HistoricalRecords()
     objects = UserManager() 
+
+    def name(self):
+        return __str__(self)
+
     def __str__(self):
         return self.first_name + ' ' + self.last_name
 
+    def path(self):
+       return  reverse('overview', kwargs = { 'member_id' :  self.id })
+
+    def url():
+       return  settings.BASE + self.path()
 
 class Tag(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)

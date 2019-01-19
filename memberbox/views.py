@@ -142,6 +142,7 @@ def modify(request,pk):
         'user' : request.user,
         'owner' : box.owner,
         'form':  form,
+        'box': box,
     }
 
     return render(request, 'memberbox/crud.html', context)

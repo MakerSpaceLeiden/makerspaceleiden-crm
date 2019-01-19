@@ -41,6 +41,12 @@ class Ufo(models.Model):
 
      history = HistoricalRecords()
 
+     def url(self):
+       return  settings.BASE + path()
+
+     def path(self):
+       return  settings.BASE + reverse('showufo', kwargs = { 'pk' :  self.id })
+
      def save(self, * args, ** kwargs):
          self.lastChange =  datetime.date.today()
 

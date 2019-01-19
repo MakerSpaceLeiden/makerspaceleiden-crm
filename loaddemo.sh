@@ -1,6 +1,6 @@
 #!/bin/sh
 set -e
-VERSION=3
+VERSION=3.7
 
 python${VERSION}  -mvenv venv
 . venv/bin/activate

@@ -16,7 +16,7 @@
     {{ form.as_table }}
     <tr><td><a href="{% url "storage" %}">cancel</a></td><td><button type="submit">{{ action }}</button></td></td>
     {% else %}
-    <tr><td>Location</td><td>{{ storage.location}}</td></tr>
+    <tr><td>Location:</td><td>{{ storage.location}}</td></tr>
     <tr><td>Justifcaton:</td><td>{{ storage.extra_info }}</td></tr>
     {% endif %}
     </table>
@@ -26,7 +26,7 @@
 <hr>
 <p>
 {% if history %}
-<a href="{% url "showhistory" pk=storage.id %}">back</a> to the history overview.
+<a href="{{ storage.history_path }}">back</a> to the history overview.
 {% else %}
 <a href="{% url "storage" %}">back</a> to the storage overview.
 {% endif %}

@@ -20,8 +20,8 @@
         <td><div class="hashover">
 		{{ item.location }}
 {%if item.image %}
-        	<div class="showhover"><a href="{{ item.image.url }}"><img alt="" src="{{ item.image.thumbnail.url }}"></center></div>
-        {%endif%}
+        	<div class="showhover"><a href="{{ item.image.url  }}"><img alt="" src="{{ item.image.thumbnail.url  }}"></center></div>
+{%endif%}
 	</div>
 	</td>
         <td>{{ item.extra_info }}</td>
@@ -52,8 +52,8 @@ The contents of the two main member cabinets along the long wall (on your left a
        <td> {% if item %}
 		<div class="box">
 		<div class="hashover">
-			<a href="{% url 'overview' member_id=item.owner.id %}">{{ item.owner }}</a>
-			<div class="showhover">{{ item.location }}<br>{{item.extra_info}}{%if item.image %}<br><a href="{{ item.image.url }}"><img alt="" src="{{ item.image.thumbnail.url }}"></center>{%endif%}</div></div>
+			<a href="{{ item.owner.path }}">{{ item.owner }}</a>
+			<div class="showhover">{{ item.location }}<br>{{item.extra_info}}{%if item.image %}<br><a href="{{ item.image.url  }}"><img alt="" src="{{ item.image.thumbnail.url   }}"></center>{%endif%}</div></div>
 		</div>
 	    {% else %}
                <i>free</i>
@@ -75,8 +75,13 @@ In a few <i>exceptional</i> cases - there is permission for a member to store th
   <tr><th>owner</th><th>location</th><th></th></tr>
   {% for item in floating %}
   <tr>
-	  <td><a href="{% url 'overview' member_id=item.owner.id %}">{{ item.owner}}</a></td>
-  	<td>{{ item.location }}</td>
+	  <td><a href="{{ item.owner.path  }}">{{ item.owner }}</a></td>
+  	<td><div class="hashover">{{ item.location }}
+{%if item.image %}
+        	<div class="showhover"><a href="{{ item.image.url  }}"><img alt="" src="{{ item.image.thumbnail.url  }}"></center></div>
+{%endif%}
+</div>
+	</td>
 	<td>{{ item.extra_info }}</rd>
   </tr>
   {% endfor %}

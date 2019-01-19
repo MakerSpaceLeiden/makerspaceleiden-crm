@@ -23,7 +23,10 @@ class Memberbox(models.Model):
     history = HistoricalRecords()
 
     def url(self):
-       return settings.BASE + reverse('overview', kwargs = { 'member_id' :  self.id })
+       return settings.BASE + self.path()
+       
+    def url(self):
+       return reverse('overview', kwargs = { 'member_id' :  self.id })
 
     def __str__(self):
         return "Box owned by " + self.owner.first_name + " " + self.owner.last_name + " at " + self.location

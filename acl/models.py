@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from simple_history.models import HistoricalRecords
+from django.urls import reverse
 
 from members.models import User
 
@@ -37,6 +38,12 @@ class Machine(models.Model):
     requires_form = models.BooleanField(default=False)
     requires_permit = models.ForeignKey(PermitType,related_name='has_permit',on_delete=models.CASCADE, blank=True, null=True)
     history = HistoricalRecords()
+
+    def path(self):
+       return  reverse('machine', kwargs = { 'machine_id' :  self.id })
+
+    def url(self):
+       return  settings.BASE + url()
 
     def __str__(self):
         return self.name

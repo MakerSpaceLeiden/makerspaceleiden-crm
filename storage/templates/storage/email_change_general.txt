@@ -30,15 +30,16 @@ This request ha been rescinded -- the storage spae is no longer needed.
 {% endif %}
 You can see the full record at:
 
-	<{{ base }}{% url 'showstorage' pk=rq.id  %}>
+	<{{ rq.url }}
 
 and any past history at:
 
-	<{{ base }}{% url 'showhistory' pk=rq.id  %}>
+	<{{ rq.history_url }}>
 
-And a full overview of {{ owner }} his storage can be seen at:
+{% if count  %}And a full overview of all {{ count }} items in special storage by {{ rq.owner.first_name }} can 
+be seen at:
 
-	<{{ base }}{% url 'storage' user_pk=rq.owner.id  %}>
+	<{{ rq.owner_url }}>{% endif %}
 
 Thanks,
 

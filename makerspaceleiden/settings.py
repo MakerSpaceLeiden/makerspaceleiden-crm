@@ -184,6 +184,11 @@ UFO_DISPOSE_DAYS=7
 #
 ALSO_INFORM_EMAIL_ADDRESSES = []
 
+# Once a person has this many storage requests - the email
+# to the list gets an extra element highlihgting this; with
+# a ling to what the person also has in store
+STORAGE_HIGHLIGHT_LIMIT = 3
+
 try:
     from .local import *
 except ImportError:

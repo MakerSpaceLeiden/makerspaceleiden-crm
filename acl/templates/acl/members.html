@@ -4,7 +4,7 @@
 
 <ul>
     {% for m in members %}
-    <li> <a href="{% url 'overview' m.id %}">{{ m }}</a>
+    <li> <a href="{{ m.path }}">{{ m }}</a>
     {% endfor %}
 </ul>
 

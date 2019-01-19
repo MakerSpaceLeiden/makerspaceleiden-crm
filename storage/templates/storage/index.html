@@ -38,18 +38,17 @@
         </td>
         <td>{{ item.what}}<br/>
             <i>
+                <a href="{{ item.owner_path }}">
+		{{ item.owner }}</a></i>
 {% if limit %}
-                <a href="{% url 'overview' member_id=item.owner.id %}">
-{% else %}
-                <a href="{% url 'storage' user_pk=item.owner.id %}">
+<!-- not sure -->
 {% endif %}
-			    {{ item.owner }}</a></i><br/>
+          <br/>
 {%if item.image %}
-          <a href="{{ item.image.url }}"><img alt="" src="{{ item.image.medium.url }}"
+          <a href="{{ item.image.url  }}"><img alt="" src="{{ item.image.medium.url  }}"
 {%else %}
 no img
 {%endif %}
-
         </td>
         <td>
 	  <b>{{ item.location }}</b></br>
@@ -64,7 +63,7 @@ no img
             {% if item.deletable %}
 		<a href="{% url 'deletestorage' pk=item.id  %}">[remove]</a>
             {% endif %}
-	    <a href="{% url 'showhistory' pk=item.id  %}">[history]</a>
+	    <a href="{{ item.history_path  }}">[history]</a>
            </p>
 	</td>
 	<td>

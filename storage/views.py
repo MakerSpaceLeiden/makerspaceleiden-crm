@@ -40,6 +40,9 @@ def sendStorageEmail(storedObject, user, isCreated, to, template):
            'user': user,
            'base': settings.BASE,
     }
+    count = Storage.objects.all().filter(owner = storedObject.owner).filter(Q(state = 'OK')|Q(state = 'AG')).count()
+    if count > settings.STORAGE_HIGHLIGHT_LIMIT:
+     context['count'] = count
     if isCreated:
      context['created'] = True
 
@@ -140,7 +143,7 @@ def modify(request,pk):
     try:
          storage = Storage.objects.get(pk=pk)
     except Storage.DoesNotExist:
-         return HttpResponse("Eh - what storage ??",status=404,content_type="text/plain")
+         return HttpResponse("Eh - modify what storage ??",status=404,content_type="text/plain")
 
     if not storage.editable() and not storage.location_updatable():
          return HttpResponse("Eh - no can do ??",status=403,content_type="text/plain")
@@ -185,7 +188,7 @@ def delete(request,pk):
     try:
          storage = Storage.objects.get(pk=pk)
     except Storage.DoesNotExist:
-         return HttpResponse("Eh - what storage ??",status=404,content_type="text/plain")
+         return HttpResponse("Eh - delete what storage ??",status=404,content_type="text/plain")
 
     form = ConfirmForm(request.POST or None, initial = {'pk':pk})
     if not request.POST:
@@ -232,7 +235,7 @@ def showhistory(request,pk,rev=None):
     try:
          storage = Storage.objects.get(pk=pk)
     except Storage.DoesNotExist:
-         return HttpResponse("Eh - what storage ??",status=404,content_type="text/plain")
+         return HttpResponse("Eh - history for what storage ??" % pk,status=404,content_type="text/plain")
     context = {
        'title': 'View history',
 #       'opts': { 'admin_url': { 'simple_history': 'xxx' } },
@@ -249,7 +252,7 @@ def showhistory(request,pk,rev=None):
             'user' : request.user,
             'owner' : storage.owner,
             'form':  form,
-            'box':  historic,
+            'storage':  historic,
             'history': True,
       }
       return render(request, 'storage/crud.html', context)

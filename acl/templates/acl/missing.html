@@ -8,7 +8,7 @@
 <th>member</th></tr>
 {% for member in amiss %}
 <tr>
-	<td><a href="{% url 'overview' member_id=member.id %}"> {{ member.first_name }}  {{ member.last_name }}</a></td>
+	<td><a href="{{ member.path }}"> {{ member.name }}</a></td>
 </tr>
 {% endfor %}
 </table>

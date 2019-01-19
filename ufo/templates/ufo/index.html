@@ -10,7 +10,7 @@
   {% for item in lst %}
   <tr valign=top>
         <td rowspan=2 valign=top>{{ item.get_state_display }}</td>
-	<td rowspan=2 valign=top><a href="{{ item.image.url }}"><img alt="" src="{{ item.image.medium.url }}"/></a>
+	<td rowspan=2 valign=top><a href="{{ item.image.url   }}"><img alt="" src="{{ item.image.medium.url   }}"/></a>
   	<td>{{ item.description }}</td>
 	{%if item.owner %}
   	<td>{{ item.owner }}</td>

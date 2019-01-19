@@ -2,6 +2,10 @@
 
 {% block content %}
   <h2>{{ label }}</h2>
+<p/>
+{% if box.image %}
+<a href="{{box.image.url}}"><img src="{{box.image.large.url}}"></a>
+{% endif %}
 <table>
   <form method="post"  enctype="multipart/form-data">
     {% csrf_token %}
