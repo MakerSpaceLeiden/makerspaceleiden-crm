@@ -113,4 +113,6 @@ initial_populate
 *.swp
 
 makerspaceleiden/local.py
+makerspaceleiden/my.cnf
+
 bin

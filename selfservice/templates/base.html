@@ -29,7 +29,7 @@
         {% block branding %}Makerspace Leiden{% endblock %}
         </div>
         {% block usertools %}
-        {% if has_permission %}
+	{%if has_permission %}
         <div id="user-tools">
             {% block welcome-msg %}
                 {% trans 'Welcome,' %}
@@ -53,7 +53,7 @@
                 <a href="{% url 'logout' %}">{% trans 'Log out' %}</a>
             {% endblock %}
         </div>
-        {% endif %}
+	{% endif %}
         {% endblock %}
         {% block nav-global %}{% endblock %}
     </div>

@@ -95,7 +95,7 @@
 	<tr><td colspan=2><h3>Entitlements</h3></tr>
 	{% for machine,info in lst.items %}
 	<tr>
-		<td align=right><a href="{{ machine.path  }}">{{ machine }}</a></td>
+		<td align=right><a href="{{ info.path }}">{{ machine }}</a></td>
 		<td>
                 {%if info.xs == True %}
 		<b>

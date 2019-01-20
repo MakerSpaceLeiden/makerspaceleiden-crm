@@ -42,8 +42,11 @@ class UserManager(BaseUserManager):
 class User(AbstractUser):
     username = None
     email = models.EmailField(_('email address'), unique=True)
+    phone_number = models.CharField(max_length=40, blank=True, null=True, help_text="Optional; only visible to the trustees and board delegated administrators")
+
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name']
+
     form_on_file = models.BooleanField( 
 	default=False,
     )
@@ -53,11 +56,11 @@ class User(AbstractUser):
     history = HistoricalRecords()
     objects = UserManager() 
 
-    def name(self):
-        return __str__(self)
-
     def __str__(self):
         return self.first_name + ' ' + self.last_name
+
+    def name(self):
+        return self.__str__()
 
     def path(self):
        return  reverse('overview', kwargs = { 'member_id' :  self.id })

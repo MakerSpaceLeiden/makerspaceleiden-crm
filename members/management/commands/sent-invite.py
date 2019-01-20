@@ -25,6 +25,8 @@ def reset_password(email, reset = False,
 
     if reset:
         user.set_unusable_password()
+        user.changeReason = "Locked it from the sent-invite command."
+        user.save()
 
     form = PasswordResetForm({'email': email })
 

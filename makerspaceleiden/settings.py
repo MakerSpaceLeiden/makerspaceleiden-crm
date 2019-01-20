@@ -125,9 +125,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# For DEVLOPMNET  - fake bacend
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' 
-
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
 
@@ -154,8 +151,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static")
 STATICFILES_DIRS = [ ]
 
 AUTH_USER_MODEL = 'members.User'
-
-MEDIA_ROOT="/tmp"
 MEDIA_URL = '/media/'
 
 MAX_ZIPFILE=48*1024*1024

@@ -47,6 +47,8 @@ class Command(BaseCommand):
 
            member.email = email
            member.set_password('1234')
+           if len(phone)>4:
+                 member.phone_number = phone
            if ' ' in name:
                  member.first_name = name.split(' ',1)[0]
                  member.last_name = name.split(' ',1)[1] 

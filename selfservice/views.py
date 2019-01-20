@@ -285,7 +285,7 @@ def amnesty(request):
     machines = Machine.objects.exclude(requires_permit = None)
     machines_entitled = Machine.objects.all().filter(requires_permit__isRequiredToOperate__holder=request.user)
 
-    context = { 'title': 'Amnesty' }
+    context = { 'title': 'Amnesty', 'saved': False }
 
     form = AmnestyForm(request.POST or None, machines=machines)
     if form.is_valid():
@@ -294,7 +294,7 @@ def amnesty(request):
             if m in machines_entitled:
                 continue
             if not m.requires_permit or m.requires_permit in permits:
-                continue
+                  continue
             permits.append(m.requires_permit)
         for p in permits:    
             e,created = Entitlement.objects.get_or_create(holder = request.user, 

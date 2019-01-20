@@ -40,7 +40,7 @@ class Machine(models.Model):
     history = HistoricalRecords()
 
     def path(self):
-       return  reverse('machine', kwargs = { 'machine_id' :  self.id })
+       return  reverse('machine_overview', kwargs = { 'machine_id' :  self.id })
 
     def url(self):
        return  settings.BASE + url()

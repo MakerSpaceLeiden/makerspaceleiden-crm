@@ -24,11 +24,11 @@ def matrix_mm(machine,mbr):
        out['requires_permit'] = machine.requires_permit
        out['requires_form'] = machine.requires_form
 
+       xs = True
        # Does the machine require a form; and does the user have that form on file.
        if machine.requires_form and not mbr.form_on_file:
-          return out
+          xs = False
 
-       xs = True
        if machine.requires_permit: 
            ents = Entitlement.objects.filter(permit = machine.requires_permit, holder = mbr)
            if ents.count() < 1:
@@ -131,6 +131,7 @@ def member_overview(request,member_id = None):
     lst = {}
     for mchn in machines:
        lst[ mchn.name ] = matrix_mm(mchn, member)
+       lst[ mchn.name ][ 'path' ] = mchn.path()
 
     context = {
        'title': member.first_name + ' ' + member.last_name,

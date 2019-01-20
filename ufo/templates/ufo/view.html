@@ -3,12 +3,13 @@
 {% block content %}
 
 <a href="{{ item.image.url   }}"><img alt="" src="{{ item.image.large.url   }}"/></a>
-<br>
+<p>
 {{ item.description }}
-<p/>
+<br>
 Removal deadline: {{ item.deadline }}
-Disposal date: {{ item.disposed_by_date }}
-<p/>
+<br>
+Disposal date: {{ item.dispose_by_date }}
+<br>
 {%if item.owner %}
 Person now responsible: {{ item.owner }}
 {%endif%}

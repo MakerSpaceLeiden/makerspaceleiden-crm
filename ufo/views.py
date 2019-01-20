@@ -307,7 +307,7 @@ def upload_zip(request):
                 logger.error("Error during cleanup of {}: {}".format(tmpZip,e))
 
             if lst:
-                alertOwnersToChange(lst, [ request.user ])
+                alertOwnersToChange(lst, request.user, [ request.user ])
 
             return render(request, 'ufo/upload.html', { 
                'action': 'Done', 

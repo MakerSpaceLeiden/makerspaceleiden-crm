@@ -10,4 +10,7 @@ django-stdimage
 django-dynamic-filenames
 
 # When using Postgress as the backing DB
-psycopg2-binary
+# psycopg2-binary
+
+# For production
+mysqlclient
