@@ -31,11 +31,19 @@ EMAIL_BACKEND = 'django_sendmail_backend.backends.EmailBackend'
 LOGGING = {
             'version': 1,
             'disable_existing_loggers': False,
+            'formatters': {
+                'standard': {
+                        'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
+                },
+            },
             'handlers': {
                  'file': {
                       'level': 'INFO',
-                      'class': 'logging.FileHandler',
-                      'filename': '/var/log/crm-debug.log',
+                      'class': 'logging.handlers.RotatingFileHandler',
+                      'filename': '/var/log/crm/crm-debug.log',
+                      'maxBytes': 1024*1024, 
+                      'backupCount': 10,
+                      'formatter': 'standard',
                  },
             },
             'loggers': {
