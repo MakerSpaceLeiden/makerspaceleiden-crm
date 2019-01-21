@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-{% load qr_tags  %}
+{% load qr_code  %}
 
 <style>
 .sem { width:12em; }
@@ -33,7 +33,7 @@
 	<td><code>{{ item.id }}<code></td>
         <td>
 	{{ item.get_state_display }}
-	<center>{% qr_from_text item.url "s" %}
+	<center>{% qr_from_text item.url size="s" border=1 %}
 	</center>
         </td>
         <td>{{ item.what}}<br/>

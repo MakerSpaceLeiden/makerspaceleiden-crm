@@ -6,7 +6,7 @@ from django.forms import ModelForm
 class UserForm(ModelForm):
     class Meta:
        model = User
-       fields = [ 'first_name', 'last_name', 'email', 'phone_number' ]
+       fields = [ 'first_name', 'last_name', 'email', 'phone_number', 'image' ]
        help_texts = {
             'email': "When you change this field; you will get a verification email to your new address. And your old address and the trustee's are sent a notice of this change."
        }

@@ -36,7 +36,7 @@ GRAND_AMNESTY = True
 INSTALLED_APPS = [
     'import_export',
     'simple_history',
-    'qrcode',
+    'qr_code',
 
     'storage.apps.StorageConfig',
     'memberbox.apps.MemberboxConfig',
@@ -174,6 +174,19 @@ IMG_VARIATIONS={
 
 UFO_DEADLINE_DAYS=14
 UFO_DISPOSE_DAYS=7
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    },
+    'qr-code': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'qr-code-cache',
+        'TIMEOUT': 3600
+    }
+}
+
+QR_CODE_CACHE_ALIAS = 'qr-code'
 
 # Set to a list to be kept informed of things like UFO
 # deadlines and what not.
