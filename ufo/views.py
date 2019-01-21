@@ -152,7 +152,11 @@ def create(request):
     return render(request, 'ufo/crud.html', context)
 
 def show(request,pk):
-    item = Ufo.objects.get(pk=pk)
+    try:
+       item = Ufo.objects.get(pk=pk)
+    except ObjectDoesNotExist as e:
+        return HttpResponse("UFO not found",status=404,content_type="text/plain")
+
     context = {
         'title': 'Uknown Floating Objects',
         'item': item,
@@ -161,7 +165,10 @@ def show(request,pk):
 
 @login_required
 def modify(request,pk):
-    oitem = Ufo.objects.get(pk=pk)
+    try:
+        oitem = Ufo.objects.get(pk=pk)
+    except ObjectDoesNotExist as e:
+        return HttpResponse("UFO not found",status=404,content_type="text/plain")
     toinform = [ oitem.owner ]
 
     context = {
@@ -194,7 +201,11 @@ def modify(request,pk):
 
 @login_required
 def mine(request,pk):
-    item = Ufo.objects.get(pk=pk)
+    try:
+        item = Ufo.objects.get(pk=pk)
+    except ObjectDoesNotExist as e:
+        return HttpResponse("UFO not found",status=404,content_type="text/plain")
+
     item.changeReason = "claimed as 'mine' by {} via self service portal".format(request.user)
     if item.owner != request.user:
         alertOwnersToChange(item, request.user, [ item.owner ])
@@ -210,7 +221,7 @@ def delete(request,pk):
     try:
        item = Ufo.objects.get(pk=pk)
     except ObjectDoesNotExist as e:
-       return HttpResponse("Not found",status=404,content_type="text/plain")
+       return HttpResponse("UFO not found",status=404,content_type="text/plain")
 
 
     form = UfoForm(request.POST or None, instance = item)

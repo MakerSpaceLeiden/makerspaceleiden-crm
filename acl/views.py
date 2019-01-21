@@ -10,6 +10,7 @@ from django.views.generic import ListView, CreateView, UpdateView
 from django.urls import reverse_lazy
 from django import forms
 from django.forms import ModelForm
+from django.core.exceptions import ObjectDoesNotExist
 
 from members.models import Tag,User
 from .models import Machine,Entitlement,PermitType
@@ -84,7 +85,10 @@ def machine_overview(request, machine_id = None):
     instructors = []
     machines = Machine.objects.order_by('name')
     if machine_id:
-        machines = machines.filter(pk = machine_id)
+        try:
+            machines = machines.filter(pk = machine_id)
+        except ObjectDoesNotExist as e:
+            return HttpResponse("Machine not found",status=404,content_type="text/plain")
         machine = machines.first()
         permit = machine.requires_permit
         if permit:
@@ -115,7 +119,11 @@ def members(request):
 
 @login_required
 def member_overview(request,member_id = None):
-    member = User.objects.get(pk=member_id)
+    try:
+       member = User.objects.get(pk=member_id)
+    except ObjectDoesNotExist as e:
+       return HttpResponse("User not found",status=404,content_type="text/plain")
+
     machines = Machine.objects.order_by()
     boxes = Memberbox.objects.all().filter(owner = member)
     storage = Storage.objects.all().filter(owner = member)
@@ -149,7 +157,7 @@ def api_details(request,machine_id):
     try:
        machine = Machine.objects.get(pk=machine_id)
     except:
-       raise Http404("Machine gone AWOL, sorry")
+       raise Http404("Machine not found")
 
     context = {
        'machine': machine.name,
