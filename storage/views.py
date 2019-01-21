@@ -101,13 +101,11 @@ def index(request,user_pk):
     return render(request, 'storage/index.html', context)
 
 @login_required
-@csrf_protect
 def showstorage(request, pk):
     # not implemented yet.
     return redirect('storage')
 
 @login_required
-@csrf_protect
 def create(request):
     if request.method == "POST":
      form = StorageForm(request.POST or None, request.FILES, initial = { 'owner': request.user })
@@ -142,7 +140,6 @@ def create(request):
     return render(request, 'storage/crud.html', context)
 
 @login_required
-@csrf_protect
 def modify(request,pk):
     try:
          storage = Storage.objects.get(pk=pk)
@@ -187,7 +184,6 @@ def modify(request,pk):
     return render(request, 'storage/crud.html', context)
 
 @login_required
-@csrf_protect
 def delete(request,pk):
     try:
          storage = Storage.objects.get(pk=pk)
@@ -234,7 +230,6 @@ class MySimpleHistoryAdmin(SimpleHistoryAdmin):
        return True
 
 @login_required
-@csrf_protect
 def showhistory(request,pk,rev=None):
     try:
          storage = Storage.objects.get(pk=pk)
