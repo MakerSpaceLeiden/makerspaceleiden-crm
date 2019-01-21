@@ -3,9 +3,12 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from simple_history.models import HistoricalRecords
 from django.contrib.auth.models import AbstractUser
-from django.contrib.auth.models import AbstractUser, BaseUserManager 
+from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.utils.translation import ugettext_lazy as _
 from django.urls import reverse_lazy,reverse
+from stdimage.models import StdImageField
+from makerspaceleiden.utils import upload_to_pattern
+
 
 class UserManager(BaseUserManager):
     """Define a model manager for User model with no username field."""
@@ -47,17 +50,19 @@ class User(AbstractUser):
     email = models.EmailField(_('email address'), unique=True)
     phone_number = models.CharField(max_length=40, blank=True, null=True, help_text="Optional; only visible to the trustees and board delegated administrators")
 
+    image = StdImageField(upload_to=upload_to_pattern, variations=settings.IMG_VARIATIONS, validators=settings.IMG_VALIDATORS, blank=True, default='')
+
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name']
 
-    form_on_file = models.BooleanField( 
+    form_on_file = models.BooleanField(
 	default=False,
     )
     email_confirmed = models.BooleanField(
         default=False
     )
     history = HistoricalRecords()
-    objects = UserManager() 
+    objects = UserManager()
 
     def __str__(self):
         return self.first_name + ' ' + self.last_name

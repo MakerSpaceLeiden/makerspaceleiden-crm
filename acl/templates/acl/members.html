@@ -2,11 +2,20 @@
 
 {% block content %}
 
-<ul>
+<table>
     {% for m in members %}
-    <li> <a href="{{ m.path }}">{{ m }}</a>
+    <tr>
+        <td>
+            {% if m.image %}
+                <a href="{{ m.image.url }}"><img alt="" src="{{ m.image.thumbnail.url   }}"/></a>
+            {% endif%}
+        </td>
+        <td>
+            <a href="{{ m.path }}">{{ m }}</a>
+        </td>
+    </tr>
     {% endfor %}
-</ul>
+</table>
 
 
 {% endblock %}

@@ -139,7 +139,7 @@ def recordinstructions(request):
     if request.method == "POST" and form.is_valid():
       context['machines'] = []
       for mid in form.cleaned_data['machine']:
-       try:  
+       try:
          m = Machine.objects.get(pk=mid)
          p = User.objects.get(pk=form.cleaned_data['person'])
          i = user=request.user
@@ -183,7 +183,7 @@ def recordinstructions(request):
          logger.error("Unexpected error during save of intructions: {0}".format(e))
 
     context['saved'] = saved
-   
+
     return render(request, 'record.html', context)
 
 @login_required
@@ -216,11 +216,11 @@ def userdetails(request):
        member = request.user
        old_email = "{}".format(member.email)
     except User.DoesNotExist:
-       return HttpResponse("You are propably not a member-- admin perhaps?",status=500,content_type="text/plain")
+       return HttpResponse("You are probably not a member-- admin perhaps?", status=500, content_type="text/plain")
 
     if request.method == "POST":
        try:
-         user = UserForm(request.POST, instance = request.user) 
+         user = UserForm(request.POST, request.FILES, instance = request.user)
          save_user = user.save(commit=False)
          if user.is_valid():
              new_email = "{}".format(user.cleaned_data['email'])
@@ -229,7 +229,7 @@ def userdetails(request):
              save_user.changeReason = 'Updated through the self-service interface by {0}'.format(request.user)
              save_user.save()
 
-             user = UserForm(request.POST, instance = save_user) 
+             user = UserForm(request.POST, instance = save_user)
              for f in user.fields:
                user.fields[f].disabled = True
 
@@ -246,10 +246,10 @@ def userdetails(request):
 
     form = UserForm(instance = request.user)
     context = {
-	'title': 'Selfservice - update details',
-	'is_logged_in': request.user.is_authenticated,
-	'user' : request.user,
-	'form': form,
+        'title': 'Selfservice - update details',
+        'is_logged_in': request.user.is_authenticated,
+        'user' : request.user,
+        'form': form,
         'has_permission': True,
     }
     return render(request, 'userdetails.html', context)
@@ -299,8 +299,8 @@ def amnesty(request):
             if not m.requires_permit or m.requires_permit in permits:
                   continue
             permits.append(m.requires_permit)
-        for p in permits:    
-            e,created = Entitlement.objects.get_or_create(holder = request.user, 
+        for p in permits:
+            e,created = Entitlement.objects.get_or_create(holder = request.user,
                     issuer = request.user, permit = p);
             if created:
                e.changeReason = 'Added through the grand amnesty interface by {0}'.format(request.user)

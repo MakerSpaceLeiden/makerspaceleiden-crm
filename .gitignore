@@ -116,3 +116,10 @@ makerspaceleiden/local.py
 makerspaceleiden/my.cnf
 
 bin
+
+# IntelliJ IDEA IDE workspace
+.idea
+
+# Uploaded images
+ufo/ufo
+members/user
