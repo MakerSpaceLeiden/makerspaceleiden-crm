@@ -11,6 +11,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.contrib.admin.sites import AdminSite
 from django.utils import six
+from django.core.exceptions import ObjectDoesNotExist
+
 
 import logging
 import re
@@ -115,8 +117,8 @@ def create(request):
 def modify(request,pk):
     try:
          box = Memberbox.objects.get(pk=pk)
-    except Memberbox.DoesNotExist:
-         return HttpResponse("Eh - what box ??",status=404,content_type="text/plain")
+    except ObjectDoesNotExist:
+         return HttpResponse("Box not found",status=404,content_type="text/plain")
 
     if request.method == "POST":
      form = MemberboxForm(request.POST or None, request.FILES, instance = box)
@@ -152,7 +154,7 @@ def delete(request,pk):
     try:
          box = Memberbox.objects.get(pk=pk)
     except Memberbox.DoesNotExist:
-         return HttpResponse("Eh - what box ??",status=404,content_type="text/plain")
+         return HttpResponse("Box not found",status=404,content_type="text/plain")
 
 
     if box.owner != request.user:

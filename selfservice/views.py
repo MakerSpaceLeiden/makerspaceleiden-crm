@@ -103,10 +103,7 @@ def pending(request):
 
 @login_required
 def recordinstructions(request):
-    try:
-       member = request.user
-    except User.DoesNotExist:
-       return HttpResponse("You are propably not a member-- admin perhaps?",status=500,content_type="text/plain")
+    member = request.user
 
     # keep the option open to `do bulk adds
     members = User.objects.exclude(id = member.id) #.order_by('first_name')
@@ -203,8 +200,12 @@ def confirmemail(request, uidb64, token, newemail):
            user.save()
         else:
            return HttpResponse("Failed to confirm",status=500,content_type="text/plain")
-    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
-        return render(request, 'email_verification_ok.html')
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist) as e:
+        # We perhaps should not provide the end user with feedback -- e.g. prentent all
+        # went well. As we do not want to function as an oracle.
+        #
+        logger.error("Something else went wrong in confirm email: {0}".format(e))
+        HttpResponse("Something went wrong. Sorry.",status=500,content_type="text/plain")
 
     # return redirect('userdetails')
     return render(request, 'email_verification_ok.html')

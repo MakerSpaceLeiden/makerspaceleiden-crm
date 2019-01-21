@@ -7,7 +7,7 @@
 </th>
     {% for u,ps in agg.items %}
     <tr>
-	    <td><b> {{ u }} </b></td>
+	    <td><b><a href="{{ u.path }}">{{ u }}</a></b></td>
        {% for p in perms %}
         <td>
            {% if p in ps %}

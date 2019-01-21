@@ -18,6 +18,7 @@ from simple_history.admin import SimpleHistoryAdmin
 from django.template.loader import render_to_string, get_template
 from django.core.mail import EmailMessage
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 
 import datetime
 
@@ -60,7 +61,10 @@ def index(request,user_pk):
 
     sc = Storage.objects.all().order_by('requested','id').reverse()
     if user_pk:
-       owner = User.objects.get(pk=user_pk)
+       try:
+          owner = User.objects.get(pk=user_pk)
+       except ObjectDoesNotExist:
+          return HttpResponse("User not found",status=404,content_type="text/plain")
        sc = sc.filter(owner_id = user_pk)
     for i in sc:
        if i.expired() or i.state in ('EX', 'D'):
@@ -97,13 +101,11 @@ def index(request,user_pk):
     return render(request, 'storage/index.html', context)
 
 @login_required
-@csrf_protect
 def showstorage(request, pk):
     # not implemented yet.
     return redirect('storage')
 
 @login_required
-@csrf_protect
 def create(request):
     if request.method == "POST":
      form = StorageForm(request.POST or None, request.FILES, initial = { 'owner': request.user })
@@ -138,12 +140,11 @@ def create(request):
     return render(request, 'storage/crud.html', context)
 
 @login_required
-@csrf_protect
 def modify(request,pk):
     try:
          storage = Storage.objects.get(pk=pk)
     except Storage.DoesNotExist:
-         return HttpResponse("Eh - modify what storage ??",status=404,content_type="text/plain")
+         return HttpResponse("Storage not found",status=404,content_type="text/plain")
 
     if not storage.editable() and not storage.location_updatable():
          return HttpResponse("Eh - no can do ??",status=403,content_type="text/plain")
@@ -183,12 +184,11 @@ def modify(request,pk):
     return render(request, 'storage/crud.html', context)
 
 @login_required
-@csrf_protect
 def delete(request,pk):
     try:
          storage = Storage.objects.get(pk=pk)
     except Storage.DoesNotExist:
-         return HttpResponse("Eh - delete what storage ??",status=404,content_type="text/plain")
+         return HttpResponse("Storage not found", status=404,content_type="text/plain")
 
     form = ConfirmForm(request.POST or None, initial = {'pk':pk})
     if not request.POST:
@@ -230,12 +230,11 @@ class MySimpleHistoryAdmin(SimpleHistoryAdmin):
        return True
 
 @login_required
-@csrf_protect
 def showhistory(request,pk,rev=None):
     try:
          storage = Storage.objects.get(pk=pk)
     except Storage.DoesNotExist:
-         return HttpResponse("Eh - history for what storage ??" % pk,status=404,content_type="text/plain")
+         return HttpResponse("Storage not found",  pk,status=404,content_type="text/plain")
     context = {
        'title': 'View history',
 #       'opts': { 'admin_url': { 'simple_history': 'xxx' } },
