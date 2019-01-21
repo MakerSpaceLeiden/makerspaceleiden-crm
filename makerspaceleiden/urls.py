@@ -17,6 +17,8 @@ from django.contrib import admin
 from django.urls import include, path
 from django.conf.urls.static import static
 from django.conf import settings
+from qr_code import urls as qr_code_urls
+
 
 urlpatterns = [
     path('', include('selfservice.urls')),
@@ -28,6 +30,7 @@ urlpatterns = [
     path('ufo/', include('ufo.urls')),
     path('admin/', admin.site.urls),
 #    url(r'^autocomplete/', include('autocomplete_light.urls')),
+    path('qr_code/', include(qr_code_urls, namespace='qr_code')),
 ]
 
 urlpatterns += static(r'/favicon.ico', document_root='static/favicon.ico')

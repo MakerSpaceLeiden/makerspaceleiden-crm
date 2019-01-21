@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% load qr_tags  %}
+{% load qr_code  %}
 
 {% block content %}
 
@@ -9,7 +9,7 @@
 <table>
 	<tr>
 		<td colspan=2><h3>Personal details</h3></td>
-		<td valign=top rowspan=5><center>{% qr_from_text member.url size="m" %}<br/><code><font size=-3>{{ member.url }}</font></code></center></td>
+		<td valign=top rowspan=5><center>{% qr_from_text member.url size="m" border=1 %}<br/><code><font size=-3>{{ member.url }}</font></code></center></td>
 	</tr>
 	<tr valign=top>
 		<td align=right>First name</td><td>{{ member.first_name}}</td>
