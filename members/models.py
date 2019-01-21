@@ -7,7 +7,10 @@ from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.utils.translation import ugettext_lazy as _
 from django.urls import reverse_lazy,reverse
 from stdimage.models import StdImageField
+
+from django.db.models.signals import pre_delete, pre_save
 from stdimage.utils import pre_delete_delete_callback, pre_save_delete_callback
+
 from makerspaceleiden.utils import upload_to_pattern
 
 
