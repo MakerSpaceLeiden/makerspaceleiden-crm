@@ -7,6 +7,7 @@ from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.utils.translation import ugettext_lazy as _
 from django.urls import reverse_lazy,reverse
 from stdimage.models import StdImageField
+from stdimage.utils import pre_delete_delete_callback, pre_save_delete_callback
 from makerspaceleiden.utils import upload_to_pattern
 
 
@@ -84,3 +85,7 @@ class Tag(models.Model):
     def __str__(self):
         return self.tag + ' (' + str(self.owner) + ')'
 
+
+# Handle image cleanup.
+pre_delete.connect(pre_delete_delete_callback, sender=User)
+pre_save.connect(pre_save_delete_callback, sender=User)
