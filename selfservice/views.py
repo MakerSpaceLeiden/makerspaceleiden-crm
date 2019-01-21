@@ -291,6 +291,8 @@ def amnesty(request):
     if form.is_valid():
         permits = []
         for m in machines:
+            if not form.cleaned_data['machine_%s' % m.id]:
+                continue
             if m in machines_entitled:
                 continue
             if not m.requires_permit or m.requires_permit in permits:

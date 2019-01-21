@@ -9,10 +9,10 @@
 <table>
 	<tr>
 		<td colspan=2><h3>Personal details</h3></td>
+		<td valign=top rowspan=5><center>{% qr_from_text member.url size="m" %}<br/><code><font size=-3>{{ member.url }}</font></code></center></td>
 	</tr>
 	<tr valign=top>
 		<td align=right>First name</td><td>{{ member.first_name}}</td>
-		<td valign=top rowspan=5><center>{% qr_from_text member.url "m" %}<br/>private box label</center></td>
 	</tr>
 	<tr><td align=right>Last name</td><td>{{ member.last_name }}</td></tr>
 	<tr><td align=right>Email (usernme)</td><td>{{ member.email}}</td></tr>

@@ -94,7 +94,8 @@ WSGI_APPLICATION = 'makerspaceleiden.wsgi.application'
 MAILINGLIST='deelnemers@makerspaceleiden.nl'
 TRUSTEES='hetbestuur@makerspaceleiden.nl'
 DEFAULT_FROM_EMAIL="noc@makerspaceleiden.nl"
-BASE='https://makerspaceleiden.nl/crm'
+# Leave it to FORCE_SCRPT do do the psotfix right
+BASE='https://makerspaceleiden.nl'
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases

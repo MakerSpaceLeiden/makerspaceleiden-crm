@@ -52,8 +52,8 @@ The contents of the two main member cabinets along the long wall (on your left a
        <td> {% if item %}
 		<div class="box">
 		<div class="hashover">
-			<a href="{{ item.owner.path }}">{{ item.owner }}</a>
-			<div class="showhover">{{ item.location }}<br>{{item.extra_info}}{%if item.image %}<br><a href="{{ item.image.url  }}"><img alt="" src="{{ item.image.thumbnail.url   }}"></center>{%endif%}</div></div>
+			<a href="{{ item.owner.path }}">{{ item.owner.first_name }}</a>
+			<div class="showhover">{{item.owner }}<br>{{ item.location }}<br>{{item.extra_info}}{%if item.image %}<br><a href="{{ item.image.url  }}"><img alt="" src="{{ item.image.thumbnail.url   }}"></center>{%endif%}</div></div>
 		</div>
 	    {% else %}
                <i>free</i>

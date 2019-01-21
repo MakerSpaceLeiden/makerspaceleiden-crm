@@ -39,6 +39,7 @@ logger = logging.getLogger(__name__)
 from .models import Ufo
 from .admin import UfoAdmin
 from .forms import UfoForm, NewUfoForm, UfoZipUploadForm
+from members.models import User
 
 # Note - we do this here; rather than in the model its save() - as this
 # lets admins change things through the database interface silently. 
@@ -54,8 +55,10 @@ def alertOwnersToChange(itemOrItems, userThatMadeTheChange = None, toinform = []
        toinform.extend(settings.ALSO_INFORM_EMAIL_ADDRESSES)
 
     for person in toinform:
-      if person:
-        to[person.email]=True
+        if person and isinstance(person,User):
+            to[person.email]=True
+        else:
+            to[person]=True
 
     # We use a dict rather than an array to prune any duplicates.
     to = to.keys()
@@ -75,7 +78,7 @@ def alertOwnersToChange(itemOrItems, userThatMadeTheChange = None, toinform = []
           part2.attach(MIMEText(render_to_string('ufo/email_notification_bulk.html', context) , 'html'))
     else:
           context['item'] = itemOrItems
-          subject = "[makerbot] Change to an UFO %s" % itemOrItems.description
+          subject = "[makerbot] Change to an UFO: %s" % itemOrItems.description
           part1 = MIMEText(render_to_string('ufo/email_notification.txt', context), 'plain')
           part2 = MIMEMultipart('mixed')
 
@@ -84,6 +87,7 @@ def alertOwnersToChange(itemOrItems, userThatMadeTheChange = None, toinform = []
     # a single one.
     #
     if isinstance(itemOrItems,list):
+       msg = MIMEMultipart('alternative')
        for i in itemOrItems:
            ext = i.image.name.split('.')[-1]
            attachment = MIMEImage(i.image.thumbnail.read(), "image/"+ext)
@@ -92,12 +96,12 @@ def alertOwnersToChange(itemOrItems, userThatMadeTheChange = None, toinform = []
            part2.attach(attachment)
            # email.attach(i.image.name, i.image.thumbnail.read(), "image/"+ext)
     else:
+       msg = MIMEMultipart('mixed')
        ext = itemOrItems.image.name.split('.')[-1]
-       attachment = MIMEImage(itemOrItems.image.medium.read(), "image/"+ext)
+       attachment = MIMEImage(itemOrItems.image.medium.read(), ext)
        attachment.add_header('Content-ID',str(itemOrItems.pk))
        part2.attach(attachment)
 
-    msg = MIMEMultipart('alternative')
     msg.attach(part1)
     msg.attach(part2)
 

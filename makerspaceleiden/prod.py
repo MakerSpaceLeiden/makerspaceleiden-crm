@@ -47,4 +47,4 @@ LOGGING = {
             },
 }
 
-
+ALSO_INFORM_EMAIL_ADDRESSES = [ 'deelnemers@mailman.makerspaceleiden.nl' ]

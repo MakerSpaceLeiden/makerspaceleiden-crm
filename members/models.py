@@ -40,6 +40,9 @@ class UserManager(BaseUserManager):
         return self._create_user(email, password, **extra_fields)
 
 class User(AbstractUser):
+    class Meta:
+        ordering = ['first_name', 'last_name']
+
     username = None
     email = models.EmailField(_('email address'), unique=True)
     phone_number = models.CharField(max_length=40, blank=True, null=True, help_text="Optional; only visible to the trustees and board delegated administrators")
@@ -65,7 +68,7 @@ class User(AbstractUser):
     def path(self):
        return  reverse('overview', kwargs = { 'member_id' :  self.id })
 
-    def url():
+    def url(self):
        return  settings.BASE + self.path()
 
 class Tag(models.Model):
