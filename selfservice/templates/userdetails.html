@@ -8,12 +8,12 @@
     <table>
         {{ form.as_table }}
     </table>
-  Thanks for help us grow the makerspace ! 
+  Thanks for help us grow the makerspace !
  <p/>
   <hr>
   <a href="..">back to the home page</a>
 {% else %}
-  <form method="post" novalidate>
+  <form method="post" enctype="multipart/form-data" novalidate>
     {% csrf_token %}
     <table>
         {{ form.as_table }}
