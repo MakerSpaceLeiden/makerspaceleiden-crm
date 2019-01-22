@@ -11,7 +11,7 @@
   Thanks for help us grow the makerspace !
  <p/>
   <hr>
-  <a href="..">back to the home page</a>
+  <a href="{% url 'index' %}">back to the home page</a>
 {% else %}
   <form method="post" enctype="multipart/form-data" novalidate>
     {% csrf_token %}
