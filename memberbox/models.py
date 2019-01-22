@@ -30,7 +30,9 @@ class Memberbox(models.Model):
        return reverse('overview', kwargs = { 'member_id' :  self.id })
 
     def __str__(self):
-        return "Box owned by " + self.owner.first_name + " " + self.owner.last_name + " at " + self.location
+        if self.owner:
+           return "Box owned by " + self.owner.first_name + " " + self.owner.last_name + " at " + self.location
+        return "Box at " + self.location + " (owner unknown)"
 
 # Handle image cleanup.
 pre_delete.connect(pre_delete_delete_callback, sender=Memberbox)
