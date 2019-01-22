@@ -14,6 +14,10 @@
     .box {
         padding: 10px;
         vertical-align: center;
+        text-align: center;
+    }
+    .box.full {
+        background-color: #b4cbdb;
     }
     .box_table {
         border-collapse: collapse;
@@ -25,6 +29,11 @@
     }
     .free {
         color: lightgray;
+    }
+    .box-location {
+        margin-top: 10px;
+        color: gray;
+        text-align: center;
     }
 </style>
 
@@ -70,20 +79,22 @@ The contents of the two main member cabinets along the long wall (on your left a
   <tr>
     {% for item in row %}
        <td>
-		  <div class="box">
-            {% if item %}
+            {% if item.box %}
+              <div class="box full">
 		      <div class="hashover">
-			    <a href="{{ item.owner.path }}">{{ item.owner.first_name }}</a>
+                  <a href="{{ item.box.owner.path }}"><b>{{ item.box.owner.first_name }}</b></a>
 			    <div class="showhover">
-                    {{item.owner }}<br>
-                    {{ item.location }}<br>
-                    {{item.extra_info}} {%if item.image %}<br>
-                    <a href="{{ item.image.url  }}"><img alt="" src="{{ item.image.thumbnail.url   }}"></a>{%endif%}
+                    {{item.box.owner }}<br>
+                    {{ item.box.location }}<br>
+                    {{item.box.extra_info}} {%if item.box.image %}<br>
+                    <a href="{{ item.box.image.url  }}"><img alt="" src="{{ item.box.image.thumbnail.url   }}"></a>{%endif%}
                 </div>
               </div>
 	        {% else %}
+              <div class="box">
               <i class="free">free</i>
 	        {% endif %}
+            <div class="box-location">{{ item.location }}</div>
 		  </div>
        </td>
     {% endfor %}

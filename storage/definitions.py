@@ -26,6 +26,6 @@ def parse_box_location(text):
         if location.storage in STORAGES:
             num_rows = STORAGES[location.storage]['num_rows']
             num_cols = STORAGES[location.storage]['num_cols']
-            if 0 < location.row < num_rows and 0 < location.col < num_cols:
+            if 0 < location.row <= num_rows and 0 < location.col <= num_cols:
                 return location
 

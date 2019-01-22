@@ -19,7 +19,7 @@ def index(request):
     floating = []
     storages = dict((storage_key, {
         'description': storage_data['description'],
-        'boxes': [[None] * storage_data['num_cols'] for _ in range(storage_data['num_rows'])],
+        'boxes': [[{'location': '{0}{1}{2}'.format(storage_key, col+1, storage_data['num_rows']-row), 'box': None} for col in range(storage_data['num_cols'])] for row in range(storage_data['num_rows'])],
     }) for storage_key, storage_data in STORAGES.items())
 
     # Fill up data structures
@@ -27,7 +27,7 @@ def index(request):
         box_location = parse_box_location(box.location)
         if box_location:
             num_rows = STORAGES[box_location.storage]['num_rows']
-            storages[box_location.storage]['boxes'][num_rows-box_location.row][box_location.col-1] = box
+            storages[box_location.storage]['boxes'][num_rows-box_location.row][box_location.col-1] = {'location': box.location, 'box': box}
         else:
             floating.append(box)
 
