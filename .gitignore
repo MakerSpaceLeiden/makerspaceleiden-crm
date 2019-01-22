@@ -34,6 +34,7 @@ MANIFEST
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
+pip-selfcheck.json
 
 # Unit test / coverage reports
 htmlcov/
@@ -89,6 +90,8 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+pyvenv.cfg
+share
 
 # Spyder project settings
 .spyderproject
@@ -123,3 +126,4 @@ bin
 # Uploaded images
 ufo/ufo
 members/user
+memberbox/memberbox
