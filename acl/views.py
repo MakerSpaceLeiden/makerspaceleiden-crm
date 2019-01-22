@@ -149,6 +149,7 @@ def member_overview(request,member_id = None):
        'boxes': boxes,
        'lst': lst,
        'permits': specials,
+       'user' : request.user,
     }
     return render(request, 'acl/member_overview.html', context)
 

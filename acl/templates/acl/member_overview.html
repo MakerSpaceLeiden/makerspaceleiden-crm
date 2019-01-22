@@ -8,7 +8,13 @@
 
 <table>
 	<tr>
-		<td colspan=2><h3>Personal details</h3></td>
+		<td colspan=2><h3>Personal details</h3>
+		{% if member == user %}
+		<hr/>
+		<a href="{% url 'userdetails' %}">edit your own user details</a>
+		<p/>
+		{% endif %}
+		</td>
 		<td valign=top rowspan=5><center>{% qr_from_text member.url size="m" border=1 %}<br/><code><font size=-3>{{ member.url }}</font></code></center></td>
 	</tr>
 	{% if member.image %}
