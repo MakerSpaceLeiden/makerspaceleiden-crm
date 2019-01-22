@@ -20,7 +20,7 @@ class Memberbox(models.Model):
     extra_info = models.CharField(max_length=200,
             help_text = "Such as 'plastic bin'. Especially important if you are keeping things in an odd place.")
 
-    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE,  blank=True, null=True)
     history = HistoricalRecords()
 
     def url(self):
