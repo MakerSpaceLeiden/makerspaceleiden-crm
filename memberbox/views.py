@@ -1,85 +1,41 @@
-from django.contrib.sites.shortcuts import get_current_site
-from django.template import loader
 from django.http import HttpResponse
-from django.conf import settings
-from django.shortcuts import redirect
-from django.views.generic import ListView, CreateView, UpdateView
 from django.contrib.auth.decorators import login_required
-from django import forms
-from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.contrib.admin.sites import AdminSite
-from django.utils import six
 from django.core.exceptions import ObjectDoesNotExist
 
+from .models import Memberbox
+from .forms import MemberboxForm, NewMemberboxForm
+from storage.definitions import parse_box_location, STORAGES
 
 import logging
-import re
-
-from members.models import User
-from .models import Memberbox
-from .admin import MemberboxAdmin
-from .forms import MemberboxForm, NewMemberboxForm
-
 logger = logging.getLogger(__name__)
+
 
 @login_required
 def index(request):
-    tmp = {}
-    sizes_c = {}
-    sizes_r = {}
-    floating = []
     yours = Memberbox.objects.filter(owner = request.user).order_by('location')
+
+    # Prepare empty data structures with rows and columns
+    floating = []
+    storages = dict((storage_key, {
+        'description': storage_data['description'],
+        'boxes': [[None] * storage_data['num_cols'] for _ in range(storage_data['num_rows'])],
+    }) for storage_key, storage_data in STORAGES.items())
+
+    # Fill up data structures
     for box in Memberbox.objects.order_by('location'):
-      m=re.search(r'^([LR]{1})(\d{1})(\d{1})$', box.location.upper())
-      if m:
-        k = m.group(1)
-        r = int(m.group(2))
-        c = int(m.group(3))
-
-        if not k in tmp:
-          tmp[ k ] = {}
-          sizes_r[k] = 6
-          sizes_c[k] = 6
-
-        if r >  sizes_r[k]:
-           sizes_r[k] = r
-        if c >  sizes_c[k]:
-           sizes_c[k] = c
-        
-        if not r in tmp[k]:
-           tmp[k][r] ={} 
-
-        tmp[k][r][c] = box
-      else:
-        floating.append(box)
-
-    labels = { 
-             'L' : 'Left cabinet (near door)' , 
-             'R' : 'Right cabinet (near WC)' , 
-    }
-    boxes = {}
-    for k,contents in tmp.items():
-       contents = []
-       for r in reversed(range(1,sizes_r[k]+1)):
-         row = []
-         for c in range(1,sizes_c[k]+1):
-            try:
-              row.append(tmp[k][r][c])
-            except Exception as e:
-              row.append('')
-
-         contents.append(row)
-       if k in labels:
-         k = labels[k]
-       boxes[k] = contents
+        box_location = parse_box_location(box.location)
+        if box_location:
+            num_rows = STORAGES[box_location.storage]['num_rows']
+            storages[box_location.storage]['boxes'][num_rows-box_location.row][box_location.col-1] = box
+        else:
+            floating.append(box)
 
     context = {
         'title': 'Storage',
         'user' : request.user,
         'has_permission': request.user.is_authenticated,
-        'boxes': boxes,
+        'storages': list(storages.values()),
         'floating': floating,
         'yours': yours,
     }

@@ -3,9 +3,29 @@
 {% block content %}
 
 <style>
-.showhover { display: none; }
-.hashover:hover .showhover { display: block; }
-.box { border:1px solid black; }
+    .showhover { display: none; }
+    .hashover:hover .showhover {
+        display: block;
+        position: absolute;
+        background-color: white;
+        border: 1px solid black;
+        padding: 10px;
+    }
+    .box {
+        padding: 10px;
+        vertical-align: center;
+    }
+    .box_table {
+        border-collapse: collapse;
+    }
+    .box_table tr td {
+        margin: 0;
+        padding: 3px;
+        border: 1px solid lightgray;
+    }
+    .free {
+        color: lightgray;
+    }
 </style>
 
 <p>Members may have a <i>members box</i> which have a fixed, assigned, place. Unlike long-storage items - these are not time limited for members.</p>
@@ -26,7 +46,7 @@
 	</td>
         <td>{{ item.extra_info }}</td>
         <td>
-		<a href="{% url 'changebox' pk=item.id %}">[change]</a> 
+		<a href="{% url 'changebox' pk=item.id %}">[change]</a>
 		<a href="{% url 'deletebox' pk=item.id  %}">[delete]</a>
 	</td>
   </tr>
@@ -43,22 +63,29 @@ Ask a trustee if you do not yet have a box/slot.
 The contents of the two main member cabinets along the long wall (on your left as you come in).
 <p>
 
-{% for cabinet,contents in boxes.items %}
-<h3> {{ cabinet }}</h3>
-<table>
-  {% for row in contents %}
+{% for storage in storages %}
+<h3> {{ storage.description }}</h3>
+<table class="box_table">
+  {% for row in storage.boxes %}
   <tr>
     {% for item in row %}
-       <td> {% if item %}
-		<div class="box">
-		<div class="hashover">
-			<a href="{{ item.owner.path }}">{{ item.owner.first_name }}</a>
-			<div class="showhover">{{item.owner }}<br>{{ item.location }}<br>{{item.extra_info}}{%if item.image %}<br><a href="{{ item.image.url  }}"><img alt="" src="{{ item.image.thumbnail.url   }}"></center>{%endif%}</div></div>
-		</div>
-	    {% else %}
-               <i>free</i>
-	    {% endif %}
-       </td> 
+       <td>
+		  <div class="box">
+            {% if item %}
+		      <div class="hashover">
+			    <a href="{{ item.owner.path }}">{{ item.owner.first_name }}</a>
+			    <div class="showhover">
+                    {{item.owner }}<br>
+                    {{ item.location }}<br>
+                    {{item.extra_info}} {%if item.image %}<br>
+                    <a href="{{ item.image.url  }}"><img alt="" src="{{ item.image.thumbnail.url   }}"></a>{%endif%}
+                </div>
+              </div>
+	        {% else %}
+              <i class="free">free</i>
+	        {% endif %}
+		  </div>
+       </td>
     {% endfor %}
   </tr>
   {% endfor %}
