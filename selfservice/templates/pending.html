@@ -5,7 +5,7 @@
 {% if saved %}
   Entitlements activated.
   <hr>
-  <a href="..">back to the home page</a>
+  <a href="{% url 'index' %}">back to the home page</a>
 {% else %}
 {% if not lst %}
 Noting outstanding

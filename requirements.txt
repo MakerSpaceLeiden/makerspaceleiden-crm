@@ -10,10 +10,11 @@ django-dynamic-filenames
 
 # We're also including Pillow  as otherwise QR will fall back
 # to SVG - which is not as supported.
-# Pillow
+Pillow
 django-qr-code
+
 # When using Postgress as the backing DB
 # psycopg2-binary
 
 # For production
-mysqlclient
+# mysqlclient
