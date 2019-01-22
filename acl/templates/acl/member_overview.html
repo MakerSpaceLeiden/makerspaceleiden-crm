@@ -4,8 +4,11 @@
 
 {% block content %}
 
-{% if lst %}
+{% if member.image %}
+	<a href="{{ member.image.url }}"><img alt="" src="{{ member.image.medium.url   }}"/></a>
+{% endif %}
 
+{% if lst %}
 <table>
 	<tr>
 		<td colspan=2><h3>Personal details</h3>
@@ -15,15 +18,18 @@
 		<p/>
 		{% endif %}
 		</td>
-		<td valign=top rowspan=5><center>{% qr_from_text member.url size="m" border=1 %}<br/><code><font size=-3>{{ member.url }}</font></code></center></td>
+		<td valign=top rowspan=5 align=center>{% qr_from_text member.url size="m" border=1 %}<br/><code><font size=-3>{{ member.url }}</font></center></td>
 	</tr>
-	{% if member.image %}
-		<a href="{{ member.image.url }}"><img alt="" src="{{ member.image.medium.url   }}"/></a>
-	{% else %}
-		<tr valign=top>
-			<td align=right>Profile image</td><td><a href="{% url 'userdetails' %}">[ Add profile image ]</a></td>
-		</tr>
-	{% endif %}
+{% if member.image %}
+	<!-- image is outside the table - above it -->
+{% else %}
+   {% if member == user %}
+	<tr valign=top>
+		<td align=right>Profile image</td>
+		<td><a href="{% url 'userdetails' %}">[ Add profile image ]</a></td>
+	</tr>
+   {% endif %}
+{% endif %}
 	<tr valign=top>
 		<td align=right>First name</td><td>{{ member.first_name}}</td>
 	</tr>
