@@ -78,13 +78,21 @@ The contents of the two main member cabinets along the long wall (on your left a
   {% for row in storage.boxes %}
   <tr>
     {% for item in row %}
-       <td>
+       <td width=100px>
             {% if item.box %}
               <div class="box full">
 		      <div class="hashover">
-                  <a href="{{ item.box.owner.path }}"><b>{{ item.box.owner.first_name }}</b></a>
+		  {% if item.box.owner %}
+                  	<a href="{{ item.box.owner.path }}"><b>{{ item.box.owner.first_name }}</b></a>
+		  {% else %}
+		  	<i>unk</i>
+		  {% endif %}
 			    <div class="showhover">
+		  {% if item.box.owner %}
                     {{item.box.owner }}<br>
+		  {% else %}
+		  <i>owner unknown</i><br>
+		  {% endif %}
                     {{ item.box.location }}<br>
                     {{item.box.extra_info}} {%if item.box.image %}<br>
                     <a href="{{ item.box.image.url  }}"><img alt="" src="{{ item.box.image.thumbnail.url   }}"></a>{%endif%}
@@ -113,7 +121,11 @@ In a few <i>exceptional</i> cases - there is permission for a member to store th
   <tr><th>owner</th><th>location</th><th></th></tr>
   {% for item in floating %}
   <tr>
+		  {% if item.owner %}
 	  <td><a href="{{ item.owner.path  }}">{{ item.owner }}</a></td>
+		  {% else %}
+		  <td>  	<i>owner unknown</i></td>
+		  {% endif %}
   	<td><div class="hashover">{{ item.location }}
 {%if item.image %}
         	<div class="showhover"><a href="{{ item.image.url  }}"><img alt="" src="{{ item.image.thumbnail.url  }}"></center></div>
