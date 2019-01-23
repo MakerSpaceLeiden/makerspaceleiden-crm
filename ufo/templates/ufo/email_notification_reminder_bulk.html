@@ -1,0 +1,37 @@
+Folks,
+<p/>
+{%if postDeadline %}
+The following items are nearing their deadline and have not been claimed. So make
+sure you claim your property back; as otherwise these will be free for others to 
+claim, and if not claimed quick enough, be disposed.
+</p>
+<ul>
+{%for item in postDeadline %}
+<li> <a href="{{item.url }}">{{ item.description }}</a> <br>
+     Deadline {{ item.deadline }}<br>
+     Will be disposed {{ item.dispose_by_date }}<p>
+{%endfor%}
+</ul>
+
+By the way - if something is yours - and you do not want it anymore; then do feel to
+mark it as 'can be disposed'. 
+<p>
+{%endif%}
+
+{%if postDisposeline %}
+Know that the items listed below are now past their 'dispose by' deadline. So if you
+have some time; be so kind to dump them in the container or drop them off at the
+Kringloop next door. And then mark them 'gone' in the CRM.
+<p>
+<ul>
+{%for item in postDeadline %}
+<li><a href="{{item.url}}">{{ item }}</a>
+{%endfor%}
+</ul>
+{%endif%}
+<p>
+Your friendly makerbot.
+<hr/>
+-- <br>
+<font color="gray" size=-1><i>"I love deadlines. I love the whooshing noise they make as they go by."<br></i>
+- Douglas Adams, The Salmon of Doubt</font>
