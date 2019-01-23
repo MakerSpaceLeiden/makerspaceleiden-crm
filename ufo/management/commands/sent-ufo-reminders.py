@@ -12,40 +12,6 @@ from ufo.utils import emailUfoInfo
 import sys,os
 import datetime
 
-''' 
-Sent reminders for any UFOs that will soo
-change state.
-'''
-def reset_password(email, reset = False,
-        from_email=settings.DEFAULT_FROM_EMAIL, 
-        template='members/email_invite.txt',
-        subject_template='members/email_invite_subject.txt',
-        ):
-    try:
-        user = User.objects.get(email=email)
-    except Exception as e:
-        print("No user with email address <{}> found.".format(email), file=sys.stderr)
-        return False
-
-    if reset:
-        user.set_unusable_password()
-        user.changeReason = "Locked it from the sent-invite command."
-        user.save()
-
-    form = PasswordResetForm({'email': email })
-
-    if not form.is_valid():
-        raise Exception("Eh - internal issues")
-
-    try:
-        form.save(from_email=from_email, email_template_name=template, subject_template_name=subject_template)
-        print("{} - Email sent.".format(email))
-    except Exception as e:
-        print("Sending to  <{}> failed: {}".format(email,e), file=sys.stderr)
-        return False
-
-    return True
-
 class Command(BaseCommand):
     help = 'Sent reminders for UFOs.'
 
@@ -69,6 +35,6 @@ class Command(BaseCommand):
             'postDeadline': postDeadline,
             'postDisposeline': postDisposeline,
         }
-        emailUfoInfo(items.values(), 'email_notification_reminder', None, [ settings.MAILINGLIST ], context )
+        emailUfoInfo(items.values(), 'email_notification_reminder', [ settings.MAILINGLIST ], context )
 
         sys.exit(rc)

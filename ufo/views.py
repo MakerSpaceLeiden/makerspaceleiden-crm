@@ -26,6 +26,8 @@ from django.core.mail import EmailMultiAlternatives
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
+from ufo.utils import emailUfoInfo
+
 
 import datetime
 import uuid
@@ -45,70 +47,14 @@ from members.models import User
 # lets admins change things through the database interface silently. 
 # Which can help when sheparding the community.
 #
-def alertOwnersToChange(itemOrItems, userThatMadeTheChange = None, toinform = []):
-
-    to = {}
-    if userThatMadeTheChange:
-       to[ userThatMadeTheChange.email ] = True 
-    
-    if settings.ALSO_INFORM_EMAIL_ADDRESSES:
-       toinform.extend(settings.ALSO_INFORM_EMAIL_ADDRESSES)
-
-    for person in toinform:
-        if person and isinstance(person,User):
-            to[person.email]=True
-        else:
-            to[person]=True
-
-    # We use a dict rather than an array to prune any duplicates.
-    to = to.keys()
-
+def alertOwnersToChange(item, userThatMadeTheChange = None, toinform = []):
     context = {
            'user': userThatMadeTheChange,
            'base': settings.BASE,
     }
-    part2 = None
-
-    if isinstance(itemOrItems,list):
-          context['items'] = itemOrItems
-          subject = "[makerbot] Upload of %d UFOs" % len(itemOrItems)
-
-          part1 = MIMEText(render_to_string('ufo/email_notification_bulk.txt', context) , 'plain')
-          part2 = MIMEMultipart('related')
-          part2.attach(MIMEText(render_to_string('ufo/email_notification_bulk.html', context) , 'html'))
-    else:
-          context['item'] = itemOrItems
-          subject = "[makerbot] Change to an UFO: %s" % itemOrItems.description
-          part1 = MIMEText(render_to_string('ufo/email_notification.txt', context), 'plain')
-          part2 = MIMEMultipart('mixed')
-
-    # Note that we want the images to be (much) smaller if we are doing
-    # lot of them (e.g. in case of a zip upload) - than if it is just
-    # a single one.
-    #
-    if isinstance(itemOrItems,list):
-       msg = MIMEMultipart('alternative')
-       for i in itemOrItems:
-           ext = i.image.name.split('.')[-1]
-           attachment = MIMEImage(i.image.thumbnail.read(), "image/"+ext)
-           attachment.add_header('Content-ID',str(i.pk))
-           attachment.add_header('Content-Disposition', 'inline; filename="' + i.image.name +'"')
-           part2.attach(attachment)
-           # email.attach(i.image.name, i.image.thumbnail.read(), "image/"+ext)
-    else:
-       msg = MIMEMultipart('mixed')
-       ext = itemOrItems.image.name.split('.')[-1]
-       attachment = MIMEImage(itemOrItems.image.medium.read(), ext)
-       attachment.add_header('Content-ID',str(itemOrItems.pk))
-       part2.attach(attachment)
-
-    msg.attach(part1)
-    msg.attach(part2)
-
-    email = EmailMessage(subject, None, to=to, from_email=settings.DEFAULT_FROM_EMAIL)
-    email.attach(msg)
-    email.send()
-
+    if userThatMadeTheChange:
+      toinform.add(userThatMadeTheChange.email)
+    return emailUfoInfo(items, 'ufo/email_notification', toinform = [], context = {})
 
 def index(request,days=30):
     lst = Ufo.objects.all()
@@ -136,7 +82,7 @@ def create(request):
             item.changeReason = "Created by {} through the self-service portal.".format(request.user)
             item.save()
 
-            alertOwnersToChange(item, request.user, [ item.owner ])
+            alertOwnersToChange([item], request.user, [ item.owner.email ])
             return redirect('ufo')
 
         except Exception as e:
@@ -169,7 +115,7 @@ def modify(request,pk):
         oitem = Ufo.objects.get(pk=pk)
     except ObjectDoesNotExist as e:
         return HttpResponse("UFO not found",status=404,content_type="text/plain")
-    toinform = [ oitem.owner ]
+    toinform = [ oitem.owner.email ]
 
     context = {
         'title': 'Update an Uknown Floating Objects',
@@ -186,9 +132,9 @@ def modify(request,pk):
         except Exception as e:
             logger.error("Unexpected error during update of ufo: {}".format(e))
 
-        toinform.append(item.owner)
+        toinform.append(item.owner.email)
  
-        alertOwnersToChange(item, request.user, toinform )
+        alertOwnersToChange([item], request.user, toinform )
 
         context['item']=item
 
@@ -208,9 +154,7 @@ def mine(request,pk):
 
     item.changeReason = "claimed as 'mine' by {} via self service portal".format(request.user)
     if item.owner != request.user:
-        alertOwnersToChange(item, request.user, [ item.owner ])
-    item.owner = request.user
-    item.state = 'OK'
+        alertOwnersToChange([item], request.user, [ item.owner.email ])
     item.save()
 
     return redirect('ufo')
@@ -322,7 +266,7 @@ def upload_zip(request):
                 logger.error("Error during cleanup of {}: {}".format(tmpZip,e))
 
             if lst:
-                alertOwnersToChange(lst, request.user, [ request.user ])
+                alertOwnersToChange(lst, request.user, [ request.user.email ])
 
             return render(request, 'ufo/upload.html', { 
                'action': 'Done', 
