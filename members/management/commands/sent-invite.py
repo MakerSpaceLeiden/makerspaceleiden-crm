@@ -8,6 +8,7 @@ from django.conf import settings
 from django.core.mail import EmailMessage
 
 import sys,os
+from datetime import datetime
 ''' 
 Sent invites; to just one user, or all users
 in the system,
@@ -65,6 +66,12 @@ class Command(BaseCommand):
             dest='save', type = str, 
             help='Save the message as rfc822 blobs rather than sending. Useful as we sort out dkim on the server. Pass the output directory as an argument',
         )
+        parser.add_argument(
+            '--nevers',
+            dest='nevers', 
+            action='store_true',
+            help='Skip people that have logged in at least once. Only valid in conjunction wit the --all options.',
+        )
 
     def handle(self, *args, **options):
         rc = 0
@@ -78,6 +85,9 @@ class Command(BaseCommand):
                 rc = 1
             else:
                 for user in User.objects.all():
+                   if options['nevers'] and user.last_login:
+                       print("Skipping - login {} seen {}".format(user.name,user.last_login.strftime("%Y-%m-%d %H:%M:%S")))
+                       continue
                    rc |= not reset_password(user.email, options['reset'])
         elif options['email']:
             for email in options['email']:
