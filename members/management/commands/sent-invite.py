@@ -59,10 +59,19 @@ class Command(BaseCommand):
             action='store_true',
             dest='reset',
             help='Also reset/block the current account. So any (old) password will not work any longer.',
-       )
+        )
+        parser.add_argument(
+            '--save',
+            dest='save', type = str, 
+            help='Save the message as rfc822 blobs rather than sending. Useful as we sort out dkim on the server. Pass the output directory as an argument',
+        )
 
     def handle(self, *args, **options):
         rc = 0
+        if options['save']:
+            settings.EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+            settings.EMAIL_FILE_PATH = options['save']
+
         if options['all']:
             if options['email']:
                 print("The option --all cannot be used with additional emails specified as arguments.", file=sys.stderr)
@@ -76,5 +85,9 @@ class Command(BaseCommand):
         else:
             for email in sys.stdin:
                 rc |= not reset_password(email, options['reset'])
+
+#        if options['save']:
+#             for f in os.listdir(options['save']):
+#                 print(f)
 
         sys.exit(rc)
