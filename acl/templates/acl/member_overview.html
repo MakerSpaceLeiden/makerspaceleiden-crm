@@ -34,7 +34,12 @@
 		<td align=right>First name</td><td>{{ member.first_name}}</td>
 	</tr>
 	<tr><td align=right>Last name</td><td>{{ member.last_name }}</td></tr>
-	<tr><td align=right>Email (usernme)</td><td>{{ member.email}}</td></tr>
+	<tr><td align=right>Email (username)</td><td>{{ member.email}}</td></tr>
+	{%if user.is_superuser or member == user %}
+        {% if member.phone_number %}
+	<tr><td align=right>Phone:</td><td>{{ member.phone_number }}<p/><i>Note: this field is only visible to the member and the admins</i></td></tr>
+        {%endif %}
+        {%endif %}
 	<tr><td align=right>Waiver on file</td><td>
 			{%if member.form_on_file %} yes {% else %} no {% endif %}
 			</td></tr>
@@ -47,6 +52,7 @@
 	{%if member.is_superuser%}
 			<tr><td></td><td>Is a superuser</td><td>
 	{% endif %}
+
 	{%if permits %}
 	<tr><td colspan=2><h3>Special Permits and Instructions</h3></tr>
 	{%for p in permits %}
@@ -57,7 +63,13 @@
 		</td></tr>
 	{%endfor %}
 	{% endif %}
-
+{% if tags %}
+	<tr><td colspan=2><h3>Tags</h3></tr>
+        {% for tag in tags %}
+		<tr><td></td><td>{{ tag.tag }}</td></tr>
+	{% endfor %}
+	<tr><td></td><td width=400><i>Note: above is only visible to member and the admins. Keep confidential as tags are trivial to clone once you know this number.</i></tr>
+{% endif %}
 	<tr><td colspan=2><h3><a href="{% url 'boxes' %}">Boxes</h3></tr>
 	{% if boxes %}
         {% for box in boxes %}

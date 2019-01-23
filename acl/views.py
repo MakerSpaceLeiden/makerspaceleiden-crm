@@ -151,6 +151,11 @@ def member_overview(request,member_id = None):
        'permits': specials,
        'user' : request.user,
     }
+
+    if member == request.user or request.user.is_superuser:
+        tags = Tag.objects.filter(owner = member)
+        context['tags'] = tags
+
     return render(request, 'acl/member_overview.html', context)
 
 @login_required

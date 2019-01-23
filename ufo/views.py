@@ -22,6 +22,7 @@ from django.conf import settings
 from django.contrib.admin.sites import AdminSite
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import EmailMultiAlternatives
+from django.urls import reverse
 
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
@@ -112,7 +113,7 @@ def alertOwnersToChange(itemOrItems, userThatMadeTheChange = None, toinform = []
 def ufo_redirect(pk = None):
     url = reverse('ufo')
     if pk:
-      url += '#' + pk
+      url = '%s#%d' % (url, pk)
     return redirect(url)
 
 
