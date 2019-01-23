@@ -109,6 +109,12 @@ def alertOwnersToChange(itemOrItems, userThatMadeTheChange = None, toinform = []
     email.attach(msg)
     email.send()
 
+def ufo_redirect(pk = None):
+    url = reverse('ufo')
+    if pk:
+      url += '#' + pk
+    return redirect(url)
+
 
 def index(request,days=30):
     lst = Ufo.objects.all()
@@ -137,7 +143,7 @@ def create(request):
             item.save()
 
             alertOwnersToChange(item, request.user, [ item.owner ])
-            return redirect('ufo')
+            return ufo_redirect(item.id)
 
         except Exception as e:
             logger.error("Unexpected error during initial save of new ufo: {}".format(e))
@@ -192,7 +198,7 @@ def modify(request,pk):
 
         context['item']=item
 
-        return redirect('ufo')
+        return ufo_redirect(pk)
 
     form = UfoForm(instance = oitem)
     context['form'] = form
@@ -213,7 +219,7 @@ def mine(request,pk):
     item.state = 'OK'
     item.save()
 
-    return redirect('ufo')
+    return ufo_redirect(pk)
 
 @login_required
 # Limit this to admins ?
@@ -252,7 +258,7 @@ def delete(request,pk):
          logger.error("Unexpected error during delete of item: {0}".format(e))
          return HttpResponse("Box fail",status=400,content_type="text/plain")
 
-    return redirect('ufo')
+    return ufo_redirect()
 
 @login_required
 def upload_zip(request):
