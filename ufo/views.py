@@ -57,6 +57,12 @@ def alertOwnersToChange(item, userThatMadeTheChange = None, toinform = []):
       toinform.add(userThatMadeTheChange.email)
     return emailUfoInfo(items, 'ufo/email_notification', toinform = [], context = {})
 
+def ufo_redirect(pk = None):
+    url = reverse('ufo')
+    if pk:
+      url += '#' + pk
+    return redirect(url)
+
 def index(request,days=30):
     lst = Ufo.objects.all()
     if days > 0:
