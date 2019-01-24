@@ -94,7 +94,9 @@ def machine_overview(request, machine_id = None):
         if permit:
             permit = PermitType.objects.get(pk = permit.id)
             if permit.permit:
-                instructors = Entitlement.objects.filter(permit=permit)
+                    instructors = Entitlement.objects.filter(permit=permit.permit)
+            else:
+                    instructors = Entitlement.objects.filter(permit=permit)
     lst = {}
     for mchn in machines:
        lst[ mchn.name ] = matrix_m(mchn)
@@ -103,7 +105,7 @@ def machine_overview(request, machine_id = None):
        'members': User.objects.order_by('first_name'),
        'machines': machines,
        'lst': lst,
-       'instructors': instructors,
+       'instructors': instructors.order_by('holder__first_name'),
     }
     return render(request, 'acl/matrix.html', context)
 
