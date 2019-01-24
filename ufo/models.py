@@ -56,7 +56,7 @@ class Ufo(models.Model):
                 self.deadline =  datetime.date.today() + datetime.timedelta(settings.UFO_DEADLINE_DAYS)
 
          if not self.dispose_by_date:
-                self.dispose_by_date = datetime.date.today() + datetime.timedelta(settings.UFO_DISPOSE_DAYS)
+                self.dispose_by_date = self.deadline + datetime.timedelta(settings.UFO_DISPOSE_DAYS)
 
          if self.dispose_by_date < self.deadline:
                self.dispose_by_date = self.deadline + datetime.timedelta(1)
