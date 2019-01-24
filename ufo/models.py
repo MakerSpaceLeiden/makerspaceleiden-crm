@@ -28,6 +28,7 @@ class Ufo(models.Model):
            ('OK', 'Claimed'),
            ('DEL', 'can be disposed'),
            ('DON', 'Donated to the space'),
+           ('GONE', 'Gone'),
      )
      image = StdImageField(upload_to=upload_to_pattern,
              variations=settings.IMG_VARIATIONS,validators=settings.IMG_VALIDATORS)
