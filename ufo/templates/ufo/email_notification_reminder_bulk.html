@@ -1,3 +1,4 @@
+{% autoescape off %}
 Folks,
 <p/>
 {%if postDeadline %}
@@ -10,6 +11,7 @@ claim, and if not claimed quick enough, be disposed.
 <li> <a href="{{item.url }}">{{ item.description }}</a> <br>
      Deadline {{ item.deadline }}<br>
      Will be disposed {{ item.dispose_by_date }}<p>
+     <a href="{{ item.url }}"><img src="cid:{{item.id}}"/></a>
 {%endfor%}
 </ul>
 
@@ -19,13 +21,16 @@ mark it as 'can be disposed'.
 {%endif%}
 
 {%if postDisposeline %}
-Know that the items listed below are now past their 'dispose by' deadline. So if you
-have some time; be so kind to dump them in the container or drop them off at the
-Kringloop next door. And then mark them 'gone' in the CRM.
+Know that the items listed below are now past their 'dispose by' deadline - or have
+already been marked 'to be disposed'. So if you have some time; be so kind to dump 
+them in the container or drop them off at the Kringloop next door. And then mark 
+them 'gone' in the CRM.
 <p>
 <ul>
-{%for item in postDeadline %}
-<li><a href="{{item.url}}">{{ item }}</a>
+{%for item in postDisposeline %}
+<li><a href="{{item.url}}">{{ item.description }}</a><br>
+	     Will be disposed {{ item.dispose_by_date }}<p>
+     <a href="{{ item.url }}"><img src="cid:{{item.id}}"/></a>
 {%endfor%}
 </ul>
 {%endif%}
@@ -35,3 +40,4 @@ Your friendly makerbot.
 -- <br>
 <font color="gray" size=-1><i>"I love deadlines. I love the whooshing noise they make as they go by."<br></i>
 - Douglas Adams, The Salmon of Doubt</font>
+{% endautoescape %}

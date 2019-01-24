@@ -1,3 +1,4 @@
+{% autoescape off %}
 Folks,
 <p/>
 {%if postDeadline %}
@@ -9,7 +10,9 @@ claim, and if not claimed quick enough, be disposed.
 {%for item in postDeadline %}
 <li> <a href="{{item.url }}">{{ item.description }}</a> <br>
      Deadline {{ item.deadline }}<br>
-     Will be disposed {{ item.dispose_by_date }}<p>
+     Will be disposed {{ item.dispose_by_date }}<br>
+	<a href="{{ item.url }}"><img src="cid:{{item.id}}"/></a><br>
+	<p>
 {%endfor%}
 </ul>
 
@@ -19,15 +22,20 @@ mark it as 'can be disposed'.
 {%endif%}
 
 {%if postDisposeline %}
-Know that the item listed below is now past its 'dispose by' deadline. So if you
-have some time; be so kind to dump them in the container or drop it off at the
+Know that the item listed below is now past its 'dispose by' deadline or has
+been marked 'can be disposed' by the owner. So if you have some time; be so kind 
+to dump them in the container or drop it off at the
 Kringloop next door. And then mark them 'gone' in the CRM.
 <p>
 <ul>
-{%for item in postDeadline %}
-<li><a href="{{item.url}}">{{ item }}</a>
+{%for item in postDisposeline %}
+<li><a href="{{item.url}}">{{ item }}</a><br>
+	<a href="{{ item.url }}"><img src="cid:{{item.id}}"/></a>
+     Will be disposed {{ item.dispose_by_date }}<br>
+
 {%endif%}
 <ul>
 <p>
 Your friendly makerbot.
 <hr/>
+{% endautoescape %}

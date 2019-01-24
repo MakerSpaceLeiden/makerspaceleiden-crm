@@ -1,3 +1,4 @@
+{% autoescape off %}
 Folks,
 
 {{ user }} just did a bulk upload of lots of unclaimed objects.
@@ -7,3 +8,4 @@ With the description: {{ item.description }}
 {% endif %}
 
 Your friendly makerbot.
+{% endautoescape %}

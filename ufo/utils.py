@@ -43,9 +43,6 @@ from members.models import User
 
 def emailUfoInfo(itemsToAttachImage, template, toinform = [], context = {}):
     to = {}
-    if settings.ALSO_INFORM_EMAIL_ADDRESSES:
-       toinform.extend(settings.ALSO_INFORM_EMAIL_ADDRESSES)
-
     for person in toinform:
        to[person]=True
 
@@ -68,20 +65,21 @@ def emailUfoInfo(itemsToAttachImage, template, toinform = [], context = {}):
 
           for i in itemsToAttachImage:
              ext = i.image.name.split('.')[-1]
-             attachment = MIMEImage(i.image.thumbnail.read(), "image/"+ext)
+             attachment = MIMEImage(i.image.thumbnail.read(), ext)
              attachment.add_header('Content-ID',str(i.pk))
              attachment.add_header('Content-Disposition', 'inline; filename="' + i.image.name +'"')
              part2.attach(attachment)
     else:
+          item = itemsToAttachImage[0]
           msg = MIMEMultipart('mixed')
           subject = render_to_string('ufo/{}_subject.txt'.format(template), context)
 
           part1 = MIMEText(render_to_string('ufo/{}.txt'.format(template), context), 'plain')
           part2 = MIMEMultipart('mixed')
 
-          ext = itemsToAttachImage.image.name.split('.')[-1]
-          attachment = MIMEImage(itemsToAttachImage.first.image.medium.read(), ext)
-          attachment.add_header('Content-ID',str(item.first.pk))
+          ext = item.image.name.split('.')[-1]
+          attachment = MIMEImage(item.image.medium.read(), ext)
+          attachment.add_header('Content-ID',str(item.pk))
           part2.attach(attachment)
 
     msg.attach(part1)

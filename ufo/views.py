@@ -48,19 +48,23 @@ from members.models import User
 # lets admins change things through the database interface silently. 
 # Which can help when sheparding the community.
 #
-def alertOwnersToChange(item, userThatMadeTheChange = None, toinform = []):
+def alertOwnersToChange(items, userThatMadeTheChange = None, toinform = []):
     context = {
            'user': userThatMadeTheChange,
            'base': settings.BASE,
     }
     if userThatMadeTheChange:
-      toinform.add(userThatMadeTheChange.email)
-    return emailUfoInfo(items, 'ufo/email_notification', toinform = [], context = {})
+      toinform.append(userThatMadeTheChange.email)
+
+    if settings.ALSO_INFORM_EMAIL_ADDRESSES:
+       toinform.extend(settings.ALSO_INFORM_EMAIL_ADDRESSES)
+
+    return emailUfoInfo(items, 'email_notification', toinform = [], context = {})
 
 def ufo_redirect(pk = None):
     url = reverse('ufo')
     if pk:
-      url += '#' + pk
+      url = '{}#{}'.format(url, pk)
     return redirect(url)
 
 def index(request,days=30):
@@ -122,7 +126,10 @@ def modify(request,pk):
         oitem = Ufo.objects.get(pk=pk)
     except ObjectDoesNotExist as e:
         return HttpResponse("UFO not found",status=404,content_type="text/plain")
-    toinform = [ oitem.owner.email ]
+
+    toinform = []
+    if oitem.owner:
+       toinform.append(oitem.owner.email)
 
     context = {
         'title': 'Update an Uknown Floating Objects',
@@ -139,7 +146,8 @@ def modify(request,pk):
         except Exception as e:
             logger.error("Unexpected error during update of ufo: {}".format(e))
 
-        toinform.append(item.owner.email)
+        if item.owner:
+            toinform.append(item.owner.email)
  
         alertOwnersToChange([item], request.user, toinform )
 

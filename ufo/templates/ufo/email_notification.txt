@@ -1,3 +1,4 @@
+{% autoescape off %}
 Folks,
 
 This is to let you know that {{ user }} has just changed the details for
@@ -10,4 +11,5 @@ Description:	{{ item.description }}
 Owner/resp.:	{{ item.owner }}
 		{{ item.get_state_display }}
 
+{% endautoescape %}
 

@@ -48,7 +48,10 @@ class Ufo(models.Model):
        return  settings.BASE + self.path()
 
      def path(self):
-       return  reverse('showufo', kwargs = { 'pk' :  self.id })
+       return reverse('showufo', kwargs = { 'pk' :  self.id })
+
+     def __str__(self):
+         return self.description
 
      def save(self, * args, ** kwargs):
          self.lastChange =  datetime.date.today()
