@@ -17,7 +17,7 @@ from .models import Machine,Entitlement,PermitType
 from storage.models import Storage
 from memberbox.models import Memberbox
 
-def matrix_mm(machine,mbr):
+def matrix_mm(machine,member):
        out = { 'xs' : False, 'instructions_needed' : False, 'tags' : [] }
        out['mid'] = machine.id
 
@@ -27,11 +27,11 @@ def matrix_mm(machine,mbr):
 
        xs = True
        # Does the machine require a form; and does the user have that form on file.
-       if machine.requires_form and not mbr.form_on_file:
+       if machine.requires_form and not member.form_on_file:
           xs = False
 
        if machine.requires_permit: 
-           ents = Entitlement.objects.filter(permit = machine.requires_permit, holder = mbr)
+           ents = Entitlement.objects.filter(permit = machine.requires_permit, holder = member)
            if ents.count() < 1:
              return out
 
@@ -40,7 +40,7 @@ def matrix_mm(machine,mbr):
                if e.active == False:
                     xs = False
 
-       for tag in Tag.objects.filter(owner = mbr):
+       for tag in Tag.objects.filter(owner = member):
           out['tags'].append(tag.tag)
        
        out['activated'] = xs
@@ -81,6 +81,38 @@ def api_index(request):
     return render(request, 'acl/index.html', context)
 
 @login_required
+def api_index_legacy(request):
+    out = ""
+    for member in User.objects.filter(is_active = True):
+
+        machines = []
+        for machine in Machine.objects.all():
+
+            if machine.requires_form and not member.form_on_file:
+                  continue
+
+            entitlements = Entitlement.objects.filter(holder = member).filter(active = True)
+
+            if machine.requires_permit:
+              entitlements = entitlements.filter(permit = machine.requires_permit)
+              
+            # shoudl we also check the other biz rules - such as permit by permit ?
+            if entitlements.count() <= 0:
+                 continue
+
+            machines.append(machine.name)
+        if not machines:
+            continue
+ 
+        machines_string=  ','.join(machines)
+
+        tags = Tag.objects.filter(owner = member)
+        for tag in tags:
+               out += "{}:{}:{} # {}\n".format(tag.tag, machines_string, member.name(),tag.id)
+
+    return HttpResponse(out,content_type='text/plain')
+
+@login_required
 def machine_overview(request, machine_id = None):
     instructors = []
     machines = Machine.objects.order_by('name')
@@ -97,6 +129,7 @@ def machine_overview(request, machine_id = None):
                     instructors = Entitlement.objects.filter(permit=permit.permit)
             else:
                     instructors = Entitlement.objects.filter(permit=permit)
+            instructors = instructors.order_by('holder__first_name'),
     lst = {}
     for mchn in machines:
        lst[ mchn.name ] = matrix_m(mchn)
@@ -105,7 +138,7 @@ def machine_overview(request, machine_id = None):
        'members': User.objects.order_by('first_name'),
        'machines': machines,
        'lst': lst,
-       'instructors': instructors.order_by('holder__first_name'),
+       'instructors': instructors
     }
     return render(request, 'acl/matrix.html', context)
 

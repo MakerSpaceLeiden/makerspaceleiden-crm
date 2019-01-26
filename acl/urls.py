@@ -17,6 +17,9 @@ urlpatterns = [
     # Convenience page to debug the API
     path('', views.api_index, name='acl-index'),
 
+    # Legacy API
+    path('v2', views.api_index_legacy, name='acl-v2'),
+
     # API oriented
     path('<int:machine_id>', views.api_details, name='details'),
 ]
