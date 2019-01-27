@@ -14,7 +14,7 @@ from .models import Entitlement
 
 #class MachineAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 class MachineAdmin(ImportExportModelAdmin,SimpleHistoryAdmin):
-    list_display = ('name','description','location','requires_instruction','requires_form','requires_permit')
+    list_display = ('name','node_name', 'node_machine_name', 'description','location','requires_instruction','requires_form','requires_permit')
 admin.site.register(Machine,MachineAdmin)
 
 #class LocationAdmin(ImportExportModelAdmin,admin.ModelAdmin):

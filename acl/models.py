@@ -30,8 +30,16 @@ class Location(models.Model):
     def __str__(self):
         return self.name
 
+class NodeField(models.CharField):
+    def get_prep_value(self, value):
+        return str(value).lower()
+
 class Machine(models.Model):
     name = models.CharField(max_length=40, unique=True)
+
+    node_name  = NodeField(max_length=20,blank=True,help_text="Name of the controlling node")
+    node_machine_name = NodeField(max_length=20, blank=True,help_text="Name of device or machine used by the node")
+
     description =  models.CharField(max_length=200,blank=True)
     location = models.ForeignKey(Location,related_name="is_located",on_delete=models.CASCADE, blank=True, null=True)
     requires_instruction = models.BooleanField(default=False)
