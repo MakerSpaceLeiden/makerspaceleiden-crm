@@ -11,11 +11,15 @@ from django.urls import reverse_lazy
 from django import forms
 from django.forms import ModelForm
 from django.core.exceptions import ObjectDoesNotExist
+from ipware import get_client_ip
 
 from members.models import Tag,User
 from .models import Machine,Entitlement,PermitType
 from storage.models import Storage
 from memberbox.models import Memberbox
+
+import logging
+logger = logging.getLogger(__name__)
 
 def matrix_mm(machine,member):
        out = { 'xs' : False, 'instructions_needed' : False, 'tags' : [] }
@@ -80,13 +84,40 @@ def api_index(request):
     }
     return render(request, 'acl/index.html', context)
 
-@login_required
-def api_index_legacy(request):
+def api_index_legacy1(request, secret=None):
+    if not (secret == settings.LV1_SECRET or (request.user and request.user.is_superuser)):
+            return HttpResponse("XS denied",status=403,content_type="text/plain")
+
+    out = ""
+    for member in User.objects.filter(is_active = True):
+        ok = False
+        entitlements = Entitlement.objects.filter(holder = member).filter(active = True).filter(permit = settings.DOORS)
+              
+        if entitlements.count() <= 0:
+                 continue
+
+        tags = Tag.objects.filter(owner = member)
+        for tag in tags:
+            tagstr= '[{}]'.format(', '.join(tag.tag.split('-')))
+            line = "{}:ok:{}".format(tagstr, member.name())
+            if member.email:
+                 line += ":{}".format(member.email)
+            if member.phone_number:
+                 line += " # {}".format(member.phone_number)
+            out += line +"\n"
+
+    return HttpResponse(out,content_type='text/plain')
+
+def api_index_legacy2(request):
+    ip, local = get_client_ip(request, proxy_trusted_ips=('127.0.0.1','::1'))
+    if not (local or (request.user and request.user.is_superuser)):
+            return HttpResponse("XS denied",status=403,content_type="text/plain")
+
     out = ""
     for member in User.objects.filter(is_active = True):
 
         machines = []
-        for machine in Machine.objects.all():
+        for machine in Machine.objects.all().exclude(requires_permit = None).exclude(node_machine_name = None):
 
             if machine.requires_form and not member.form_on_file:
                   continue
@@ -100,11 +131,12 @@ def api_index_legacy(request):
             if entitlements.count() <= 0:
                  continue
 
-            machines.append(machine.name)
+            if machine.node_machine_name:
+                 machines.append(machine.node_machine_name)
         if not machines:
             continue
  
-        machines_string=  ','.join(machines)
+        machines_string=  ','.join(machines).lower()
 
         tags = Tag.objects.filter(owner = member)
         for tag in tags:

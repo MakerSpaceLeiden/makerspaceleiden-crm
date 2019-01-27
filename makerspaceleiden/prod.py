@@ -1,5 +1,5 @@
 FORCE_SCRIPT_NAME='/crm'
-LOGIN_URL = '/crm//admin/login/'
+LOGIN_URL = '/crm/login/'
 LOGIN_REDIRECT_URL = '/crm/'
 LOGOUT_REDIRECT_URL = '/crm/'
 STATIC_URL = '/crm-static/'
@@ -45,14 +45,42 @@ LOGGING = {
                       'backupCount': 10,
                       'formatter': 'standard',
                  },
+                 'console': {
+                      'level': 'DEBUG',
+                      'class': 'logging.StreamHandler',
+                      'formatter': 'standard',
+                 },
             },
             'loggers': {
                   'django': {
+                      'handlers': ['console'],
+                      'propagate': True,
+                  },
+                  'django.server': {
                       'handlers': ['file'],
-                      'level': 'DEBUG',
+                      'propagate': True,
+                  },
+                  'django.request': {
+                      'handlers': ['file'],
+                      'propagate': True,
+                  },
+                  'django.security': {
+                      'handlers': ['file'],
+                      'propagate': True,
+                  },
+                  'django.db': {
+                      'handlers': ['file'],
+                      'propagate': True,
+                  },
+                  'django.template': {
+                      'handlers': ['file'],
                       'propagate': True,
                   },
             },
 }
-
 ALSO_INFORM_EMAIL_ADDRESSES = [ 'deelnemers@mailman.makerspaceleiden.nl' ]
+
+# v1 legacy
+DOORS=3
+LV1_SECRET='hjGFJ36bPEpAJ8cbc9FEBjPna6ax4bR9B5RDMBVQSI'
+
