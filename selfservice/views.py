@@ -106,7 +106,7 @@ def recordinstructions(request):
     member = request.user
 
     # keep the option open to `do bulk adds
-    members = User.objects.exclude(id = member.id) #.order_by('first_name')
+    members = User.objects.filter(is_active = True).exclude(id = member.id) #.order_by('first_name')
 
     # Only show machine we are entitled for ourselves.
     #

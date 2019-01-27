@@ -54,7 +54,7 @@ def matrix_mm(machine,member):
 
 def matrix_m(machine):
     lst = {}
-    for mbr in User.objects.order_by():
+    for mbr in User.objects.filter(is_active = True).order_by():
        lst[ mbr ] = matrix_mm(machine,mbr)
   
     return lst 
@@ -167,7 +167,7 @@ def machine_overview(request, machine_id = None):
        lst[ mchn.name ] = matrix_m(mchn)
 
     context = {
-       'members': User.objects.order_by('first_name'),
+       'members': User.objects.filter(is_active = True).order_by('first_name'),
        'machines': machines,
        'lst': lst,
        'instructors': instructors
@@ -176,7 +176,7 @@ def machine_overview(request, machine_id = None):
 
 @login_required
 def members(request):
-    members = User.objects.order_by('first_name')
+    members = User.objects.filter(is_active = True).order_by('first_name')
 
     context = {
        'title': "Members list",
@@ -239,7 +239,7 @@ def api_details(request,machine_id):
     return render(request, 'acl/details.txt', context, content_type='text/plain')
 
 def missing(tof):
-    holders = User.objects.all().filter(form_on_file = tof).filter(isGivenTo__permit__has_permit__requires_form = True).distinct()
+    holders = User.objects.all().filter(is_active = True).filter(form_on_file = tof).filter(isGivenTo__permit__has_permit__requires_form = True).distinct()
     return holders
 
 @login_required
