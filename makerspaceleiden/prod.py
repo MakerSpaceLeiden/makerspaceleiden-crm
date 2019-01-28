@@ -82,5 +82,6 @@ ALSO_INFORM_EMAIL_ADDRESSES = [ 'deelnemers@mailman.makerspaceleiden.nl' ]
 
 # v1 legacy
 DOORS=3
-LV1_SECRET='hjGFJ36bPEpAJ8cbc9FEBjPna6ax4bR9B5RDMBVQSI'
+with open('/etc/crm_v1_ss.txt') as f:
+        LV1_SECRET= f.read().strip()
 
