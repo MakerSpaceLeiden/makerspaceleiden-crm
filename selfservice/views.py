@@ -29,7 +29,7 @@ from acl.models import Machine,Entitlement,PermitType
 from selfservice.forms import UserForm, SignUpForm
 from .models import WiFiNetwork
 
-def sentEmailVerification(request,user,new_email,ccOrNone = None):
+def sentEmailVerification(request,user,new_email,ccOrNone = None, template='email_verification_email.txt'):
             current_site = get_current_site(request)
             subject = 'Confirm your email adddress ({})'.format(current_site.domain)
             context = {
@@ -41,7 +41,7 @@ def sentEmailVerification(request,user,new_email,ccOrNone = None):
                 'token': email_check_token.make_token(user),
             }
 
-            msg = render_to_string('email_verification_email.txt', context)
+            msg = render_to_string(template, context)
             EmailMessage(subject, msg, to=[user.email], from_email=settings.DEFAULT_FROM_EMAIL).send()
 
             if ccOrNone:
@@ -264,7 +264,7 @@ def signup(request):
             user = form.save()
             email = form.cleaned_data.get('email')
             raw_password = form.cleaned_data.get('password1')
-            return sentEmailVerification(request,user,email,[ settings.TRUSTEES ] )
+            return sentEmailVerification(request,user,email,[ settings.TRUSTEES ],'signup_email.txt' )
 
             user = authenticate(email=email, password=raw_password)
             login(request, user)

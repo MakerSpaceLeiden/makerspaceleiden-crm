@@ -1,0 +1,16 @@
+{% autoescape off %}
+Hi {{ user.first_name }},
+
+Thanks for singing up at the Makerspace Leiden.
+
+Your username will be: 
+	{{ new_email }}
+
+Please click on the link below to confirm email address:
+
+{{ request.scheme  }}://{{ domain }}{% url 'confirm_email' uidb64=uid token=token newemail=user.email %}
+
+One of the Trustees will soon be in touch to arrange to activate the account.
+
+{% endautoescape %}
+
