@@ -2,10 +2,10 @@
 #
 # Requirements
 # gitt
-# Python 3.x
+# Python 3.7
 # Python 3 venv
 # 
-# e.g. apt install python3 python3-venv git
+# e.g. apt install python3.7 python3.7-venv git
 
 # Recent copy of the code:
 #
@@ -14,8 +14,8 @@ git clone https://github.com/dirkx/makerspaceleiden-crm.git
 # Setup virtual environment as conveniet.
 #
 cd makerspaceleiden-crm/
-python3.6 -m venv .
- . bin/activate
+python3.7 -m venv venv
+ . venv/bin/activate
 
 # Install dependencies - default test install asume SQLLite as
 # the db. 
