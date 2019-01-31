@@ -28,6 +28,8 @@ from members.models import Tag,User
 from acl.models import Machine,Entitlement,PermitType
 from selfservice.forms import UserForm, SignUpForm
 from .models import WiFiNetwork
+from .waiverform import generate_waiverform_fd
+
 
 def sentEmailVerification(request,user,new_email,ccOrNone = None, template='email_verification_email.txt'):
             current_site = get_current_site(request)
@@ -209,6 +211,17 @@ def confirmemail(request, uidb64, token, newemail):
 
     # return redirect('userdetails')
     return render(request, 'email_verification_ok.html')
+
+
+@login_required
+def waiverform(request):
+    try:
+        member = request.user
+    except User.DoesNotExist:
+        return HttpResponse("You are probably not a member-- admin perhaps?", status=500, content_type="text/plain")
+    fd = generate_waiverform_fd(f'{member.first_name} {member.last_name}')
+    return HttpResponse(fd.getvalue(), status=200, content_type="application/pdf")
+
 
 @login_required
 def userdetails(request):

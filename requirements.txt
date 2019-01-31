@@ -21,3 +21,6 @@ django-qr-code
 
 # Determine client IP address
 django-ipware
+
+# PDF generation
+reportlab

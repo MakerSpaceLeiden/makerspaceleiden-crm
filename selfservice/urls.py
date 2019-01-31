@@ -11,6 +11,7 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('record_instructions/', views.recordinstructions, name='add_instruction'),
     path('userdetails/', views.userdetails, name='userdetails'),
+    path('waiverform/', views.waiverform, name='waiverform'),
 
     # For the trutee's -- to ease admin
     path('pending/', views.pending, name='pending'),
