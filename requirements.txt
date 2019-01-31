@@ -24,3 +24,4 @@ django-ipware
 
 # PDF generation
 reportlab
+PyPDF2

@@ -19,6 +19,7 @@ from django.utils import six
 from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import EmailMessage
+from django.urls import reverse
 
 from django.conf import settings
 
@@ -28,7 +29,7 @@ from members.models import Tag,User
 from acl.models import Machine,Entitlement,PermitType
 from selfservice.forms import UserForm, SignUpForm
 from .models import WiFiNetwork
-from .waiverform import generate_waiverform_fd
+from .waiverform.waiverform import generate_waiverform_fd
 
 
 def sentEmailVerification(request,user,new_email,ccOrNone = None, template='email_verification_email.txt'):
@@ -218,9 +219,30 @@ def waiverform(request, user_id=None):
     try:
         member = User.objects.get(pk=user_id)
     except ObjectDoesNotExist as e:
-        return HttpResponse("User not found",status=404,content_type="text/plain")
-    fd = generate_waiverform_fd(f'{member.first_name} {member.last_name}')
+        return HttpResponse("User not found", status=404, content_type="text/plain")
+    fd = generate_waiverform_fd(member.id, f'{member.first_name} {member.last_name}', reverse('waiver_confirmation', kwargs=dict(user_id=user_id)))
     return HttpResponse(fd.getvalue(), status=200, content_type="application/pdf")
+
+
+@login_required
+def confirm_waiver(request, user_id=None):
+    try:
+        operator_user = request.user
+    except User.DoesNotExist:
+        return HttpResponse("You are probably not a member-- admin perhaps?", status=400, content_type="text/plain")
+
+    try:
+        member = User.objects.get(pk=user_id)
+    except ObjectDoesNotExist as e:
+        return HttpResponse("User not found", status=404, content_type="text/plain")
+
+    if not operator_user.is_staff:
+        return HttpResponse("You must be staff to confirm a waiver", status=400, content_type="text/plain")
+
+    member.form_on_file = True
+    member.save()
+
+    return render(request, 'waiver_confirmation.html', { 'member': member })
 
 
 @login_required
