@@ -214,11 +214,11 @@ def confirmemail(request, uidb64, token, newemail):
 
 
 @login_required
-def waiverform(request):
+def waiverform(request, user_id=None):
     try:
-        member = request.user
-    except User.DoesNotExist:
-        return HttpResponse("You are probably not a member-- admin perhaps?", status=500, content_type="text/plain")
+        member = User.objects.get(pk=user_id)
+    except ObjectDoesNotExist as e:
+        return HttpResponse("User not found",status=404,content_type="text/plain")
     fd = generate_waiverform_fd(f'{member.first_name} {member.last_name}')
     return HttpResponse(fd.getvalue(), status=200, content_type="application/pdf")
 

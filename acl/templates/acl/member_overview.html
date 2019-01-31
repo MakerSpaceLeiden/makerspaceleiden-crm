@@ -41,7 +41,7 @@
         {%endif %}
         {%endif %}
 	<tr><td align=right>Waiver on file</td><td>
-			{%if member.form_on_file %} yes {% else %} no <a href="{% url 'waiverform' %}" target="_blank">[ Download form ]</a>{% endif %}
+			{%if member.form_on_file %} yes {% else %} no <a href="{% url 'waiverform' user_id=member.id %}" target="_blank">[ Download form ]</a>{% endif %}
 			</td></tr>
 	{%if member == user %}
 			<tr><td></td><td><a href="{% url 'userdetails' %}">[edit]</a></td><td>
