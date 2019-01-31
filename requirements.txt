@@ -18,3 +18,6 @@ django-qr-code
 
 # For production
 # mysqlclient
+
+# Determine client IP address
+django-ipware
