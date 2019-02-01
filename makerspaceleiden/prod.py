@@ -85,3 +85,6 @@ DOORS=3
 with open('/etc/crm_v1_ss.txt') as f:
         LV1_SECRET= f.read().strip()
 
+
+GRAND_AMNESTY = False
+

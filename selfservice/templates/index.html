@@ -23,6 +23,8 @@ There are no wifi network passwords for members at the moment.
 	<li><a href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Categorie:Tool">List of all tools</a> and their documentation.
 <p/>
 	<li><a href="{% url 'overview' member_id=member.id %}">Your data</a>
+	<li><a href="{% url 'userdetails' %}">Update your personal details</a>
+	<li><a href="{% url 'password_change' %}">change your password</a>
 {%if settings.GRAND_AMNESTY %}
 	<li><a href="{% url 'amnesty' %}">Grand amnesty</a>
 {%endif %}
@@ -34,13 +36,8 @@ There are no wifi network passwords for members at the moment.
 <p/>
 <!--	<li><a href="{% url 'members-index' %}">All machines that require instruction</a> -->
 	<li><a href="{% url 'machine_overview' %}">All machines (slow)</a>
-
-	<p/>
-	<li><a href="{% url 'add_instruction' %}">Record instructions you've just given</a>
-	<p/>
-	<li><a href="{% url 'userdetails' %}">Update your personal details</a>
-	<li><a href="{% url 'password_change' %}">change your password</a>
-	<p/>
+	<li><a href="{% url 'add_instruction' %}">Record instructions you've just given</a> on a machine to someone.
+<p/>
 	<li><a href="{% url 'boxes' %}">Members box management</a>
 	<li><a href="{% url 'storage' %}">Storage management</a>
 	<p/>
