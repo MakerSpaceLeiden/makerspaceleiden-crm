@@ -1,3 +1,4 @@
+import os
 from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.encoding import force_bytes, force_text
@@ -30,6 +31,10 @@ from acl.models import Machine,Entitlement,PermitType
 from selfservice.forms import UserForm, SignUpForm
 from .models import WiFiNetwork
 from .waiverform.waiverform import generate_waiverform_fd
+from .aggregator_adapter import AggregatorAdapter
+
+
+aggregator_adapter = AggregatorAdapter(os.environ.get('AGGREGATOR_BASE_URL', 'http://127.0.0.1:5000'), os.environ.get('AGGREGATOR_USERNAME', 'user'), os.environ.get('AGGREGATOR_PASSWORD', 'pass'))
 
 
 def sentEmailVerification(request,user,new_email,ccOrNone = None, template='email_verification_email.txt'):
@@ -244,6 +249,12 @@ def confirm_waiver(request, user_id=None):
     member.save()
 
     return render(request, 'waiver_confirmation.html', { 'member': member })
+
+
+@login_required
+def space_state(request):
+    space_state = aggregator_adapter.fetch_state_space()
+    return render(request, 'space_state.html', space_state)
 
 
 @login_required
