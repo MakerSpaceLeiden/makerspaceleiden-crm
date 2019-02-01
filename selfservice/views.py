@@ -220,7 +220,8 @@ def waiverform(request, user_id=None):
         member = User.objects.get(pk=user_id)
     except ObjectDoesNotExist as e:
         return HttpResponse("User not found", status=404, content_type="text/plain")
-    fd = generate_waiverform_fd(member.id, f'{member.first_name} {member.last_name}', reverse('waiver_confirmation', kwargs=dict(user_id=user_id)))
+    confirmation_url = request.build_absolute_uri(reverse('waiver_confirmation', kwargs=dict(user_id=user_id)))
+    fd = generate_waiverform_fd(member.id, f'{member.first_name} {member.last_name}', confirmation_url)
     return HttpResponse(fd.getvalue(), status=200, content_type="application/pdf")
 
 
