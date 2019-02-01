@@ -10,7 +10,14 @@ https://docs.djangoproject.com/en/2.1/howto/deployment/wsgi/
 import os
 
 from django.core.wsgi import get_wsgi_application
+from selfservice.aggregator_adapter import initialize_aggregator_adapter
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'makerspaceleiden.settings')
 
-application = get_wsgi_application()
+_application = get_wsgi_application()
+
+
+def application(environ, start_response):
+    initialize_aggregator_adapter(environ['AGGREGATOR_BASE_URL'], environ['AGGREGATOR_USERNAME'], environ['AGGREGATOR_PASSWORD'])
+    return _application(environ, start_response)
+
