@@ -18,6 +18,10 @@ _application = get_wsgi_application()
 
 
 def application(environ, start_response):
-    initialize_aggregator_adapter(environ['AGGREGATOR_BASE_URL'], environ['AGGREGATOR_USERNAME'], environ['AGGREGATOR_PASSWORD'])
+    initialize_aggregator_adapter(
+        environ.get('AGGREGATOR_BASE_URL', 'http://127.0.0.1:5000'),
+        environ.get('AGGREGATOR_USERNAME', 'user'),
+        environ.get('AGGREGATOR_PASSWORD', 'pass'),
+    )
     return _application(environ, start_response)
 

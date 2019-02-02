@@ -1,4 +1,5 @@
-import urllib
+import urllib.request
+import base64
 import json
 
 
@@ -10,14 +11,13 @@ handle = {
 class AggregatorAdapter(object):
     def __init__(self, base_url, username, password):
         self.base_url = base_url
-
-        password_mgr = urllib.request.HTTPPasswordMgrWithDefaultRealm()
-        password_mgr.add_password('MSL Aggregator', self.base_url, username, password)
-        handler = urllib.request.HTTPBasicAuthHandler(password_mgr)
-        self.opener = urllib.request.build_opener(handler)
+        credentials = ('%s:%s' % (username, password))
+        self.encoded_credentials = base64.b64encode(credentials.encode('ascii'))
 
     def fetch_state_space(self):
-        return json.loads(self.opener.open(self.base_url + '/space_state').read())
+        req = urllib.request.Request(self.base_url + '/space_state')
+        req.add_header('Authorization', 'Basic %s' % self.encoded_credentials.decode("ascii"))
+        return json.loads(urllib.request.urlopen(req).read())
 
 
 def initialize_aggregator_adapter(base_url, username, password):
