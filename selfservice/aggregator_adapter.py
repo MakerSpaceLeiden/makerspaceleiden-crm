@@ -12,7 +12,7 @@ class AggregatorAdapter(object):
         self.base_url = base_url
 
         password_mgr = urllib.request.HTTPPasswordMgrWithDefaultRealm()
-        password_mgr.add_password(None, self.base_url, username, password)
+        password_mgr.add_password('MSL Aggregator', self.base_url, username, password)
         handler = urllib.request.HTTPBasicAuthHandler(password_mgr)
         self.opener = urllib.request.build_opener(handler)
 
