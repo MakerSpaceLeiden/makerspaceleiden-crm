@@ -16,5 +16,24 @@
     </tbody>
 
   </table>
+
+
+{% if machines_on %}
+<h2>Machines currently in use</h2>
+  <table>
+    <tbody>
+      {% for machine_state in machines_on %}
+      <tr>
+        <td><b>{{ machine_state.machine }}</b></td>
+        <td>{{ machine_state.ts_human }}</i></td>
+        <td><i>{{ machine_state.ts }}</i></td>
+        <td><b><a href="{% url 'overview' member_id=machine_state.user.user_id %}">{{ machine_state.user.full_name }}</a></b></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+
+  </table>
+{% endif %}
+
 {% endblock %}
 
