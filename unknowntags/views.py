@@ -12,19 +12,17 @@ from acl.models import Entitlement,PermitType
 
 from .forms import SelectUserForm, SelectTagForm
 
+from makerspaceleiden.decorators import superuser_or_bearer_required
+
 import logging
 import datetime
 import re
 
 logger = logging.getLogger(__name__)
 
-HEADER='HTTP_X_BEARER'
-
 @csrf_exempt
+@superuser_or_bearer_required
 def unknowntag(request):
-  if not settings.UT_BEARER_SECRET or (not request.user.is_superuser and request.META.get(HEADER) != settings.UT_BEARER_SECRET):
-         return HttpResponse("XS denied",status=403,content_type="text/plain")
-
   if request.POST:
      try:
          tag = request.POST.get("tag")
