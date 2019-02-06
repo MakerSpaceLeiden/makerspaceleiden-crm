@@ -37,6 +37,12 @@ LOGGING = {
                 },
             },
             'handlers': {
+                 'log_to_stdout': {
+                     'level': 'DEBUG',
+                     'class': 'logging.StreamHandler',
+                     'stream': sys.stdout,
+                     },
+                 },
                  'file': {
                       'level': 'INFO',
                       'class': 'logging.handlers.RotatingFileHandler',
@@ -76,6 +82,12 @@ LOGGING = {
                       'handlers': ['file'],
                       'propagate': True,
                   },
+                  'commands': {
+                       'handlers': ['log_to_stdout'],
+                       'level': 'DEBUG',
+                       'propagate': True,
+                       }
+                   }
             },
 }
 ALSO_INFORM_EMAIL_ADDRESSES = [ 'deelnemers@mailman.makerspaceleiden.nl' ]
@@ -85,6 +97,8 @@ DOORS=3
 with open('/etc/crm_v1_ss.txt') as f:
         LV1_SECRET= f.read().strip()
 
+with open('/etc/crm_uk_bearer_secret.txt') as f:
+        UT_BEARER_SECRET = f.read().strip()
 
 GRAND_AMNESTY = False
 
