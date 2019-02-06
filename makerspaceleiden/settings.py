@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'acl.apps.AclConfig',
     'selfservice.apps.SelfserviceConfig',
     'ufo.apps.UfoConfig',
+    'unknowntags.apps.UnknowntagsConfig',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -200,6 +201,9 @@ ALSO_INFORM_EMAIL_ADDRESSES = []
 # to the list gets an extra element highlihgting this; with
 # a ling to what the person also has in store
 STORAGE_HIGHLIGHT_LIMIT = 3
+
+UT_BEARER_SECRET = None
+
 
 try:
     from .local import *
