@@ -26,11 +26,5 @@ class TagForm(ModelForm):
           self.fields['tag'].widget.attrs['readonly'] = True
 
     def clean_tag(self):
-        tag=[]
-        for i in re.compile('[^0-9]+').split(self.cleaned_data['tag'].upper()):
-            if i:
-              try:
-                  tag.append(str(int(i)))
-              except (ValueError, TypeError):
-                  pass
-        return '-'.join(tag)
+        tag = self.cleaned_data['tag']
+        return '-'.join([ b for b in re.compile('[^0-9]+').split(tag.upper()) if b is not None and b is not ''  and int(b) >= 0 and int(b) < 256 ])
