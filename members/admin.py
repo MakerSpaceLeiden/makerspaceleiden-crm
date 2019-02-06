@@ -43,6 +43,7 @@ class UserAdmin(ImportExportModelAdmin, BaseUserAdmin, SimpleHistoryAdmin):
 admin.site.register(User,UserAdmin)
 
 class TagAdmin(ImportExportModelAdmin,SimpleHistoryAdmin):
+    list_display = ('tag', 'owner', 'last_used','description')
     resource_class = TagResource
 
 admin.site.register(Tag,TagAdmin)
