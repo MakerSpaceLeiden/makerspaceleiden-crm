@@ -82,7 +82,7 @@ class User(AbstractUser):
 
 class Tag(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
-    tag = models.CharField(max_length=30) #, editable = False)
+    tag = models.CharField(max_length=30, unique=True) #, editable = False)
     description = models.CharField(max_length=300, blank=True, null=True)
 
     last_used = models.DateTimeField(blank=True, null = True) # , editable = False)
