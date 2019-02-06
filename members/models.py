@@ -85,7 +85,7 @@ class Tag(models.Model):
     tag = models.CharField(max_length=30) #, editable = False)
     description = models.CharField(max_length=300, blank=True, null=True)
 
-    last_used = models.DateField(blank=True, null = True) # , editable = False)
+    last_used = models.DateTimeField(blank=True, null = True) # , editable = False)
 
     history = HistoricalRecords()
 
