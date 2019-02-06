@@ -22,6 +22,7 @@ from qr_code import urls as qr_code_urls
 
 urlpatterns = [
     path('', include('selfservice.urls')),
+    path('', include('unknowntags.urls')),
     path('', include('django.contrib.auth.urls')),
     path('members/', include('members.urls')),
     path('storage/', include('storage.urls')),

@@ -70,6 +70,9 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
 	{% endif %}
 {% if tags %}
 	<tr><td colspan=2><h3>Tags</h3></tr>
+	{%if user.is_superuser or member == user %}
+		<tr><td></td><td><a href="{% url 'addmembertounknowntag' user_id=member.id %}">[ add unknown tags to this user ]</a></td></tr>
+        {% endif %}
         {% for tag in tags %}
 		<tr><td></td><td><a href="{% url 'tag_edit' tag_id=tag.id %}">{{ tag.tag }}</a> {%if tag.description %}<b>{{tag.description}}</b>{% endif %}<br><i>{% if tag.last_used %}Last seen: {{ tag.last_used }}{% else %}not used recently{% endif %}.</i></tr>
 	{% endfor %}
