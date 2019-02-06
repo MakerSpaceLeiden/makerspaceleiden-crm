@@ -14,7 +14,10 @@ from django.core.exceptions import ObjectDoesNotExist
 from ipware import get_client_ip
 
 from members.models import Tag,User
+from members.forms import TagForm
+
 from .models import Machine,Entitlement,PermitType
+
 from storage.models import Storage
 from memberbox.models import Memberbox
 
@@ -260,3 +263,33 @@ def filed_forms(request):
 	'amiss': missing(True)
     }
     return render(request, 'acl/missing.html',context)
+
+@login_required
+def tag_edit(request,tag_id = None):
+    try:
+       tag = Tag.objects.get(pk=tag_id)
+    except ObjectDoesNotExist as e:
+       return HttpResponse("Tag not found",status=404,content_type="text/plain")
+
+    context = {
+        'title': 'Update a tag',
+        'action': 'Update',
+        'item': tag
+        }
+    if request.POST:
+     form = TagForm(request.POST or None, request.FILES, instance = tag, canedittag = request.user.is_superuser)
+     if form.is_valid() and request.POST:
+        try:
+            item = form.save(commit = False)
+            item.changeReason = "Changed by {} via self service portal".format(request.user)
+            item.save()
+        except Exception as e:
+            logger.error("Unexpected error during update of tag: {}".format(e))
+
+        return redirect('overview', member_id=item.owner_id)
+
+    form = TagForm(instance = tag, canedittag = request.user.is_superuser)
+    context['form'] = form
+
+    return render(request, 'acl/crud.html', context)
+

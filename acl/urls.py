@@ -7,6 +7,8 @@ urlpatterns = [
     path('member/<int:member_id>', views.member_overview, name='overview'),
     path('member/', views.members, name='overview'),
 
+    path('tag/<int:tag_id>', views.tag_edit, name='tag_edit'),
+
     path('machine/<int:machine_id>', views.machine_overview, name='machine_overview'),
     path('machine/', views.machine_overview, name='machine_overview'),
 
