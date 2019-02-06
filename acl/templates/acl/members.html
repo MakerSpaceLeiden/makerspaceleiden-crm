@@ -11,7 +11,13 @@
             {% endif%}
         </td>
         <td>
-            <a href="{{ m.path }}">{{ m }}</a>
+            <a href="{{ m.path }}">
+		    {% if m.is_active %}
+		    {{ m }}
+		    {% else %}
+		    <i><s>{{ m }}</s></i> Deactivated.<br>Last record change: {{ m.history.first.history_date }} {{ m.history.first.changeReason }}
+		    {% endif %}
+	    </a>
         </td>
     </tr>
     {% endfor %}

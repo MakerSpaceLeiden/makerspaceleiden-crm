@@ -1,11 +1,16 @@
 {% extends 'base.html' %}
-
 {% load qr_code  %}
-
 {% block content %}
 
 {% if member.image %}
 	<a href="{{ member.image.url }}"><img alt="" src="{{ member.image.medium.url   }}"/></a>
+{% endif %}
+
+{% if not member.is_active %}
+<hr>
+<h1>WARNIG - DEACTIVATED ACCOUNT</h1>
+Last record change: {{ member.history.first.history_date }} {{ member.history.first.changeReason }}
+</hr>
 {% endif %}
 
 {% if lst %}

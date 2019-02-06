@@ -169,8 +169,10 @@ def machine_overview(request, machine_id = None):
     for mchn in machines:
        lst[ mchn.name ] = matrix_m(mchn)
 
+    members =  User.objects.all().filter(is_active = True).order_by('first_name')
+
     context = {
-       'members': User.objects.filter(is_active = True).order_by('first_name'),
+       'members': members,
        'machines': machines,
        'lst': lst,
        'instructors': instructors
@@ -179,7 +181,9 @@ def machine_overview(request, machine_id = None):
 
 @login_required
 def members(request):
-    members = User.objects.filter(is_active = True).order_by('first_name')
+    members = User.objects.order_by('first_name')
+    if not request.user.is_superuser:
+        members = members.filter(is_active = True)
 
     context = {
        'title': "Members list",
@@ -193,6 +197,9 @@ def member_overview(request,member_id = None):
        member = User.objects.get(pk=member_id)
     except ObjectDoesNotExist as e:
        return HttpResponse("User not found",status=404,content_type="text/plain")
+
+    if not member.is_active and not request.user.is_superuser:
+       return HttpResponse("User not found or access denied",status=404,content_type="text/plain")
 
     machines = Machine.objects.order_by()
     boxes = Memberbox.objects.all().filter(owner = member)
