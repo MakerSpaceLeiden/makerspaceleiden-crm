@@ -1,7 +1,11 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>State of the Space</h1>
+<h1>State of the Space
+  {% if space_open %}
+    <span style="color: green; font-weight: bold;">Space is OPEN</span>
+  {% endif %}
+</h1>
 
 <h2>User check-ins</h2>
   <table>
