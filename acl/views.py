@@ -300,3 +300,30 @@ def tag_edit(request,tag_id = None):
 
     return render(request, 'acl/crud.html', context)
 
+def tag_delete(request,tag_id = None):
+    try:
+       tag = Tag.objects.get(pk=tag_id)
+    except ObjectDoesNotExist as e:
+       return HttpResponse("Tag not found",status=404,content_type="text/plain")
+
+    context = {
+        'title': 'Delete a tag -- confirm',
+        'action': 'Yes - really Delete',
+        'item': tag
+        }
+    if request.POST:
+     form = TagForm(request.POST or None, request.FILES, instance = tag, isdelete = True)
+     if form.is_valid() and request.POST:
+        try:
+            item = form.save(commit = False)
+            item.delete()
+        except Exception as e:
+            logger.error("Unexpected error during deleteof tag: {}".format(e))
+
+        return redirect('overview', member_id=item.owner_id)
+
+    form = TagForm(instance = tag, isdelete = True)
+    context['form'] = form
+
+    return render(request, 'acl/crud.html', context)
+

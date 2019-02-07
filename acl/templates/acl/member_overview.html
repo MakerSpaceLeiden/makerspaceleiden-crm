@@ -74,7 +74,12 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
 		<tr><td></td><td><a href="{% url 'addmembertounknowntag' user_id=member.id %}">[ add unknown tags to this user ]</a></td></tr>
         {% endif %}
         {% for tag in tags %}
-		<tr><td></td><td><a href="{% url 'tag_edit' tag_id=tag.id %}">{{ tag.tag }}</a> {%if tag.description %}<b>{{tag.description}}</b>{% endif %}<br><i>{% if tag.last_used %}Last seen: {{ tag.last_used }}{% else %}not used recently{% endif %}.</i></tr>
+		<tr><td></td><td>
+<a href="{% url 'tag_edit' tag_id=tag.id %}">{{ tag.tag }}</a> 
+<a href="{% url 'tag_edit' tag_id=tag.id %}">[edit]</a>
+<a href="{% url 'tag_delete' tag_id=tag.id %}">[delete]</a>
+<br>
+                                  {%if tag.description %}<b>{{tag.description}}</b>{% endif %}<br><i>{% if tag.last_used %}Last seen: {{ tag.last_used }}{% else %}not used recently{% endif %}.</i></tr>
 	{% endfor %}
 	<tr><td></td><td width=400><i>Note: above is only visible to member and the admins. Keep confidential as tags are trivial to clone once you know this number.</i></tr>
 {% endif %}
