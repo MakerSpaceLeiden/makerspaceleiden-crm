@@ -2,15 +2,18 @@ from django.shortcuts import render, redirect
 from django.urls import path
 from django.http import HttpResponse
 from django.conf import settings
+from django.db.models import Q
 
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 
 from .models import Unknowntag
-from members.models import Tag,User
+from members.models import Tag,User,clean_tag_string
 from acl.models import Entitlement,PermitType
 
 from .forms import SelectUserForm, SelectTagForm
+
+from makerspaceleiden.decorators import superuser_or_bearer_required
 
 import logging
 import datetime
@@ -18,26 +21,25 @@ import re
 
 logger = logging.getLogger(__name__)
 
-HEADER='HTTP_X_BEARER'
-
 @csrf_exempt
+@superuser_or_bearer_required
 def unknowntag(request):
-  if not settings.UT_BEARER_SECRET or (not request.user.is_superuser and request.META.get(HEADER) != settings.UT_BEARER_SECRET):
-         return HttpResponse("XS denied",status=403,content_type="text/plain")
-
   if request.POST:
      try:
-         tag = request.POST.get("tag")
-         tag = '-'.join([ b for b in re.compile('[^0-9]+').split(tag.upper()) if b is not None and b is not '' and int(b) >=0 and int(b) < 256])
-         if len(tag) < 4:
-             return HttpResponse("Unhappy",status=500,content_type="text/plain")
-         ut, created = Unknowntag.objects.get_or_create(tag = tag)
-         # ut.save()
+         tagstr = clean_tag_string(request.POST.get("tag"))
+         if not tagstr:
+             return HttpResponse("Unhappy",status=400,content_type="text/plain")
+
+         existing = Tag.objects.all().filter(tag=tagstr)
+         if existing and existing.count() > 0:
+              return HttpResponse("Overwhelmed",status=409,content_type="text/plain")
+
+         ut, created = Unknowntag.objects.get_or_create(tag=tagstr)
          if created:
-              logger.debug("Added tag {} to the unknown tags list.".format(tag))
+              logger.debug("Added tag to the unknown tags list.")
               return HttpResponse("OK",status=200,content_type="text/plain")
 
-         return HttpResponse("Already have that tag",status=500,content_type="text/plain")
+         return HttpResponse("Already have that tag",status=409,content_type="text/plain")
      except Exception as e:
          logger.error("Unexpected error during unknown tag register: {}".format(e))
      return HttpResponse("Unhappy",status=500,content_type="text/plain")
@@ -48,8 +50,15 @@ def unknowntag(request):
 
 @login_required
 def unknowntags(request):
+  days = settings.UT_DAYS_CUTOFF
+  cutoff = datetime.date.today() - datetime.timedelta(days=days)
+
+  items =  Unknowntag.objects.all().filter(Q(last_used__gte = cutoff)).order_by('-last_used')
+
   return render(request, 'unknowntags.html', { 
-               'items': Unknowntag.objects.all().order_by('-last_used'),
+               'items': items,
+		'days': days,
+		'cutoff': cutoff,
 		'user': request.user,
          })
 
@@ -66,7 +75,7 @@ def addmembertounknowntag(request, user_id = None):
              user = User.objects.get(pk=user_id)
              tag = form.cleaned_data.get('tag')
         except:
-             return HttpResponse("Unknown tag or user gone awol. Drat.",status=500,content_type="text/plain")
+             return HttpResponse("Unknown tag or user gone awol. Drat.",status=404,content_type="text/plain")
 
         return link_tag_user(request,form,tag,user)
 

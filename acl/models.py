@@ -6,6 +6,10 @@ from django.urls import reverse
 
 from members.models import User
 
+import logging
+logger = logging.getLogger(__name__)
+
+
 class PermitType(models.Model):
     name = models.CharField(max_length=40, unique=True)
     description =  models.CharField(max_length=200)
@@ -80,6 +84,34 @@ class Entitlement(models.Model):
 
     class EntitlementViolation(Exception):
         pass
+    class DoubleEntitlemenException(Exception):
+        pass
+
+    # Special sort of create/get - where we ignore the issuer when looking for it.
+    # but add it in if we're creating it for the first time.
+    # Not sure if this is a good idea. Proly not. The other option
+    # would be to split entitelemtns into an entitelent and 1:N 
+    # endorsements.
+    #
+    # I guess we could also trap this in the one or two places wheer
+    # we create an Entitlement.
+    #
+    def get_or_create(self, **kwargs):
+        if 'permit' in kwargs and 'holder' in kwargs:
+            e = Entitelent.objects.all().filter(permit = kwars['permit']).filter(holder = kwargs['holder'])
+
+            if e and e.count() >= 1:
+               if e.count() > 1:
+                  logger.critical("IntigrityAlert: more than 1 entitlement for {}.{}".format(kwars['permit'],kwargs['holder']))
+                  # raise DoubleEntitlemenException("Two or more indentical entitlements found. Blocking creation of a third")
+
+               existing = e[0]
+               for k,v in kwargs:
+                   existing[k] = kwargs[v] 
+               logger.debug("Entity - trapped double create attempt: {}", existing)
+               return existing, False
+
+        return super(Entitlement, self).get_or_create(*args, **kwargs)
 
     def save(self, *args, **kwargs):
         # rely on the contraints to bomb out if there is nothing in kwargs and self. and self.
@@ -108,5 +140,7 @@ class Entitlement(models.Model):
         if not self.active and self.permit.permit:
             print("Should we send an email to notify Super users ?")
 
+        # should we check for duplicates here too ?
+        #
         return super(Entitlement, self).save(*args, **kwargs)
 

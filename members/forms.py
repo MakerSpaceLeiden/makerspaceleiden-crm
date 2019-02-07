@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import Tag
+from .models import Tag, clean_tag_string
 from django.forms import ModelForm
 import re
 
@@ -26,5 +26,4 @@ class TagForm(ModelForm):
           self.fields['tag'].widget.attrs['readonly'] = True
 
     def clean_tag(self):
-        tag = self.cleaned_data['tag']
-        return '-'.join([ b for b in re.compile('[^0-9]+').split(tag.upper()) if b is not None and b is not ''  and int(b) >= 0 and int(b) < 256 ])
+        return clean_tag_string(self.cleaned_data['tag'])

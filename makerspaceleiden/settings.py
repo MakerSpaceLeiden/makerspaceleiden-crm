@@ -204,6 +204,10 @@ STORAGE_HIGHLIGHT_LIMIT = 3
 
 UT_BEARER_SECRET = None
 
+# Only show the past 7 days of unknown tags. And up to 10.
+#
+UT_DAYS_CUTOFF = 7
+UT_COUNT_CUTOFF = 10
 
 try:
     from .local import *
