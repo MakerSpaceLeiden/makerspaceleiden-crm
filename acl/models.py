@@ -60,6 +60,34 @@ class Machine(models.Model):
     def __str__(self):
         return self.name
 
+# Special sort of create/get - where we ignore the issuer when looking for it.
+# but add it in if we're creating it for the first time.
+# Not sure if this is a good idea. Proly not. The other option
+# would be to split entitelemtns into an entitelent and 1:N 
+# endorsements.
+#
+# I guess we could also trap this in the one or two places wheer
+# we create an Entitlement.
+#
+class EntitlementManager(models.Manager):
+   def get_or_create(self, *args,**kwargs):
+        if 'permit' in kwargs and 'holder' in kwargs:
+            e = Entitlement.objects.all().filter(permit = kwargs.get('permit')).filter(holder = kwargs.get('holder'))
+
+            if e and e.count() >= 1:
+               existing = e[0]
+
+               if e.count() > 1:
+                  logger.critical("IntigrityAlert: {} identical entitlement for {}.{}".format(e.count(),kwargs.get('permit'),kwargs.get('holder')))
+                  # raise DoubleEntitlemenException("Two or more indentical entitlements found. Blocking creation of a third")
+               else:
+                  logger.debug("Entity - trapped double create attempt: {}", existing)
+
+               for k,v in kwargs.items():
+                   setattr(existing,k,v)
+               return existing, False
+        return super(EntitlementManager, self).get_or_create(*args, **kwargs)
+
 class Entitlement(models.Model):
     active = models.BooleanField( default=False,)
     permit = models.ForeignKey(
@@ -78,6 +106,7 @@ class Entitlement(models.Model):
         related_name='isIssuedBy',
     )
     history = HistoricalRecords()
+    objects = EntitlementManager()
 
     def __str__(self):
         return str(self.holder) + '@' + self.permit.name +'(Active:'+str(self.active)+')'
@@ -87,31 +116,6 @@ class Entitlement(models.Model):
     class DoubleEntitlemenException(Exception):
         pass
 
-    # Special sort of create/get - where we ignore the issuer when looking for it.
-    # but add it in if we're creating it for the first time.
-    # Not sure if this is a good idea. Proly not. The other option
-    # would be to split entitelemtns into an entitelent and 1:N 
-    # endorsements.
-    #
-    # I guess we could also trap this in the one or two places wheer
-    # we create an Entitlement.
-    #
-    def get_or_create(self, **kwargs):
-        if 'permit' in kwargs and 'holder' in kwargs:
-            e = Entitelent.objects.all().filter(permit = kwars['permit']).filter(holder = kwargs['holder'])
-
-            if e and e.count() >= 1:
-               if e.count() > 1:
-                  logger.critical("IntigrityAlert: more than 1 entitlement for {}.{}".format(kwars['permit'],kwargs['holder']))
-                  # raise DoubleEntitlemenException("Two or more indentical entitlements found. Blocking creation of a third")
-
-               existing = e[0]
-               for k,v in kwargs:
-                   existing[k] = kwargs[v] 
-               logger.debug("Entity - trapped double create attempt: {}", existing)
-               return existing, False
-
-        return super(Entitlement, self).get_or_create(*args, **kwargs)
 
     def save(self, *args, **kwargs):
         # rely on the contraints to bomb out if there is nothing in kwargs and self. and self.
