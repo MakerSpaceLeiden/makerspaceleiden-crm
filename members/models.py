@@ -13,6 +13,7 @@ from stdimage.utils import pre_delete_delete_callback, pre_save_delete_callback
 
 from makerspaceleiden.utils import upload_to_pattern
 
+import re
 
 class UserManager(BaseUserManager):
     """Define a model manager for User model with no username field."""
@@ -92,6 +93,14 @@ class Tag(models.Model):
     def __str__(self):
         return self.tag + ' (' + str(self.owner) + ')'
 
+def clean_tag_string(tag):
+    try:
+       return  '-'.join([ b for b in re.compile('[^0-9]+').split(tag.upper()) 
+           if b is not None and b is not '' and int(b) >=0 and int(b) < 256])
+    except ValueError as e:
+       pass
+
+    return None
 
 # Handle image cleanup.
 pre_delete.connect(pre_delete_delete_callback, sender=User)
