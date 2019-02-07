@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.urls import path
 from django.http import HttpResponse
 from django.conf import settings
+from django.db.models import Q
 
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
@@ -49,8 +50,15 @@ def unknowntag(request):
 
 @login_required
 def unknowntags(request):
+  days = settings.UT_DAYS_CUTOFF
+  cutoff = datetime.date.today() - datetime.timedelta(days=days)
+
+  items =  Unknowntag.objects.all().filter(Q(last_used__gte = cutoff)).order_by('-last_used')
+
   return render(request, 'unknowntags.html', { 
-               'items': Unknowntag.objects.all().order_by('-last_used'),
+               'items': items,
+		'days': days,
+		'cutoff': cutoff,
 		'user': request.user,
          })
 

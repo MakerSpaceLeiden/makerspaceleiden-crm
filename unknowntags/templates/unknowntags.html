@@ -3,7 +3,8 @@
 {% block content %}
 
 {% if items %}
-Unknown tags recently swiped:
+Unknown tags swiped in the past {{ days }} days:
+<p>
 <table>
 <tr><th>id</th><th>tag</th><th>last used </th></td>
 {% for item in items %}
@@ -12,7 +13,7 @@ Unknown tags recently swiped:
   <td>{{ item.tag }}</td>
   <td>{{ item.last_used }} </td>
 {% if user.is_superuser %}
-  <td><a href="{% url 'addunknowntagtomember' tag_id=item.id %}">[assing to a member]</a></td>
+  <td><a href="{% url 'addunknowntagtomember' tag_id=item.id %}">[assign to a member]</a></td>
 {% endif %}
 </tr>
 {% endfor %}

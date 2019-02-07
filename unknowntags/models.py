@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 import datetime
 
@@ -7,8 +8,8 @@ class Unknowntag(models.Model):
 
    def save(self, * args, ** kwargs):
       r = super(Unknowntag,self).save(*args, **kwargs)
-      
-      stale_tags = Unknowntag.objects.all().order_by('-last_used')[10:]
+
+      stale_tags = Unknowntag.objects.all().order_by('-last_used')[settings.UT_COUNT_CUTOFF:]
 
       for stale_tag in stale_tags:
           stale_tag.delete()

@@ -95,8 +95,12 @@ class Tag(models.Model):
 
 def clean_tag_string(tag):
     try:
-       return  '-'.join([ b for b in re.compile('[^0-9]+').split(tag.upper()) 
-           if b is not None and b is not '' and int(b) >=0 and int(b) < 256])
+       bts = [ b for b in re.compile('[^0-9]+').split(tag.upper()) 
+                   if b is not None and b is not '' and int(b) >=0 and int(b) < 256]
+       if len(bts) < 3:
+           return None
+       return '-'.join(bts)
+
     except ValueError as e:
        pass
 
