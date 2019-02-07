@@ -28,6 +28,8 @@ DATABASES = {
 
 EMAIL_BACKEND = 'django_sendmail_backend.backends.EmailBackend'
 
+import sys
+
 LOGGING = {
             'version': 1,
             'disable_existing_loggers': False,
@@ -35,14 +37,12 @@ LOGGING = {
                 'standard': {
                         'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
                 },
-            },
             'handlers': {
                  'log_to_stdout': {
                      'level': 'DEBUG',
                      'class': 'logging.StreamHandler',
                      'stream': sys.stdout,
                      },
-                 },
                  'file': {
                       'level': 'INFO',
                       'class': 'logging.handlers.RotatingFileHandler',
