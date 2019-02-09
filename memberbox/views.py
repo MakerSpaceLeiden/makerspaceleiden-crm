@@ -90,7 +90,9 @@ def modify(request,pk):
        except Exception as e:
          logger.error("Unexpected error during save of box: {0}".format(e))
     else:
-     form = MemberboxForm(request.POST or None, instance = box)
+       if not box.owner:
+           box.owner = request.user
+       form = MemberboxForm(request.POST or None, instance = box)
 
     context = {
         'label': 'Update box location and details',

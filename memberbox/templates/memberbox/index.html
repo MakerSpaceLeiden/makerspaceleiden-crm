@@ -85,7 +85,7 @@ The contents of the two main member cabinets along the long wall (on your left a
 		  {% if item.box.owner %}
                   	<a href="{{ item.box.owner.path }}"><b>{{ item.box.owner.first_name }}</b></a>
 		  {% else %}
-		  	<i>unk</i>
+			  <i><a href="{% url 'changebox' pk=item.box.id %}">[unk]</a></i>
 		  {% endif %}
 			    <div class="showhover">
 		  {% if item.box.owner %}

@@ -15,7 +15,7 @@ class NewMemberboxForm(ModelForm):
 class MemberboxForm(ModelForm):
     class Meta:
        model = Memberbox
-       fields = [ 'image', 'location', 'extra_info' ]
+       fields = [ 'image', 'location', 'extra_info', 'owner' ]
 
     # Try to keep the boxes in the cupboard all in uppercase
     # and let other things be whatever they got entered as.
