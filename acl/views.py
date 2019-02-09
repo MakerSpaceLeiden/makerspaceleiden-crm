@@ -186,8 +186,9 @@ def members(request):
         members = members.filter(is_active = True)
 
     context = {
-       'title': f"{len(members)} Members",
-       'members': members,
+        'title': "Members list",
+        'members': members,
+        'num_members': len(members),
     }
     return render(request, 'acl/members.html', context)
 
