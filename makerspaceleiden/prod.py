@@ -37,6 +37,7 @@ LOGGING = {
                 'standard': {
                         'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
                 },
+            },
             'handlers': {
                  'log_to_stdout': {
                      'level': 'DEBUG',
@@ -83,11 +84,10 @@ LOGGING = {
                       'propagate': True,
                   },
                   'commands': {
-                       'handlers': ['log_to_stdout'],
+                      'handlers': ['log_to_stdout'],
                        'level': 'DEBUG',
                        'propagate': True,
-                       }
-                   }
+                   },
             },
 }
 ALSO_INFORM_EMAIL_ADDRESSES = [ 'deelnemers@mailman.makerspaceleiden.nl' ]
