@@ -37,7 +37,7 @@ def matrix_mm(machine,member):
        if machine.requires_form and not member.form_on_file:
           xs = False
 
-       if machine.requires_permit: 
+       if machine.requires_permit:
            ents = Entitlement.objects.filter(permit = machine.requires_permit, holder = member)
            if ents.count() < 1:
              return out
@@ -49,18 +49,18 @@ def matrix_mm(machine,member):
 
        for tag in Tag.objects.filter(owner = member):
           out['tags'].append(tag.tag)
-       
+
        out['activated'] = xs
        out['xs'] = xs
 
-       return out 
+       return out
 
 def matrix_m(machine):
     lst = {}
     for mbr in User.objects.filter(is_active = True).order_by():
        lst[ mbr ] = matrix_mm(machine,mbr)
-  
-    return lst 
+
+    return lst
 
 @login_required
 def api_index(request):
@@ -95,7 +95,7 @@ def api_index_legacy1(request, secret=None):
     for member in User.objects.filter(is_active = True):
         ok = False
         entitlements = Entitlement.objects.filter(holder = member).filter(active = True).filter(permit = settings.DOORS)
-              
+
         if entitlements.count() <= 0:
                  continue
 
@@ -129,7 +129,7 @@ def api_index_legacy2(request):
 
             if machine.requires_permit:
               entitlements = entitlements.filter(permit = machine.requires_permit)
-              
+
             # shoudl we also check the other biz rules - such as permit by permit ?
             if entitlements.count() <= 0:
                  continue
@@ -138,7 +138,7 @@ def api_index_legacy2(request):
                  machines.append(machine.node_machine_name)
         if not machines:
             continue
- 
+
         machines_string=  ','.join(machines).lower()
 
         tags = Tag.objects.filter(owner = member)
@@ -186,7 +186,7 @@ def members(request):
         members = members.filter(is_active = True)
 
     context = {
-       'title': "Members list",
+       'title': f"{len(members)} Members",
        'members': members,
     }
     return render(request, 'acl/members.html', context)
