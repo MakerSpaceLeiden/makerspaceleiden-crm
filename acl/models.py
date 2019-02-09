@@ -116,7 +116,6 @@ class Entitlement(models.Model):
     class DoubleEntitlemenException(Exception):
         pass
 
-
     def save(self, *args, **kwargs):
         # rely on the contraints to bomb out if there is nothing in kwargs and self. and self.
         #

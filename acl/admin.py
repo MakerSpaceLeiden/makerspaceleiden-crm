@@ -3,6 +3,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from import_export.admin import ImportExportModelAdmin
 from simple_history.admin import SimpleHistoryAdmin
 from import_export import resources
+from django.conf import settings
 
 from django.utils.translation import ugettext_lazy as _
 
@@ -32,6 +33,19 @@ class EntitlementResource(resources.ModelResource):
 class EntitlementAdmin(ImportExportModelAdmin,SimpleHistoryAdmin):
     list_display = ('permit','holder','issuer')
     resource_class = EntitlementResource
+
+    def get_changeform_initial_data(self, request):
+        defaults = {'active': True, 'issuer': request.user, 'permit': settings.DOORS }
+
+        # See if there is a user which does not yet have a door permit; and the the
+        # one with the highest user id.
+        #
+        nodoors = User.objects.all().exclude(isGivenTo__permit  = settings.DOORS).order_by('-id')
+        if nodoors:
+           defaults['holder'] = nodoors[0]
+
+        return defaults
+
 admin.site.register(Entitlement,EntitlementAdmin)
 
 class PermitAdmin(ImportExportModelAdmin,SimpleHistoryAdmin):
