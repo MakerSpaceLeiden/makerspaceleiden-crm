@@ -247,6 +247,27 @@ def confirm_waiver(request, user_id=None):
 
     return render(request, 'waiver_confirmation.html', { 'member': member })
 
+@login_required
+def telegram_connect(request):
+    try:
+        user = request.user
+    except User.DoesNotExist:
+        return HttpResponse("You are probably not a member-- admin perhaps?", status=400, content_type="text/plain")
+
+    try:
+        User.objects.get(pk=user.id)
+    except ObjectDoesNotExist as e:
+        return HttpResponse("User not found", status=404, content_type="text/plain")
+
+    aggregator_adapter = get_aggregator_adapter()
+    if not aggregator_adapter:
+        return HttpResponse("No aggregator configuration found", status=500, content_type="text/plain")
+
+    token = aggregator_adapter.generate_telegram_connect_token(user.id)
+    return render(request, 'telegram_connect.html', {
+        'title': 'Telegram BOT',
+        'token': token,
+    })
 
 @login_required
 def space_state(request):

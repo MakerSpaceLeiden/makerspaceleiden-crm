@@ -14,6 +14,9 @@ urlpatterns = [
     path('waiver/<int:user_id>/form', views.waiverform, name='waiverform'),
     path('waiver/<int:user_id>/confirm', views.confirm_waiver, name='waiver_confirmation'),
 
+    # Telegram BOT
+    path('telegram/connect', views.telegram_connect, name='telegram_connect'),
+
     path('space_state', views.space_state, name='space_state'),
 
     # For the trutee's -- to ease admin

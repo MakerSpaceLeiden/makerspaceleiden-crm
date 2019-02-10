@@ -31,10 +31,12 @@
     <tbody>
       {% for machine_state in machines_on %}
       <tr>
-          <td><b><a href="{% url 'machine_overview' machine_id=machine_state.machine.machine_id %}">{{ machine_state.machine.name }}</a></b></td>
+        <td><b><a href="{% url 'machine_overview' machine_id=machine_state.machine.machine_id %}">{{ machine_state.machine.name }}</a></b></td>
         <td>{{ machine_state.ts_human }}</i></td>
         <td><i>{{ machine_state.ts }}</i></td>
-        <td><b><a href="{% url 'overview' member_id=machine_state.user.user_id %}">{{ machine_state.user.full_name }}</a></b></td>
+        <td>
+          <b><a href="{% url 'overview' member_id=machine_state.user.user_id %}">{{ machine_state.user.full_name }}</a></b>
+        </td>
       </tr>
       {% endfor %}
     </tbody>
