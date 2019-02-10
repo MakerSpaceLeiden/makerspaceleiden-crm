@@ -47,6 +47,7 @@ def newmember(request):
         if form.is_valid():
           try:
              email = form.cleaned_data.get('email')
+             tag = form.cleaned_data.get('tag')
              newmember = User.objects.create_user(
                  email = email,
                  first_name = form.cleaned_data.get('first_name'),
@@ -70,7 +71,11 @@ def newmember(request):
              # Wire up the tag if one was provided.
 
              if form.cleaned_data.get('tag'):
-                form.clean_data.get('tag').reassing_to_user(newmember, request.user, activate = form.cleaned_data.get('activate_doors'))
+                tag.reassing_to_user(
+                        newmember, 
+                        request.user, 
+                        activate = form.cleaned_data.get('activate_doors')
+                )
 
              # Send welcome email.
              form = PasswordResetForm({'email': newmember.email})
@@ -100,8 +105,4 @@ def newmember(request):
     return render(request, 'members/newmember.html', context)
 
   
-
-
-
-
 

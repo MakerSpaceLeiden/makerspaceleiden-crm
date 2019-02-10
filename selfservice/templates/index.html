@@ -42,6 +42,8 @@ There are no wifi network passwords for members at the moment.
 	<li><a href="{% url 'storage' %}">Storage management</a>
 	<p/>
 {%if user.is_staff %}
+	<li><a href="{% url 'newmember' %}">Add a NEW member</a>
+	<p/>
 	<li><a href="{% url 'pending' %}">Instructions pending approval trustee</a>
 	<li><a href="{% url 'missing_forms' %}">Missing forms</a>
 	<li><a href="{% url 'filed_forms' %}">Filed forms</a>

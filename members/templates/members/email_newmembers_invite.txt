@@ -3,10 +3,7 @@ Dear {{ user.first_name }},
 
 Welcome to the Makerspace Leiden !
 
-1)	If you've not set up a standing payment (automatische overschrijving) for
-	your monthly donation - please do so.
-
-2)	Next - set a password on your account in our system; so you get
+1)	Next - set a password on your account in our system; so you get
 	access to the Wifi and so on.
 
 	Your username will be your email address ({{ user.get_username }}). 
@@ -20,7 +17,7 @@ Welcome to the Makerspace Leiden !
 
 	If that fails too - contact 'noc@makerspaceleiden.nl' for help.
 
-3)	Once you are logged in; go to
+2)	Once you are logged in; go to
 
 	{{ protocol }}://{{ domain }}{% url 'index' %}
 
@@ -65,6 +62,19 @@ Welcome to the Makerspace Leiden !
 	usually empty boxes spare; or bring your own box that fits. If there is
 	no space -- ask for assistance on the deelnemers@ list - we can usually
 	liberate space with ease.
+
+8)	We generally have an open-house on the first monday of the month. That
+	always needs help.
+
+	We have a `ask anyone anything' evening every Tuesday evening from about
+	19:00. Here you can get help with a new machine; meet other people and
+	sometimes someone will show how to use a new machine or a trick
+	recently discovered.
+
+	Finally - at times you will see calls to action on the deelnemens@
+	mailing list. E.g. for the large cleanups, or some project to improve
+	something at the space. This is usually a good time to get to meet
+	the other members.
 
 If you have any trouble getting any of this to work - simply reply to this email; or contact
 the trustees at hetbestuur@makerspaceleiden.nl
