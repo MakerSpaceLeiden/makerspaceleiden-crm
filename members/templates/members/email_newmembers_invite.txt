@@ -1,0 +1,77 @@
+{% autoescape off %}
+Dear {{ user.first_name }},
+
+Welcome to the Makerspace Leiden !
+
+1)	If you've not set up a standing payment (automatische overschrijving) for
+	your monthly donation - please do so.
+
+2)	Next - set a password on your account in our system; so you get
+	access to the Wifi and so on.
+
+	Your username will be your email address ({{ user.get_username }}). 
+
+	Click on the link below to set your password:
+
+	{{ protocol }}://{{ domain }}{% url 'password_reset_confirm' uidb64=uid token=token %}
+
+	If clicking the link above doesn't work, please copy and paste the URL in a new 
+	browser window instead. 
+
+	If that fails too - contact 'noc@makerspaceleiden.nl' for help.
+
+3)	Once you are logged in; go to
+
+	{{ protocol }}://{{ domain }}{% url 'index' %}
+
+	and navigate to 'your data'. Double check the spelling of your name
+	and other details.
+
+	Consider uploading a picture - to help people know you.
+
+3)	You will also have been subscribed to two mailing lists; `deelnemeners'
+        and `spacelog'. 
+
+	The first, `deelnemers' is used for all communication between participants.
+	For example when someone wants help (or instrucition) with a machine.
+
+ 	It can be high volume at times - so you may want to use a filter in your
+	mailtool to send it to a certain folder; or follow the link under each
+	email to switch to `digest' -- where the flow is reduced to just one email
+	per day with a summary.
+
+4)	Next you will want to go to the wiki  {{ protocol }}://{{ domain }} --> Wiki.
+
+	Here - read at the very least the first page; and in particular the 'Safety and 
+ 	Noise' section and the 'Procedures and Principles'. Safety is not optional.
+
+	And some machines absolutely require mandatory instruction.
+
+5)	If you want to use category 1 and 2 machines (the two most dangerous classes,
+ 	these include the large three phase powered woodworking machines) - then 
+	be sure to ask & arrange for instrucitons on the deelnemers@ mailing list. 
+
+	And also go to {{ protocol }}://{{ domain }}{% url 'index' %},
+	navigate to `your data'; sign and print out the waiver form and
+	(hand) deliver it to the address on the form.
+
+6)	Most people write a short introduction email to deelnemers@ (see
+	the archive -- link at the bottom of each deelnemers@ email
+	if you are curious as to what others wrote).
+
+7)	It is likely that you will want to claim some storage space; a 'box'. On
+	the page  {{ protocol }}://{{ domain }}{% url 'index' %} -> Members
+	Box Management - you can check if there is still an empty slot. There are
+	usually empty boxes spare; or bring your own box that fits. If there is
+	no space -- ask for assistance on the deelnemers@ list - we can usually
+	liberate space with ease.
+
+If you have any trouble getting any of this to work - simply reply to this email; or contact
+the trustees at hetbestuur@makerspaceleiden.nl
+
+Have fun making !
+
+Your friendly makerbot.
+
+{% endautoescape %}
+

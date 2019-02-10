@@ -2,6 +2,10 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from .models import Tag, clean_tag_string
 from django.forms import ModelForm
+
+from members.models import User
+from unknowntags.models import Unknowntag
+
 import re
 
 class NewTagForm(ModelForm):
@@ -45,6 +49,15 @@ class TagForm(ModelForm):
           for k,f in self.fields.items():
                 f.help_text = '(not editable during a delete)'
 
-
     def clean_tag(self):
         return clean_tag_string(self.cleaned_data['tag'])
+
+class NewUserForm(forms.Form):
+    first_name = forms.CharField(max_length=User._meta.get_field('first_name').max_length)
+    last_name = forms.CharField(max_length=User._meta.get_field('last_name').max_length)
+    email = forms.EmailField()
+    phone_number = forms.CharField(max_length=User._meta.get_field('phone_number').max_length, 
+	required=False, help_text="Optional; only visible to the trustees and board delegated administrators")
+    tag = forms.ModelChoiceField(queryset=Unknowntag.objects.all(), required = False, help_text="Optional. Leave blank to add later.")
+    activate_doors = forms.BooleanField(initial = True, help_text='Also give this user door permits if they did not have it yet. Only applicable if above tag is specified.') 
+

@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>{{ label }}</h2>
+
+  Process:
+  <ol>
+    <li>	Fill out this form.
+    <li> 	The membner gets an invite email - asking him or her to set a password.
+    <li>	Already adding a tag now is <i>optional</i>.
+    <li>	Once set - the account is automatically activated as a paying member. 
+    <li>	The trusteeds get a message about this (and we may do the mailing list invite automatically later on).
+    <li>	A trustee can then couple a unknown-card form the list to this member if not done in step 3.
+  </ol>
+  <form method="post"  enctype="multipart/form-data">
+  <table>
+    {% csrf_token %}
+    {{ form.as_table }}
+    <tr><td></td><td><button type="submit">{{ action }}</button></td></tr>
+  </table>
+  </form>
+  </p>
+
+<hr>
+<p>
+<a href="{% url "index" %}">back</a> to the main page.
+<p>
+
+{% endblock %}
