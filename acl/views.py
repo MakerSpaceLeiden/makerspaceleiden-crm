@@ -11,9 +11,15 @@ from django.urls import reverse_lazy
 from django import forms
 from django.forms import ModelForm
 from django.core.exceptions import ObjectDoesNotExist
+
+from django.views.decorators.csrf import csrf_exempt
+from makerspaceleiden.decorators import superuser_or_bearer_required
+
+import json
+from django.http import JsonResponse
 from ipware import get_client_ip
 
-from members.models import Tag,User
+from members.models import Tag,User, clean_tag_string
 from members.forms import TagForm
 
 from .models import Machine,Entitlement,PermitType
@@ -86,30 +92,6 @@ def api_index(request):
 	'freeforall': ffa,
     }
     return render(request, 'acl/index.html', context)
-
-def api_index_legacy1(request, secret=None):
-    if not (secret == settings.LV1_SECRET or (request.user and request.user.is_superuser)):
-            return HttpResponse("XS denied",status=403,content_type="text/plain")
-
-    out = ""
-    for member in User.objects.filter(is_active = True):
-        ok = False
-        entitlements = Entitlement.objects.filter(holder = member).filter(active = True).filter(permit = settings.DOORS)
-
-        if entitlements.count() <= 0:
-                 continue
-
-        tags = Tag.objects.filter(owner = member)
-        for tag in tags:
-            tagstr= '[{}]'.format(', '.join(tag.tag.split('-')))
-            line = "{}:ok:{}".format(tagstr, member.name())
-            if member.email:
-                 line += ":{}".format(member.email)
-            if member.phone_number:
-                 line += " # {}".format(member.phone_number)
-            out += line +"\n"
-
-    return HttpResponse(out,content_type='text/plain')
 
 def api_index_legacy2(request):
     ip, local = get_client_ip(request, proxy_trusted_ips=('127.0.0.1','::1'))
@@ -327,4 +309,73 @@ def tag_delete(request,tag_id = None):
     context['form'] = form
 
     return render(request, 'acl/crud.html', context)
+
+def userdetails(owner):
+    return {
+            'user': True,
+            'name': str(owner),
+            'first_name': owner.first_name,
+            'last_name': owner.last_name,
+            'email': owner.email,
+    }
+
+
+@csrf_exempt
+@superuser_or_bearer_required
+def api_gettaginfo(request):
+  if request.POST:
+    tagstr = clean_tag_string(request.POST.get("tag"))
+
+    if not tagstr:
+            return HttpResponse("No valid tag",status=400,content_type="text/plain")
+
+    try:
+         tag = Tag.objects.get(tag = tagstr)
+         owner = tag.owner
+    except ObjectDoesNotExist as e:
+         return HttpResponse("Tag/Owner not found",status=404,content_type="text/plain")
+
+    out = userdetails(owner)
+    if tag.description:
+       out['tag'] = tag.description
+    out['seenBefore'] = True
+    return JsonResponse(out)
+
+  return JsonResponse({})
+
+@csrf_exempt
+@superuser_or_bearer_required
+def api_getok(request, machine = None):
+  if request.POST:
+    tagstr = clean_tag_string(request.POST.get("tag"))
+
+    if not tagstr:
+            return HttpResponse("No valid tag",status=400,content_type="text/plain")
+
+    try:
+         machine = Machine.objects.get(node_machine_name = machine)
+    except ObjectDoesNotExist as e:
+         return HttpResponse("Machine not found",status=404,content_type="text/plain")
+    try:
+         tag = Tag.objects.get(tag = tagstr)
+    except ObjectDoesNotExist as e:
+         return HttpResponse("Tag/Owner not found",status=404,content_type="text/plain")
+
+    owner = tag.owner
+
+    ok = matrix_mm(machine, owner)
+
+    out = userdetails(owner)
+    if tag.description:
+      out['tag'] = tag.description
+
+    out['requires_instruction'] = machine.requires_instruction
+    out['requires_permit'] = str(machine.requires_permit)
+    out['requires_form'] = machine.requires_form
+    out['machine'] = str(machine)
+    out['access'] = ok['xs']
+
+    return JsonResponse(out)
+
+  return JsonResponse({})
 
