@@ -1,12 +1,13 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>State of the Space -
+<h1>State of the Space 
   {% if space_open %}
-    <span style="color: green; font-weight: bold;">Space is OPEN</span>
+    <span style="color: green; font-weight: bold;">- Space is OPEN</span>
   {% endif %}
 </h1>
 
+{% if users_in_space %}
 <h2>User check-ins</h2>
   <table>
     <tbody>
@@ -18,8 +19,10 @@
       </tr>
       {% endfor %}
     </tbody>
-
   </table>
+{% else %}
+<i>not seen anyone recently</i>
+{% endif %}
 
 
 {% if machines_on %}
