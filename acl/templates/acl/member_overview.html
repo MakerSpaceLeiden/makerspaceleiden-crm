@@ -57,6 +57,7 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
 	{%if member.is_superuser%}
 			<tr><td></td><td>Is a superuser</td><td>
 	{% endif %}
+	<tr><td></td><td><a href="{% url 'telegram_connect' %}">Connect Telegram</a></td><td>
 
 	{%if permits %}
 	<tr><td colspan=2><h3>Special Permits and Instructions</h3></tr>
@@ -75,7 +76,7 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
         {% endif %}
         {% for tag in tags %}
 		<tr><td></td><td>
-<a href="{% url 'tag_edit' tag_id=tag.id %}">{{ tag.tag }}</a> 
+<a href="{% url 'tag_edit' tag_id=tag.id %}">{{ tag.tag }}</a>
 <a href="{% url 'tag_edit' tag_id=tag.id %}">[edit]</a>
 <a href="{% url 'tag_delete' tag_id=tag.id %}">[delete]</a>
 <br>
