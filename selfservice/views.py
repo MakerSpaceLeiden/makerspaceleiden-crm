@@ -77,7 +77,7 @@ def index(request):
 
 @login_required
 def pending(request):
-    pending = Entitlement.objects.all().filter(active = False)
+    pending = Entitlement.objects.all().filter(active = False).filter(holder__is_active = True)
 
     es = []
     for p in pending:
