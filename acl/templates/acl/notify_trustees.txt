@@ -1,0 +1,13 @@
+{% autoescape off %}
+L.S.
+
+This is to let you know that {{ issuer }} was so kind to give instructions to {{ holder }} 
+for the {{ permit }}.
+
+This now requires your attention; see the list at:
+
+	https://{{ domain }}{% url 'pending' %}
+
+-- 
+Your friendly SpaceBot.
+{% endautoescape  %}

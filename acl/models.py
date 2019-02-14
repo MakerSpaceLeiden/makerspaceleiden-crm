@@ -3,6 +3,10 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from simple_history.models import HistoricalRecords
 from django.urls import reverse
+from django.core.mail import EmailMessage
+from django.conf import settings
+from django.template.loader import render_to_string, get_template
+from django.contrib.sites.shortcuts import get_current_site
 
 from members.models import User
 
@@ -137,13 +141,27 @@ class Entitlement(models.Model):
             except EntitlementNotFound:
                 pass
 
-        # Notify the super users if this requires approval. Is this a good
-        # place ? Or should bwe do this on a crontab ?
-        #
         if not self.active and self.permit.permit:
-            print("Should we send an email to notify Super users ?")
+            try:
+                 context = { 'holder': self.holder, 
+                         'issuer': self.issuer, 
+                         'permit': self.permit,
+                         'domain': current_site.domain,
+                         }
+
+                 subject = render_to_string('acl/notify_trustees_subject.txt', context).strip()
+                 body =  render_to_string('acl/notify_trustees.txt', context)
+
+                 EmailMessage(subject, body, 
+                         to=[self.issuer.email, settings.TRUSTEES, 'dirkx@webweaving.org'], 
+                         from_email=settings.DEFAULT_FROM_EMAIL
+                 ).send()
+            except Exception as e:
+                logger.critical("Drat on email: {}".format(str(e)))
 
         # should we check for duplicates here too ?
         #
         return super(Entitlement, self).save(*args, **kwargs)
+
+
 
