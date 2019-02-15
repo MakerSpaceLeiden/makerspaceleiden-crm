@@ -57,6 +57,7 @@
     {% for machine_state in machines %}
       <tr>
         <td><b><a href="{% url 'machine_overview' machine_id=machine_state.machine.machine_id %}">{{ machine_state.machine.name }}</a></b></td>
+        <td>{{ machine_state.machine.location_name }}</td>
         <td>{{ machine_state.state }}</td>
       </tr>
     {% endfor %}
