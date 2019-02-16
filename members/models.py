@@ -63,6 +63,7 @@ class User(AbstractUser):
     form_on_file = models.BooleanField(default=False)
     email_confirmed = models.BooleanField(default=False)
     telegram_user_id = models.CharField(max_length=200, blank=True, null=True, help_text="Optional; Telegram User ID; only visible to the trustees and board delegated administrators")
+    uses_signal = models.BooleanField(default=False)
 
     history = HistoricalRecords()
     objects = UserManager()
