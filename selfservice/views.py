@@ -28,7 +28,7 @@ import logging
 
 from members.models import Tag,User
 from acl.models import Machine,Entitlement,PermitType
-from selfservice.forms import UserForm, SignUpForm
+from selfservice.forms import UserForm, SignUpForm, SignalNotificationSettingsForm
 from .models import WiFiNetwork
 from .waiverform.waiverform import generate_waiverform_fd
 from .aggregator_adapter import get_aggregator_adapter
@@ -264,10 +264,77 @@ def telegram_connect(request):
         return HttpResponse("No aggregator configuration found", status=500, content_type="text/plain")
 
     token = aggregator_adapter.generate_telegram_connect_token(user.id)
-    return render(request, 'telegram_connect.html', {
+    return HttpResponse(token, status=200, content_type="text/plain")
+
+
+@login_required
+def telegram_disconnect(request):
+    try:
+        user = request.user
+    except User.DoesNotExist:
+        return HttpResponse("You are probably not a member-- admin perhaps?", status=400, content_type="text/plain")
+
+    try:
+        User.objects.get(pk=user.id)
+    except ObjectDoesNotExist as e:
+        return HttpResponse("User not found", status=404, content_type="text/plain")
+
+    aggregator_adapter = get_aggregator_adapter()
+    if not aggregator_adapter:
+        return HttpResponse("No aggregator configuration found", status=500, content_type="text/plain")
+
+    aggregator_adapter.disconnect_telegram(user.id)
+    return render(request, 'telegram_disconnect.html', {
         'title': 'Telegram BOT',
-        'token': token,
     })
+
+
+@login_required
+def signal_disconnect(request):
+    try:
+        user = request.user
+    except User.DoesNotExist:
+        return HttpResponse("You are probably not a member-- admin perhaps?", status=400, content_type="text/plain")
+
+    try:
+        User.objects.get(pk=user.id)
+    except ObjectDoesNotExist as e:
+        return HttpResponse("User not found", status=404, content_type="text/plain")
+
+    user.uses_signal = False
+    user.save()
+
+    return render(request, 'signal_disconnect.html', {
+        'title': 'Signal BOT',
+    })
+
+@login_required
+def notification_settings(request):
+    try:
+        user = request.user
+    except User.DoesNotExist:
+        return HttpResponse("You are probably not a member-- admin perhaps?", status=400, content_type="text/plain")
+
+    try:
+        User.objects.get(pk=user.id)
+    except ObjectDoesNotExist as e:
+        return HttpResponse("User not found", status=404, content_type="text/plain")
+
+    if request.method == "POST":
+        user_form = SignalNotificationSettingsForm(request.POST, request.FILES, instance = user)
+        if user_form.is_valid():
+            user_form.save()
+            return redirect('overview', member_id=user.id)
+
+    form = SignalNotificationSettingsForm(instance = user)
+
+    return render(request, 'notification_settings.html', {
+        'title': 'Notification Settings',
+        'uses_signal': user.phone_number and user.uses_signal,
+        'form': form,
+        'user': user,
+    })
+
 
 @login_required
 def space_state(request):

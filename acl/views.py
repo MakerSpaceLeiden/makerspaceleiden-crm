@@ -216,6 +216,11 @@ def member_overview(request,member_id = None):
         tags = Tag.objects.filter(owner = member)
         context['tags'] = tags
 
+    # Notification settings
+    context['uses_signal'] = request.user.phone_number and request.user.uses_signal
+    context['uses_telegram'] = bool(request.user.telegram_user_id)
+    context['uses_email'] = not context['uses_signal'] and not context['uses_telegram']
+
     return render(request, 'acl/member_overview.html', context)
 
 @login_required

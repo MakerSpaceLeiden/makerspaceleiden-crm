@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <p>
+    Telegram BOT successfully disconnected from your account.
+  </p>
+  <p style="margin-top: 30px;">
+    <a href="{% url 'notification_settings' %}">[ Back to Notification Settings ]</a>
+  </p>
+{% endblock %}
+

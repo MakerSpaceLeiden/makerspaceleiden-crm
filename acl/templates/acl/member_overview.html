@@ -57,7 +57,24 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
 	{%if member.is_superuser%}
 			<tr><td></td><td>Is a superuser</td><td>
 	{% endif %}
-	<tr><td></td><td><a href="{% url 'telegram_connect' %}">Connect Telegram</a></td><td>
+
+    <tr><td colspan=2><h3>Notifications</h3></td></tr>
+	<tr><td></td><td>
+        <p>
+            The system can occasionally send you reminders when you forget to check-out, leave machines turned on, or other useful warnings.
+        </p>
+        <p>
+            Currently using:
+            <ul>
+                <li>Email: {% if uses_email %} <b style="color: green;">ACTIVE</b> {% else %} inactive {% endif %}</li>
+                <li>Telegram: {% if uses_telegram %} <b style="color: green;">ACTIVE</b> {% else %} inactive {% endif %}</li>
+                <li>Signal: {% if uses_signal %} <b style="color: green;">ACTIVE</b> {% else %} inactive {% endif %}</li>
+            </ul>
+        </p>
+        <p>
+            <a href="{% url 'notification_settings' %}">[ Edit notification settings ]</a>
+        </p>
+	</td><td>
 
 	{%if permits %}
 	<tr><td colspan=2><h3>Special Permits and Instructions</h3></tr>

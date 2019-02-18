@@ -3,6 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from members.models import User
 from django.forms import ModelForm
 
+
 class UserForm(ModelForm):
     class Meta:
        model = User
@@ -10,6 +11,17 @@ class UserForm(ModelForm):
        help_texts = {
             'email': "When you change this field; you will get a verification email to your new address. And your old address and the trustee's are sent a notice of this change."
        }
+
+
+class SignalNotificationSettingsForm(ModelForm):
+    class Meta:
+       model = User
+       fields = [ 'phone_number', 'uses_signal' ]
+       help_texts = {
+           'phone_number': "In order to use Signal, you need to enter your phone number including the country code.",
+           'uses_signal': "Check this box if you want to use Signal.",
+       }
+
 
 class SignUpForm(UserCreationForm):
     first_name = forms.CharField(max_length=30, required=False, help_text='Optional.')

@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<p>
+  <h3>Signal – {% if uses_signal %} <b style="color: green;">ACTIVE</b> {% else %} inactive {% endif %}</h3>
+    {% if uses_signal %}
+    <p style="margin-top: 10px;">
+      <a style="background-color: #CCCCCC; border-radius: 3px; font-size: 12px; border: 1px solid #003366; padding: 5px; color: black;" href="{% url 'signal_disconnect' %}" target="_blank">Deactivate Signal</a>
+    </p>
+    {% else %}
+    <form method="post" enctype="multipart/form-data" novalidate>
+      <table>
+        {% csrf_token %}
+        {{ form.as_table }}
+        <tr>
+          <td></td>
+          <td>
+            <button type="submit" style="background-color: #79aec8; border-radius: 3px; border: 1px solid #003366; font-size: 12px; padding: 5px; color: black;">Activate Signal</button>
+          </td>
+        </tr>
+      </table>
+    </form>
+    {% endif %}
+</p>
+
+<p style="margin-top: 30px;">
+  <h3>Telegram – {% if user.telegram_user_id %} <b style="color: green;">ACTIVE</b> {% else %} inactive {% endif %}</h3>
+  {% if not user.telegram_user_id %}
+  <p style="margin-top: 10px;">
+    <a id="telegram_connect" data-connecturl="{% url 'telegram_connect' %}" style="background-color: #79aec8; border-radius: 3px; border: 1px solid #003366; font-size: 12px; padding: 5px; color: black;" href="https://t.me/MakerSpaceLeidenBot?start={{ token }}" target="_blank">Activate Telegram</a><br/>
+  </p>
+  <p>
+    This button will open another window where you can link your Telegram account to the Makerspace BOT.<br/>
+    When you're done come back here and refresh the page or navigate back to the home.
+  </p>
+  {% else %}
+  <p style="margin-top: 10px;">
+    <a style="background-color: #CCCCCC; border-radius: 3px; font-size: 12px; border: 1px solid #003366; padding: 5px; color: black;" href="{% url 'telegram_disconnect' %}" target="_blank">Deactivate Telegram</a>
+  </p>
+  {% endif %}
+</p>
+
+<p style="margin-top: 30px;">
+  <a href="{% url 'overview' member_id=user.id  %}">Back to Your Data</a>
+</p>
+
+<script type="text/javascript">
+   var link = document.getElementById('telegram_connect');
+   if (link) {
+     link.onclick = function (e) {
+       e.preventDefault();
+       fetch(link.dataset.connecturl)
+           .then(function (response) {
+             return response.text();
+           })
+           .then(function (token) {
+             var telegramUrl = 'https://t.me/MakerSpaceLeidenBot?start=' + token;
+             window.open(telegramUrl, '_blank');
+           })
+           .catch(function (err) {
+             console.error(err);
+           });
+     };
+   }
+</script>
+
+{% endblock %}
+

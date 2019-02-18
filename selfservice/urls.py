@@ -16,6 +16,9 @@ urlpatterns = [
 
     # Telegram BOT
     path('telegram/connect', views.telegram_connect, name='telegram_connect'),
+    path('telegram/disconnect', views.telegram_disconnect, name='telegram_disconnect'),
+    path('signal/disconnect', views.signal_disconnect, name='signal_disconnect'),
+    path('notifications/settings', views.notification_settings, name='notification_settings'),
 
     path('space_state', views.space_state, name='space_state'),
 
