@@ -320,10 +320,17 @@ def notification_settings(request):
     except ObjectDoesNotExist as e:
         return HttpResponse("User not found", status=404, content_type="text/plain")
 
+    aggregator_adapter = get_aggregator_adapter()
+    if not aggregator_adapter:
+        return HttpResponse("No aggregator configuration found", status=500, content_type="text/plain")
+
     if request.method == "POST":
         user_form = SignalNotificationSettingsForm(request.POST, request.FILES, instance = user)
         if user_form.is_valid():
             user_form.save()
+            uses_signal = bool(user_form.data.get('uses_signal'))
+            if uses_signal:
+                aggregator_adapter.onboard_signal(user.id)
             return redirect('overview', member_id=user.id)
 
     form = SignalNotificationSettingsForm(instance = user)
