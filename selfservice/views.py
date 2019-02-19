@@ -332,6 +332,7 @@ def notification_settings(request):
         'uses_signal': user.phone_number and user.uses_signal,
         'signal_form': signal_form,
         'email_form': email_form,
+        'uses_email': (not user.uses_signal and not user.telegram_user_id) or user.always_uses_email,
         'user': user,
     })
 
