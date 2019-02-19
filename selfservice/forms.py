@@ -23,6 +23,12 @@ class SignalNotificationSettingsForm(ModelForm):
        }
 
 
+class EmailNotificationSettingsForm(ModelForm):
+    class Meta:
+       model = User
+       fields = [ 'always_uses_email' ]
+
+
 class SignUpForm(UserCreationForm):
     first_name = forms.CharField(max_length=30, required=False, help_text='Optional.')
     last_name = forms.CharField(max_length=30, required=False, help_text='Optional.')

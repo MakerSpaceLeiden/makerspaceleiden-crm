@@ -50,6 +50,16 @@ class AggregatorAdapter(object):
                                      )
         urllib.request.urlopen(req).read().decode('utf-8')
 
+    def notification_test(self, user_id):
+        json_payload = {
+            'user_id': user_id
+        }
+        req = urllib.request.Request(self.base_url + '/notification/test',
+                                     data=json.dumps(json_payload).encode('utf8'),
+                                     headers={'Authorization': 'Basic %s' % self.encoded_credentials.decode("ascii")}
+                                     )
+        urllib.request.urlopen(req).read().decode('utf-8')
+
 
 def initialize_aggregator_adapter(base_url, username, password):
     handle['aggregator_adapter'] = AggregatorAdapter(base_url, username, password)

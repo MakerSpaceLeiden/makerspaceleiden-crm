@@ -64,6 +64,7 @@ class User(AbstractUser):
     email_confirmed = models.BooleanField(default=False)
     telegram_user_id = models.CharField(max_length=200, blank=True, null=True, help_text="Optional; Telegram User ID; only visible to the trustees and board delegated administrators")
     uses_signal = models.BooleanField(default=False)
+    always_uses_email = models.BooleanField(default=False, help_text="Receive notifications via email even when using a chat BOT")
 
     history = HistoricalRecords()
     objects = UserManager()

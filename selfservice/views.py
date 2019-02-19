@@ -28,7 +28,7 @@ import logging
 
 from members.models import Tag,User
 from acl.models import Machine,Entitlement,PermitType
-from selfservice.forms import UserForm, SignUpForm, SignalNotificationSettingsForm
+from selfservice.forms import UserForm, SignUpForm, SignalNotificationSettingsForm, EmailNotificationSettingsForm
 from .models import WiFiNetwork
 from .waiverform.waiverform import generate_waiverform_fd
 from .aggregator_adapter import get_aggregator_adapter
@@ -324,6 +324,34 @@ def notification_settings(request):
     if not aggregator_adapter:
         return HttpResponse("No aggregator configuration found", status=500, content_type="text/plain")
 
+    signal_form = SignalNotificationSettingsForm(instance = user)
+    email_form = EmailNotificationSettingsForm(instance = user)
+
+    return render(request, 'notification_settings.html', {
+        'title': 'Notification Settings',
+        'uses_signal': user.phone_number and user.uses_signal,
+        'signal_form': signal_form,
+        'email_form': email_form,
+        'user': user,
+    })
+
+
+@login_required
+def save_signal_notification_settings(request):
+    try:
+        user = request.user
+    except User.DoesNotExist:
+        return HttpResponse("You are probably not a member-- admin perhaps?", status=400, content_type="text/plain")
+
+    try:
+        User.objects.get(pk=user.id)
+    except ObjectDoesNotExist as e:
+        return HttpResponse("User not found", status=404, content_type="text/plain")
+
+    aggregator_adapter = get_aggregator_adapter()
+    if not aggregator_adapter:
+        return HttpResponse("No aggregator configuration found", status=500, content_type="text/plain")
+
     if request.method == "POST":
         user_form = SignalNotificationSettingsForm(request.POST, request.FILES, instance = user)
         if user_form.is_valid():
@@ -333,14 +361,48 @@ def notification_settings(request):
                 aggregator_adapter.onboard_signal(user.id)
             return redirect('overview', member_id=user.id)
 
-    form = SignalNotificationSettingsForm(instance = user)
 
-    return render(request, 'notification_settings.html', {
-        'title': 'Notification Settings',
-        'uses_signal': user.phone_number and user.uses_signal,
-        'form': form,
-        'user': user,
-    })
+@login_required
+def save_email_notification_settings(request):
+    try:
+        user = request.user
+    except User.DoesNotExist:
+        return HttpResponse("You are probably not a member-- admin perhaps?", status=400, content_type="text/plain")
+
+    try:
+        User.objects.get(pk=user.id)
+    except ObjectDoesNotExist as e:
+        return HttpResponse("User not found", status=404, content_type="text/plain")
+
+    aggregator_adapter = get_aggregator_adapter()
+    if not aggregator_adapter:
+        return HttpResponse("No aggregator configuration found", status=500, content_type="text/plain")
+
+    if request.method == "POST":
+        user_form = EmailNotificationSettingsForm(request.POST, request.FILES, instance = user)
+        if user_form.is_valid():
+            user_form.save()
+            return redirect('overview', member_id=user.id)
+
+
+@login_required
+def notification_test(request):
+    try:
+        user = request.user
+    except User.DoesNotExist:
+        return HttpResponse("You are probably not a member-- admin perhaps?", status=400, content_type="text/plain")
+
+    try:
+        User.objects.get(pk=user.id)
+    except ObjectDoesNotExist as e:
+        return HttpResponse("User not found", status=404, content_type="text/plain")
+
+    aggregator_adapter = get_aggregator_adapter()
+    if not aggregator_adapter:
+        return HttpResponse("No aggregator configuration found", status=500, content_type="text/plain")
+
+    aggregator_adapter.notification_test(user.id)
+    return redirect('notification_settings')
 
 
 @login_required
