@@ -26,7 +26,7 @@ def superuser_or_bearer_required(function):
 
           # Also accept a modern RFC 6750 style header.
           elif request.META.get(MODERN_HEADER):
-              match = re.search(r'\bbearer\s+(\S+)', request.META.get(MODERN_HEADER, re.IGNORECASE))
+              match = re.search(r'\bbearer\s+(\S+)', request.META.get(MODERN_HEADER), re.IGNORECASE)
               if match:
                   secret = match.group(1)
 
