@@ -4,9 +4,13 @@ from django.core.exceptions import PermissionDenied
 from django.conf import settings
 
 from functools import wraps
+import re
 
 HEADER='HTTP_X_BEARER'
 MODERN_HEADER='HTTP_AUTHORIZATION'
+
+import logging
+logger = logging.getLogger(__name__)
 
 def superuser_or_bearer_required(function):
   @wraps(function)
@@ -22,9 +26,9 @@ def superuser_or_bearer_required(function):
 
           # Also accept a modern RFC 6750 style header.
           elif request.META.get(MODERN_HEADER):
-              match = re.search('\bbearer\s+(\S+)', request.META.get(MODERN_HEADER, re.IGNORECASE))
+              match = re.search(r'\bbearer\s+(\S+)', request.META.get(MODERN_HEADER, re.IGNORECASE))
               if match:
-                  secret = match.group(0)
+                  secret = match.group(1)
 
           if secret == settings.UT_BEARER_SECRET:
              return function(request, *args, **kwargs)
