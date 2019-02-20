@@ -20,12 +20,10 @@ urlpatterns = [
     # Convenience page to debug the API
     path('', views.api_index, name='acl-index'),
 
-    # Legacy API
-    path('v1', views.api_index_legacy1, name='acl-v1'),
-    path('v1/<str:secret>', views.api_index_legacy1, name='acl-v1'),
-    path('v2', views.api_index_legacy2, name='acl-v2'),
-
     # API oriented
+    path('api/v1/getok/<str:machine>', views.api_getok, name='acl-v1-getok'),
+    path('api/v1/gettaginfo', views.api_gettaginfo, name='acl-v1-gettaginfo'),
+
     path('<int:machine_id>', views.api_details, name='details'),
 ]
 

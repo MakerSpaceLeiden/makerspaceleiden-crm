@@ -1,11 +1,17 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>State of the Space 
+<h1>State of the Space
   {% if space_open %}
     <span style="color: green; font-weight: bold;">- Space is OPEN</span>
   {% endif %}
 </h1>
+
+{% for light in lights_on %}
+  <p>
+    {{ light.name }} lights are <b style="color: green;">ON</b>
+  </p>
+{% endfor %}
 
 {% if users_in_space %}
 <h2>User check-ins</h2>
@@ -31,16 +37,32 @@
     <tbody>
       {% for machine_state in machines_on %}
       <tr>
-          <td><b><a href="{% url 'machine_overview' machine_id=machine_state.machine.machine_id %}">{{ machine_state.machine.name }}</a></b></td>
+        <td><b><a href="{% url 'machine_overview' machine_id=machine_state.machine.machine_id %}">{{ machine_state.machine.name }}</a></b></td>
         <td>{{ machine_state.ts_human }}</i></td>
         <td><i>{{ machine_state.ts }}</i></td>
-        <td><b><a href="{% url 'overview' member_id=machine_state.user.user_id %}">{{ machine_state.user.full_name }}</a></b></td>
+        <td>
+          <b><a href="{% url 'overview' member_id=machine_state.user.user_id %}">{{ machine_state.user.full_name }}</a></b>
+        </td>
       </tr>
       {% endfor %}
     </tbody>
 
   </table>
 {% endif %}
+
+
+<h2>All machines</h2>
+<table>
+  <tbody>
+    {% for machine_state in machines %}
+      <tr>
+        <td><b><a href="{% url 'machine_overview' machine_id=machine_state.machine.machine_id %}">{{ machine_state.machine.name }}</a></b></td>
+        <td>{{ machine_state.machine.location_name }}</td>
+        <td>{{ machine_state.state }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
 
 {% endblock %}
 

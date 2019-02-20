@@ -40,3 +40,4 @@ python manage.py createsuperuser
 #
 python manage.py runserver 
 
+# or add --settings=makerspaceleiden.local_with_db to run on mysql locally

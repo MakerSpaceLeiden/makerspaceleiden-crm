@@ -16,11 +16,12 @@
 		</td></tr>
 		<tr><td alight=right>Instruction: </td>
 			<td>{% if machines.first.requires_permit %}
-				Instructions are required ({{ machines.first.requires_permit }})
+				Instructions are required ({{ machines.first.requires_permit }}).<p/>
 			{% if instructors %}
 			<br/>Instructions can be given by:
 			<ol>
-			{% for e in instructors %}
+			{% for ee in instructors %}
+			{% for e in ee %}
 			<li><a href="{{ e.holder.path }}">{{ e.holder }}</a>
 				{% if e.active %}
 				<!-- active -->
@@ -28,6 +29,7 @@
 				(not active)
 				{% endif %}
 			{% endfor %}
+		 	{% endfor %}
 			</ol>
 			{% endif %}
 			{% else %}

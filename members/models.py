@@ -47,25 +47,25 @@ class UserManager(BaseUserManager):
 
         return self._create_user(email, password, **extra_fields)
 
+
 class User(AbstractUser):
     class Meta:
         ordering = ['first_name', 'last_name']
 
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['first_name', 'last_name', 'telegram_user_id']
+
     username = None
+
     email = models.EmailField(_('email address'), unique=True)
     phone_number = models.CharField(max_length=40, blank=True, null=True, help_text="Optional; only visible to the trustees and board delegated administrators")
-
     image = StdImageField(upload_to=upload_to_pattern, variations=settings.IMG_VARIATIONS, validators=settings.IMG_VALIDATORS, blank=True, default='')
+    form_on_file = models.BooleanField(default=False)
+    email_confirmed = models.BooleanField(default=False)
+    telegram_user_id = models.CharField(max_length=200, blank=True, null=True, help_text="Optional; Telegram User ID; only visible to the trustees and board delegated administrators")
+    uses_signal = models.BooleanField(default=False)
+    always_uses_email = models.BooleanField(default=False, help_text="Receive notifications via email even when using a chat BOT")
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['first_name', 'last_name']
-
-    form_on_file = models.BooleanField(
-	default=False,
-    )
-    email_confirmed = models.BooleanField(
-        default=False
-    )
     history = HistoricalRecords()
     objects = UserManager()
 
@@ -76,10 +76,11 @@ class User(AbstractUser):
         return self.__str__()
 
     def path(self):
-       return  reverse('overview', kwargs = { 'member_id' :  self.id })
+        return  reverse('overview', kwargs = { 'member_id' :  self.id })
 
     def url(self):
-       return  settings.BASE + self.path()
+        return  settings.BASE + self.path()
+
 
 class Tag(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -95,7 +96,7 @@ class Tag(models.Model):
 
 def clean_tag_string(tag):
     try:
-       bts = [ b for b in re.compile('[^0-9]+').split(tag.upper()) 
+       bts = [ b for b in re.compile('[^0-9]+').split(tag.upper())
                    if b is not None and b is not '' and int(b) >=0 and int(b) < 256]
        if len(bts) < 3:
            return None

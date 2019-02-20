@@ -1,5 +1,9 @@
 from django.conf import settings
 from django.db import models
+
+from members.models import Tag,clean_tag_string
+from acl.models import Entitlement,PermitType
+
 import datetime
 
 class Unknowntag(models.Model):
@@ -20,7 +24,7 @@ class Unknowntag(models.Model):
          return "{} swiped on {}".format(self.tag, self.last_used.strftime("%Y-%m-%d %H:%M:%S"))
 
    def reassing_to_user(self, user, admin, activate = False):
-      newtag = Tag.objects.create(tag=tag.tag, owner = user,
+      newtag = Tag.objects.create(tag=self.tag, owner = user,
                  description="The card that was added on {} by {} ".format(datetime.date.today(), admin))
       newtag.changeReason = "Moved from the unknown tags list by {} to this user.".format(admin)
       newtag.save()

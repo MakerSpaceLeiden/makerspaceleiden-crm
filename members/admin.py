@@ -27,6 +27,7 @@ class UserAdmin(ImportExportModelAdmin, BaseUserAdmin, SimpleHistoryAdmin):
     fieldsets = (
         (None,                 {'fields': ('email', 'password')}),
         (_('Membership'),      {'fields': ('first_name', 'last_name', 'form_on_file', 'email_confirmed')}),
+        (_('BOTs'),            {'fields': ('telegram_user_id', 'uses_signal')}),
         (_('Permissions'),     {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
         (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
     )

@@ -135,13 +135,29 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'CET'
+TIME_ZONE = 'Europe/Amsterdam'
 
 USE_I18N = True
 
-USE_L10N = True
-
 USE_TZ = True
+
+# -- START - Custom formatting of date/time and numbers ----
+USE_L10N = False
+
+DATETIME_FORMAT = 'D Y-m-d G:i:s'
+TIME_FORMAT = 'G:i:s'
+DATE_FORMAT = 'D Y-m-d'
+SHORT_DATE_FORMAT = 'Y-m-d'
+
+YEAR_MONTH_FORMAT = r'Y-m'
+MONTH_DAY_FORMAT = r'm-d'
+SHORT_DATETIME_FORMAT = 'Y-m-d G:i'
+FIRST_DAY_OF_WEEK = 1  # Monday
+
+DECIMAL_SEPARATOR = ','
+THOUSAND_SEPARATOR = '.'
+NUMBER_GROUPING = 3
+# -- END - Custom formatting of date/time and numbers ----
 
 
 LOGIN_URL = '/login/'

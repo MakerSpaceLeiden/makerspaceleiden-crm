@@ -25,7 +25,9 @@ def reset_password(email, reset = False,
         return False
 
     if reset:
-        user.set_unusable_password()
+        # Set it to an unguessable one - as unusable blocks email sending.
+        # user.set_unusable_password()
+        user.set_password(  User.objects.make_random_password() )
         user.changeReason = "Locked it from the sent-invite command."
         user.save()
 

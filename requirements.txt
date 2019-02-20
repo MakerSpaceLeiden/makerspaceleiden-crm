@@ -17,7 +17,7 @@ django-qr-code
 # psycopg2-binary
 
 # For production
-# mysqlclient
+mysqlclient
 
 # Determine client IP address
 django-ipware
