@@ -6,6 +6,7 @@ from django.conf import settings
 from functools import wraps
 
 HEADER='HTTP_X_BEARER'
+MODERN_HEADER='HTTP_AUTHORIZATION'
 
 def superuser_or_bearer_required(function):
   @wraps(function)
@@ -13,14 +14,24 @@ def superuser_or_bearer_required(function):
       if request.user.is_superuser:
             return function(request, *args, **kwargs)
 
-      if (settings.UT_BEARER_SECRET and
-          request.META.get(HEADER) and
-          request.META.get(HEADER) == settings.UT_BEARER_SECRET):
-            # set extra flag to singal this shis non user case? 
-            return function(request, *args, **kwargs)
+      if hasattr(settings, 'UT_BEARER_SECRET'):
+          secret = None
+          # Pendantic header
+          if request.META.get(HEADER):
+              secret = request.META.get(HEADER)
+
+          # Also accept a modern RFC 6750 style header.
+          elif request.META.get(MODERN_HEADER):
+              match = re.search('\bbearer\s+(\S+)', request.META.get(MODERN_HEADER, re.IGNORECASE))
+              if match:
+                  secret = match.group(0)
+
+          if secret == settings.UT_BEARER_SECRET:
+             return function(request, *args, **kwargs)
 
       # Quell some odd 'code 400, message Bad request syntax ('tag=1-2-3-4')'
       request.POST 
+
       # raise PermissionDenied
       return HttpResponse("XS denied",status=403,content_type="text/plain")
   return wrap
