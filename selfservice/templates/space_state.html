@@ -15,6 +15,8 @@
 
 {% if users_in_space %}
 <h2>User check-ins</h2>
+
+
   <table>
     <tbody>
       {% for checkin in users_in_space %}
@@ -22,6 +24,11 @@
         <td><b><a href="{% url 'overview' member_id=checkin.user.user_id %}">{{ checkin.user.full_name }}</a></b></td>
         <td>{{ checkin.ts_checkin_human }}</i></td>
         <td><i>{{ checkin.ts_checkin }}</i></td>
+        {% if checkin.user.user_id == user.id or True %}
+        <td>
+          <a style="background-color: #CCCCCC; border-radius: 3px; font-size: 12px; border: 1px solid #003366; padding: 5px; color: black;" href="{% url 'checkout_from_space' %}">Check out</a>
+        </td>
+        {% endif %}
       </tr>
       {% endfor %}
     </tbody>
@@ -29,7 +36,6 @@
 {% else %}
 <i>There's no one at the space now.</i>
 {% endif %}
-
 
 {% if machines_on %}
 <h2>Machines currently in use</h2>
