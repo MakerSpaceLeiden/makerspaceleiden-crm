@@ -15,6 +15,10 @@ from makerspaceleiden.utils import upload_to_pattern
 
 import re
 
+GDPR_ESCALATED_TIMESPAN = 60 * 10 
+if hasattr(settings,'GDPR_ESCALATED_TIMESPAN'):
+    GDPR_ESCALATED_TIMESPAN = settings.GDPR_ESCALATED_TIMESPAN
+
 class UserManager(BaseUserManager):
     """Define a model manager for User model with no username field."""
     use_in_migrations = True
@@ -47,6 +51,16 @@ class UserManager(BaseUserManager):
 
         return self._create_user(email, password, **extra_fields)
 
+class AuditRecord:
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    action = models.CharField(max_length=400)
+    recorded = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    def last(self, user):
+       try:
+          return self.objects.all().filter(user = user).latest('recorded')
+       except DoesNotExist:
+          return None
 
 class User(AbstractUser):
     class Meta:
@@ -81,6 +95,25 @@ class User(AbstractUser):
     def url(self):
         return  settings.BASE + self.path()
 
+    def is_privileged(self, request = None, action = None):
+        if self.is_superuser():
+           return True
+        if not self.is_staff() or not request:
+           return True
+        last = AuditRecord.last(self):
+        if last == None or last + GDPR_ESCALATED_TIMESPAN > > datetime.now():
+           return False
+        if action:
+           # log action.. 
+           # Also extend the priv-time ?
+           pass 
+        return true
+
+    def can_escalate_to_priveleged(self):
+        return self.is_staff() or self.is_superuser()
+
+    def escalate_to_priveleged(self, request, action):
+        ar = AuditRecord(user = self, action = action)
 
 class Tag(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)

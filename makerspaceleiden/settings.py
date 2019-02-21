@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'selfservice.apps.SelfserviceConfig',
     'ufo.apps.UfoConfig',
     'unknowntags.apps.UnknowntagsConfig',
+    'mailinglists.apps.MailinglistConfig',
 
     'django.contrib.admin',
     'django.contrib.auth',
