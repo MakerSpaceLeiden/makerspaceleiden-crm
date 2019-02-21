@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'import_export',
     'simple_history',
     'qr_code',
+    'makerspaceleiden',
 
     'storage.apps.StorageConfig',
     'memberbox.apps.MemberboxConfig',
@@ -88,7 +89,6 @@ TEMPLATES = [
         },
     },
 ]
-
 SETTINGS_EXPORT = [ 'GRAND_AMNESTY', ]
 
 WSGI_APPLICATION = 'makerspaceleiden.wsgi.application'
