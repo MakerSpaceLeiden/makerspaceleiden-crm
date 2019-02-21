@@ -13,7 +13,6 @@ from members.models import User
 import logging
 logger = logging.getLogger(__name__)
 
-
 class PermitType(models.Model):
     name = models.CharField(max_length=40, unique=True)
     description =  models.CharField(max_length=200)
@@ -29,7 +28,12 @@ class PermitType(models.Model):
     def __str__(self):
         return self.name
 
-
+    def hasThisPermit(self, user):
+        e = Entitlement.objects.all().filter(holder=user,permit=self).first
+        if e and e.active == True:
+            return True
+        return False
+           
 class Location(models.Model):
     name = models.CharField(max_length=40, unique=True)
     description =  models.CharField(max_length=200,blank=True)
@@ -53,6 +57,9 @@ class Machine(models.Model):
     requires_instruction = models.BooleanField(default=False)
     requires_form = models.BooleanField(default=False)
     requires_permit = models.ForeignKey(PermitType,related_name='has_permit',on_delete=models.CASCADE, blank=True, null=True)
+
+    out_of_order = models.BooleanField(default=False)
+
     history = HistoricalRecords()
 
     def path(self):
@@ -64,6 +71,24 @@ class Machine(models.Model):
     def __str__(self):
         return self.name
 
+    def canOperate(self,user):
+        if not user.is_active:
+            return False
+        if self.requires_form and not user.form_on_file:
+            return False
+        if not self.requires_permit:
+            return True
+        return self.requires_permit.hasThisPermit(user)
+
+    def canInstruct(self,user):
+        if not self.canOperate(user):
+            return False
+        if not self.requires_permit:
+            return True
+        if not self.requires_permit.permit:
+            return True
+        return self.requires_permit.hasThisPermit(self.requires_permit.permit)
+        
 # Special sort of create/get - where we ignore the issuer when looking for it.
 # but add it in if we're creating it for the first time.
 # Not sure if this is a good idea. Proly not. The other option

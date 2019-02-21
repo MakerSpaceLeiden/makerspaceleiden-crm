@@ -1,0 +1,14 @@
+{% autoescape off %}
+Folks,
+
+This is to let you know that {{ user }} has just {%if machine.out_of_order %}taken {{ machine }} out of service{% else %}put {{ machine }}back into operations{% endif %}. Details are below.
+
+Your friendly makerbot.
+
+Situation:	{{ item.get_situation_display }}
+URL:            <{{ item.url }}>
+Description:	{{ item.description }}
+Reporter:	{{ item.reporter }}
+
+{% endautoescape %}
+t

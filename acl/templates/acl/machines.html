@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<ul>
+    {% for p in machines %}
+    <li> <a href="{% url 'machine_overview' p.id %}">{{ p.name }}</a>
+    (<i> {{ p.description }} </i>)
+{% if p.out_of_order %}
+	<b style="color: red;">OUT OF ORDER</b>
+{% endif %}
+
+    {% endfor %}
+</ul>
+
+{% endblock %}

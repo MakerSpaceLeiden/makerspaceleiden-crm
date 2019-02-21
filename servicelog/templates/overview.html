@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block content %}
+{% if items %}
+<table>
+{% for item in items %}
+	<tr><td colspan=2><b>
+	{% ifchanged %}
+		<h2><a href="{% url 'machine_overview' item.machine.id %}">{{ item.machine }}</a></h2>
+{% if machine.out_of_order %}
+	machine out of operations - <a href="{% url 'service_log_crud' machine_id=item.machine.id %}">[report back into operations]</a>
+{% else %}
+	Machine operational - <a href="{% url 'service_log_crud' machine_id=item.machine.id %}">[report a problem]</a>
+{% endif %}
+	<p>
+	{% else %}
+	Historic
+	{% endifchanged %}
+	Report # {{ item.id }}  -- {{  item.reported }} --  {{ item.reporter }}<
+	</td></tr>
+	<tr><td align=right>Situation:</td><td>{{ item.get_situation_display }}</td></tr>
+	<tr><td align=right></td><td>
+{% if item.image %}
+        	<a href="{{ item.image.url   }}"><img alt="" src="{{ item.image.medium.url   }}"/></a>
+		<p>
+{% endif %}
+		{{ item.description}}
+	</td></tr>
+	<tr><td align=right>Reported:</td><td>{{ item.created }} by {{ item.reporter }}</td></tr>
+{% if item.created != item.last_updated %}
+	<tr><td align=right>Updated:</td><td>{{ item.last_updated }}</td></tr>
+	<tr><td align=right></td><td><a href="{% url 'service_log_crud' machine_id=item.machine.id servicelog_id=item.id %}">[edit]</a></td></tr>
+{% endif %}
+	<tr><td align=right colspan=2><p/></td></tr>
+
+{% endfor %}
+{% else %}
+No issues reported for this machine.
+{% endif %}
+
+{% endblock %}
+

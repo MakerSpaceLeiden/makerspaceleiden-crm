@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'selfservice.apps.SelfserviceConfig',
     'ufo.apps.UfoConfig',
     'unknowntags.apps.UnknowntagsConfig',
+    'servicelog.apps.ServicelogConfig',
 
     'django.contrib.admin',
     'django.contrib.auth',

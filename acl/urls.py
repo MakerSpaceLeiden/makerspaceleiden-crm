@@ -12,6 +12,7 @@ urlpatterns = [
 
     path('machine/<int:machine_id>', views.machine_overview, name='machine_overview'),
     path('machine/', views.machine_overview, name='machine_overview'),
+    path('machines', views.machine_list, name='machine_list'),
 
     # For the trusteeds - to ease admin.
     path('missing_forms/', views.missing_forms, name='missing_forms'),

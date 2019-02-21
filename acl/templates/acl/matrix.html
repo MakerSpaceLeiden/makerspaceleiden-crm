@@ -4,8 +4,23 @@
 {% if machines.count == 1 %}
 <h1><hr/>XS matrix for {{ machines.first }} <hr/></h1>
 <table>
-	<tr><td alight=right>Machine: </td><td>{{ machines.first.name }}</td></tr>
-	<tr><td alight=right></td><td>{{ machines.first.description}}</td></tr>
+	<tr><td alight=right>Machine: </td><td>{{ machines.first.name }}
+{% if machines.first.out_of_order %}
+		<b style="color: red;">OUT OF ORDER</b>
+{% endif %}
+        </td></tr>
+	<tr><td alight=right></td><td>{{ machines.first.description}}<br/></td></tr>
+{%if True %}
+	<tr><td alight=right>Service</td><td>Service log <a href="{% url 'service_log_view' machine_id=machines.first.id %}">[view]</a>
+	<br/>
+	Report this machine
+   {% if machines.first.out_of_order %}
+					<a href="{% url 'service_log_crud' machine_id=machines.first.id %}">[repaired]</a>
+   {% else %}
+					<a href="{% url 'service_log_crud' machine_id=machines.first.id %}">[out of order]</a>
+   {% endif %}
+        </td></tr>
+{% endif %}
 	<tr><td alight=right>Location: </td><td>{{ machines.first.location}}</td></tr>
 	<tr><td alight=right>Waiver: </td><td>
 			{% if  machines.first.requires_form %}

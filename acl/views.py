@@ -37,10 +37,14 @@ def matrix_mm(machine,member):
        out['requires_instruction'] = machine.requires_instruction
        out['requires_permit'] = machine.requires_permit
        out['requires_form'] = machine.requires_form
+       out['out_of_order'] = machine.out_of_order
 
        xs = True
        # Does the machine require a form; and does the user have that form on file.
        if machine.requires_form and not member.form_on_file:
+          xs = False
+
+       if machine.out_of_order:
           xs = False
 
        if machine.requires_permit:
@@ -128,6 +132,17 @@ def api_index_legacy2(request):
                out += "{}:{}:{} # {}\n".format(tag.tag, machines_string, member.name(),tag.id)
 
     return HttpResponse(out,content_type='text/plain')
+
+@login_required
+def machine_list(request):
+    machines = Machine.objects.order_by('name')
+    members =  User.objects.all().filter(is_active = True).order_by('first_name')
+
+    context = {
+       'members': members,
+       'machines': machines,
+    }
+    return render(request, 'acl/machines.html', context)
 
 @login_required
 def machine_overview(request, machine_id = None):
@@ -288,6 +303,7 @@ def tag_edit(request,tag_id = None):
 
     return render(request, 'acl/crud.html', context)
 
+@login_required
 def tag_delete(request,tag_id = None):
     try:
        tag = Tag.objects.get(pk=tag_id)
@@ -317,6 +333,7 @@ def tag_delete(request,tag_id = None):
 
 def userdetails(owner):
     return {
+            'userid': owner.id,
             'user': True,
             'name': str(owner),
             'first_name': owner.first_name,
