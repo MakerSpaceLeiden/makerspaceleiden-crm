@@ -4,5 +4,5 @@ from django.contrib.auth import views as auth_views
 from . import views
 
 urlpatterns = [
-    path('edit', views.edit, name='list_edit'),
+    path('mailinglists_edit', views.mailinglists_edit , name='mailinglists_edit'),
 ]

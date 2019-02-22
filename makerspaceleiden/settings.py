@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'selfservice.apps.SelfserviceConfig',
     'ufo.apps.UfoConfig',
     'unknowntags.apps.UnknowntagsConfig',
-    'mailinglists.apps.MailinglistConfig',
+    'mailinglists.apps.MailinglistsConfig',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -89,7 +89,7 @@ TEMPLATES = [
     },
 ]
 
-SETTINGS_EXPORT = [ 'GRAND_AMNESTY', ]
+SETTINGS_EXPORT = [ 'GRAND_AMNESTY', 'ML_ADMINURL', ]
 
 WSGI_APPLICATION = 'makerspaceleiden.wsgi.application'
 
@@ -225,6 +225,9 @@ UT_BEARER_SECRET = None
 #
 UT_DAYS_CUTOFF = 7
 UT_COUNT_CUTOFF = 10
+
+ML_PASSWORD = 'Foo'
+ML_ADMINURL = 'https://mailman.foo.com/mailman'
 
 try:
     from .local import *
