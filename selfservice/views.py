@@ -408,10 +408,32 @@ def notification_test(request):
 
 @login_required
 def space_state(request):
+    try:
+        user = request.user
+    except User.DoesNotExist:
+        return HttpResponse("You are probably not a member-- admin perhaps?", status=400, content_type="text/plain")
+
     aggregator_adapter = get_aggregator_adapter()
     if not aggregator_adapter:
         return HttpResponse("No aggregator configuration found", status=500, content_type="text/plain")
-    return render(request, 'space_state.html', aggregator_adapter.fetch_state_space())
+    context = aggregator_adapter.fetch_state_space()
+    context['user'] = user
+    return render(request, 'space_state.html', context)
+
+
+@login_required
+def space_checkout(request):
+    try:
+        user = request.user
+    except User.DoesNotExist:
+        return HttpResponse("You are probably not a member-- admin perhaps?", status=400, content_type="text/plain")
+
+    aggregator_adapter = get_aggregator_adapter()
+    if not aggregator_adapter:
+        return HttpResponse("No aggregator configuration found", status=500, content_type="text/plain")
+
+    aggregator_adapter.checkout(user.id)
+    return redirect('space_state')
 
 
 @login_required

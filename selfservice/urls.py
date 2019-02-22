@@ -23,7 +23,9 @@ urlpatterns = [
     path('notifications/settings/email', views.save_email_notification_settings, name='email_notification_settings'),
     path('notifications/test', views.notification_test, name='notification_test'),
 
+
     path('space_state', views.space_state, name='space_state'),
+    path('space_state/checkout', views.space_checkout, name='checkout_from_space'),
 
     # For the trutee's -- to ease admin
     path('pending/', views.pending, name='pending'),

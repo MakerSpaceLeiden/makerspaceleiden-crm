@@ -19,46 +19,31 @@ class AggregatorAdapter(object):
         req.add_header('Authorization', 'Basic %s' % self.encoded_credentials.decode("ascii"))
         return json.loads(urllib.request.urlopen(req).read())
 
-    def generate_telegram_connect_token(self, user_id):
+    def _request_with_user_id(self, url, user_id):
         json_payload = {
             'user_id': user_id
         }
-        req = urllib.request.Request(self.base_url + '/telegram/token',
+        req = urllib.request.Request(self.base_url + url,
                                      data=json.dumps(json_payload).encode('utf8'),
                                      headers={'Authorization': 'Basic %s' % self.encoded_credentials.decode("ascii")}
                                      )
-        token = urllib.request.urlopen(req).read().decode('utf-8')
+        return urllib.request.urlopen(req).read().decode('utf-8')
+
+    def generate_telegram_connect_token(self, user_id):
+        token = self._request_with_user_id('/telegram/token', user_id)
         return token
 
     def disconnect_telegram(self, user_id):
-        json_payload = {
-            'user_id': user_id
-        }
-        req = urllib.request.Request(self.base_url + '/telegram/disconnect',
-                                     data=json.dumps(json_payload).encode('utf8'),
-                                     headers={'Authorization': 'Basic %s' % self.encoded_credentials.decode("ascii")}
-                                     )
-        urllib.request.urlopen(req).read().decode('utf-8')
+        self._request_with_user_id('/telegram/disconnect', user_id)
 
     def onboard_signal(self, user_id):
-        json_payload = {
-            'user_id': user_id
-        }
-        req = urllib.request.Request(self.base_url + '/signal/onboard',
-                                     data=json.dumps(json_payload).encode('utf8'),
-                                     headers={'Authorization': 'Basic %s' % self.encoded_credentials.decode("ascii")}
-                                     )
-        urllib.request.urlopen(req).read().decode('utf-8')
+        self._request_with_user_id('/signal/onboard', user_id)
 
     def notification_test(self, user_id):
-        json_payload = {
-            'user_id': user_id
-        }
-        req = urllib.request.Request(self.base_url + '/notification/test',
-                                     data=json.dumps(json_payload).encode('utf8'),
-                                     headers={'Authorization': 'Basic %s' % self.encoded_credentials.decode("ascii")}
-                                     )
-        urllib.request.urlopen(req).read().decode('utf-8')
+        self._request_with_user_id('/notification/test', user_id)
+
+    def checkout(self, user_id):
+        self._request_with_user_id('/space/checkout', user_id)
 
 
 def initialize_aggregator_adapter(base_url, username, password):
