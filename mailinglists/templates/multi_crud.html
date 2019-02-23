@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>{{ label }}</h2>
+Note that due to the store-and-forward nature of queued email delivery - changing settings here may not have an immediate
+effect. It is normaly to have emails `en-route' as the change takes hold. Likewise - it can take up to 72hrs for all the 
+digest changes to clear.
+<h3>Mailing list  subscriptions {{ user }} </h3>
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <table>
+{% for list, form in forms %}
+    <tr><th>{{list.name}}</th><th>{{list.description}}</th></tr>
+    <tr><td></td><td>
+    <table>
+    {{ form.as_table }}
+    </table>
+    </td></tr>
+{% endfor %}
+    <tr><td></td><td>
+<p/>
+<a href="{% url 'index' %}">cancel</a>  <button type="submit">{{ action }}</button></td></td>
+    </table>
+  </form>
+  </p>
+
+{% endblock %}

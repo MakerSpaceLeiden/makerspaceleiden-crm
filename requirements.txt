@@ -25,3 +25,6 @@ django-ipware
 # PDF generation
 reportlab
 PyPDF2
+
+# Mailman scraping API
+lxml

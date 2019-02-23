@@ -26,6 +26,7 @@ urlpatterns = [
     path('', include('django.contrib.auth.urls')),
     path('members/', include('members.urls')),
     path('servicelog/', include('servicelog.urls')),
+    path('mailinglists/', include('mailinglists.urls')),
     path('storage/', include('storage.urls')),
     path('boxes/', include('memberbox.urls')),
     path('acl/', include('acl.urls')),

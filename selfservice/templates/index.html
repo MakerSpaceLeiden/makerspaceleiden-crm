@@ -23,6 +23,9 @@ There are no wifi network passwords for members at the moment.
 	<li><a href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Categorie:Tool">List of all tools</a> and their documentation.
 <p/>
 	<li><a href="{% url 'overview' member_id=member.id %}">Your data</a>
+{%if settings.ML_ADMINURL%}
+	<li><a href="{% url 'mailinglists_edit' %}">Mailing lists subscriptions</a> and digest settings.
+{%endif %}
 	<li><a href="{% url 'userdetails' %}">Update your personal details</a>
 	<li><a href="{% url 'password_change' %}">change your password</a>
 {%if settings.GRAND_AMNESTY %}
