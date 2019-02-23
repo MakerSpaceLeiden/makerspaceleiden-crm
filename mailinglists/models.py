@@ -65,16 +65,10 @@ class Subscription(models.Model):
 def sub_deleted(sender,instance,**kwargs):
      instance.unsubscribe()
 
-# def sub_saved(sender,instance,*args, **kwargs):
 def sub_saved(sender, instance, created, **kwars):
      if created:
         instance.subscribe()
-     instance.sync_activate()
-
-def user_deleted(sender,instance,**kwargs):
-     # Delete all this users subscriptions.
-     for sub in Subscription.objects.all().filter(member = instace):
-         sub.delete()
+     # instance.sync_activate()
 
 def user_saved(sender, instance, created, **kwargs):
      if created:
@@ -83,12 +77,11 @@ def user_saved(sender, instance, created, **kwargs):
              sub.changeReason("Create triggered by user save")
              sub.save()
  
-     for sub in Subscription.objects.all().filter(member = instance):
-         sub.manage(instance.is_active)
-
-post_delete.connect(user_deleted, sender=User)
-post_save.connect(user_saved, sender=User.is_active)
+     # for sub in Subscription.objects.all().filter(member = instance):
+     #    sub.manage(instance.is_active)
 
 post_delete.connect(sub_deleted, sender=Subscription)
+
+post_save.connect(user_saved, sender=User.is_active)
 post_save.connect(sub_saved, sender=Subscription)
 

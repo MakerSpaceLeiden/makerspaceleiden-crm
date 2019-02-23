@@ -26,7 +26,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if options['all']:
-           lists = Mailinglist.objects.all()
+           lists = Mailinglist.objects.all().order_by('name')
         else:
            lists = [Mailinglist.objects.get(name = name) for name in options['listname']]
 
@@ -45,7 +45,7 @@ class Command(BaseCommand):
         for mlist in lists:
            print(f'# {mlist.name}: {mlist.description} Mandatory: {mlist.mandatory}')
 
-           dr = 'x'
+           dr = '.'
            if options['systemonly']:
                dr = '?'
                roster = []
@@ -57,11 +57,11 @@ class Command(BaseCommand):
            for s in  Subscription.objects.all().filter(mailinglist__name = mlist):
                system.append(s.member.email)
    
-           for email in list(set(roster)|set(system)):
+           for email in sorted(list(set(roster)|set(system))):
                 r = dr
                 if email in roster:
                     r = 'R'
-                s = 'x' 
+                s = '.' 
                 if email in system:
                     s = 'S'
                 print(f'{r} {s} {mlist} {email}')

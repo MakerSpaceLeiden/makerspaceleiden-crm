@@ -49,7 +49,7 @@ class MailmanService:
                 'adminpw': self.password
         }).encode('ascii')
 
-        # print(f"LOGIN {url1}") 
+        print(f"LOGIN {url1}") 
         with self.opener.open(urllib.request.Request(url1, postdata)) as response:
                 body = response.read()
                 tree = html.fromstring(body)
@@ -69,7 +69,7 @@ class MailmanService:
 
                  formparams[ 'csrf_token' ] =  self.csrf_token
                  postdata = urllib.parse.urlencode(formparams).encode('ascii')
-                 # print(f"POST {url2}") 
+                 print(f"POST {url2}") 
                  with self.opener.open(urllib.request.Request(url2, postdata)) as response:
                       body = response.read()
                       tree = html.fromstring(body)
