@@ -87,7 +87,7 @@ class Machine(models.Model):
             return True
         if not self.requires_permit.permit:
             return True
-        return self.requires_permit.hasThisPermit(self.requires_permit.permit)
+        return self.requires_permit.permit(user)
         
 # Special sort of create/get - where we ignore the issuer when looking for it.
 # but add it in if we're creating it for the first time.
