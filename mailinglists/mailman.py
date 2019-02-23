@@ -54,8 +54,9 @@ class MailmanService:
                 body = response.read()
                 tree = html.fromstring(body)
                 self.csrf_token = tree.xpath(self.CSRF_EXTRACT)[0]
-                return True
-
+                if self.csrf_token:
+                       print(self.csrf_token)
+                       return True
         raise MailmanException("No CSRF/cookie available recived.")
 
     def post(self, mailinglist, url2, formparams):
@@ -63,9 +64,9 @@ class MailmanService:
         while(retry):
            try:
                  if not self.csrf_token:
-                     self.login(mailinglist)
                      # We (re)try just once.
                      retry = False
+                     self.login(mailinglist)
 
                  formparams[ 'csrf_token' ] =  self.csrf_token
                  postdata = urllib.parse.urlencode(formparams).encode('ascii')

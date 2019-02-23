@@ -31,10 +31,12 @@ class Command(BaseCommand):
             raise CommandError('Noting to do.')
 
         # We do not use the default option of parser - as to not reveal settings needlessly.
-        if 'password' in options:
+        password = settings.ML_PASSWORD
+        if options['password']:
              password = options['password']
 
-        if 'url' in options:
+        url = settings.ML_ADMINURL
+        if options['url']:
              url = options['url']
 
         dryrun = options['dry']
