@@ -52,7 +52,7 @@ class UserManager(BaseUserManager):
         return self._create_user(email, password, **extra_fields)
 
 class AuditRecord:
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey('User', on_delete=models.CASCADE)
     action = models.CharField(max_length=400)
     recorded = models.DateTimeField(auto_now_add=True, db_index=True)
 
@@ -100,8 +100,8 @@ class User(AbstractUser):
            return True
         if not self.is_staff() or not request:
            return True
-        last = AuditRecord.last(self):
-        if last == None or last + GDPR_ESCALATED_TIMESPAN > > datetime.now():
+        last = AuditRecord.last(self)
+        if last == None or last + GDPR_ESCALATED_TIMESPAN > datetime.now():
            return False
         if action:
            # log action.. 
