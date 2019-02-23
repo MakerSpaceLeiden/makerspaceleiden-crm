@@ -36,10 +36,12 @@ class MailmanService:
         self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.cj))
 
         self.csrf_token = None
-        
+
+    def __str__(self):
+        return f'MailmanService-{MailmanService}'
+
     def login(self, mailinglist ):
         url1 = f'{ self.adminurl }/admin/{ mailinglist }'
-    
         # We may need this if the cookie is too old.
         # response = self.opener.open(url1)
 
@@ -47,6 +49,7 @@ class MailmanService:
                 'adminpw': self.password
         }).encode('ascii')
 
+        # print(f"LOGIN {url1}") 
         with self.opener.open(urllib.request.Request(url1, postdata)) as response:
                 body = response.read()
                 tree = html.fromstring(body)
@@ -66,7 +69,7 @@ class MailmanService:
 
                  formparams[ 'csrf_token' ] =  self.csrf_token
                  postdata = urllib.parse.urlencode(formparams).encode('ascii')
-   
+                 # print(f"POST {url2}") 
                  with self.opener.open(urllib.request.Request(url2, postdata)) as response:
                       body = response.read()
                       tree = html.fromstring(body)
@@ -106,7 +109,7 @@ class MailmanAccount:
         return self.mass_subscribe([email])
 
     def mass_subscribe(self,emails):
-        url2 = f'{ self.service.adminurl }/admin/{self.mailinglist}/members/add'
+        url2 = f'{self.service.adminurl }/admin/{self.mailinglist}/members/add'
         params = {
             'subscribe_or_invite': '0', # 0=subscribe, 1=invite
             'send_welcome_msg_to_this_batch': '0',
@@ -126,6 +129,42 @@ class MailmanAccount:
            'setmemberopts_btn': 'Submit Your Changes'
         }
         return self._adminform(url2, params)
+
+    def roster(self):
+        url2 = f'{self.service.adminurl}/admin/{self.mailinglist}/members'
+        body = self.service.post(self.mailinglist, url2, {})
+        tree = html.fromstring(body)
+
+        # Check if we get all emails - or if we need to paginate.
+        m1  = re .search('<center><em>(\d+) members total, (\d+) shown</em></center>', str(body))
+        m2  = re .search('<center><em>(\d+) members total</em></center>', str(body))
+        if m1:
+           cnt = m1.group(1)
+        elif m2:
+           cnt = m2.group(1)
+        else:
+           raise MailmanException(f"Could not retrieve roster.")
+
+        letters = []
+        for url in tree.xpath('//a/@href'):
+              m = re.search('\?letter=(.)$', url)
+              if m:
+                letters.append(m.group(1))
+        vals = []
+
+        vals.extend(tree.xpath('//input[@name="user" and @type="HIDDEN"]/@value'))
+
+        for l in letters[1:]:
+           url3 = f'{url2}?letter={l}'
+           body = self.service.post(self.mailinglist, url3, {})
+           tree = html.fromstring(body)
+           vals.extend(tree.xpath('//input[@name="user" and @type="HIDDEN"]/@value'))
+ 
+        if int(cnt) != len(vals):
+           raise MailmanException(f"Could not retrieve complete roster.")
+
+        # return [email.replace('--at--', '@') for email in vals]
+        return [urllib.parse.unquote(email) for email in vals]
 
     def is_subscribed(self):
        try:
@@ -151,9 +190,6 @@ class MailmanAccount:
         return self._adminform(url2, params)
 
     def _adminform(self, url2, params):
-        print(f'HTTP get on {url2} -- {params}')
-        return True
-
         # We prlly should intercepts CSRF at a handler
         # level - and hide it from subsequent calls. I.e.
         # make a CSRF OpenerDirector.
@@ -216,14 +252,16 @@ if __name__ == "__main__":
    (what,adminurl, mlist,email,password) = sys.argv[1:]
    try:
      service = MailmanService(password, adminurl)
-     account = MailmanAccount(service, mlist, email)
+     account = MailmanAccount(service, mlist)
      if what == 'info':
-       print(f'Delivery: { account.delivery }')
-       print(f'Digest:   { account.digest }')
+       print(f'Delivery: { account.delivery(email) }')
+       print(f'Digest:   { account.digest(email) }')
      elif what == 'sub':
        print(account.subscribe(email))
      elif what == 'unsub':
        print(account.unsubscribe(email))
+     elif what == 'roster':
+       print("\n".join(account.roster()))
      else:
        print("Eh - just now info, sub and ubsub") 
    except MailmanAccessDeniedException as e:

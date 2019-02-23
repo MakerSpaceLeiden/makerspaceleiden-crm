@@ -33,9 +33,19 @@ import logging
 logger = logging.getLogger(__name__)
 
 @login_required
-def mailinglists_edit(request):
+def mailinglists_edit(request, user_id = None):
+    user = request.user
+    if user_id:
+        try:
+           user = User.objects.get(id = user_id)
+        except User.DoesNotExist:
+         return HttpResponse("User not found",status=404,content_type="text/plain")
+  
+    if user != request.user and not request.user.is_superuser():
+         return HttpResponse("XS denied",status=403, content_type="text/plain")
+
     lists = Mailinglist.objects.all()
-    subs = Subscription.objects.all().filter(member = request.user)
+    subs = Subscription.objects.all().filter(member = user)
 
     # In theory we could assume a perfectly synced DB; but we'll for now
     # allow discrepancies - and simply add any missing subscriptions if
@@ -51,12 +61,11 @@ def mailinglists_edit(request):
         id2sub[str(s.mailinglist.id)] = s
 
     if request.method == "POST":
-        # TODO: We skip the disabled on active for manadatory lists. 
         forms = [ SubscriptionForm(request.POST, prefix=str(l.id), instance = id2sub[ str(l.id) ]) for l in lists ]
         if all([form.is_valid() for form in forms]):
             for form in forms:
                 nw= form.save(commit=False)
-                nw.member = request.user
+                nw.member = user
                 nw.mailinglist = id2list[ form.prefix ]
                 nw.save()
             return redirect('mailinglists_edit')
@@ -73,17 +82,14 @@ def mailinglists_edit(request):
            form = SubscriptionForm(prefix=str(l.id), instance = s)
         else:
            form = SubscriptionForm(prefix=str(l.id)) 
-        if l.mandatory:
-           form.fields['active'].value = True
-           form.fields['active'].disabled = True
-           form.fields['active'].help_text = 'This list is mandatory for all members. It cannot be disabled. Contact the trustees for exceptions.'
 
         forms.append((l, form))
 
     return render(request,'multi_crud.html', {
-          'title': 'Edit your mailing lists subscriptions',
+          'title': 'Edit mailing lists subscriptions',
           'forms': forms,
           'action': 'Submit',
+          'user': user,
           'back': 'mailinglists_edit',
     })
 
