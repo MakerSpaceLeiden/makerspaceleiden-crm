@@ -211,6 +211,7 @@ class MailmanAccount:
            # bit of a hack - should be a chat/expect per form type. But these
            # are unique enough for the few functons that we have.
            if 'Already a member' in str(body):
+               return True
                raise MailmanAlreadySubscribed("already a member")
 
            if ' zijn met succes ' in str(body):
