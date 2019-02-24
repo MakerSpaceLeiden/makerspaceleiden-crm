@@ -88,6 +88,10 @@ LOGGING = {
                        'level': 'DEBUG',
                        'propagate': True,
                    },
+                  '': {
+                      'handlers': ['file'],
+                      'propagate': True,
+                  },
             },
 }
 ALSO_INFORM_EMAIL_ADDRESSES = [ 'deelnemers@mailman.makerspaceleiden.nl' ]
