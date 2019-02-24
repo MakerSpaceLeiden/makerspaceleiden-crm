@@ -18,7 +18,7 @@ class Command(BaseCommand):
         parser.add_argument( '--url', dest='url', type = str, help='Admin URL',)
         parser.add_argument( '--password', dest='password', type = str, help='Admin Password',)
 
-        # parser.add_argument('dir', choices = ['list2crm', 'crm2list','compare'])
+        parser.add_argument('dir', choices = ['list2crm', 'crm2list','compare'])
         parser.add_argument('listname', nargs='*')
 
     def handle(self, *args, **options):
@@ -39,6 +39,17 @@ class Command(BaseCommand):
 
         dryrun = options['dry']
 
+        pull = False
+        push = False
+        if options['dir'] == 'list2crm':
+             pull = True
+        elif options['dir'] == 'crm2list':
+             push = True
+        elif not dryrun:
+             print("Comparing - automatically a dryrun")
+             dryrun = True
+             
+ 
         service = MailmanService(password, url)
         for mlist in lists:
            print(f'# {mlist.name}: {mlist.description}')
@@ -74,53 +85,75 @@ class Command(BaseCommand):
 
                    v = account.delivery(email)
                    if sub.active != v:
-                       print(f"\tACTION: update active flag to {v}")
-                       if not dryrun:
-                          sub.active = v
-                          sub.save()
+                       if pull:
+                          print(f"\tACTION: active flag to {v} - list is leading")
+                          if not dryrun:
+                             sub.active = v
+                             sub.save()
+                       if push:
+                          print(f"\tACTION: active flag to {sub.active} - crm is leading")
+                          if not dryrun:
+                               acount.delivery(email, sub.active)
                    else:
                        print(f'\tactive/delivery flag in sync.')
 
                    v = account.digest(email)
                    if sub.digest != v:
-                       print(f"\tACTION: update digest flag to {v}")
-                       if not dryrun:
-                          sub.digest = v
-                          sub.save()
+                       if pull:
+                          print(f"\tACTION: digest flag to {v} - list is leading")
+                          if not dryrun:
+                             sub.digest = v
+                             sub.save()
+                       if push:
+                          print(f"\tACTION: digest flag to {sub.digest } - crm is leading")
+                          if not dryrun:
+                             acount.digest (email, sub.digest)
                    else:
                        print(f'\tdigest flag in sync.')
  
                 elif email in known and email in system:
                    print(f'{email}\n \tmissing on roster - but we think it should be subscribed')
-                   print(f"\tACTION: Subscribing on server")
-                   if dryrun:
-                       continue
-                   
-                   s = Subscription.objects.get(mailinglist == mlist, member.email == email)
-                   s.subscribe()
-                   # s.changeReason("Sync Subscribed during command sync")
-                   s.save()
+                   if pull:
+                       print(f"\tDEFER: nothing - as we're pulling from the list")
+
+                   if push:
+                       print(f"\tACTION: Subscribing on crm -- list is leading")
+                       if not dryrun:
+                         s = Subscription.objects.get(mailinglist == mlist, member.email == email)
+                         s.subscribe()
+                         # s.changeReason("Sync Subscribed during command sync")
+                         s.save()
 
                 elif email in known and email in roster:
                    print(f'{email}\n \ton the roster - but not recorded as subscribed.')
-                   print(f"\tACTION: record as subscribed")
-                   if dryrun:
-                       continue
-                   s = Subscription(member = e2u[email], mailinglist = mlist, digest = False, active = False)
-                   s.save()
+                   if pull:
+                       print(f"\tACTION: record as subscribed -- list is leading")
+                       if not dryrun:
+                          s = Subscription(member = e2u[email], mailinglist = mlist, digest = False, active = True)
+                          s.save()
+                   if push:
+                       print(f"\tDEFER: nothing - as the crm is leading")
 
                 elif email in known:
                    print(f'{email}\n \tmissing on roster - and not recorded as subscribed.')
-                   print(f"\tACTION: Subscribing onto the roster AND recoring as subscribed")
-                   if dryrun:
-                       continue
-                   s = Subscription(member = e2u[email], mailinglist = mlist, digest = False, active = False)
-                   s.subscribe()
-                   # s.changeReason("Subscribed during command sync and added to the mailing list server")
-                   s.save()
+                   if legacy:
+                       print(f"\tACTION: Subscribing onto the roster AND recoring as subscribed")
+                       if not dryrun:
+                          s = Subscription(member = e2u[email], mailinglist = mlist, digest = False, active = False)
+                          s.subscribe()
+                          # s.changeReason("Subscribed during command sync and added to the mailing list server")
+                          s.save()
+                   if pull:
+                       print(f"\tDEFER: not doing anything - list is leading'")
+                   if push:
+                       print(f"\tACTION: Subscribing onto the roster AND recoring as subscribed")
+                       if not dryrun:
+                          s = Subscription(member = e2u[email], mailinglist = mlist, digest = False, active = False)
+                          s.save()
 
                 elif email in roster:
-                   print(f'{email}\n \tnot in the crm, but on the roster -- not removed (IGNORED).')
+                   print(f'{email}\n \tnot in the crm, but on the roster')
+                   print(f"\tDEFER: a user will need to be added to the crm; or a users email needs to be adjusted")
                 else:
                    raise Exception("bug")
  
