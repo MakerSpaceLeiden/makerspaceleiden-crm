@@ -9,7 +9,7 @@ MAILMAN_PASSWD = None # e.g. 'Foo'
 
 # These should be "0" or "1" -- as a string.
 #
-LIST_OWNER_NOTIFS = "0"
+LIST_OWNER_NOTIFS = "1"
 
 class MailmanAlreadySubscribed(Exception):
     pass
@@ -49,13 +49,13 @@ class MailmanService:
                 'adminpw': self.password
         }).encode('ascii')
 
-        print(f"LOGIN {url1}") 
+        # print(f"LOGIN {url1}") 
         with self.opener.open(urllib.request.Request(url1, postdata)) as response:
                 body = response.read()
                 tree = html.fromstring(body)
                 self.csrf_token = tree.xpath(self.CSRF_EXTRACT)[0]
                 if self.csrf_token:
-                       print(self.csrf_token)
+                       #print(self.csrf_token)
                        return True
         raise MailmanException("No CSRF/cookie available recived.")
 
@@ -70,7 +70,7 @@ class MailmanService:
 
                  formparams[ 'csrf_token' ] =  self.csrf_token
                  postdata = urllib.parse.urlencode(formparams).encode('ascii')
-                 print(f"POST {url2}") 
+                 #print(f"POST {url2}") 
                  with self.opener.open(urllib.request.Request(url2, postdata)) as response:
                       body = response.read()
                       tree = html.fromstring(body)
@@ -196,7 +196,6 @@ class MailmanAccount:
         # make a CSRF OpenerDirector.
         #
         try:
-   
            formparams = {}
            get = None
            for k,v in params.items():
@@ -207,15 +206,11 @@ class MailmanAccount:
 
            body = self.service.post(self.mailinglist, url2, formparams)
            tree = html.fromstring(body)
-
            # bit of a hack - should be a chat/expect per form type. But these
            # are unique enough for the few functons that we have.
            if 'Already a member' in str(body):
                return True
                raise MailmanAlreadySubscribed("already a member")
-
-           if ' zijn met succes ' in str(body):
-               return True
 
            if 'Successfully subscribed:' in str(body):
                return True
@@ -226,7 +221,8 @@ class MailmanAccount:
            if 'Cannot unsubscribe non-members:' in str(body):
                 raise MailmanAccessNoSuchSubscriber("not found")
 
-           if 'mailing list membership configuration for' not in str(body):
+           if 'mailing list membership configuration for' not in str(body) and ' zijn met succes ' not in str(body):
+                # print(str(body))
                 raise MailmanAccessNoSuchSubscriber("not found")
 
            if get:
@@ -239,9 +235,10 @@ class MailmanAccount:
 
            results = {}
            for k,v in params.items():
-               val = tree.xpath('//input[@name="'+get+'" and @checked]/@value')[0]
-               results[ k ] = str(val)
-
+               val = tree.xpath('//input[@name="'+k+'" and @checked]/@value')
+               if val and val[0]:
+                 results[ k ] = str(val)
+ 
            return results
 
         except urllib.error.HTTPError as e:

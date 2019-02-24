@@ -69,7 +69,7 @@ class Command(BaseCommand):
               e2u[ u.email ] = u
 
            # system = Subscription.objects.all().values_list('member__email', flat=True)
-           subs = Subscription.objects.all()
+           subs = Subscription.objects.all().filter(mailinglist = mlist)
            system = []
            e2s = {}
            for s in subs:
@@ -95,7 +95,7 @@ class Command(BaseCommand):
                        if push:
                           print(f"\tACTION: active flag to {sub.active} - crm is leading")
                           if not dryrun:
-                               acount.delivery(email, sub.active)
+                               account.delivery(email, sub.active)
                    else:
                        print(f'\tactive/delivery flag in sync.')
 
