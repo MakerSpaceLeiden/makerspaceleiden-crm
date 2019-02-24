@@ -149,7 +149,8 @@ class Command(BaseCommand):
 
                 elif email in roster:
                    print(f'{email}\n \tnot in the crm, but on the roster')
-                   print(f"\tDEFER: a user will need to be added to the crm; or a users email needs to be adjusted")
+                   if pull or push:
+                      print(f"\tDEFER: a user will need to be added to the crm; or a users email needs to be adjusted")
                 else:
                    raise Exception("bug")
  
