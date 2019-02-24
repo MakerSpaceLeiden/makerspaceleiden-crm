@@ -213,6 +213,9 @@ class MailmanAccount:
            if 'Already a member' in str(body):
                raise MailmanAlreadySubscribed("already a member")
 
+           if ' zijn met succes ' in str(body):
+               return True
+
            if 'Successfully subscribed:' in str(body):
                return True
 
