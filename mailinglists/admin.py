@@ -12,7 +12,8 @@ class MailinglistAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
 admin.site.register(Mailinglist, MailinglistAdmin)
 
 class SubscriptionAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
-     pass
+    list_display = ('mailinglist', 'member', 'active', 'digest')
+
 admin.site.register(Subscription, SubscriptionAdmin)
 
 
