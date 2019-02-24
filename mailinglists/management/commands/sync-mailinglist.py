@@ -129,7 +129,7 @@ class Command(BaseCommand):
                 elif email in known and email in roster:
                    print(f'{email}\n \ton the roster - but not recorded as subscribed.')
                    if pull:
-                       print(f"\tACTION: record as subscribed -- list is leading")
+                       print(f"\tACTION: record as subscribed wth active delivery -- list is leading")
                        if not dryrun:
                           s = Subscription(member = e2u[email], mailinglist = mlist, digest = False, active = True)
                           s.save()
@@ -141,7 +141,7 @@ class Command(BaseCommand):
                    if pull:
                        print(f"\tDEFER: not doing anything - list is leading'")
                    if push:
-                       print(f"\tACTION: Subscribing onto the roster AND recoring as subscribed")
+                       print(f"\tACTION: Subscribing onto the roster AND recoring as subscribed with delivery off")
                        if not dryrun:
                           s = Subscription(member = e2u[email], mailinglist = mlist, digest = False, active = False)
                           s.subscribe()
@@ -150,7 +150,7 @@ class Command(BaseCommand):
                 elif email in roster:
                    print(f'{email}\n \tnot in the crm, but on the roster')
                    if pull or push:
-                      print(f"\tDEFER: a user will need to be added to the crm; or a users email needs to be adjusted")
+                      print(f"\tDEFER: modify/add user in crm or delete from roster")
                 else:
                    raise Exception("bug")
  
