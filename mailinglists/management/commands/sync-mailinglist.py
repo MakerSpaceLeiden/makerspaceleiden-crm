@@ -138,19 +138,13 @@ class Command(BaseCommand):
 
                 elif email in known:
                    print(f'{email}\n \tmissing on roster - and not recorded as subscribed.')
-                   if legacy:
-                       print(f"\tACTION: Subscribing onto the roster AND recoring as subscribed")
-                       if not dryrun:
-                          s = Subscription(member = e2u[email], mailinglist = mlist, digest = False, active = False)
-                          s.subscribe()
-                          # s.changeReason("Subscribed during command sync and added to the mailing list server")
-                          s.save()
                    if pull:
                        print(f"\tDEFER: not doing anything - list is leading'")
                    if push:
                        print(f"\tACTION: Subscribing onto the roster AND recoring as subscribed")
                        if not dryrun:
                           s = Subscription(member = e2u[email], mailinglist = mlist, digest = False, active = False)
+                          s.subscribe()
                           s.save()
 
                 elif email in roster:
