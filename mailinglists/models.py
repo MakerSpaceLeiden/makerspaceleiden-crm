@@ -55,7 +55,7 @@ class Subscription(models.Model):
         if not self.account:
               self.account = MailmanAccount(service, self.mailinglist)
 
-        self.account.subscribe(self.member.email, self.member.name)
+        self.account.subscribe(self.member.email, str(self.member.name))
 
     def unsubscribe(self):
         if not self.account:
