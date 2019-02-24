@@ -34,11 +34,11 @@ class Command(BaseCommand):
             raise CommandError('Noting to do.')
 
         password = settings.ML_PASSWORD
-        if 'password' in options:
+        if options['password']:
              password = options['password']
 
         url = settings.ML_ADMINURL
-        if 'url' in options:
+        if options['url']:
              url = options['url']
 
         service = MailmanService(password,url)
