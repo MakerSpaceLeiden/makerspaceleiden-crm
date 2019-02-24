@@ -4,6 +4,9 @@ import http.cookiejar
 from lxml import html
 import re
 
+import logging
+logger = logging.getLogger(__name__)
+
 MAILMAN_URL = None # e.g. 'https://mailman.makerspaceleiden.nl/mailman'
 MAILMAN_PASSWD = None # e.g. 'Foo'
 
@@ -206,6 +209,7 @@ class MailmanAccount:
 
            body = self.service.post(self.mailinglist, url2, formparams)
            tree = html.fromstring(body)
+       
            # bit of a hack - should be a chat/expect per form type. But these
            # are unique enough for the few functons that we have.
            if 'Already a member' in str(body):
@@ -221,9 +225,8 @@ class MailmanAccount:
            if 'Cannot unsubscribe non-members:' in str(body):
                 raise MailmanAccessNoSuchSubscriber("not found")
 
-           if 'mailing list membership configuration for' not in str(body) and ' zijn met succes ' not in str(body):
-                # print(str(body))
-                raise MailmanAccessNoSuchSubscriber("not found")
+           # if 'mailing list membership configuration for' not in str(body) and ' zijn met succes ' not in str(body):
+                  # raise MailmanAccessNoSuchSubscriber("not found")
 
            if get:
                 val = tree.xpath('//input[@name="'+get+'" and @checked]/@value')[0]
@@ -238,7 +241,9 @@ class MailmanAccount:
                val = tree.xpath('//input[@name="'+k+'" and @checked]/@value')
                if val and val[0]:
                  results[ k ] = str(val)
- 
+
+           del formparams['csrf_token']
+           logger.debug(f'{url2} {formparams} {results}')
            return results
 
         except urllib.error.HTTPError as e:

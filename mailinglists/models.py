@@ -68,7 +68,7 @@ def sub_deleted(sender,instance,**kwargs):
 def sub_saved(sender, instance, created, **kwars):
      if created:
         instance.subscribe()
-     # instance.sync_activate()
+     instance.sync_activate()
 
 def user_saved(sender, instance, created, **kwargs):
      if created:

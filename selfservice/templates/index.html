@@ -24,9 +24,7 @@ There are no wifi network passwords for members at the moment.
 <p/>
 	<li><a href="{% url 'overview' member_id=member.id %}">Your data</a>
 {%if settings.ML_ADMINURL%}
-<!--
 	<li><a href="{% url 'mailinglists_edit' %}">Mailing lists subscriptions</a> and digest settings.
--->
 {%endif %}
 	<li><a href="{% url 'userdetails' %}">Update your personal details</a>
 	<li><a href="{% url 'password_change' %}">change your password</a>
