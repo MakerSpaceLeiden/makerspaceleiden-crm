@@ -106,7 +106,7 @@ def mailinglists_archives(request):
         'back': 'home',
     })
 
-service = MailmanService()
+service = MailmanService(settings.ML_PASSWORD, settings.ML_ADMINURL)
 
 def mailinglists_archive(request, mlist, yearmonth = None, order = None):
    try:
@@ -151,5 +151,7 @@ def mailinglists_archive(request, mlist, yearmonth = None, order = None):
 
    body = re.sub(re.compile('<!--x-search-form-->.*</form>',re.DOTALL),'',body)
 
-   return HttpResponse(body, content_type = response.info().get_content_type)
-
+   mimetype = response.info().get_content_type()
+   if not mimetype:
+       mimetype = 'text/plain'
+   return HttpResponse(body,content_type = mimetype)
