@@ -106,8 +106,8 @@ def mailinglists_archives(request):
         'back': 'home',
     })
 
-service = MailmanService(settings.ML_PASSWORD, settings.ML_ADMINURL)
-
+# TODO gzip ascii version
+#      attachment (full URL intercept)
 def mailinglists_archive(request, mlist, yearmonth = None, order = None):
    try:
         mid = Mailinglist.objects.get(name = mlist)
@@ -137,8 +137,11 @@ def mailinglists_archive(request, mlist, yearmonth = None, order = None):
 
    if order :
        path = path + order  + '.html'
+
+   service = MailmanService(settings.ML_PASSWORD, settings.ML_ADMINURL)
    response = service.get(mlist, path)
-   body = response.read().decode('utf-8')
+
+   body = response.read().decode('latin1')
 
    if yearmonth == None:
       p = reverse('mailinglists_archives')
