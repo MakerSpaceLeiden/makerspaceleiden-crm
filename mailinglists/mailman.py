@@ -92,6 +92,28 @@ class MailmanService:
 
         raise MailmanException("Unknown error - e.g. wrong password")
 
+    def get(self, mailinglist, path):
+        url = f'{ self.adminurl }/{ path }'
+        retry = True
+        while(retry):
+           try:
+                 if not self.csrf_token:
+                     retry = False
+                     self.login(mailinglist)
+                 return self.opener.open(urllib.request.Request(url))
+
+           except urllib.error.HTTPError as e:
+                   if e.code != 401:
+                      logger.error(f"Mailinglist proxy get on url {url} failed.")
+                      raise e
+
+           #propably a wrong cookie or CSRF issue; reset these. And try again.
+           #
+           self.csrf_token = None
+           self.cj.clear()
+
+        raise MailmanException("Unknown error - e.g. wrong password")
+
 class MailmanAccount:
     def __init__(self, service, mailinglist):
         self.service = service

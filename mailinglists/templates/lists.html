@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>{{ label }}</h2>
+
+The archives are confidential. Access to the archive is only for (current, active) members and those authorized by the trustees of the foundation.
+
+<ul>
+{% for list in items %}
+   <li><a href="{% url 'mailinglists_archive' mlist=list.name %}">{{ list.name }}</a> <i>{{ list.description }}</i>
+{% if list.visible_months %}
+<br>
+Only the last {{ list.visible_months }} months. Contact the trustees for historic data.
+{% endif %}
+{% endfor %}
+</ul>
+
+</p>
+  Note: The archive may be a few hours behond.
+{% endblock %}

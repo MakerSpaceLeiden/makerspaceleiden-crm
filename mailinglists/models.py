@@ -15,6 +15,8 @@ class Mailinglist(models.Model):
     description =  models.CharField(max_length=400)
     mandatory = models.BooleanField(default=False,help_text = 'Requires super admin to change')
 
+    visible_months = models.IntegerField(default=0, help_text="How long these archives are visible for normal members, or blank/0 if `forever'")
+
     history = HistoricalRecords()
 
     def __str__(self):
