@@ -46,7 +46,7 @@ def mailinglists_edit(request, user_id = None):
         except User.DoesNotExist:
          return HttpResponse("User not found",status=404,content_type="text/plain")
   
-    if user != request.user and not request.user.is_superuser():
+    if user != request.user and not request.user.is_superuser:
          return HttpResponse("XS denied",status=403, content_type="text/plain")
 
     lists = Mailinglist.objects.all()
@@ -130,7 +130,7 @@ def mailinglists_archive(request, mlist, yearmonth = None, order = None):
 
        if mid.visible_months:
           f = datetime.date.today()- datetime.timedelta(days = mid.visible_months*30) # Bit in-exact; but not very critical as we round down to months.
-          if year < f.year or (year == f.year and month < f.month):
+          if year < f.year or (year == f.year and month < f.month) and not request.user.is_superuser:
              return HttpResponse("No access to archives this old; contact the trustees",status=404,content_type="text/plain")
 
        path = path + yearmonth + '/'
