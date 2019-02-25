@@ -90,7 +90,7 @@ class MailmanService:
            self.csrf_token = None
            self.cj.clear()
 
-        raise MailmanException("Unknown error")
+        raise MailmanException("Unknown error - e.g. wrong password")
 
 class MailmanAccount:
     def __init__(self, service, mailinglist):

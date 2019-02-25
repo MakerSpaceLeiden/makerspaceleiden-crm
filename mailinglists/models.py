@@ -4,6 +4,9 @@ from django.db.models.signals import post_delete,post_save, pre_delete, pre_save
 from django.conf import settings
 from simple_history.models import HistoricalRecords
 
+import logging
+logger = logging.getLogger(__name__)
+
 from .mailman import MailmanService, MailmanAccount
 service = MailmanService(settings.ML_PASSWORD, settings.ML_ADMINURL)
 
