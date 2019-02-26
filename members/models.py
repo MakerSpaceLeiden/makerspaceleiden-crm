@@ -7,17 +7,19 @@ from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.utils.translation import ugettext_lazy as _
 from django.urls import reverse_lazy,reverse
 from stdimage.models import StdImageField
+from django.core.exceptions import ObjectDoesNotExist
 
 from django.db.models.signals import pre_delete, pre_save
 from stdimage.utils import pre_delete_delete_callback, pre_save_delete_callback
 
 from makerspaceleiden.utils import upload_to_pattern
 
-import re
+import re, datetime
 
-GDPR_ESCALATED_TIMESPAN = 60 * 10 
-if hasattr(settings,'GDPR_ESCALATED_TIMESPAN'):
-    GDPR_ESCALATED_TIMESPAN = settings.GDPR_ESCALATED_TIMESPAN
+GDPR_ESCALATED_TIMESPAN_SECONDS = 60 * 10 
+
+if hasattr(settings,'GDPR_ESCALATED_TIMESPAN_SECONDS'):
+    GDPR_ESCALATED_TIMESPAN_SECONDS = settings.GDPR_ESCALATED_TIMESPAN_SECONDS
 
 class UserManager(BaseUserManager):
     """Define a model manager for User model with no username field."""
@@ -51,15 +53,24 @@ class UserManager(BaseUserManager):
 
         return self._create_user(email, password, **extra_fields)
 
-class AuditRecord:
+class AuditRecord(models.Model):
     user = models.ForeignKey('User', on_delete=models.CASCADE)
     action = models.CharField(max_length=400)
     recorded = models.DateTimeField(auto_now_add=True, db_index=True)
+    final = models.BooleanField(default = False)
 
-    def last(self, user):
+    history = HistoricalRecords()
+
+    def __str__(self):
+        return f'{self.action} by {self.user} on {self.recorded}'
+
+    def last(user):
        try:
-          return self.objects.all().filter(user = user).latest('recorded')
-       except DoesNotExist:
+          rec = AuditRecord.objects.all().filter(user = user).latest('recorded')
+          if rec.final:
+             return None
+          return rec.recorded
+       except ObjectDoesNotExist:
           return None
 
 class User(AbstractUser):
@@ -95,22 +106,28 @@ class User(AbstractUser):
     def url(self):
         return  settings.BASE + self.path()
 
-    def is_privileged(self, request = None, action = None):
-        if self.is_superuser():
+    def is_privileged(self):
+        if self.is_superuser:
            return True
-        if not self.is_staff() or not request:
-           return True
-        last = AuditRecord.last(self)
-        if last == None or last + GDPR_ESCALATED_TIMESPAN > datetime.now():
+
+        if not self.is_staff:
            return False
-        if action:
-           # log action.. 
-           # Also extend the priv-time ?
-           pass 
-        return true
+
+        last = AuditRecord.last(self)
+        print(last)
+        print(datetime.datetime.now())
+
+        if last == None:
+           return False
+
+        endtime =  last +  datetime.timedelta(seconds=GDPR_ESCALATED_TIMESPAN_SECONDS)
+        now = datetime.datetime.now(last.tzinfo)
+
+        print(f'last: {last} -- end time {endtime} == now: {now}')
+        return endtime > now
 
     def can_escalate_to_priveleged(self):
-        return self.is_staff() or self.is_superuser()
+        return self.is_staff or self.is_superuser
 
     def escalate_to_priveleged(self, request, action):
         ar = AuditRecord(user = self, action = action)

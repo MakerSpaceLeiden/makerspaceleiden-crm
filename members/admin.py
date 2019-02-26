@@ -7,8 +7,7 @@ from import_export import resources
 from simple_history.admin import SimpleHistoryAdmin
 from django.utils.translation import ugettext_lazy as _
 
-
-from .models import Tag,  User
+from .models import Tag,  User, AuditRecord
 
 class UserResource(resources.ModelResource):
     class Meta:
@@ -48,4 +47,11 @@ class TagAdmin(ImportExportModelAdmin,SimpleHistoryAdmin):
     resource_class = TagResource
 
 admin.site.register(Tag,TagAdmin)
+
+class AuditRecordAdmin(ImportExportModelAdmin,SimpleHistoryAdmin):
+    list_display = ('user', 'action', 'recorded')
+    resource_class = AuditRecord
+
+admin.site.register(AuditRecord, AuditRecordAdmin)
+
 

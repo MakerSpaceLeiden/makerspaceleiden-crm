@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import Tag, clean_tag_string
+from .models import Tag, clean_tag_string, AuditRecord
 from django.forms import ModelForm
 
 from members.models import User
@@ -61,3 +61,10 @@ class NewUserForm(forms.Form):
     tag = forms.ModelChoiceField(queryset=Unknowntag.objects.all(), required = False, help_text="Optional. Leave blank to add later.")
     activate_doors = forms.BooleanField(initial = True, help_text='Also give this user door permits if they did not have it yet. Only applicable if above tag is specified.') 
 
+class NewAuditRecordForm(ModelForm):
+   class Meta:
+      model = AuditRecord
+      fields = [ 'action', ]
+      help_texts = {
+          'action': 'Reason why you need to become admin; e.g. "debug an issue", "fix user record", "add a mailinglist", "adjust a tag", etc.',
+      }

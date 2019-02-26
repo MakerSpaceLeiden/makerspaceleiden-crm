@@ -34,6 +34,15 @@
             {% block welcome-msg %}
                 {% trans 'Welcome,' %}
                 <strong>{% firstof user.get_short_name user.get_username %}</strong>.
+{% if user.is_privileged %}<b>(admin)</b>
+   {% if not user.is_superuser %}
+	/ <a href="{% url 'drop' %}">[drop]</a> / 
+   {% endif %}
+{% else %}
+   {% if user.can_escalate_to_priveleged %}
+	/ <a href="{% url 'sudo' %}">[SUDO]</a> /
+   {% endif %}
+{% endif %}
             {% endblock %}
             {% block userlinks %}
                 {% if site_url %}

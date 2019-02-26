@@ -9,10 +9,10 @@ from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.db.utils import IntegrityError
 
-from .forms import NewUserForm
+from .forms import NewUserForm, NewAuditRecordForm
 
 from acl.models import Entitlement,PermitType
-from members.models import Tag,User,clean_tag_string
+from members.models import Tag,User,clean_tag_string,AuditRecord
 
 import logging
 import datetime
@@ -104,5 +104,42 @@ def newmember(request):
     context['form'] = NewUserForm()
     return render(request, 'members/newmember.html', context)
 
-  
+@login_required
+def sudo(request):
+    if not request.user.can_escalate_to_priveleged:
+            return HttpResponse("XS denied",status=403,content_type="text/plain")
 
+    if request.POST:
+        form = NewAuditRecordForm(request.POST)
+        if form.is_valid():
+          try:
+             record = form.save(commit = False)
+             record.user = request.user
+             record.changeReason = f'SUDO escalation in webinterface by {request.user}'
+             record.save()
+          except Exception as e:
+             logger.error("Failed to create uudit recordser : {}".format(e))
+             return HttpResponse("Could not create audit record.",status=500,content_type="text/plain")
+
+    form = NewAuditRecordForm()
+    context = {
+          'label': 'Reason',
+          'title': 'Become and admin',
+          'action': 'go admin',
+          'form': NewAuditRecordForm(),
+          'back': 'index',
+    }
+    return render(request, 'crud.html', context)
+
+def drop(request):
+    if not request.user.can_escalate_to_priveleged:
+            return HttpResponse("XS denied",status=403,content_type="text/plain")
+
+    if not request.user.is_privileged:
+            return HttpResponse("Not privd at this time",status=403,content_type="text/plain")
+
+    record = AuditRecord(user = request.user, final = True, action = 'Drop privs from webinterface')
+    record.changereason =  f'DROP in webinterface by {request.user}'
+    record.save()
+
+    return redirect('index')
