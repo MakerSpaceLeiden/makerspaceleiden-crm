@@ -49,7 +49,7 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
 			{%if member.form_on_file %} yes {% else %} no <a href="{% url 'waiverform' user_id=member.id %}" target="_blank">[ Download form ]</a>{% endif %}
 			</td></tr>
 	{%if member == user %}
-			<tr><td></td><td><a href="{% url 'userdetails' %}">[edit]</a></td><td>
+			<tr><td></td><td><a href="{% url 'userdetails' %}">[edit]</a></td></tr>
 	{% endif %}
 	{%if member.is_staff %}
 			<tr><td></td><td>Can edit databases (staff)</td><td>
@@ -58,6 +58,27 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
 			<tr><td></td><td>Is a superuser</td><td>
 	{% endif %}
 
+    <tr><td colspan=2><h3>Subscriptions</h3></td></tr>
+{% for sub in subscriptions %}
+        <tr><td align=right>{{sub.mailinglist.name}}</td><td><i>{{sub.mailinglist.description}}</i>
+	<br/>Subscribed:
+	{%if sub.active %}
+		yes
+	{% else %}
+		no
+	{% endif %}.
+	<br/>Digest
+	{%if sub.active %}
+		yes
+	{% else %}
+		no, receive in real time
+	{% endif %}.
+	<p/></td></tr>
+{% endfor %}
+	{%if member == user or user.is_superadmin %}
+			<tr><td></td><td><a href="{% url 'mailinglists_edit'  user_id=member.id %}">[edit]</a> your subscriptions</td></tr>
+	{% endif %}
+    
     {%if member == user %}
     <tr><td colspan=2><h3>Notifications</h3></td></tr>
 	<tr><td></td><td>

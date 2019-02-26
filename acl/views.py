@@ -22,6 +22,8 @@ from ipware import get_client_ip
 from members.models import Tag,User, clean_tag_string
 from members.forms import TagForm
 
+from mailinglists.models import Mailinglist, Subscription
+
 from .models import Machine,Entitlement,PermitType
 
 from storage.models import Storage
@@ -202,6 +204,8 @@ def member_overview(request,member_id = None):
     machines = Machine.objects.order_by()
     boxes = Memberbox.objects.all().filter(owner = member)
     storage = Storage.objects.all().filter(owner = member)
+    subscriptions = Subscription.objects.all().filter(member = member)
+
     normal_permits = {}
     for m in machines:
         normal_permits[ m.requires_permit ] = True
@@ -224,6 +228,7 @@ def member_overview(request,member_id = None):
        'boxes': boxes,
        'lst': lst,
        'permits': specials,
+       'subscriptions': subscriptions,
        'user' : request.user,
     }
 

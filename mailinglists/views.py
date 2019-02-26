@@ -106,9 +106,8 @@ def mailinglists_archives(request):
         'back': 'home',
     })
 
-# TODO gzip ascii version
-#      attachment (full URL intercept)
-def mailinglists_archive(request, mlist, yearmonth = None, order = None):
+# Todo: attachment (full URL intercept) & rewrite them.
+def mailinglists_archive(request, mlist, yearmonth = None, order = None, zip = None):
    try:
         mid = Mailinglist.objects.get(name = mlist)
         mlist = mid.name
@@ -133,7 +132,10 @@ def mailinglists_archive(request, mlist, yearmonth = None, order = None):
           if year < f.year or (year == f.year and month < f.month) and not request.user.is_superuser:
              return HttpResponse("No access to archives this old; contact the trustees",status=404,content_type="text/plain")
 
-       path = path + yearmonth + '/'
+       if zip:
+           path = path + yearmonth + '.txt.gz'
+       else:
+           path = path + yearmonth + '/'
 
    if order :
        path = path + order  + '.html'
