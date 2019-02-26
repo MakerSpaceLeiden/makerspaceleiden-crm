@@ -160,10 +160,10 @@ def mailinglists_archive(request, mlist, yearmonth = None, order = None, zip = N
    if mimetype == 'text/html' and not attachment:
       try:
          body = body.decode('utf-8')
-      except UnicodeEncodeError:
+      except UnicodeDecodeError:
          try:
               body = body.decode('latin1')
-         except UnicodeEncodeError:
+         except UnicodeDecodeError:
               body = body.decode(errors = 'ignore')
 
       if yearmonth == None:
@@ -175,7 +175,7 @@ def mailinglists_archive(request, mlist, yearmonth = None, order = None, zip = N
          body = re.sub(r'<a href="\S+listinfo\S+"[^<]*</a>',f'<a href="{p}">Overview for the archive of this list</a>.', body)
 
       if order:
-         pattern = f'{service.adminurl}/private/{mlist}/(attachments/\d+/[a-fA-F0-9]+/attachment-(\d+)\.\w+)'
+         pattern = f'{service.adminurl}/private/{mlist}/(attachments/\d+/[a-fA-F0-9]+/attachment[\-\d+.\w]+)'
          r = re.compile(pattern)
          body = re.sub(r,'\g<1>',body)
 
