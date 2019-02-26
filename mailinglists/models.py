@@ -3,6 +3,8 @@ from members.models import User
 from django.db.models.signals import post_delete,post_save, pre_delete, pre_save
 from django.conf import settings
 from simple_history.models import HistoricalRecords
+from django.urls import reverse_lazy,reverse
+
 
 import logging
 logger = logging.getLogger(__name__)
@@ -21,6 +23,9 @@ class Mailinglist(models.Model):
 
     def __str__(self):
         return self.name
+
+    def path(self):
+        return reverse('mailinglists_archive', kwargs = { 'mlist': self.name  })
 
 class Subscription(models.Model):
     mailinglist = models.ForeignKey(Mailinglist, on_delete=models.CASCADE, related_name='hasMember')
