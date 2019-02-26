@@ -75,9 +75,13 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
 	{% endif %}.
 	<p/></td></tr>
 {% endfor %}
-	{%if member == user or user.is_superadmin %}
-			<tr><td></td><td><a href="{% url 'mailinglists_edit'  user_id=member.id %}">[edit]</a> your subscriptions</td></tr>
-	{% endif %}
+{%if member == user %}
+	<tr><td></td><td><a href="{% url 'mailinglists_edit'  user_id=member.id %}">[edit]</a> your subscriptions</td></tr>
+{% else %}
+{%if  user.is_superuser %}
+	<tr><td></td><td><a href="{% url 'mailinglists_edit'  user_id=member.id %}">[edit]</a> the subscriptions of {{ member.name }}</td></tr>
+{% endif %}
+{% endif %}
     
     {%if member == user %}
     <tr><td colspan=2><h3>Notifications</h3></td></tr>
