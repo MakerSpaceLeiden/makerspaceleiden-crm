@@ -38,6 +38,7 @@ def sentEmailVerification(request,user,new_email,ccOrNone = None, template='emai
             current_site = get_current_site(request)
             subject = 'Confirm your email adddress ({})'.format(current_site.domain)
             context = {
+                'has_permission': request.user.is_authenticated,
                 'request': request,
                 'user': user,
 		'new_email': new_email,
@@ -65,9 +66,9 @@ logger = logging.getLogger(__name__)
 
 def index(request):
     context = {
+        'has_permission': request.user.is_authenticated,
 	'title': 'Selfservice',
 	'user' : request.user,
-	'has_permission': request.user.is_authenticated,
     }
     if (request.user.is_authenticated):
         context['is_logged_in'] = request.user.is_authenticated

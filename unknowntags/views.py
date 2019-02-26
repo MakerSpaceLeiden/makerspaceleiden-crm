@@ -56,6 +56,7 @@ def unknowntags(request):
   items =  Unknowntag.objects.all().filter(Q(last_used__gte = cutoff)).order_by('-last_used')
 
   return render(request, 'unknowntags.html', { 
+               'has_permission': request.user.is_authenticated,
                'items': items,
 		'days': days,
 		'cutoff': cutoff,
@@ -64,7 +65,7 @@ def unknowntags(request):
 
 @login_required
 def addmembertounknowntag(request, user_id = None):
-  if not request.user.is_superuser:
+  if not request.user.is_privileged:
          return HttpResponse("XS denied",status=403,content_type="text/plain")
 
 
@@ -80,11 +81,16 @@ def addmembertounknowntag(request, user_id = None):
         return link_tag_user(request,form,tag,user)
 
   form = SelectTagForm()
-  return render(request, 'crud.html', { 'title': 'Select Tag', 'form': form, 'action': 'update' })
+  return render(request, 'crud.html', { 
+         'title': 'Select Tag', 
+         'form': form, 
+         'action': 'update',
+         'has_permission': request.user.is_authenticated,
+    })
    
 @login_required
 def addunknowntagtomember(request, tag_id = None):
-  if not request.user.is_superuser:
+  if not request.user.is_privileged:
          return HttpResponse("XS denied",status=403,content_type="text/plain")
 
   try:
@@ -104,7 +110,9 @@ def addunknowntagtomember(request, tag_id = None):
        return link_tag_user(request,form,tag,form.cleaned_data.get('user'))
 
   form = SelectUserForm()
-  return render(request, 'crud.html', { 'title': 'Select User', 'form': form, 'action': 'update' })
+  return render(request, 'crud.html', { 'title': 'Select User', 'form': form, 'action': 'update', 
+         'has_permission': request.user.is_authenticated,
+  })
 
 def link_tag_user(request, form, tag, user):
     try:

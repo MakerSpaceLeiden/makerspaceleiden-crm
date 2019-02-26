@@ -76,6 +76,7 @@ def index(request,days=30):
         'title': 'Uknown Floating Objects',
         'lst': lst,
         'days': days,
+        'has_permission': request.user.is_authenticated,
        }
     return render(request, 'ufo/index.html', context)
 
@@ -105,6 +106,7 @@ def create(request):
         'title': 'Add an Uknown Floating Objects',
         'form': form,
         'action': 'Add',
+        'has_permission': request.user.is_authenticated,
         }
     return render(request, 'ufo/crud.html', context)
 
@@ -117,6 +119,7 @@ def show(request,pk):
     context = {
         'title': 'Uknown Floating Objects',
         'item': item,
+        'has_permission': request.user.is_authenticated,
         }
     return render(request, 'ufo/view.html', context)
 
@@ -135,6 +138,7 @@ def modify(request,pk):
         'title': 'Update an Uknown Floating Objects',
         'action': 'Update',
 	'item': oitem,
+        'has_permission': request.user.is_authenticated,
         }
     if request.POST:
      form = UfoForm(request.POST or None, request.FILES, instance = oitem)
@@ -284,9 +288,14 @@ def upload_zip(request):
                 alertOwnersToChange(lst, request.user, [ request.user.email ])
 
             return render(request, 'ufo/upload.html', { 
+               'has_permission': request.user.is_authenticated,
                'action': 'Done', 
                'lst': lst,
                'skipped': skipped,
                })
 
-    return render(request, 'ufo/upload.html', {'form': form, 'action': 'Upload' })
+    return render(request, 'ufo/upload.html', {
+        'form': form, 
+        'action': 'Upload',
+        'has_permission': request.user.is_authenticated,
+    })

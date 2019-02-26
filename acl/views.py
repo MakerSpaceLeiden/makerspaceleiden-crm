@@ -96,6 +96,7 @@ def api_index(request):
         'perms': perms,
 	'instructions': instructions,
 	'freeforall': ffa,
+        'has_permission': request.user.is_authenticated,
     }
     return render(request, 'acl/index.html', context)
 
@@ -143,6 +144,7 @@ def machine_list(request):
     context = {
        'members': members,
        'machines': machines,
+       'has_permission': request.user.is_authenticated,
     }
     return render(request, 'acl/machines.html', context)
 
@@ -174,20 +176,22 @@ def machine_overview(request, machine_id = None):
        'members': members,
        'machines': machines,
        'lst': lst,
-       'instructors': instructors
+       'instructors': instructors,
+       'has_permission': request.user.is_authenticated,
     }
     return render(request, 'acl/matrix.html', context)
 
 @login_required
 def members(request):
     members = User.objects.order_by('first_name')
-    if not request.user.is_superuser:
+    if not request.user.is_privileged:
         members = members.filter(is_active = True)
 
     context = {
         'title': "Members list",
         'members': members,
         'num_members': len(members),
+        'has_permission': request.user.is_authenticated,
     }
     return render(request, 'acl/members.html', context)
 
@@ -198,7 +202,7 @@ def member_overview(request,member_id = None):
     except ObjectDoesNotExist as e:
        return HttpResponse("User not found",status=404,content_type="text/plain")
 
-    if not member.is_active and not request.user.is_superuser:
+    if not member.is_active and not request.user.is_privileged:
        return HttpResponse("User not found or access denied",status=404,content_type="text/plain")
 
     machines = Machine.objects.order_by()
@@ -230,9 +234,10 @@ def member_overview(request,member_id = None):
        'permits': specials,
        'subscriptions': subscriptions,
        'user' : request.user,
+       'has_permission': request.user.is_authenticated,
     }
 
-    if member == request.user or request.user.is_superuser:
+    if member == request.user or request.user.is_privileged:
         tags = Tag.objects.filter(owner = member)
         context['tags'] = tags
 
@@ -265,7 +270,8 @@ def missing_forms(request):
     context = {
 	'title': 'Missing forms',
 	'desc': 'Missing forms (of people who had instruction on a machine that needs it).',
-	'amiss': missing(False)
+	'amiss': missing(False),
+        'has_permission': request.user.is_authenticated,
     }
     return render(request, 'acl/missing.html',context)
 
@@ -275,7 +281,8 @@ def filed_forms(request):
     context = {
 	'title': 'Filed forms',
 	'desc': 'Forms on file for people that also had instruction on something',
-	'amiss': missing(True)
+	'amiss': missing(True),
+        'has_permission': request.user.is_authenticated,
     }
     return render(request, 'acl/missing.html',context)
 
@@ -289,10 +296,11 @@ def tag_edit(request,tag_id = None):
     context = {
         'title': 'Update a tag',
         'action': 'Update',
-        'item': tag
+        'item': tag,
+        'has_permission': request.user.is_authenticated,
         }
     if request.POST:
-     form = TagForm(request.POST or None, request.FILES, instance = tag, canedittag = request.user.is_superuser)
+     form = TagForm(request.POST or None, request.FILES, instance = tag, canedittag = request.user.is_privileged)
      if form.is_valid() and request.POST:
         try:
             item = form.save(commit = False)
@@ -303,7 +311,7 @@ def tag_edit(request,tag_id = None):
 
         return redirect('overview', member_id=item.owner_id)
 
-    form = TagForm(instance = tag, canedittag = request.user.is_superuser)
+    form = TagForm(instance = tag, canedittag = request.user.is_privileged)
     context['form'] = form
 
     return render(request, 'acl/crud.html', context)
@@ -318,7 +326,8 @@ def tag_delete(request,tag_id = None):
     context = {
         'title': 'Delete a tag -- confirm',
         'action': 'Yes - really Delete',
-        'item': tag
+        'item': tag,
+        'has_permission': request.user.is_authenticated,
         }
     if request.POST:
      form = TagForm(request.POST or None, request.FILES, instance = tag, isdelete = True)

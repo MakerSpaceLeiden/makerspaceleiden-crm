@@ -62,6 +62,8 @@ class NewUserForm(forms.Form):
     activate_doors = forms.BooleanField(initial = True, help_text='Also give this user door permits if they did not have it yet. Only applicable if above tag is specified.') 
 
 class NewAuditRecordForm(ModelForm):
+   return_to = forms.CharField(widget = forms.HiddenInput())
+
    class Meta:
       model = AuditRecord
       fields = [ 'action', ]

@@ -12,7 +12,7 @@ Unknown tags swiped in the past {{ days }} days:
   <td>{{ item.id }}</td>
   <td>{{ item.tag }}</td>
   <td>{{ item.last_used }} </td>
-{% if user.is_superuser %}
+{% if user.is_privileged %}
   <td><a href="{% url 'addunknowntagtomember' tag_id=item.id %}">[assign to a member]</a></td>
 {% endif %}
 </tr>

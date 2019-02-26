@@ -34,12 +34,13 @@ def index(request):
     context = {
         'agg': agg,
         'perms': perms,
+        'has_permission': request.user.is_authenticated,
     }
     return render(request, 'members/index.html', context)
 
 @login_required
 def newmember(request):
-    if not request.user.is_superuser:
+    if not request.user.is_privileged:
             return HttpResponse("XS denied",status=403,content_type="text/plain")
 
     if request.POST:
@@ -100,6 +101,7 @@ def newmember(request):
           'label': 'Add a new member',
           'title': 'New Member',
           'action': 'Invite',
+          'has_permission': request.user.is_authenticated,
     }
     context['form'] = NewUserForm()
     return render(request, 'members/newmember.html', context)
@@ -111,23 +113,29 @@ def sudo(request):
 
     if request.POST:
         form = NewAuditRecordForm(request.POST)
+
         if form.is_valid():
           try:
              record = form.save(commit = False)
              record.user = request.user
              record.changeReason = f'SUDO escalation in webinterface by {request.user}'
              record.save()
+
+             return redirect(form.cleaned_data.get('return_to'))
+             # return redirect('index')
+
           except Exception as e:
              logger.error("Failed to create uudit recordser : {}".format(e))
              return HttpResponse("Could not create audit record.",status=500,content_type="text/plain")
 
-    form = NewAuditRecordForm()
+    form = NewAuditRecordForm(None, initial = {'return_to': request.META['HTTP_REFERER']  })
     context = {
           'label': 'Reason',
           'title': 'Become and admin',
           'action': 'go admin',
-          'form': NewAuditRecordForm(),
+          'form': form,
           'back': 'index',
+          'has_permission': request.user.is_authenticated,
     }
     return render(request, 'crud.html', context)
 
@@ -142,4 +150,4 @@ def drop(request):
     record.changereason =  f'DROP in webinterface by {request.user}'
     record.save()
 
-    return redirect('index')
+    return redirect( request.META['HTTP_REFERER'] )

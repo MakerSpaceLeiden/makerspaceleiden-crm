@@ -106,6 +106,7 @@ class User(AbstractUser):
     def url(self):
         return  settings.BASE + self.path()
 
+    @property
     def is_privileged(self):
         if self.is_superuser:
            return True
@@ -126,6 +127,7 @@ class User(AbstractUser):
         print(f'last: {last} -- end time {endtime} == now: {now}')
         return endtime > now
 
+    @property
     def can_escalate_to_priveleged(self):
         return self.is_staff or self.is_superuser
 

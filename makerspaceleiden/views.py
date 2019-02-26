@@ -29,7 +29,8 @@ def showhistory(request,aClass,pk,rev=None):
             'storage':  historic,
             'history': True,
             'item': o,
-            'back': f'{o.__class__.__name__}_overview'
+            'back': f'{o.__class__.__name__}_overview',
+            'has_permission': request.user.is_authenticated,
       }
       return render(request, 'crud.html', context)
       # return historyAdmin.history_form_view(request,str(pk),str(rev), context)

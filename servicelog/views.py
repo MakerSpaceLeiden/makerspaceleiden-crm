@@ -117,6 +117,7 @@ def servicelog_overview(request, machine_id = None):
     context = {
        'title': title,
        'items' : entries,
+       'has_permission': request.user.is_authenticated,
     }
     return render(request,'overview.html', context)
 
@@ -135,7 +136,8 @@ def servicelog_crud(request, machine_id = None, servicelog_id = None):
        except ObjectDoesNotExist as e:
           return HttpResponse("Servicelog not found",status=404,content_type="text/plain")
     context = {
-        'item': machine
+        'item': machine,
+        'has_permission': request.user.is_authenticated,
         }
     if machine.out_of_order:
         context['title'] = 'Report as back in service'

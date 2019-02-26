@@ -38,6 +38,7 @@ def index(request):
         'storages': list(storages.values()),
         'floating': floating,
         'yours': yours,
+        'has_permission': request.user.is_authenticated,
     }
 
     return render(request, 'memberbox/index.html', context)
@@ -66,6 +67,7 @@ def create(request):
         'user' : request.user,
         'owner' : request.user,
         'form':  form,
+        'has_permission': request.user.is_authenticated,
     }
     return render(request, 'memberbox/crud.html', context)
 
@@ -103,6 +105,7 @@ def modify(request,pk):
         'owner' : box.owner,
         'form':  form,
         'box': box,
+        'has_permission': request.user.is_authenticated,
     }
 
     return render(request, 'memberbox/crud.html', context)
