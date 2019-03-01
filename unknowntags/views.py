@@ -118,7 +118,7 @@ def link_tag_user(request, form, tag, user):
     try:
           print("Linking {} userid={}/{} ".format(tag.tag,user.id,user))
           newtag = Tag.objects.create(tag=tag.tag, owner = user,
-                 description="The card that was wdded on {} by {}".format(datetime.date.today(), request.user))
+                 description="The card that was linked to this user on {} by {} through the self service portal".format(datetime.date.today(), request.user))
           newtag.changeReason = "Linked by {} ".format(request.user)
           newtag.save()
           tag.delete()
