@@ -84,7 +84,8 @@ def addmembertounknowntag(request, user_id = None):
   return render(request, 'crud.html', { 
          'title': 'Select Tag', 
          'form': form, 
-         'action': 'update',
+         'action': 'update', 
+         'back': 'unknowntags',
          'has_permission': request.user.is_authenticated,
     })
    
@@ -92,7 +93,6 @@ def addmembertounknowntag(request, user_id = None):
 def addunknowntagtomember(request, tag_id = None):
   if not request.user.is_privileged:
          return HttpResponse("XS denied",status=403,content_type="text/plain")
-
   try:
       tag= Unknowntag.objects.get(pk=tag_id)
   except:
@@ -110,7 +110,7 @@ def addunknowntagtomember(request, tag_id = None):
        return link_tag_user(request,form,tag,form.cleaned_data.get('user'))
 
   form = SelectUserForm()
-  return render(request, 'crud.html', { 'title': 'Select User', 'form': form, 'action': 'update', 
+  return render(request, 'crud.html', { 'title': 'Select User', 'form': form, 'action': 'update', 'back': 'unknowntags',
          'has_permission': request.user.is_authenticated,
   })
 
