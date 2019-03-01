@@ -26,12 +26,12 @@ admin.site.register(Location,LocationAdmin)
 class EntitlementResource(resources.ModelResource):
     class Meta:
        model = Entitlement
-       fields = [ 'permit', 'holder', 'issuer' ]
+       fields = [ 'permit', 'holder', 'issuer','active' ]
        import_id_fields = [ 'permit', 'holder', 'issuer' ]
        # import_id_fields = [ 'permit', 'holder', 'issuer' ]
 
 class EntitlementAdmin(ImportExportModelAdmin,SimpleHistoryAdmin):
-    list_display = ('permit','holder','issuer')
+    list_display = ('permit','holder','issuer','active')
     resource_class = EntitlementResource
 
     def get_changeform_initial_data(self, request):
