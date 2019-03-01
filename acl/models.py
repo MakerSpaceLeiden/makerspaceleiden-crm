@@ -9,6 +9,7 @@ from django.template.loader import render_to_string, get_template
 from django.contrib.sites.shortcuts import get_current_site
 
 from members.models import User
+from django.contrib.sites.models import Site
 
 import logging
 logger = logging.getLogger(__name__)

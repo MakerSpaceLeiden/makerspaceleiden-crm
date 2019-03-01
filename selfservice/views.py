@@ -158,11 +158,11 @@ def recordinstructions(request):
          #
          created = False
          try:
-            record = Entitlement.objects.get(permit=pt, holder=p, commit=False,request = request)
+            record = Entitlement.objects.get(permit=pt, holder=p)
             record.issuer = i
             record.changeReason = 'Updated through the self-service interface by {0}'.format(i)
          except Entitlement.DoesNotExist:
-            record = Entitlement.objects.create(permit=pt, holder=p, issuer=i)
+            record = Entitlement.objects.create(permit=pt, holder=p, issuer=i, request=request, commit=False)
             created = True
             record.changeReason = 'Created in the self-service interface by {0}'.format(i)
          except Exception as e:
