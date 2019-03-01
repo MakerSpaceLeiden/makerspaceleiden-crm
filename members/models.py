@@ -8,6 +8,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.urls import reverse_lazy,reverse
 from stdimage.models import StdImageField
 from django.core.exceptions import ObjectDoesNotExist
+from django import forms
 
 from django.db.models.signals import pre_delete, pre_save
 from stdimage.utils import pre_delete_delete_callback, pre_save_delete_callback
@@ -55,7 +56,7 @@ class UserManager(BaseUserManager):
 
 class AuditRecord(models.Model):
     user = models.ForeignKey('User', on_delete=models.CASCADE)
-    action = models.CharField(max_length=400)
+    action = models.TextField(max_length=400)
     recorded = models.DateTimeField(auto_now_add=True, db_index=True)
     final = models.BooleanField(default = False)
 
@@ -115,8 +116,6 @@ class User(AbstractUser):
            return False
 
         last = AuditRecord.last(self)
-        print(last)
-        print(datetime.datetime.now())
 
         if last == None:
            return False

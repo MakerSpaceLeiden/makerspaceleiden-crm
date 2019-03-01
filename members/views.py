@@ -9,6 +9,8 @@ from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.db.utils import IntegrityError
 
+from django.template.loader import render_to_string, get_template
+
 from .forms import NewUserForm, NewAuditRecordForm
 
 from acl.models import Entitlement,PermitType
@@ -130,12 +132,13 @@ def sudo(request):
 
     form = NewAuditRecordForm(None, initial = {'return_to': request.META['HTTP_REFERER']  })
     context = {
-          'label': 'Reason',
+          'label': 'GDPR (AVG)',
           'title': 'Become and admin',
           'action': 'go admin',
           'form': form,
           'back': 'index',
           'has_permission': request.user.is_authenticated,
+          'preamble': render_to_string('precooked_gdpr_options.html'),
     }
     return render(request, 'crud.html', context)
 

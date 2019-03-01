@@ -32,7 +32,7 @@ class Command(BaseCommand):
         for line in sys.stdin:
            line = line.strip()
            print(line)
-           name, i, p, pt, desc,location = line.split(',')
+           name, i, p, pt,  desc,location = line.split(',')
 
            if name=='name' or name.startswith('#'):
                continue
@@ -46,21 +46,22 @@ class Command(BaseCommand):
                permit.description = 'Permit to use ' + pt
                permit.changeReason = "Added during bulk import."
                permit.save()
+               print(permit)
 
            if location:
                loc,wasCreated = Location.objects.get_or_create(name=location)
                loc.changeReason = "Added during bulk import."
                loc.save()
+               print(loc)
+
+           print(pt)
+           print(loc)
 
            machine,wasCreated = Machine.objects.get_or_create(name=name)
            machine.description = desc
 
            if location:
                   machine.location = loc 
-           if int(i)>0:
-                  machine.requires_instruction = True
-           else:
-                  machine.requires_instruction = False
            if pt:
                   machine.requires_form = True
                   machine.requres_permit = pt

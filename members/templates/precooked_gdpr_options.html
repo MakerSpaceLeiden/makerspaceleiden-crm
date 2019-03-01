@@ -1,0 +1,40 @@
+<p>
+As per our privacy policy (and the regulation that implements the GDPR, de Algemene Verordening	Gegevensbescherming) we balance
+the individuals privacy with needs of the Stichting, the collective, to manage the community.
+<p>
+Now at times, it will be, nessesary for Trustees, or those that have been delegated certain tasks, to interact
+with privacy sensitive informtion about outs. For example to update some-ones record; or to check that something
+has happened.
+<p>
+As part of the checks and balances required by this regulation - we keep track of who accesses what information; and especially
+why this was needed; and we need to minimise this as much as possible.
+<p>
+So this form lets you become an `admin' for up to ten minutes (extended each time you 'use' your admin powers)
+<p>
+Just select one the buttons below:
+<hr>
+<script>
+	function fill(x) {
+		document.getElementById('id_action').value = x;
+		document.getElementById('crud_form').submit();
+	};
+</script>
+<blockquote>
+<input type="button" value="manage membership" 
+	onClick="fill('Manage memnershp details.');"/>
+<input type="button" value="fix tag" 
+	onClick="fill('Fix a legacy RFID tag.');"/>
+<input type="button" value="fix bouncer" 
+	onClick="fill('Fix bouncer on mailing list.');"/>
+<input type="button" value="Edit permission" 
+	onClick="fill('Manually edit machine/door permits.');"/>
+<input type="button" value="Clean up" 
+	onClick="fill('Clean up stale accounts/ufo/storage items.');"/>
+<input type="button" value="fixing bug" 
+	onClick="fill('I am fixing bugs on production (as the issue is naught impossible to reproduce in vitro.');"/>
+<input type="button" value="release check" 
+	onClick="fill('I a doing a quick post release sanity check.');"/>
+</blockquote>
+<hr>
+<p>
+Or enter your own text below and hit the 'go Admin' button.

@@ -32,7 +32,8 @@ class Command(BaseCommand):
         woodpermit,wasCreated = PermitType.objects.get_or_create(name = 'Wood Instruction')
         woodpermit.description = 'Can issue wood machine entitlement'
         woodpermit.save()
-
+ 
+        trustee = None
         while True:
            email = sys.stdin.readline().strip()
            if email == '':
@@ -57,6 +58,9 @@ class Command(BaseCommand):
                  member.last_name = ''
            if len(what.split(' ')) > 1:
                   member.form_on_file = True
+           if trustee == None:
+                member.is_staff = True
+                trustee = member
            member.save()
            print("Member={}".format(member))
 
