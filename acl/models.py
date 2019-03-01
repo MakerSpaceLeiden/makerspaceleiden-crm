@@ -146,9 +146,11 @@ class Entitlement(models.Model):
         pass
 
     def save(self, *args, **kwargs):
+        current_site = Site.objects.get(pk=settings.SITE_ID)
+
         # rely on the contraints to bomb out if there is nothing in kwargs and self. and self.
         #
-        if not self.issuer and request in kwargs:
+        if not self.issuer and 'request' in kwargs:
                   self.issuer = kwargs['request'].user
               
         issuer_permit = PermitType.objects.get(pk = self.permit.pk)
@@ -156,6 +158,7 @@ class Entitlement(models.Model):
         if 'request' in kwargs:
           if issuer_permit and not PermitType.objects.filter(permit=issuer_permit,holder=request.user):
              raise EntitlementViolation("issuer of this entitelment lacks the entitlement to issue it.")
+          current_site = get_current_site(request)
        
         if self.active == None:
             # See if we can fetch an older approval for same that may already have
