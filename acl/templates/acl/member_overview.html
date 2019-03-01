@@ -69,13 +69,13 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
 		yes
 	{% else %}
 		no
-	{% endif %}.
+	{% endif %}
 	<br/>Digest
-	{%if sub.active %}
+	{%if sub.digest %}
 		yes
 	{% else %}
 		no, receive in real time
-	{% endif %}.
+	{% endif %}
 	<p/></td></tr>
 {% endfor %}
 {%if member == user %}
