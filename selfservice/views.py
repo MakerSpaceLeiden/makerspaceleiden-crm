@@ -158,7 +158,7 @@ def recordinstructions(request):
          #
          created = False
          try:
-            record = Entitlement.objects.get(permit=pt, holder=p)
+            record = Entitlement.objects.get(permit=pt, holder=p, commit=False,request = request)
             record.issuer = i
             record.changeReason = 'Updated through the self-service interface by {0}'.format(i)
          except Entitlement.DoesNotExist:
