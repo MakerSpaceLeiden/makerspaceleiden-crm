@@ -15,8 +15,10 @@ logger = logging.getLogger(__name__)
 def superuser_or_bearer_required(function):
   @wraps(function)
   def wrap(request, *args, **kwargs):
-      if request.user.is_privileged:
-            return function(request, *args, **kwargs)
+      if request.user:
+          if type(request.user).__name__ == 'User':
+              if request.user.is_privileged:
+                  return function(request, *args, **kwargs)
 
       if hasattr(settings, 'UT_BEARER_SECRET'):
           secret = None
