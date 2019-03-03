@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'unknowntags.apps.UnknowntagsConfig',
     'servicelog.apps.ServicelogConfig',
     'mailinglists.apps.MailinglistsConfig',
+    'chores.apps.ChoresConfig',
 
     'django.contrib.admin',
     'django.contrib.auth',

@@ -32,6 +32,7 @@ urlpatterns = [
     path('acl/', include('acl.urls')),
     path('ufo/', include('ufo.urls')),
     path('admin/', admin.site.urls),
+    path('chores/', include('chores.urls')),
 #    url(r'^autocomplete/', include('autocomplete_light.urls')),
     path('qr_code/', include(qr_code_urls, namespace='qr_code')),
 ]

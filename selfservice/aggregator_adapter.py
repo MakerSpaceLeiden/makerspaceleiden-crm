@@ -19,10 +19,10 @@ class AggregatorAdapter(object):
         req.add_header('Authorization', 'Basic %s' % self.encoded_credentials.decode("ascii"))
         return json.loads(urllib.request.urlopen(req).read())
 
-    def _request_with_user_id(self, url, user_id):
-        json_payload = {
-            'user_id': user_id
-        }
+    def _request_with_user_id(self, url, user_id=None):
+        json_payload = {}
+        if user_id is not None:
+            json_payload['user_id'] = user_id
         req = urllib.request.Request(self.base_url + url,
                                      data=json.dumps(json_payload).encode('utf8'),
                                      headers={'Authorization': 'Basic %s' % self.encoded_credentials.decode("ascii")}
@@ -44,6 +44,9 @@ class AggregatorAdapter(object):
 
     def checkout(self, user_id):
         self._request_with_user_id('/space/checkout', user_id)
+
+    def get_chores(self):
+        return json.loads(self._request_with_user_id('/chores/overview'))
 
 
 def initialize_aggregator_adapter(base_url, username, password):

@@ -28,3 +28,6 @@ PyPDF2
 
 # Mailman scraping API
 lxml
+
+# JSON fields in the DB model
+jsonfield

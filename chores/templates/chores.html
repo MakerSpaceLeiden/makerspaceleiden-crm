@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<p>
+    Below is the list of chores for the next 3 months.
+</p>
+<p>
+    Please sign up for the activities you can help with. If a chore is getting close and nobody has signed up yet, the system will send out reminders.
+</p>
+
+{% for event_group in event_groups %}
+    <div style="margin-top: 50px;">
+        <h2>{{ event_group.ts_str }}</h2>
+
+        <!--<ul>-->
+            {% for event in event_group.events %}
+                <p>
+                    {{ event.time_str }} - {{ event.chore.description }}
+                    <ul>
+                        {% for volunteer in event.volunteers %}
+                        <li style="margin-top: 5px;">
+                            {% if volunteer == 'offer_volunteering' %}
+                                <a href="{% url 'signup_chore' chore_id=event.chore.chore_id ts=event.when.timestamp %}" style="border: 1px solid gray; border-radius: 3px; padding: 2px;">Add me as volunteer</a>
+                            {% elif volunteer is None %}
+                                <i>Volunteer needed</i>
+                            {% else %}
+                                <b>{{ volunteer.first_name }}</b>
+                            {% endif %}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </p>
+            {% endfor %}
+        <!--</ul>-->
+    </div>
+{% endfor %}
+
+{% endblock %}
