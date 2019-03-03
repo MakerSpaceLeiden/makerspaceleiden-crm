@@ -119,7 +119,9 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
 {% if tags %}
 	{%if user.is_privileged or member == user %}
 	<tr><td colspan=2><h3>Tags</h3></tr>
+	{%if user.is_privileged %}
 		<tr><td></td><td><a href="{% url 'addmembertounknowntag' user_id=member.id %}">[ add unknown tags to this user ]</a></td></tr>
+	{%endif %}
         {% for tag in tags %}
 		<tr><td></td><td>
 <a href="{% url 'tag_edit' tag_id=tag.id %}">{{ tag.tag }}</a>
