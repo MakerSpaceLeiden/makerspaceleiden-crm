@@ -26,6 +26,9 @@
                                 <i>Volunteer needed</i>
                             {% else %}
                                 <b>{{ volunteer.first_name }}</b>
+                                {% if volunteer.id == user.id %}
+                                    <a href="{% url 'remove_signup_chore' chore_id=event.chore.chore_id ts=event.when.timestamp %}" style="border: 1px solid gray; border-radius: 3px; padding: 2px; color: red;">Remove me as volunteer</a>
+                                {% endif %}
                             {% endif %}
                         </li>
                         {% endfor %}

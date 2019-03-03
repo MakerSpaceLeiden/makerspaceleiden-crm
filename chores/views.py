@@ -75,3 +75,19 @@ def signup(request, chore_id, ts):
        raise e
 
     return redirect('chores')
+
+
+@login_required
+def remove_signup(request, chore_id, ts):
+    try:
+        chore = Chore.objects.get(pk=chore_id)
+    except ObjectDoesNotExist as e:
+        return HttpResponse("Chore not found", status=404, content_type="text/plain")
+
+    try:
+       ChoreVolunteer.objects.filter(user=request.user, chore=chore, timestamp=ts).delete()
+    except Exception as e:
+       logger.error("Something else went wrong during delete: {0}".format(e))
+       raise e
+
+    return redirect('chores')
