@@ -10,7 +10,7 @@ def admin_view(view, cacheable=False):
         if not request.user.is_active and not request.user.is_staff:
             raise Http404()
 
-        if request.user.can_escalate_to_priveleged:
+        if not request.user.is_anonymous and request.user.can_escalate_to_priveleged:
            if not request.user.is_privileged:
               return redirect('sudo')
 
