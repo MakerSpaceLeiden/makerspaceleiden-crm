@@ -19,7 +19,7 @@ from django.conf.urls.static import static
 from django.conf import settings
 from qr_code import urls as qr_code_urls
 
-from my_project.admin import admin_view
+from .admin import admin_view
 admin.site.admin_view = admin_view
 
 urlpatterns = [

@@ -8,6 +8,7 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.db.utils import IntegrityError
+from django.urls import reverse
 
 from django.template.loader import render_to_string, get_template
 
@@ -130,7 +131,10 @@ def sudo(request):
              logger.error("Failed to create uudit recordser : {}".format(e))
              return HttpResponse("Could not create audit record.",status=500,content_type="text/plain")
 
-    form = NewAuditRecordForm(None, initial = {'return_to': request.META['HTTP_REFERER']  })
+    rurl = reverse('index')
+    if 'HTTP_REFERER' in request.META:
+        rurl = request.META['HTTP_REFERER']
+    form = NewAuditRecordForm(None, initial = {'return_to': rurl  })
     context = {
           'label': 'GDPR (AVG)',
           'title': 'Become and admin',
