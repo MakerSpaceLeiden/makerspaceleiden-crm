@@ -78,8 +78,8 @@ class MailmanService:
                       body = response.read()
                       tree = html.fromstring(body)
 
-                 if "The form lifetime has expire." not in str(body):
-                          return body
+                 if 'first log in by giving your' not in str(body) and "The form lifetime has expire." not in str(body):
+                      return body
 
            except urllib.error.HTTPError as e:
                    if e.code != 401:
@@ -201,16 +201,20 @@ class MailmanAccount:
        return False
 
     def _option(self,field, email, onoff = None):
+        params = {
+            'options-submit':'Submit My Changes', # essential magic - gleaned from the ./Mailman/Cgi/options.py
+        }
         if onoff != None:
            if onoff:
               onoff = "1"
            else:
               onoff = "0"
+           logger.debug(f'Setting {email}@{self.mailinglist} {field} = {onoff}')
+        else:
+           logger.debug(f'Reading {email} {field}')
 
-        params = {
-            'options-submit':'Submit My Changes', # essential magic - gleaned from the ./Mailman/Cgi/options.py
-            field: onoff 
-        }
+        params[field] = onoff
+
         email = re.sub('@','--at--',email)
         url2 = f'{ self.service.adminurl }/options/{self.mailinglist}/{email}'
         return self._adminform(url2, params)
@@ -246,9 +250,6 @@ class MailmanAccount:
 
            if 'Cannot unsubscribe non-members:' in str(body):
                 raise MailmanAccessNoSuchSubscriber("not found")
-
-           # if 'first log in by giving your' in str(body):
-           #     raise MailmanAccessDeniedException(f"Access denied")
 
            # if 'mailing list membership configuration for' not in str(body) and ' zijn met succes ' not in str(body):
                   # raise MailmanAccessNoSuchSubscriber("not found")
