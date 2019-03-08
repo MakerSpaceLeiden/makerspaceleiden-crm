@@ -52,7 +52,7 @@ class MailmanService:
                 'adminpw': self.password
         }).encode('ascii')
 
-        # print(f"LOGIN {url1}") 
+        logger.debug(f"LOGIN {url1}") 
         with self.opener.open(urllib.request.Request(url1, postdata)) as response:
                 body = response.read()
                 tree = html.fromstring(body)
@@ -73,7 +73,7 @@ class MailmanService:
 
                  formparams[ 'csrf_token' ] =  self.csrf_token
                  postdata = urllib.parse.urlencode(formparams).encode('ascii')
-                 #print(f"POST {url2}") 
+                 logger.debug(f"POST {url2}") 
                  with self.opener.open(urllib.request.Request(url2, postdata)) as response:
                       body = response.read()
                       tree = html.fromstring(body)
@@ -246,6 +246,9 @@ class MailmanAccount:
 
            if 'Cannot unsubscribe non-members:' in str(body):
                 raise MailmanAccessNoSuchSubscriber("not found")
+
+           # if 'first log in by giving your' in str(body):
+           #     raise MailmanAccessDeniedException(f"Access denied")
 
            # if 'mailing list membership configuration for' not in str(body) and ' zijn met succes ' not in str(body):
                   # raise MailmanAccessNoSuchSubscriber("not found")
