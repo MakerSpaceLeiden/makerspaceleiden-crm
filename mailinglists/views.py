@@ -73,7 +73,7 @@ def mailinglists_edit(request, user_id = None):
                 nw.member = user
                 nw.mailinglist = id2list[ form.prefix ]
                 nw.save()
-            return redirect('mailinglists_edit')
+            return redirect('mailinglists_edit', user_id = user.id)
 
     forms = []
     for l in lists:

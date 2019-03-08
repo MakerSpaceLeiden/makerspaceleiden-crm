@@ -9,7 +9,8 @@ from django.urls import reverse_lazy,reverse
 import logging
 logger = logging.getLogger(__name__)
 
-from .mailman import MailmanService, MailmanAccount
+from .mailman import MailmanService, MailmanAccount, MailmanAccessNoSuchSubscriber
+
 service = MailmanService(settings.ML_PASSWORD, settings.ML_ADMINURL)
 
 class Mailinglist(models.Model):
@@ -55,8 +56,16 @@ class Subscription(models.Model):
               self.account = MailmanAccount(service, self.mailinglist)
         email = self.member.email
 
-        self.account.digest(email, self.digest)
-        self.account.delivery(email, self.active)
+        retry = 2
+        while(retry > 0):
+          retry -= 1
+          try:
+              self.account.digest(email, self.digest)
+              self.account.delivery(email, self.active)
+          except MailmanAccessNoSuchSubscriber as e:
+              logger.error(f'Missed create subscription; fixing for {email} @ {self.mailinglist}')
+              self.subscribe()
+              retry -= 1
 
         # if active != self.active or digest != self.digest:
         #    raise Exception("out of sync with server.")
@@ -65,7 +74,8 @@ class Subscription(models.Model):
         if not self.account:
               self.account = MailmanAccount(service, self.mailinglist)
 
-        self.account.subscribe(self.member.email, self.member.name())
+        r = self.account.subscribe(self.member.email, self.member.name())
+        logger.error(r)
 
     def unsubscribe(self):
         if not self.account:
