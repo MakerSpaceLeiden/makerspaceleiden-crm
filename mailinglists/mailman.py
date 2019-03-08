@@ -288,6 +288,14 @@ if __name__ == "__main__":
      if what == 'info':
        print(f'Delivery: { account.delivery(email) }')
        print(f'Digest:   { account.digest(email) }')
+     elif what == 'nomail':
+       print(account.delivery(email,False))
+     elif what == 'mail':
+       print(account.delivery(email,True))
+     elif what == 'digest':
+       print(account.digest(email,True))
+     elif what == 'nodigest':
+       print(account.digest(email,False))
      elif what == 'sub':
        print(account.subscribe(email))
      elif what == 'unsub':
@@ -295,7 +303,7 @@ if __name__ == "__main__":
      elif what == 'roster':
        print("\n".join(account.roster()))
      else:
-       print("Eh - just now info, sub and ubsub") 
+       print("Eh - just now info, mail, nomail, digest, nodigest, sub and ubsub") 
    except MailmanAccessDeniedException as e:
      print("Access denied")
    except MailmanAccessNoSuchSubscriber:
