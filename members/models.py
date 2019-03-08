@@ -123,7 +123,6 @@ class User(AbstractUser):
         endtime =  last +  datetime.timedelta(seconds=GDPR_ESCALATED_TIMESPAN_SECONDS)
         now = datetime.datetime.now(last.tzinfo)
 
-        print(f'last: {last} -- end time {endtime} == now: {now}')
         return endtime > now
 
     @property
