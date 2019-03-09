@@ -113,13 +113,13 @@ def recordinstructions(request):
 
     # keep the option open to `do bulk adds
     members = User.objects.filter(is_active = True)
-    machines = Machine.objects.all()
+    machines = Machine.objects.all().exclude(requires_permit = None)
 
     # Only show machine we are entitled for ourselves.
     #
 
     if not request.user.is_privileged:
-      machines = machines.filter(requires_permit__isRequiredToOperate__holder=member).filter(Q(requires_permit__permit=None) | Q(requires_permit__permit__isRequiredToOperate__holder=member) | Q(requires_permit = None))
+      machines = machines.filter(Q(requires_permit__permit=None) | Q(requires_permit__permit__isRequiredToOperate__holder=member))
       members = members.exclude(id = member.id) #.order_by('first_name')
 
     ps =[]
@@ -127,7 +127,7 @@ def recordinstructions(request):
       ps.append((m.id,m.first_name +' ' + m.last_name))
 
     ms = []
-    for m in machines:
+    for m in machines.order_by('name'):
           ms.append((m.id,m.name))
 
     form = forms.Form(request.POST) # machines, members)
