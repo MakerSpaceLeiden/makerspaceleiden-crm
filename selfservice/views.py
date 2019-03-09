@@ -112,11 +112,15 @@ def recordinstructions(request):
     member = request.user
 
     # keep the option open to `do bulk adds
-    members = User.objects.filter(is_active = True).exclude(id = member.id) #.order_by('first_name')
+    members = User.objects.filter(is_active = True)
+    machines = Machine.objects.all()
 
     # Only show machine we are entitled for ourselves.
     #
-    machines = Machine.objects.all().filter(requires_permit__isRequiredToOperate__holder=member).filter(Q(requires_permit__permit=None) | Q(requires_permit__permit__isRequiredToOperate__holder=member) | Q(requires_permit = None))
+
+    if not request.user.is_privileged:
+      machines = machines.filter(requires_permit__isRequiredToOperate__holder=member).filter(Q(requires_permit__permit=None) | Q(requires_permit__permit__isRequiredToOperate__holder=member) | Q(requires_permit = None))
+      members = members.exclude(id = member.id) #.order_by('first_name')
 
     ps =[]
     for m in members:
@@ -128,7 +132,10 @@ def recordinstructions(request):
 
     form = forms.Form(request.POST) # machines, members)
     form.fields['machine'] = forms.MultipleChoiceField(label='Machine',choices=ms,help_text='Select multiple if so desired')
-    form.fields['person'] = forms.ChoiceField(label='Person',choices=ps)
+    form.fields['persons'] = forms.MultipleChoiceField(label='Person',choices=ps, help_text='Select multiple if so desired')
+
+    if request.user.is_privileged:
+       form.fields['issuer'] = forms.ChoiceField(label='Issuer',choices=ps)
 
     context = {
         'machines': machines,
@@ -144,52 +151,64 @@ def recordinstructions(request):
     saved = False
     if request.method == "POST" and form.is_valid():
       context['machines'] = []
+      context['holder'] = []
+
       for mid in form.cleaned_data['machine']:
        try:
          m = Machine.objects.get(pk=mid)
-         p = User.objects.get(pk=form.cleaned_data['person'])
-         i = user=request.user
+         if request.user.is_privileged and form.cleaned_data['issuer']:
+             i =  User.objects.get(pk=form.cleaned_data['issuer'])
+         else:
+             i = user=request.user
 
          pt = None
          if m.requires_permit:
              pt = PermitType.objects.get(pk=m.requires_permit.id)
 
-         # Note: We allow for 'refreshers' -- and rely on the history record.
-         #
-         created = False
-         try:
-            record = Entitlement.objects.get(permit=pt, holder=p)
-            record.issuer = i
-            record.changeReason = 'Updated through the self-service interface by {0}'.format(i)
-         except Entitlement.DoesNotExist:
-            record = Entitlement.objects.create(permit=pt, holder=p, issuer=i, request=request, commit=False)
-            created = True
-            record.changeReason = 'Created in the self-service interface by {0}'.format(i)
-         except Exception as e:
-            logger.error("Something else went wrong during create: {0}".format(e))
-            raise e
+         if pt == None:
+             logger.error(f'{m} skipped - no permit - bug ?')
+             continue
 
-         if pt and pt.permit:
-             # Entitlements that require instruction permits also
-             # require a trustee OK. This gets reset on re-intruction.
+         for pid in form.cleaned_data['persons']:
+             p = User.objects.get(pk=pid)
+
+             # Note: We allow for 'refreshers' -- and rely on the history record.
              #
-             record.active = False;
-         else:
-             record.active = True;
-
-         record.save()
+             created = False
+             try:
+                record = Entitlement.objects.get(permit=pt, holder=p)
+                record.issuer = i
+                record.changeReason = 'Updated through the self-service interface by {0}'.format(i)
+             except Entitlement.DoesNotExist:
+                record = Entitlement(permit=pt, holder=p, issuer=i)
+                created = True
+                record.changeReason = 'Created in the self-service interface by {0}'.format(i)
+             except Exception as e:
+                logger.error("Something else went wrong during create: {0}".format(e))
+                raise e
+    
+             if pt and pt.permit:
+                 # Entitlements that require instruction permits also
+                 # require a trustee OK. This gets reset on re-intruction.
+                 #
+                 record.active = False;
+             else:
+                 record.active = True;
+    
+             record.save(request=request)
+             context['holder'].append(p)
 
          context["created"] = created
          context['machines'].append(m)
-         context['holder'] = p
          context['issuer'] = i
 
          saved = True
-       except Exception as e:
+       # except Exception as e:
+       except Entitlement.DoesNotExist as e:
          logger.error("Unexpected error during save of intructions: {0}".format(e))
 
-    context['saved'] = saved
 
+    context['saved'] = saved
     return render(request, 'record.html', context)
 
 @login_required

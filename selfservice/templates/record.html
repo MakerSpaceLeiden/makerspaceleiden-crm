@@ -7,12 +7,11 @@
   <blockquote>
     <emph>{{ issuer }}
     has given instruction to 
-	{{ holder }}
+	{{ holder|join:", "  }}
     for use of 
 	{{ machines|join:", "  }}
     </emph>
-   <p>
-   and {{ issuer.first_name }} trust {{ holder.first_name }} to use this machine properly and safely.</i>
+   {{ issuer.first_name }} trust {{ holder.first_name }} to use this machine properly and safely.</i>
    </p>
   </blockquote>
   <p>

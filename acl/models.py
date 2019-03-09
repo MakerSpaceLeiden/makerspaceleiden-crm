@@ -1,4 +1,5 @@
 from django.db import models
+
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from simple_history.models import HistoricalRecords
@@ -149,18 +150,23 @@ class Entitlement(models.Model):
     def save(self, *args, **kwargs):
         current_site = Site.objects.get(pk=settings.SITE_ID)
 
+        user = None
+        if 'request' in kwargs:
+           request = kwargs['request']
+           del  kwargs['request']
+           current_site = get_current_site(request)
+           user = request.user
+
         # rely on the contraints to bomb out if there is nothing in kwargs and self. and self.
         #
-        if not self.issuer and 'request' in kwargs:
-                  self.issuer = kwargs['request'].user
+        if not self.issuer and user:
+                  self.issuer = user
               
         issuer_permit = PermitType.objects.get(pk = self.permit.pk)
 
-        if 'request' in kwargs:
-          if issuer_permit and not PermitType.objects.filter(permit=issuer_permit,holder=request.user):
+        if issuer_permit and not Entitlement.objects.filter(permit=issuer_permit,holder=self.issuer):
              raise EntitlementViolation("issuer of this entitelment lacks the entitlement to issue it.")
-          current_site = get_current_site(request)
-       
+
         if self.active == None:
             # See if we can fetch an older approval for same that may already have
             # been activated. And grandfather it in.
@@ -186,7 +192,7 @@ class Entitlement(models.Model):
                          from_email=settings.DEFAULT_FROM_EMAIL
                  ).send()
             except Exception as e:
-                logger.critical("Drat on email: {}".format(str(e)))
+                logger.critical("Failed to sent an email: {}".format(str(e)))
 
         # should we check for duplicates here too ?
         #
