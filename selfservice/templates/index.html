@@ -64,7 +64,7 @@ There are no wifi network passwords for members at the moment.
 	<li><a href="{% url 'logout' %}?next={% url 'index' %}">logout</a>
 	</ul>
 {% else %}
-<a href="signup">signup</a> or <a href="{% url 'login' %}?next={% url 'index' %}">login</a> or <a href="{% url 'password_reset' %}">reset my password</a>
+Please <a href="{% url 'login' %}?next={% url 'index' %}">login</a> or <a href="{% url 'password_reset' %}">reset my password</a>
 {% endif %}
 
 {% endblock %}
