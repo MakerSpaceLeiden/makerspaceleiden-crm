@@ -470,9 +470,9 @@ def space_state_api_info(request):
                 continue
             if 'off' in mj['state']:
                 continue
-            if 'deur' in mj['state']['name']:
+            if 'deur' in mj['machine']['name']:
                 continue
-            payload['machines'].append(mj['state']['name'])
+            payload['machines'].append(mj['machine']['name'])
         if 'users_in_space' in context:
             for ij in context['users_in_space']:
                 if 'user' in ij:
