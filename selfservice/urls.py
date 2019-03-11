@@ -27,6 +27,7 @@ urlpatterns = [
     path('space_state', views.space_state, name='space_state'),
     path('space_state/checkout', views.space_checkout, name='checkout_from_space'),
     path('api/v1/state', views.space_state_api, name='space_state_api'),
+    path('api/v1/info', views.space_state_api_info, name='space_state_api_info'),
 
     # For the trutee's -- to ease admin
     path('pending/', views.pending, name='pending'),

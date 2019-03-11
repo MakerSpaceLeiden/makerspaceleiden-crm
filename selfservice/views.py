@@ -455,6 +455,38 @@ def space_state_api(request):
 
     return HttpResponse(json.dumps(payload).encode('utf8'), content_type = 'application/json')
 
+@superuser_or_bearer_required
+def space_state_api_info(request):
+    aggregator_adapter = get_aggregator_adapter()
+    if not aggregator_adapter:
+        return HttpResponse("No aggregator configuration found", status=500, content_type="text/plain")
+    context = aggregator_adapter.fetch_state_space()
+
+    try:
+        payload = { 'machines': [], 'members': [], 'lights': [] }
+        if 'machines' in context:
+          for mj in context['machines']:
+            if 'ready' in mj['state']:
+                continue
+            if 'off' in mj['state']:
+                continue
+            if 'deur' in mj['state']['name']:
+                continue
+            payload['machines'].append(mj['state']['name'])
+        if 'users_in_space' in context:
+            for ij in context['users_in_space']:
+                if 'user' in ij:
+                    payload['members'].append(ij["user"]["first_name"])
+        if 'lights_on' in context:
+             payload['lights'] = context['lights_on']
+
+        return HttpResponse(json.dumps(payload).encode('utf8'), content_type = 'application/json')
+
+    except Exception as e:
+        logger.error(f"Something went wrong during json return parse from aggregator - likely compat issue: {e}");
+
+    return HttpResponse("No aggregator response", status=500, content_type="text/plain")
+
 @login_required
 def space_checkout(request):
     try:
