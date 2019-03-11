@@ -62,6 +62,7 @@ class Subscription(models.Model):
           try:
               self.account.digest(email, self.digest)
               self.account.delivery(email, self.active)
+              logger.error(f'Updated {email} @ {self.mailinglist} to delivery {self.active} and digest {self.digest}')
           except MailmanAccessNoSuchSubscriber as e:
               logger.error(f'Missed create subscription; fixing for {email} @ {self.mailinglist}')
               self.subscribe()
@@ -75,7 +76,6 @@ class Subscription(models.Model):
               self.account = MailmanAccount(service, self.mailinglist)
 
         r = self.account.subscribe(self.member.email, self.member.name())
-        logger.error(r)
 
     def unsubscribe(self):
         if not self.account:
