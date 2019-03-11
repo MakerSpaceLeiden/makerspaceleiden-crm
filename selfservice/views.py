@@ -21,10 +21,12 @@ from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import EmailMessage
 from django.urls import reverse
+from makerspaceleiden.decorators import superuser_or_bearer_required
 
 from django.conf import settings
 
 import logging
+import json
 
 from members.models import Tag,User
 from acl.models import Machine,Entitlement,PermitType
@@ -425,7 +427,6 @@ def notification_test(request):
     aggregator_adapter.notification_test(user.id)
     return redirect('notification_settings')
 
-
 @login_required
 def space_state(request):
     try:
@@ -440,6 +441,19 @@ def space_state(request):
     context['user'] = user
     return render(request, 'space_state.html', context)
 
+@superuser_or_bearer_required
+def space_state_api(request):
+    aggregator_adapter = get_aggregator_adapter()
+    if not aggregator_adapter:
+        return HttpResponse("No aggregator configuration found", status=500, content_type="text/plain")
+    context = aggregator_adapter.fetch_state_space()
+
+    payload = {}
+    for e in ['space_open', 'machines', 'users_in_space', 'lights_on']:
+        if e in context:
+          payload[e] = context[e]
+
+    return HttpResponse(json.dumps(payload).encode('utf8'), content_type = 'application/json')
 
 @login_required
 def space_checkout(request):
