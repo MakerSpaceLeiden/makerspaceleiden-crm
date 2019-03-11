@@ -32,8 +32,9 @@ def superuser_or_bearer_required(function):
               if match:
                   secret = match.group(1)
 
-          if secret == settings.UT_BEARER_SECRET:
-             return function(request, *args, **kwargs)
+          for bs in settings.UT_BEARER_SECRET.split():
+              if secret == bs:
+                  return function(request, *args, **kwargs)
 
       # Quell some odd 'code 400, message Bad request syntax ('tag=1-2-3-4')'
       request.POST 
