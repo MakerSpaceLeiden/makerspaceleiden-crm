@@ -119,6 +119,12 @@ class EntitlementManager(models.Manager):
                return existing, False
         return super(EntitlementManager, self).get_or_create(*args, **kwargs)
 
+class EntitlementViolation(Exception):
+        pass
+class DoubleEntitlemenException(Exception):
+        pass
+
+
 class Entitlement(models.Model):
     active = models.BooleanField( default=False,)
     permit = models.ForeignKey(
@@ -142,11 +148,6 @@ class Entitlement(models.Model):
     def __str__(self):
         return str(self.holder) + '@' + self.permit.name +'(Active:'+str(self.active)+')'
 
-    class EntitlementViolation(Exception):
-        pass
-    class DoubleEntitlemenException(Exception):
-        pass
-
     def save(self, *args, **kwargs):
         current_site = Site.objects.get(pk=settings.SITE_ID)
 
@@ -165,7 +166,8 @@ class Entitlement(models.Model):
         issuer_permit = PermitType.objects.get(pk = self.permit.pk)
 
         if issuer_permit and not Entitlement.objects.filter(permit=issuer_permit,holder=self.issuer):
-             raise EntitlementViolation("issuer of this entitelment lacks the entitlement to issue it.")
+            logger.critical(f"Entitlement.save(): holder f{self.issuer} cannot issue f{self.permit} to f{self.holder} as the holder lacks f{issuer_permit}")
+            raise EntitlementViolation("issuer of this entitelment lacks the entitlement to issue it.")
 
         if self.active == None:
             # See if we can fetch an older approval for same that may already have
