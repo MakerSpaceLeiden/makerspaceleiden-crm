@@ -8,6 +8,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.urls import reverse_lazy,reverse
 from stdimage.models import StdImageField
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.validators import RegexValidator
 from django import forms
 
 from django.db.models.signals import pre_delete, pre_save
@@ -17,7 +18,7 @@ from makerspaceleiden.utils import upload_to_pattern
 
 import re, datetime
 
-GDPR_ESCALATED_TIMESPAN_SECONDS = 60 * 10 
+GDPR_ESCALATED_TIMESPAN_SECONDS = 60 * 10
 
 if hasattr(settings,'GDPR_ESCALATED_TIMESPAN_SECONDS'):
     GDPR_ESCALATED_TIMESPAN_SECONDS = settings.GDPR_ESCALATED_TIMESPAN_SECONDS
@@ -84,7 +85,8 @@ class User(AbstractUser):
     username = None
 
     email = models.EmailField(_('email address'), unique=True)
-    phone_number = models.CharField(max_length=40, blank=True, null=True, help_text="Optional; only visible to the trustees and board delegated administrators")
+    phone_regex = RegexValidator(regex=r'^\+\d{9,15}$', message="Phone number must be entered with country code (+31, etc.) and no spaces, dashes, etc.")
+    phone_number = models.CharField(validators=[phone_regex], max_length=40, blank=True, null=True, help_text="Optional; only visible to the trustees and board delegated administrators")
     image = StdImageField(upload_to=upload_to_pattern, variations=settings.IMG_VARIATIONS, validators=settings.IMG_VALIDATORS, blank=True, default='')
     form_on_file = models.BooleanField(default=False)
     email_confirmed = models.BooleanField(default=False)
