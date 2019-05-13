@@ -87,14 +87,16 @@ def sub_deleted(sender,instance,**kwargs):
 
 def sub_saved(sender, instance, created, **kwars):
      if created:
+        logger.info("instance.subscribe triggerrd in sub_saved() by create")
         instance.subscribe()
      instance.sync_activate()
 
 def user_saved(sender, instance, created, **kwargs):
      if created:
+         logger.info("sub save triggered by created in user_saved()")
          for mailinglist in Mailinglist.objects.all():
              sub = Subscription(mailinglist = mailinglist, member = sender, active = False)
-             sub.changeReason("Create triggered by user save")
+             sub.changeReason("Create triggered by user create")
              sub.save()
  
      # for sub in Subscription.objects.all().filter(member = instance):
