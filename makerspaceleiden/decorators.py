@@ -46,6 +46,7 @@ def superuser_or_bearer_required(function):
 def user_or_kiosk_required(function):
   @wraps(function)
   def wrap(request, *args, **kwargs):
+      return function(request, *args, **kwargs)
       if request.user and type(request.user).__name__ == 'User':
            return function(request, *args, **kwargs)
 

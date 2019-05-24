@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'members.apps.UserConfig',
     'acl.apps.AclConfig',
     'selfservice.apps.SelfserviceConfig',
+    'kiosk.apps.KioskConfig',
     'ufo.apps.UfoConfig',
     'unknowntags.apps.UnknowntagsConfig',
     'servicelog.apps.ServicelogConfig',
