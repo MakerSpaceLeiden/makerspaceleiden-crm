@@ -166,7 +166,7 @@ class Entitlement(models.Model):
         issuer_permit = PermitType.objects.get(pk = self.permit.pk)
 
         if issuer_permit and not Entitlement.objects.filter(permit=issuer_permit,holder=self.issuer):
-            logger.critical(f"Entitlement.save(): holder f{self.issuer} cannot issue f{self.permit} to f{self.holder} as the holder lacks f{issuer_permit}")
+            logger.critical(f"Entitlement.save(): holder {self.issuer} cannot issue {self.permit} to {self.holder} as the holder lacks {issuer_permit}")
             raise EntitlementViolation("issuer of this entitelment lacks the entitlement to issue it.")
 
         if self.active == None:

@@ -42,3 +42,27 @@ def superuser_or_bearer_required(function):
       # raise PermissionDenied
       return HttpResponse("XS denied",status=403,content_type="text/plain")
   return wrap
+
+def user_or_kiosk_required(function):
+  @wraps(function)
+  def wrap(request, *args, **kwargs):
+      if request.user and type(request.user).__name__ == 'User':
+           return function(request, *args, **kwargs)
+
+      x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+      if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+      else:
+        ip = request.META.get('REMOTE_ADDR')
+
+      if ip == '127.0.0.1':
+           return function(request, *args, **kwargs)
+
+      # Quell some odd 'code 400, message Bad request syntax ('tag=1-2-3-4')'
+      request.POST 
+
+      # raise PermissionDenied
+      return HttpResponse("XS denied",status=403,content_type="text/plain")
+  return wrap
+
+

@@ -232,6 +232,8 @@ UT_COUNT_CUTOFF = 10
 ML_PASSWORD = 'Foo'
 ML_ADMINURL = 'https://mailman.foo.com/mailman'
 
+# REGISTRATION_OPEN = False
+
 try:
     from .local import *
 except ImportError:

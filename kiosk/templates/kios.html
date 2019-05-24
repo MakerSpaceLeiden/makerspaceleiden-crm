@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>State of the Space
+  {% if space_open %}
+    <span style="color: green; font-weight: bold;">- Space is OPEN</span>
+  {% endif %}
+</h1>
+
+{% for light in lights_on %}
+  <p>
+    {{ light.name }} lights are <b style="color: green;">ON</b>
+  </p>
+{% endfor %}
+
+{% if users_in_space %}
+<h2>User check-ins</h2>
+
+
+  <table>
+    <tbody>
+      {% for checkin in users_in_space %}
+      <tr>
+        <td><b><a href="{% url 'overview' member_id=checkin.user.user_id %}">{{ checkin.user.full_name }}</a></b></td>
+        <td>{{ checkin.ts_checkin_human }}</i></td>
+        <td><i>{{ checkin.ts_checkin }}</i></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+<i>There's no one at the space now.i - show how come you are reading this ?</i>
+{% endif %}
+
+{% if machines_on %}
+<h2>Machines currently in use</h2>
+  <table>
+    <tbody>
+      {% for machine_state in machines_on %}
+      <tr>
+        <td><b><a href="{% url 'machine_overview' machine_id=machine_state.machine.machine_id %}">{{ machine_state.machine.name }}</a></b></td>
+        <td>{{ machine_state.ts_human }}</i></td>
+        <td><i>{{ machine_state.ts }}</i></td>
+        <td>
+          <b><a href="{% url 'overview' member_id=machine_state.user.user_id %}">{{ machine_state.user.full_name }}</a></b>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+
+  </table>
+{% endif %}
+
+
+<h2>All machines</h2>
+<table>
+  <tbody>
+    {% for machine_state in machines %}
+      <tr>
+        <td><b><a href="{% url 'machine_overview' machine_id=machine_state.machine.machine_id %}">{{ machine_state.machine.name }}</a></b></td>
+        <td>{{ machine_state.machine.location_name }}</td>
+        <td>{{ machine_state.state }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}
+
