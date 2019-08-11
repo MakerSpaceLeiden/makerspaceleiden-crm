@@ -18,6 +18,7 @@ from makerspaceleiden.decorators import superuser_or_bearer_required
 import logging
 import datetime
 import re
+from django.utils import timezone
 
 logger = logging.getLogger(__name__)
 
@@ -51,7 +52,7 @@ def unknowntag(request):
 @login_required
 def unknowntags(request):
   days = settings.UT_DAYS_CUTOFF
-  cutoff = datetime.date.today() - datetime.timedelta(days=days)
+  cutoff = timezone.now() - datetime.timedelta(days=days)
 
   items =  Unknowntag.objects.all().filter(Q(last_used__gte = cutoff)).order_by('-last_used')
 

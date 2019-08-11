@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.db import models
 from django.db.models import Q
+from django.utils import timezone
 
 from members.models import Tag,clean_tag_string
 from acl.models import Entitlement,PermitType
@@ -13,7 +14,7 @@ class Unknowntag(models.Model):
 
    def save(self, * args, ** kwargs):
       days = settings.UT_DAYS_CUTOFF
-      cutoff = datetime.date.today() - datetime.timedelta(days=days)
+      cutoff = timezone.now() - datetime.timedelta(days=days)
       stale_tags =  Unknowntag.objects.all().filter(Q(last_used__lt = cutoff))
 
       for stale_tag in stale_tags:
