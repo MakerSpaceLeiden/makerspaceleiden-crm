@@ -1,0 +1,2 @@
+{% load escape_comma %}
+{% for item in items %}{{ item.tag }},{{ item.name|escape_comma }},{{ item.description|escape_comma }
