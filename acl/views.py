@@ -184,13 +184,16 @@ def machine_overview(request, machine_id = None):
 @login_required
 def members(request):
     members = User.objects.order_by('first_name')
+    active = members.filter(is_active = True)
     if not request.user.is_privileged:
-        members = members.filter(is_active = True)
+        members = active
 
     context = {
         'title': "Members list",
         'members': members,
+        'num_active': len(active),
         'num_members': len(members),
+        'num_inactive': len(members) - len(active),
         'has_permission': request.user.is_authenticated,
     }
     return render(request, 'acl/members.html', context)
