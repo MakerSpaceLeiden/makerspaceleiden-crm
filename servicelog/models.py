@@ -17,7 +17,7 @@ from makerspaceleiden.utils import upload_to_pattern
 
 
 from django.db.models.signals import pre_delete, pre_save
-from stdimage.utils import pre_delete_delete_callback, pre_save_delete_callback
+# from stdimage.utils import pre_delete_delete_callback, pre_save_delete_callback
 
 import re
 
@@ -47,7 +47,7 @@ class Servicelog(models.Model):
 
     description = models.TextField(max_length = 16 *1024)
 
-    image = StdImageField(
+    image = StdImageField(delete_orphans=True,
              upload_to=upload_to_pattern,
              blank = True,
              variations=settings.IMG_VARIATIONS,validators=settings.IMG_VALIDATORS,
@@ -63,5 +63,5 @@ class Servicelog(models.Model):
 
 
 # Handle image cleanup.
-pre_delete.connect(pre_delete_delete_callback, sender=Servicelog)
-pre_save.connect(pre_save_delete_callback, sender=Servicelog)
+# pre_delete.connect(pre_delete_delete_callback, sender=Servicelog)
+# pre_save.connect(pre_save_delete_callback, sender=Servicelog)

@@ -8,7 +8,7 @@ from django.urls import reverse
 
 
 from django.db.models.signals import pre_delete, pre_save
-from stdimage.utils import pre_delete_delete_callback, pre_save_delete_callback
+#from stdimage.utils import pre_delete_delete_callback, pre_save_delete_callback
 
 from django.db import models
 from members.models import User
@@ -30,7 +30,7 @@ class Ufo(models.Model):
            ('DON', 'Donated to the space'),
            ('GONE', 'Gone'),
      )
-     image = StdImageField(upload_to=upload_to_pattern,
+     image = StdImageField(upload_to=upload_to_pattern,delete_orphans=True,
              variations=settings.IMG_VARIATIONS,validators=settings.IMG_VALIDATORS)
      description = models.CharField(max_length=300, blank=True, null=True)
 
@@ -68,5 +68,5 @@ class Ufo(models.Model):
          return super(Ufo,self).save(*args, **kwargs)
 
 # Handle image cleanup.
-pre_delete.connect(pre_delete_delete_callback, sender=Ufo)
-pre_save.connect(pre_save_delete_callback, sender=Ufo)
+# pre_delete.connect(pre_delete_delete_callback, sender=Ufo)
+# pre_save.connect(pre_save_delete_callback, sender=Ufo)

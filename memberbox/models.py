@@ -5,13 +5,13 @@ from simple_history.models import HistoricalRecords
 from members.models import User
 from stdimage.models import StdImageField
 from django.db.models.signals import pre_delete, pre_save
-from stdimage.utils import pre_delete_delete_callback, pre_save_delete_callback
+# from stdimage.utils import pre_delete_delete_callback, pre_save_delete_callback
 from makerspaceleiden.utils import upload_to_pattern
 from django.urls import reverse
 
 
 class Memberbox(models.Model):
-    image = StdImageField(upload_to=upload_to_pattern, blank=True, null=True,
+    image = StdImageField(upload_to=upload_to_pattern, blank=True, null=True,delete_orphans=True,
              variations=settings.IMG_VARIATIONS,validators=settings.IMG_VALIDATORS,
              help_text = "Optional - but highly recommened.")
 
@@ -35,6 +35,6 @@ class Memberbox(models.Model):
         return "Box at " + self.location + " (owner unknown)"
 
 # Handle image cleanup.
-pre_delete.connect(pre_delete_delete_callback, sender=Memberbox)
-pre_save.connect(pre_save_delete_callback, sender=Memberbox)
+# pre_delete.connect(pre_delete_delete_callback, sender=Memberbox)
+# pre_save.connect(pre_save_delete_callback, sender=Memberbox)
 

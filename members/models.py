@@ -12,7 +12,7 @@ from django.core.validators import RegexValidator
 from django import forms
 
 from django.db.models.signals import pre_delete, pre_save
-from stdimage.utils import pre_delete_delete_callback, pre_save_delete_callback
+# from stdimage.utils import pre_delete_delete_callback, pre_save_delete_callback
 
 from makerspaceleiden.utils import upload_to_pattern
 
@@ -87,7 +87,7 @@ class User(AbstractUser):
     email = models.EmailField(_('email address'), unique=True)
     phone_regex = RegexValidator(regex=r'^\+\d{9,15}$', message="Phone number must be entered with country code (+31, etc.) and no spaces, dashes, etc.")
     phone_number = models.CharField(validators=[phone_regex], max_length=40, blank=True, null=True, help_text="Optional; only visible to the trustees and board delegated administrators")
-    image = StdImageField(upload_to=upload_to_pattern, variations=settings.IMG_VARIATIONS, validators=settings.IMG_VALIDATORS, blank=True, default='')
+    image = StdImageField(upload_to=upload_to_pattern, variations=settings.IMG_VARIATIONS, validators=settings.IMG_VALIDATORS, blank=True, default='',delete_orphans=True)
     form_on_file = models.BooleanField(default=False)
     email_confirmed = models.BooleanField(default=False)
     telegram_user_id = models.CharField(max_length=200, blank=True, null=True, help_text="Optional; Telegram User ID; only visible to the trustees and board delegated administrators")
@@ -160,5 +160,5 @@ def clean_tag_string(tag):
     return None
 
 # Handle image cleanup.
-pre_delete.connect(pre_delete_delete_callback, sender=User)
-pre_save.connect(pre_save_delete_callback, sender=User)
+# pre_delete.connect(pre_delete_delete_callback, sender=User)
+# pre_save.connect(pre_save_delete_callback, sender=User)
