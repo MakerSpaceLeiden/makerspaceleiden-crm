@@ -62,9 +62,9 @@ class Subscription(models.Model):
           try:
               self.account.digest(email, self.digest)
               self.account.delivery(email, self.active)
-              logger.error(f'Updated {email} @ {self.mailinglist} to delivery {self.active} and digest {self.digest}')
+              logger.info(f'Updated {email} @ {self.mailinglist} to delivery {self.active} and digest {self.digest}')
           except MailmanAccessNoSuchSubscriber as e:
-              logger.error(f'Missed create subscription; fixing for {email} @ {self.mailinglist}')
+              logger.info(f'Missing subscription - duyring sync; attempting fix by creating {email} @ {self.mailinglist}')
               self.subscribe()
               retry -= 1
 
@@ -83,7 +83,10 @@ class Subscription(models.Model):
         self.account.unsubscribe(self.member.email)
 
 def sub_deleted(sender,instance,**kwargs):
-     instance.unsubscribe()
+    try:
+        instance.unsubscribe()
+    except MailmanAccessNoSuchSubscriber as e:
+        logger.error(f'Trying to unsub {email} @ {self.mailinglist} during delete - but already not present.')
 
 def sub_saved(sender, instance, created, **kwars):
      if created:
