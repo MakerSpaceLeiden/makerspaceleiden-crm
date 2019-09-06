@@ -26,6 +26,7 @@ urlpatterns = [
     path('', include('selfservice.urls')),
     path('', include('kiosk.urls')),
     path('', include('unknowntags.urls')),
+    path('', include('mainssensor.urls')),
     path('', include('django.contrib.auth.urls')),
     path('', include('acl.urls')),
     path('members/', include('members.urls')),
@@ -36,7 +37,8 @@ urlpatterns = [
     path('ufo/', include('ufo.urls')),
     path('admin/', admin.site.urls),
     path('chores/', include('chores.urls')),
-#    url(r'^autocomplete/', include('autocomplete_light.urls')),
+#   url(r'^autocomplete/', include('autocomplete_light.urls')),
+    path('admin/', admin.site.urls),
     path('qr_code/', include(qr_code_urls, namespace='qr_code')),
 ]
 

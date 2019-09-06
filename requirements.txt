@@ -16,9 +16,6 @@ django-qr-code
 # When using Postgress as the backing DB
 # psycopg2-binary
 
-# For production
-mysqlclient
-
 # Determine client IP address
 django-ipware
 
@@ -31,3 +28,7 @@ lxml
 
 # JSON fields in the DB model
 jsonfield
+
+# For production
+# mysqlclient
+

@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'servicelog.apps.ServicelogConfig',
     'mailinglists.apps.MailinglistsConfig',
     'chores.apps.ChoresConfig',
+    'mainssensor.apps.MainssensorConfig',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -75,6 +76,10 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'makerspaceleiden.urls'
+
+TEMPLATE_LOADERS = (
+    'django.template.loaders.app_directories.load_template_source',
+)
 
 TEMPLATES = [
     {
