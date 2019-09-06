@@ -200,6 +200,8 @@ def members(request):
 
 @login_required
 def member_overview(request,member_id = None):
+    if member_id == None:
+        member_id = request.user.id
     try:
        member = User.objects.get(pk=member_id)
     except ObjectDoesNotExist as e:
