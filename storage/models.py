@@ -7,7 +7,7 @@ from django.core.mail import EmailMessage
 from django.conf import settings
 from stdimage.models import StdImageField
 from django.db.models.signals import pre_delete, pre_save
-from stdimage.utils import pre_delete_delete_callback, pre_save_delete_callback
+# from stdimage.utils import pre_delete_delete_callback, pre_save_delete_callback
 from makerspaceleiden.utils import upload_to_pattern
 from django.urls import reverse
 
@@ -25,7 +25,7 @@ class Storage(models.Model):
 	('EX','Expired'),
     	('D', 'Rescinded'),
      )
-    image = StdImageField(upload_to=upload_to_pattern, blank=True, null=True,
+    image = StdImageField(upload_to=upload_to_pattern, blank=True, null=True,delete_orphans=True,
              variations=settings.IMG_VARIATIONS,validators=settings.IMG_VALIDATORS)
 
     what = models.CharField(max_length=200)
@@ -123,6 +123,6 @@ class Storage(models.Model):
         return
 
 # Handle image cleanup.
-pre_delete.connect(pre_delete_delete_callback, sender=Storage)
-pre_save.connect(pre_save_delete_callback, sender=Storage)
+# pre_delete.connect(pre_delete_delete_callback, sender=Storage)
+# pre_save.connect(pre_save_delete_callback, sender=Storage)
 

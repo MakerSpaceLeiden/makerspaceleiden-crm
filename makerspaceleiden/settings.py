@@ -44,11 +44,13 @@ INSTALLED_APPS = [
     'members.apps.UserConfig',
     'acl.apps.AclConfig',
     'selfservice.apps.SelfserviceConfig',
+    'kiosk.apps.KioskConfig',
     'ufo.apps.UfoConfig',
     'unknowntags.apps.UnknowntagsConfig',
     'servicelog.apps.ServicelogConfig',
     'mailinglists.apps.MailinglistsConfig',
     'chores.apps.ChoresConfig',
+    'mainssensor.apps.MainssensorConfig',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -74,6 +76,10 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'makerspaceleiden.urls'
+
+TEMPLATE_LOADERS = (
+    'django.template.loaders.app_directories.load_template_source',
+)
 
 TEMPLATES = [
     {
@@ -231,6 +237,8 @@ UT_COUNT_CUTOFF = 10
 
 ML_PASSWORD = 'Foo'
 ML_ADMINURL = 'https://mailman.foo.com/mailman'
+
+# REGISTRATION_OPEN = False
 
 try:
     from .local import *

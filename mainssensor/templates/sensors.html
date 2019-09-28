@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% if items %}
+<p>
+<table>
+<tr><th>id</th><th>name</th><th>description</th></td>
+{% for item in items %}
+<tr>
+  <td>{{ item.tag }}</td>
+  <td>{{ item.name }} </td>
+  <td>{{ item.description }} </td>
+</tr>
+{% endfor %}
+</table>
+{% else %}
+No mains sensors.
+{% endif %}
+
+{% endblock %}

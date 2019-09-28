@@ -9,7 +9,8 @@ from django.urls import reverse_lazy,reverse
 import logging
 logger = logging.getLogger(__name__)
 
-from .mailman import MailmanService, MailmanAccount
+from .mailman import MailmanService, MailmanAccount, MailmanAccessNoSuchSubscriber
+
 service = MailmanService(settings.ML_PASSWORD, settings.ML_ADMINURL)
 
 class Mailinglist(models.Model):
@@ -55,8 +56,17 @@ class Subscription(models.Model):
               self.account = MailmanAccount(service, self.mailinglist)
         email = self.member.email
 
-        self.account.digest(email, self.digest)
-        self.account.delivery(email, self.active)
+        retry = 2
+        while(retry > 0):
+          retry -= 1
+          try:
+              self.account.digest(email, self.digest)
+              self.account.delivery(email, self.active)
+              logger.info(f'Updated {email} @ {self.mailinglist} to delivery {self.active} and digest {self.digest}')
+          except MailmanAccessNoSuchSubscriber as e:
+              logger.info(f'Missing subscription - duyring sync; attempting fix by creating {email} @ {self.mailinglist}')
+              self.subscribe()
+              retry -= 1
 
         # if active != self.active or digest != self.digest:
         #    raise Exception("out of sync with server.")
@@ -65,7 +75,7 @@ class Subscription(models.Model):
         if not self.account:
               self.account = MailmanAccount(service, self.mailinglist)
 
-        self.account.subscribe(self.member.email, self.member.name())
+        r = self.account.subscribe(self.member.email, self.member.name())
 
     def unsubscribe(self):
         if not self.account:
@@ -73,18 +83,23 @@ class Subscription(models.Model):
         self.account.unsubscribe(self.member.email)
 
 def sub_deleted(sender,instance,**kwargs):
-     instance.unsubscribe()
+    try:
+        instance.unsubscribe()
+    except MailmanAccessNoSuchSubscriber as e:
+        logger.error(f'Trying to unsub {email} @ {self.mailinglist} during delete - but already not present.')
 
 def sub_saved(sender, instance, created, **kwars):
      if created:
+        logger.info("instance.subscribe triggerrd in sub_saved() by create")
         instance.subscribe()
      instance.sync_activate()
 
 def user_saved(sender, instance, created, **kwargs):
      if created:
+         logger.info("sub save triggered by created in user_saved()")
          for mailinglist in Mailinglist.objects.all():
              sub = Subscription(mailinglist = mailinglist, member = sender, active = False)
-             sub.changeReason("Create triggered by user save")
+             sub.changeReason("Create triggered by user create")
              sub.save()
  
      # for sub in Subscription.objects.all().filter(member = instance):

@@ -1,4 +1,5 @@
 from django.db import models
+
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from simple_history.models import HistoricalRecords
@@ -121,6 +122,12 @@ class EntitlementManager(models.Manager):
                return existing, False
         return super(EntitlementManager, self).get_or_create(*args, **kwargs)
 
+class EntitlementViolation(Exception):
+        pass
+class DoubleEntitlemenException(Exception):
+        pass
+
+
 class Entitlement(models.Model):
     active = models.BooleanField( default=False,)
     permit = models.ForeignKey(
@@ -144,26 +151,28 @@ class Entitlement(models.Model):
     def __str__(self):
         return str(self.holder) + '@' + self.permit.name +'(Active:'+str(self.active)+')'
 
-    class EntitlementViolation(Exception):
-        pass
-    class DoubleEntitlemenException(Exception):
-        pass
-
     def save(self, *args, **kwargs):
         current_site = Site.objects.get(pk=settings.SITE_ID)
 
+        user = None
+        if 'request' in kwargs:
+           request = kwargs['request']
+           del  kwargs['request']
+           current_site = get_current_site(request)
+           user = request.user
+
         # rely on the contraints to bomb out if there is nothing in kwargs and self. and self.
         #
-        if not self.issuer and 'request' in kwargs:
-                  self.issuer = kwargs['request'].user
+        if not self.issuer and user:
+                  self.issuer = user
               
         issuer_permit = PermitType.objects.get(pk = self.permit.pk)
 
-        if 'request' in kwargs:
-          if issuer_permit and not PermitType.objects.filter(permit=issuer_permit,holder=request.user):
-             raise EntitlementViolation("issuer of this entitelment lacks the entitlement to issue it.")
-          current_site = get_current_site(request)
-       
+        if issuer_permit and not Entitlement.objects.filter(permit=issuer_permit,holder=self.issuer):
+            if not user or not user.is_staff:
+                logger.critical(f"Entitlement.save(): holder {self.issuer} cannot issue {self.permit} to {self.holder} as the holder lacks {issuer_permit}")
+                raise EntitlementViolation("issuer of this entitelment lacks the entitlement to issue it.")
+            logger.critical(f"Entitlement.save(): STAFFF bypass of rule 'holder {self.issuer} cannot issue {self.permit} to {self.holder} as the holder lacks {issuer_permit}'")
         if self.active == None:
             # See if we can fetch an older approval for same that may already have
             # been activated. And grandfather it in.
@@ -189,7 +198,7 @@ class Entitlement(models.Model):
                          from_email=settings.DEFAULT_FROM_EMAIL
                  ).send()
             except Exception as e:
-                logger.critical("Drat on email: {}".format(str(e)))
+                logger.critical("Failed to sent an email: {}".format(str(e)))
 
         # should we check for duplicates here too ?
         #

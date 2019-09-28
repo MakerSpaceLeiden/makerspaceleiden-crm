@@ -150,11 +150,12 @@ def drop(request):
     if not request.user.can_escalate_to_priveleged:
             return HttpResponse("XS denied",status=403,content_type="text/plain")
 
-    if not request.user.is_privileged:
-            return HttpResponse("Not privd at this time",status=403,content_type="text/plain")
-
     record = AuditRecord(user = request.user, final = True, action = 'Drop privs from webinterface')
-    record.changereason =  f'DROP in webinterface by {request.user}'
+
+    if request.user.is_privileged:
+         record.changereason =  f'DROP in webinterface by {request.user}'
+    else:
+         record.changereason =  f'DROP in webinterface by {request.user} - but actual permission had already timed out.'
     record.save()
 
     return redirect( request.META['HTTP_REFERER'] )

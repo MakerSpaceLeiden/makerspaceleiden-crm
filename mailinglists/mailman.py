@@ -78,8 +78,11 @@ class MailmanService:
                       body = response.read()
                       tree = html.fromstring(body)
 
-                 if "The form lifetime has expire." not in str(body):
-                          return body
+                 if 'first log in by giving your' in str(body):
+                      raise MailmanAccessNoSuchSubscriber
+
+                 if "The form lifetime has expire." not in str(body) and 'List Administrator Password:' not in str(body):
+                      return body
 
            except urllib.error.HTTPError as e:
                    if e.code != 401:
@@ -90,7 +93,7 @@ class MailmanService:
            self.csrf_token = None
            self.cj.clear()
 
-        raise MailmanException("Unknown error - e.g. wrong password")
+        raise MailmanException("Unknown error - e.g. wrong password - POST")
 
     def get(self, mailinglist, path):
         url = f'{ self.adminurl }/{ path }'
@@ -112,7 +115,7 @@ class MailmanService:
            self.csrf_token = None
            self.cj.clear()
 
-        raise MailmanException("Unknown error - e.g. wrong password")
+        raise MailmanException("Unknown error - e.g. wrong password - GET")
 
 class MailmanAccount:
     def __init__(self, service, mailinglist):
@@ -137,7 +140,6 @@ class MailmanAccount:
     def mass_subscribe(self,emails):
         url2 = f'{self.service.adminurl }/admin/{self.mailinglist}/members/add'
         params = {
-            'subscribe_or_invite': '0', # 0=subscribe, 1=invite
             'send_welcome_msg_to_this_batch': '0',
             'send_notifications_to_list_owner' : LIST_OWNER_NOTIFS,
             'subscribees': '\n'.join(emails),
@@ -201,16 +203,20 @@ class MailmanAccount:
        return False
 
     def _option(self,field, email, onoff = None):
+        params = {
+            'options-submit':'Submit My Changes', # essential magic - gleaned from the ./Mailman/Cgi/options.py
+        }
         if onoff != None:
            if onoff:
               onoff = "1"
            else:
               onoff = "0"
+           logger.debug(f'Setting {email}@{self.mailinglist} {field} = {onoff}')
+        else:
+           logger.debug(f'Reading {email} {field}')
 
-        params = {
-            'options-submit':'Submit My Changes', # essential magic - gleaned from the ./Mailman/Cgi/options.py
-            field: onoff 
-        }
+        params[field] = onoff
+
         email = re.sub('@','--at--',email)
         url2 = f'{ self.service.adminurl }/options/{self.mailinglist}/{email}'
         return self._adminform(url2, params)
@@ -231,7 +237,7 @@ class MailmanAccount:
 
            body = self.service.post(self.mailinglist, url2, formparams)
            tree = html.fromstring(body)
-       
+
            # bit of a hack - should be a chat/expect per form type. But these
            # are unique enough for the few functons that we have.
            if 'Already a member' in str(body):
@@ -247,8 +253,8 @@ class MailmanAccount:
            if 'Cannot unsubscribe non-members:' in str(body):
                 raise MailmanAccessNoSuchSubscriber("not found")
 
-           # if 'first log in by giving your' in str(body):
-           #     raise MailmanAccessDeniedException(f"Access denied")
+           if 'List Administrator Password:' in str(body):
+               raise MailmanAccessDeniedException("during form post")
 
            # if 'mailing list membership configuration for' not in str(body) and ' zijn met succes ' not in str(body):
                   # raise MailmanAccessNoSuchSubscriber("not found")

@@ -192,7 +192,7 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
             <p><i>Note: this list may be incomplete or contain tag-swipes that were not followed by actually powering the machine on.</i></p>
         </td></tr>
         {% endif %}
-	<tr><td colspan=2><h3>Entitlements</h3></tr>
+	<tr><td colspan=2><h3>Entitlements</h3><div id="Entitlements"/></tr>
 	{% for machine,info in lst.items %}
 	<tr>
 		<td align=right><a href="{{ info.path }}">{{ machine }}</a></td>

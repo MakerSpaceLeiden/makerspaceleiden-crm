@@ -4,27 +4,29 @@ from django.contrib.auth import views as auth_views
 from . import views
 
 urlpatterns = [
-    path('member/<int:member_id>', views.member_overview, name='overview'),
-    path('member/', views.members, name='overview'),
+    path('me', views.member_overview, name='my_page'),
 
-    path('tag/edit/<int:tag_id>', views.tag_edit, name='tag_edit'),
-    path('tag/delete/<int:tag_id>', views.tag_delete, name='tag_delete'),
+    path('acl/member/<int:member_id>', views.member_overview, name='overview'),
+    path('acl/member/', views.members, name='overview'),
 
-    path('machine/<int:machine_id>', views.machine_overview, name='machine_overview'),
-    path('machine/', views.machine_overview, name='machine_overview'),
-    path('machines', views.machine_list, name='machine_list'),
+    path('acl/tag/edit/<int:tag_id>', views.tag_edit, name='tag_edit'),
+    path('acl/tag/delete/<int:tag_id>', views.tag_delete, name='tag_delete'),
+
+    path('acl/machine/<int:machine_id>', views.machine_overview, name='machine_overview'),
+    path('acl/machine/', views.machine_overview, name='machine_overview'),
+    path('acl/machines', views.machine_list, name='machine_list'),
 
     # For the trusteeds - to ease admin.
-    path('missing_forms/', views.missing_forms, name='missing_forms'),
-    path('filed_forms/', views.filed_forms, name='filed_forms'),
+    path('acl/missing_forms/', views.missing_forms, name='missing_forms'),
+    path('acl/filed_forms/', views.filed_forms, name='filed_forms'),
 
     # Convenience page to debug the API
-    path('', views.api_index, name='acl-index'),
+    path('acl/', views.api_index, name='acl-index'),
 
     # API oriented
-    path('api/v1/getok/<str:machine>', views.api_getok, name='acl-v1-getok'),
-    path('api/v1/gettaginfo', views.api_gettaginfo, name='acl-v1-gettaginfo'),
+    path('acl/api/v1/getok/<str:machine>', views.api_getok, name='acl-v1-getok'),
+    path('acl/api/v1/gettaginfo', views.api_gettaginfo, name='acl-v1-gettaginfo'),
 
-    path('<int:machine_id>', views.api_details, name='details'),
+    path('acl/<int:machine_id>', views.api_details, name='details'),
 ]
 
