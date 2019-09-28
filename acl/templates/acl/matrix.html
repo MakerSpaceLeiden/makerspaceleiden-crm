@@ -21,6 +21,16 @@
    {% endif %}
         </td></tr>
 {% endif %}
+{%if user.is_privileged %}
+	<tr><td alight=right>Recent use: </td><td>
+		{% for r in used %}
+			<br>{% r.user %} <i>({% r.used %})</i></br>
+		{% endfor %}
+		<p>
+		<i>Note: it is possible that this list contains ommissions. As no record is kept when, for example, the ADSL connection is down. It can also contain (accidental) swipes; which were every followed up by someone actually switching the power on or running the motor. See the logs for this.</i>
+		</p>
+	</td></tr>
+{% endif %}
 	<tr><td alight=right>Location: </td><td>{{ machines.first.location}}</td></tr>
 	<tr><td alight=right>Waiver: </td><td>
 			{% if  machines.first.requires_form %}

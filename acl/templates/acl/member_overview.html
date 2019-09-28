@@ -185,7 +185,13 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
 		<a href="{% url 'addstorage' %}">[request extra storage]</a>
 		</td></tr>
 	{% endif %}
-
+	{%if user.is_privileged or member == user %}
+	<tr><td colspan=2><h3>Machine recently used</h3></tr>
+	<tr><td></td><td>
+            {% for r in used %}<br>{% r.machine %} ({% r.used %})</br>{%endfor%}
+            <p><i>Note: this list may be incomplete or contain tag-swipes that were not followed by actually powering the machine on.</i></p>
+        </td></tr>
+        {% endif %}
 	<tr><td colspan=2><h3>Entitlements</h3></tr>
 	{% for machine,info in lst.items %}
 	<tr>

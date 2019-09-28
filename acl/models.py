@@ -14,6 +14,9 @@ from django.contrib.sites.models import Site
 import logging
 logger = logging.getLogger(__name__)
 
+# Should we also drop them if they are too old (either too old, or too many?)
+MAX_USERS_TRACKED = 3
+
 class PermitType(models.Model):
     name = models.CharField(max_length=40, unique=True)
     description =  models.CharField(max_length=200)
@@ -192,5 +195,18 @@ class Entitlement(models.Model):
         #
         return super(Entitlement, self).save(*args, **kwargs)
 
+class RecentUse(models.Model):
+   user = models.ForeignKey(User, on_delete=models.CASCADE)
+   machine = models.ForeignKey(Machine, on_delete=models.CASCADE)
+   used = models.DateTimeField(auto_now=True)
+
+   def save(self, * args, ** kwargs):
+      r = super(Unknowntag,self).save(*args, **kwargs)
+      self.objects.all().filter(machine=machine).order_by('-used')[:MAX_USERS_TRACKED].delete()
+
+      return r
+
+   def __str__(self):
+         return "{} used {} on  on {}".format(self.user, self.machine, self.last_used.strftime("%Y-%m-%d %H:%M:%S"))
 
 

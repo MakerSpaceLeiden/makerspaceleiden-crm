@@ -24,7 +24,7 @@ from members.forms import TagForm
 
 from mailinglists.models import Mailinglist, Subscription
 
-from .models import Machine,Entitlement,PermitType
+from .models import Machine,Entitlement,PermitType,RecentUse
 
 from storage.models import Storage
 from memberbox.models import Memberbox
@@ -151,6 +151,7 @@ def machine_list(request):
 @login_required
 def machine_overview(request, machine_id = None):
     instructors = []
+    used = []
     machines = Machine.objects.order_by('name')
     if machine_id:
         try:
@@ -166,6 +167,9 @@ def machine_overview(request, machine_id = None):
             else:
                     instructors = Entitlement.objects.filter(permit=permit)
             instructors = instructors.order_by('holder__first_name'),
+        if request.user.is_privileged:
+             used = RecentUse.objects.all().filter(machine=machine).order_by(-used)
+
     lst = {}
     for mchn in machines:
        lst[ mchn.name ] = matrix_m(mchn)
@@ -176,6 +180,7 @@ def machine_overview(request, machine_id = None):
        'members': members,
        'machines': machines,
        'lst': lst,
+       'used': used,
        'instructors': instructors,
        'has_permission': request.user.is_authenticated,
     }
@@ -231,6 +236,7 @@ def member_overview(request,member_id = None):
        'storage': storage,
        'boxes': boxes,
        'lst': lst,
+       'used': used,
        'permits': specials,
        'subscriptions': subscriptions,
        'user' : request.user,
@@ -240,6 +246,7 @@ def member_overview(request,member_id = None):
     if member == request.user or request.user.is_privileged:
         tags = Tag.objects.filter(owner = member)
         context['tags'] = tags
+        context['used'] = RecentUse.objects.all().filter(user=member).order_by(-used)
 
     # Notification settings
     context['uses_signal'] = request.user.phone_number and request.user.uses_signal
@@ -398,8 +405,14 @@ def api_getok(request, machine = None):
          return HttpResponse("Tag/Owner not found",status=404,content_type="text/plain")
 
     owner = tag.owner
-
     ok = matrix_mm(machine, owner)
+
+    if ok['xs']:
+       try:
+          r = RecentUse(user=owner,machine=machine)
+          r.save()
+       except Exception as e:
+          logger.error("Unexpected error when recording use of {} by {}: {}".format(machine,owner,e))
 
     out = userdetails(owner)
     if tag.description:
