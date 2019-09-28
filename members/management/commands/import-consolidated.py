@@ -75,7 +75,7 @@ class Command(BaseCommand):
                 print(admin.email)
                 print(woodpermit)
                 print(entit)
-                entit.save()
+                entit.save(bypass_user =  admin)
 
            self.stdout.write('Imported {} <{}>'.format(name,email))
 
@@ -106,7 +106,7 @@ class Command(BaseCommand):
                entit.holder = member
                entit.issuer = user0
                entit.active = True
-               entit.save()
+               entit.save(bypass_user =  admin)
 #               except Exception as e:
 #                 raise e
 

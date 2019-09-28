@@ -160,6 +160,11 @@ class Entitlement(models.Model):
            del  kwargs['request']
            current_site = get_current_site(request)
            user = request.user
+        else:
+           if 'bypass_user' in kwargs:
+              user = kwargs['bypass_user']
+              del  kwargs['bypass_user']
+              logger.critical("Warning - bypass in operation.")
 
         # rely on the contraints to bomb out if there is nothing in kwargs and self. and self.
         #
@@ -171,7 +176,7 @@ class Entitlement(models.Model):
         if issuer_permit and not Entitlement.objects.filter(permit=issuer_permit,holder=self.issuer):
             if not user or not user.is_staff:
                 logger.critical(f"Entitlement.save(): holder {self.issuer} cannot issue {self.permit} to {self.holder} as the holder lacks {issuer_permit}")
-                raise EntitlementViolation("issuer of this entitelment lacks the entitlement to issue it.")
+                raise EntitlementViolation("issuer {} of this entitelment lacks the entitlement to issue it.".format(self.issuer))
             logger.critical(f"Entitlement.save(): STAFFF bypass of rule 'holder {self.issuer} cannot issue {self.permit} to {self.holder} as the holder lacks {issuer_permit}'")
         if self.active == None:
             # See if we can fetch an older approval for same that may already have
