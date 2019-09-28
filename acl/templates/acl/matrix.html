@@ -23,12 +23,16 @@
 {% endif %}
 {%if user.is_privileged %}
 	<tr><td alight=right>Recent use: </td><td>
+            {% if used %}
 		{% for r in used %}
-			<br>{% r.user %} <i>({% r.used %})</i></br>
+			<a href="{{ r.user.path }}">{{ r.user }}</a> <i>({{ r.used }})</i><br>
 		{% endfor %}
 		<p>
-		<i>Note: it is possible that this list contains ommissions. As no record is kept when, for example, the ADSL connection is down. It can also contain (accidental) swipes; which were every followed up by someone actually switching the power on or running the motor. See the logs for this.</i>
+		<i>Note: it is possible that this list contains ommissions. As no record is kept when, for example, the ADSL connection is down. It can also contain (accidental) swipes; which were every followed up by someone actually switching the power on or running the motor. See the logs for this. Also - when there are consequitive swipes by the same user - actual use may have started earlier. And finally - this list is limited in both number of days and entries it shows.  </i>
 		</p>
+            {% else %}
+		<i>No recent use recorded.</i>
+            {% endif %}
 	</td></tr>
 {% endif %}
 	<tr><td alight=right>Location: </td><td>{{ machines.first.location}}</td></tr>

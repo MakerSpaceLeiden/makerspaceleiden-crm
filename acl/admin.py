@@ -12,6 +12,7 @@ from .models import PermitType
 from .models import Machine
 from .models import Location
 from .models import Entitlement
+from .models import RecentUse
 
 #class MachineAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 class MachineAdmin(ImportExportModelAdmin,SimpleHistoryAdmin):
@@ -51,4 +52,8 @@ admin.site.register(Entitlement,EntitlementAdmin)
 class PermitAdmin(ImportExportModelAdmin,SimpleHistoryAdmin):
     list_display = ('name','description')
 admin.site.register(PermitType,PermitAdmin)
+
+class RecentUseAdmin(ImportExportModelAdmin,SimpleHistoryAdmin):
+     list_display = ('user', 'machine', 'used')
+admin.site.register(RecentUse,RecentUseAdmin)
 

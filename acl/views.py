@@ -168,7 +168,7 @@ def machine_overview(request, machine_id = None):
                     instructors = Entitlement.objects.filter(permit=permit)
             instructors = instructors.order_by('holder__first_name'),
         if request.user.is_privileged:
-             used = RecentUse.objects.all().filter(machine=machine).order_by(-used)
+             used = RecentUse.objects.all().filter(machine=machine).order_by('-used')
 
     lst = {}
     for mchn in machines:
@@ -241,7 +241,6 @@ def member_overview(request,member_id = None):
        'storage': storage,
        'boxes': boxes,
        'lst': lst,
-       'used': used,
        'permits': specials,
        'subscriptions': subscriptions,
        'user' : request.user,
@@ -251,7 +250,7 @@ def member_overview(request,member_id = None):
     if member == request.user or request.user.is_privileged:
         tags = Tag.objects.filter(owner = member)
         context['tags'] = tags
-        context['used'] = RecentUse.objects.all().filter(user=member).order_by(-used)
+        context['used'] = RecentUse.objects.all().filter(user=member).order_by('-used')
 
     # Notification settings
     context['uses_signal'] = request.user.phone_number and request.user.uses_signal
@@ -395,10 +394,13 @@ def api_gettaginfo(request):
 @superuser_or_bearer_required
 def api_getok(request, machine = None):
   if request.POST:
-    tagstr = clean_tag_string(request.POST.get("tag"))
+    try:
+         tagstr = clean_tag_string(request.POST.get("tag"))
+    except Exception as e:
+         return HttpResponse("No or invalid tag",status=400,content_type="text/plain")
 
     if not tagstr:
-            return HttpResponse("No valid tag",status=400,content_type="text/plain")
+         return HttpResponse("No valid tag",status=400,content_type="text/plain")
 
     try:
          machine = Machine.objects.get(node_machine_name = machine)

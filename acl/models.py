@@ -15,8 +15,8 @@ from django.contrib.sites.models import Site
 import logging
 logger = logging.getLogger(__name__)
 
-# Should we also drop them if they are too old (either too old, or too many?)
-MAX_USERS_TRACKED = 3
+MAX_USERS_TRACKED = 5
+DAYS_USERS_TRACKED = 3
 
 class PermitType(models.Model):
     name = models.CharField(max_length=40, unique=True)
@@ -215,12 +215,22 @@ class RecentUse(models.Model):
    used = models.DateTimeField(auto_now=True)
 
    def save(self, * args, ** kwargs):
-      r = super(Unknowntag,self).save(*args, **kwargs)
-      self.objects.all().filter(machine=machine).order_by('-used')[:MAX_USERS_TRACKED].delete()
+      for e in RecentUse.objects.all().filter(machine=self.machine).order_by('-used'):
+         if e.user == self.user:
+            e.delete()
+         else:
+            break;
+      r = super(RecentUse,self).save(*args, **kwargs)
 
+      cutoff = timezone.now() - datetime.timedelta(days=DAYS_USERS_TRACKED)
+      for e in RecentUse.objects.all().filter(machine=self.machine, used__lt=cutoff).order_by('-used')[MAX_USERS_TRACKED:]:
+            e.delete()
       return r
 
    def __str__(self):
-         return "{} used {} on  on {}".format(self.user, self.machine, self.last_used.strftime("%Y-%m-%d %H:%M:%S"))
+         t = '<timestamp not yet set>'
+         if self.used:
+            t = self.used.strftime("%Y-%m-%d %H:%M:%S")
+         return "{} used {} on {}".format(self.user, self.machine, t)
 
 
