@@ -35,7 +35,6 @@ urlpatterns = [
     path('storage/', include('storage.urls')),
     path('boxes/', include('memberbox.urls')),
     path('ufo/', include('ufo.urls')),
-    path('admin/', admin.site.urls),
     path('chores/', include('chores.urls')),
 #   url(r'^autocomplete/', include('autocomplete_light.urls')),
     path('admin/', admin.site.urls),
