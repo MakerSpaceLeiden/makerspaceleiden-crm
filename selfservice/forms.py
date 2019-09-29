@@ -39,3 +39,8 @@ class SignUpForm(UserCreationForm):
         model = User
         fields = ('first_name', 'last_name', 'email', 'password1', 'password2', )
 
+
+class TabledCheckboxSelectMultiple(forms.CheckboxSelectMultiple):
+     template_name='multiple_inputs_tabled.html'
+
+

@@ -23,6 +23,8 @@ from django.core.mail import EmailMessage
 from django.urls import reverse
 from makerspaceleiden.decorators import superuser_or_bearer_required
 
+from .forms import TabledCheckboxSelectMultiple
+
 from django.conf import settings
 
 import logging
@@ -34,7 +36,6 @@ from selfservice.forms import UserForm, SignUpForm, SignalNotificationSettingsFo
 from .models import WiFiNetwork
 from .waiverform.waiverform import generate_waiverform_fd
 from .aggregator_adapter import get_aggregator_adapter
-
 
 def sentEmailVerification(request,user,new_email,ccOrNone = None, template='email_verification_email.txt'):
             current_site = get_current_site(request)
@@ -133,7 +134,8 @@ def recordinstructions(request):
           ms.append((m.id,m.name))
 
     form = forms.Form(request.POST) # machines, members)
-    form.fields['machine'] = forms.MultipleChoiceField(label='Machine',choices=ms,help_text='Select multiple if so desired')
+    # form.fields['machine'] = forms.MultipleChoiceField(label='Machine',choices=ms,help_text='Select multiple if so desired')
+    form.fields['machine'] = forms.MultipleChoiceField(label='Machine',choices=ms,help_text='Select multiple if so desired',     widget=TabledCheckboxSelectMultiple(attrs={'class': 'my-class'}),)
     form.fields['persons'] = forms.MultipleChoiceField(label='Person',choices=ps, help_text='Select multiple if so desired')
 
     if request.user.is_privileged:

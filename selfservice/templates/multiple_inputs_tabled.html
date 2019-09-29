@@ -1,0 +1,19 @@
+{% load modulo %}
+{% with id=widget.attrs.id %}
+<ul{% if id %} id="{{ id }}"{% endif %}{% if widget.attrs.class %} class="{{ widget.attrs.class }}"{% endif %}>
+<table>
+{% for group, options, index in widget.optgroups %}
+  {% if group %}
+    <li>{{ group }}<ul {% if id %} id="{{ id }}_{{ index }}"{% endif %}>
+  {% endif %}
+  {% for option in options %}
+    {% if index|modulo:6 == 0  %}<tr>{% endif %}
+    <td>{% include option.template_name with widget=option %}</td>
+    {% if index|modulo:6 == 5 %}</tr>{% endif %}
+  {% endfor %}
+  {% if group %}
+  {% endif %}
+{% endfor %}
+</table>
+</ul>
+{% endwith %}
