@@ -190,8 +190,9 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
 	<tr><td></td><td>
           {% if used %}
             {% for r in used %}
-		<a href="{{ r.user.path }}">{{ r.machine }}</a> <i>{{ r.used }})<a><br/>
+	    <a href="{{ r.user.path }}">{{ r.machine }}</a> <i>({{ r.used }})</i><br/>
 	    {% endfor %}
+	    <p>
             <p><i>Note: this list may be incomplete or contain tag-swipes that were not followed by actually powering the machine on. Or when the ADLS was done. It is also limited in time and number of entries. And will only show the most recent swipe in case of successive use.</i></p>
 	  {% else %}
               <i>None recorded resently.</i>

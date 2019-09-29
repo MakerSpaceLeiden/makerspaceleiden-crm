@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -12,6 +13,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from members.models import User
 from django.contrib.sites.models import Site
 
+import datetime 
 import logging
 logger = logging.getLogger(__name__)
 
