@@ -1,3 +1,15 @@
+# Quick test/install
+
+-	Make sure you have a somewhat recent python version
+
+-	sh loaddemo.sh
+
+Then go to
+
+	http://localhost:8000/
+
+and login using the accounts created & shown to you during the loaddemo.sh script.
+
 # Requirements
 
 ## Trustees
