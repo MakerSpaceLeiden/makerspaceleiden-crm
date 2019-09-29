@@ -34,6 +34,7 @@ class EntitlementResource(resources.ModelResource):
 class EntitlementAdmin(ImportExportModelAdmin,SimpleHistoryAdmin):
     list_display = ('permit','holder','issuer','active')
     resource_class = EntitlementResource
+    search_fields = [ 'permit__name', 'holder__first_name', 'holder__last_name', 'holder__email' ]
 
     def get_changeform_initial_data(self, request):
         defaults = {'active': True, 'issuer': request.user, 'permit': settings.DOORS }

@@ -45,6 +45,7 @@ admin.site.register(User,UserAdmin)
 class TagAdmin(ImportExportModelAdmin,SimpleHistoryAdmin):
     list_display = ('tag', 'owner', 'last_used','description')
     resource_class = TagResource
+    search_fields = [ 'tag', 'owner__first_name', 'owner__last_name', 'owner__email' ]
 
 admin.site.register(Tag,TagAdmin)
 
