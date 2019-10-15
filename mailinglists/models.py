@@ -86,7 +86,7 @@ def sub_deleted(sender,instance,**kwargs):
     try:
         instance.unsubscribe()
     except MailmanAccessNoSuchSubscriber as e:
-        logger.error(f'Trying to unsub {email} @ {self.mailinglist} during delete - but already not present.')
+        logger.error(f'Trying to unsub during delete - but already not present.')
 
 def sub_saved(sender, instance, created, **kwars):
      if created:
