@@ -1,12 +1,12 @@
 import urllib.request
 import base64
 import json
+import logging
 
 
 handle = {
     'aggregator_adapter': None,
 }
-
 
 class AggregatorAdapter(object):
     def __init__(self, base_url, username, password):
@@ -23,11 +23,17 @@ class AggregatorAdapter(object):
         json_payload = {}
         if user_id is not None:
             json_payload['user_id'] = user_id
-        req = urllib.request.Request(self.base_url + url,
-                                     data=json.dumps(json_payload).encode('utf8'),
+        try:
+            url = self.base_url + url
+            req = urllib.request.Request(url, data=json.dumps(json_payload).encode('utf8'),
                                      headers={'Authorization': 'Basic %s' % self.encoded_credentials.decode("ascii")}
                                      )
-        return urllib.request.urlopen(req).read().decode('utf-8')
+            r= urllib.request.urlopen(req).read().decode('utf-8')
+        except Exception as e:
+            logger.error("Failed {} - {}".format(url, e))
+            return None
+        return r
+
 
     def generate_telegram_connect_token(self, user_id):
         token = self._request_with_user_id('/telegram/token', user_id)
