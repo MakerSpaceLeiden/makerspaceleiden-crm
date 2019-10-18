@@ -30,12 +30,11 @@ def resolve(request, tag = None):
   if tag:
       try:
            item = Mainssensor.objects.get(tag = tag);
+           return render(request, 'single-sensor.txt', { 'item': item }, content_type="text/plain")
       except:
            return HttpResponse("Unknown sensor id\n",status=404,content_type="text/plain")
-      items = [ item ]
-  else:
-      items = Mainssensor.objects.all().order_by('tag')
 
+  items = Mainssensor.objects.all().order_by('tag')
   return render(request, 'sensors.txt', { 'items': items }, content_type="text/plain")
 
 @login_required
