@@ -129,7 +129,6 @@ class EntitlementViolation(Exception):
 class DoubleEntitlemenException(Exception):
         pass
 
-
 class Entitlement(models.Model):
     active = models.BooleanField( default=False,)
     permit = models.ForeignKey(
@@ -151,7 +150,8 @@ class Entitlement(models.Model):
     objects = EntitlementManager()
 
     def __str__(self):
-        return str(self.holder) + '@' + self.permit.name +'(Active:'+str(self.active)+')'
+        # return str(self.holder) + '@' + self.permit.name +'(Active:'+str(self.active)+')'
+        return str(self.holder) + '@' + self.permit.name +'(Trustee activated:'+ yn(self.active) + ', Form:' + yn(self.holder.form_on_file)+')'
 
     def save(self, *args, **kwargs):
         current_site = Site.objects.get(pk=settings.SITE_ID)
@@ -235,4 +235,11 @@ class RecentUse(models.Model):
             t = self.used.strftime("%Y-%m-%d %H:%M:%S")
          return "{} used {} on {}".format(self.user, self.machine, t)
 
+
+def yn(v): 
+    if v == None:
+            return "?"
+    if v:
+            return "yes"
+    return "no"
 

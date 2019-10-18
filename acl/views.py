@@ -397,18 +397,22 @@ def api_getok(request, machine = None):
     try:
          tagstr = clean_tag_string(request.POST.get("tag"))
     except Exception as e:
+         logger.error("No or invalid tag passed to getok, denied.");
          return HttpResponse("No or invalid tag",status=400,content_type="text/plain")
 
     if not tagstr:
+         logger.error("No valid tag passed to getok, denied.");
          return HttpResponse("No valid tag",status=400,content_type="text/plain")
 
     try:
          machine = Machine.objects.get(node_machine_name = machine)
     except ObjectDoesNotExist as e:
+         logger.error("Machine not found to getok, denied.");
          return HttpResponse("Machine not found",status=404,content_type="text/plain")
     try:
          tag = Tag.objects.get(tag = tagstr)
     except ObjectDoesNotExist as e:
+         logger.error("Tag {} on machine {} not found, denied.".format(tagstr,machine));
          return HttpResponse("Tag/Owner not found",status=404,content_type="text/plain")
 
     owner = tag.owner

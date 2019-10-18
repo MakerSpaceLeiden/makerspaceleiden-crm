@@ -21,6 +21,8 @@ from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import EmailMessage
 from django.urls import reverse
+from django.forms import widgets
+
 from makerspaceleiden.decorators import superuser_or_bearer_required
 
 from .forms import TabledCheckboxSelectMultiple
@@ -88,7 +90,7 @@ def pending(request):
         es.append((p.id,p))
 
     form = forms.Form(request.POST)
-    form.fields['entitlement'] = forms.MultipleChoiceField(label='Entitlements',choices=es)
+    form.fields['entitlement'] = forms.MultipleChoiceField(label='Entitlements',choices=es, widget=widgets.SelectMultiple(attrs={'size': len(es)}))
     context = {
 	'title': 'Pending entitlements',
 	'user' : request.user,
