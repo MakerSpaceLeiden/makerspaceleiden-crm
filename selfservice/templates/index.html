@@ -46,6 +46,13 @@ There are no wifi network passwords for members at the moment.
 	<li><a href="{% url 'storage' %}">Storage management</a>
 	<li><a href="{% url 'chores' %}">Chores</a>
 	<p/>
+{% if mainsadmin %}
+	<li> Lucas MainsSensors : <a href="/crm/admin/mainssensor/mainssensor/">admin interface</a>
+	<li> List of <a href="/crm/api/v1/mainssensor/resolve">sensors</a> names, descriptions and IDs.
+        <li> Or alternatively use ...<code>//crm/api/v1/mainssensor/resolve/1234</code> to get just the name (decimal number).
+	</p>
+{% endif %}
+
 {%if user.is_privileged %}
 	<li><a href="{% url 'newmember' %}">Add a NEW member</a>
 	<p/>
