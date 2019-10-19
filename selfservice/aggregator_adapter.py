@@ -3,6 +3,8 @@ import base64
 import json
 import logging
 
+logger = logging.getLogger(__name__)
+
 
 handle = {
     'aggregator_adapter': None,
@@ -52,8 +54,11 @@ class AggregatorAdapter(object):
         self._request_with_user_id('/space/checkout', user_id)
 
     def get_chores(self):
-        return json.loads(self._request_with_user_id('/chores/overview'))
-
+        try:
+          return json.loads(self._request_with_user_id('/chores/overview'))
+        except Exception as e:
+          logger.error("Failed to parse the json chore.");
+        return None
 
 def initialize_aggregator_adapter(base_url, username, password):
     handle['aggregator_adapter'] = AggregatorAdapter(base_url, username, password)
