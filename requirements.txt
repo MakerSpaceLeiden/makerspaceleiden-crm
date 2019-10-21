@@ -2,6 +2,7 @@ Django
 pytz
 django-import-export
 # django-autocomplete-light
+django-search-admin-autocomplete
 django-simple-history
 qrcode
 django-settings-export
