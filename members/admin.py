@@ -2,6 +2,8 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import UserChangeForm
 
+from search_admin_autocomplete.admin import SearchAutoCompleteAdmin
+
 from import_export.admin import ImportExportModelAdmin
 from import_export import resources
 from simple_history.admin import SimpleHistoryAdmin
@@ -21,7 +23,7 @@ class TagResource(resources.ModelResource):
        fields = [ 'owner', 'tag' ]
        import_id_fields = [ 'owner', 'tag' ]
 
-class UserAdmin(ImportExportModelAdmin, BaseUserAdmin, SimpleHistoryAdmin):
+class UserAdmin(SearchAutoCompleteAdmin, ImportExportModelAdmin, BaseUserAdmin, SimpleHistoryAdmin):
     resource_class = UserResource
     fieldsets = (
         (None,                 {'fields': ('email', 'password')}),
@@ -37,12 +39,12 @@ class UserAdmin(ImportExportModelAdmin, BaseUserAdmin, SimpleHistoryAdmin):
         }),
     )
     list_display = ('email', 'first_name', 'last_name', 'is_staff', 'form_on_file', 'last_login')
-    search_fields = ('email', 'first_name', 'last_name')
-    ordering = ('email',)
+    search_fields = [ 'email', 'first_name', 'last_name' ]
+    ordering = ('email', 'first_name', 'last_name')
 
 admin.site.register(User,UserAdmin)
 
-class TagAdmin(ImportExportModelAdmin,SimpleHistoryAdmin):
+class TagAdmin(ImportExportModelAdmin,SimpleHistoryAdmin, SearchAutoCompleteAdmin):
     list_display = ('tag', 'owner', 'last_used','description')
     resource_class = TagResource
     search_fields = [ 'tag', 'owner__first_name', 'owner__last_name', 'owner__email' ]
@@ -54,5 +56,4 @@ class AuditRecordAdmin(ImportExportModelAdmin,SimpleHistoryAdmin):
     resource_class = AuditRecord
 
 admin.site.register(AuditRecord, AuditRecordAdmin)
-
 
