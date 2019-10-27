@@ -1,0 +1,11 @@
+Dear {{ owner }},
+
+The storage location {{ location }} was marked for re-use. 
+
+If there is any junk left in it; be sure to get, or ask for, it within a few days - as otherwise it wil be thrown away or recycled soon.
+
+Yours,
+
+the makerspace bot, on behalf of the trusteeds (bestuur@makerspaceleiden.nl).
+
+

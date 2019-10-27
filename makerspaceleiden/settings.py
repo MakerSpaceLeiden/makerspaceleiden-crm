@@ -36,6 +36,7 @@ GRAND_AMNESTY = True
 INSTALLED_APPS = [
     'import_export',
     'simple_history',
+    'search_admin_autocomplete',
     'qr_code',
     'makerspaceleiden',
 

@@ -124,7 +124,6 @@ def recordinstructions(request):
 
     # Only show machine we are entitled for ourselves.
     #
-
     if not request.user.is_privileged:
       machines = machines.filter(Q(requires_permit__permit=None) | Q(requires_permit__permit__isRequiredToOperate__holder=member))
       members = members.exclude(id = member.id) #.order_by('first_name')
@@ -138,8 +137,12 @@ def recordinstructions(request):
           ms.append((m.id,m.name))
 
     form = forms.Form(request.POST) # machines, members)
-    # form.fields['machine'] = forms.MultipleChoiceField(label='Machine',choices=ms,help_text='Select multiple if so desired')
-    form.fields['machine'] = forms.MultipleChoiceField(label='Machine',choices=ms,help_text='Select multiple if so desired',     widget=TabledCheckboxSelectMultiple(attrs={'class': 'my-class'}),)
+    form.fields['machine'] = forms.MultipleChoiceField(
+              label='Machine',
+              choices=ms,
+              help_text='Select multiple if so desired',
+              widget=TabledCheckboxSelectMultiple(),
+    ) 
     form.fields['persons'] = forms.MultipleChoiceField(label='Person',choices=ps, help_text='Select multiple if so desired')
 
     if request.user.is_privileged:

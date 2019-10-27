@@ -8,6 +8,11 @@ from django.db.models.signals import pre_delete, pre_save
 # from stdimage.utils import pre_delete_delete_callback, pre_save_delete_callback
 from makerspaceleiden.utils import upload_to_pattern
 from django.urls import reverse
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string, get_template
+
+import logging
+logger = logging.getLogger(__name__)
 
 
 class Memberbox(models.Model):
@@ -33,6 +38,29 @@ class Memberbox(models.Model):
         if self.owner:
            return "Box owned by " + self.owner.first_name + " " + self.owner.last_name + " at " + self.location
         return "Box at " + self.location + " (owner unknown)"
+
+    def delete(self, save = True):
+        logger.critical("Pass 1");
+        context = {
+            'email': self.owner.email,
+            'owner' :  self.owner.first_name + " " + self.owner.last_name,
+            'location' : self.location,
+        }
+
+        logger.critical("Pass 2");
+
+        logger.critical("Pass 3")
+        try:
+           body =    render_to_string('memberbox/email_delete.txt', context)
+           subject = render_to_string('memberbox/email_delete_subject.txt', context).strip()
+
+           EmailMessage(subject, body, 
+                to=[context['email'], settings.TRUSTEES, 'dirkx@webweaving.org'], 
+                from_email=settings.DEFAULT_FROM_EMAIL).send()
+        except Exception as e:
+              logger.critical("Failed to sent empty your storage box email: {}".format(str(e)))
+
+        super(Memberbox, self).delete()
 
 # Handle image cleanup.
 # pre_delete.connect(pre_delete_delete_callback, sender=Memberbox)

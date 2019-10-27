@@ -117,7 +117,6 @@ def delete(request,pk):
     except Memberbox.DoesNotExist:
          return HttpResponse("Box not found",status=404,content_type="text/plain")
 
-
     if box.owner != request.user:
          return HttpResponse("Eh - not your box ?!",status=403,content_type="text/plain")
 
