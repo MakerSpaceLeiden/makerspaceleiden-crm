@@ -40,16 +40,11 @@ class Memberbox(models.Model):
         return "Box at " + self.location + " (owner unknown)"
 
     def delete(self, save = True):
-        logger.critical("Pass 1");
         context = {
             'email': self.owner.email,
             'owner' :  self.owner.first_name + " " + self.owner.last_name,
             'location' : self.location,
         }
-
-        logger.critical("Pass 2");
-
-        logger.critical("Pass 3")
         try:
            body =    render_to_string('memberbox/email_delete.txt', context)
            subject = render_to_string('memberbox/email_delete_subject.txt', context).strip()
