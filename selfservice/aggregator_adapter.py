@@ -17,8 +17,10 @@ class AggregatorAdapter(object):
         self.encoded_credentials = base64.b64encode(credentials.encode('ascii'))
 
     def fetch_state_space(self):
-        req = urllib.request.Request(self.base_url + '/space_state')
+        url = self.base_url + '/space_state'
+        req = urllib.request.Request(url)
         req.add_header('Authorization', 'Basic %s' % self.encoded_credentials.decode("ascii"))
+        logger.debug("Fetching {} {}".format(req,url));
         return json.loads(urllib.request.urlopen(req).read())
 
     def _request_with_user_id(self, url, user_id=None):

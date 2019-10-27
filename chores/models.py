@@ -2,13 +2,19 @@ from django.db import models
 from simple_history.models import HistoricalRecords
 from members.models import User
 import jsonfield
+import json
 
+def validate_json(payload):
+     try:
+        json.loads(payload)
+     except Exception as e:
+         raise ValidationError("Invalid json ({e}");
 
 class Chore(models.Model):
     name = models.CharField(max_length=40, unique=True)
     description = models.CharField(max_length=200)
     class_type = models.CharField(max_length=40)
-    configuration = jsonfield.JSONField()
+    configuration = jsonfield.JSONField(validators=[validate_json])
     creator = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
