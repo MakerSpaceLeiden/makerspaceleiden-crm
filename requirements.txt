@@ -1,5 +1,6 @@
 Django
 pytz
+wheel
 django-import-export
 # django-autocomplete-light
 django-search-admin-autocomplete
