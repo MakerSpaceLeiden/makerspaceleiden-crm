@@ -6,6 +6,7 @@ from . import views
 urlpatterns = [
     path('me', views.member_overview, name='my_page'),
 
+    path('acl/personal_page',          views.member_overview, name='personal_page'),
     path('acl/member/<int:member_id>', views.member_overview, name='overview'),
     path('acl/member/', views.members, name='overview'),
 
