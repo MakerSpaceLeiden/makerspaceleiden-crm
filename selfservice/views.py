@@ -1,4 +1,6 @@
 import os
+import re
+
 from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.encoding import force_bytes, force_text
@@ -254,8 +256,15 @@ def waiverform(request, user_id=None):
     except ObjectDoesNotExist as e:
         return HttpResponse("User not found", status=404, content_type="text/plain")
     confirmation_url = request.build_absolute_uri(reverse('waiver_confirmation', kwargs=dict(user_id=user_id)))
-    fd = generate_waiverform_fd(member.id, f'{member.first_name} {member.last_name}', confirmation_url)
-    return HttpResponse(fd.getvalue(), status=200, content_type="application/pdf")
+    name = f'{member.first_name} {member.last_name}'
+    safename = re.sub("\W+","-",name)
+
+    fd = generate_waiverform_fd(member.id, name, confirmation_url)
+
+    response = HttpResponse(fd.getvalue(), status=200, content_type="application/pdf")
+    response['Content-Disposition'] = f'attachment; filename="MSL-Waiver-{safename}.pdf"'
+
+    return response
 
 
 @login_required

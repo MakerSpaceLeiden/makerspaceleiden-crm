@@ -47,16 +47,16 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
         {%endif %}
         {%endif %}
 	<tr><td align=right>Waiver on file</td><td>
-			{%if member.form_on_file %} yes {% else %} no 
-	{%if member == user or user.is_priveleged %}
-  		<a href="{% url 'waiverform' user_id=member.id %}" target="_blank">[ Download form ]</a>
+			{%if member.form_on_file %} yes {% else %} no
+	{%if member == user or  user.is_privileged %}
+  		<a href="{% url 'waiverform' user_id=member.id %}" target="_blank">[ Download form ]</a>, read, sign and then delivery or mail to the address on the form.
 	{% endif %}
 {% endif %}
 			</td></tr>
 	{%if member.is_superuser %}
 			<tr><td></td><td>Is a trustee</td><td>
         {% else %}
-	{%if member.can_escalate_to_priveleged %}
+	{%if member.can_escalate_to_privileged %}
 			<tr><td></td><td>Can edit certain databases on behalf of the trustee)</td><td>
 	{% endif %}
 	{% endif %}
