@@ -1,0 +1,17 @@
+{% autoescape off %}
+L.S.
+
+Unfortunately, {{ volunteer }} can no longer volunteer for
+{{ chore.description }}.
+
+So if you have a second - would you be able to sign up at
+
+    {{ request.scheme  }}://{{ domain }}{% url 'chores' %}
+
+as we do really need some kind person to do this. To help
+keep the Space a happy and happening place.
+
+Sb.
+-- 
+Your friendly SpaceBot.
+{% endautoescape  %}

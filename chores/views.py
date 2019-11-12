@@ -10,6 +10,10 @@ from .admin import ChoreAdmin
 from .models import ChoreVolunteer, Chore
 from django.contrib.auth.decorators import login_required
 
+from django.conf import settings
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string, get_template
+
 import logging
 logger = logging.getLogger(__name__)
 
@@ -73,6 +77,20 @@ def signup(request, chore_id, ts):
     except Exception as e:
        logger.error("Something else went wrong during create: {0}".format(e))
        raise e
+    try:
+       context = {
+               'chore': chore,
+               'volunteer': request.user
+       }
+       subject = render_to_string('notify_email.subject.txt', context).strip()
+       body =  render_to_string('notify_email.txt', context)
+
+       EmailMessage(subject, body,
+            to=[request.user.email, settings.MAILINGLIST ],
+            from_email=settings.DEFAULT_FROM_EMAIL
+       ).send()
+    except Exception as e:
+       logger.error("Something else went wrong during mail sent: {0}".format(e))
 
     return redirect('chores')
 
@@ -89,5 +107,19 @@ def remove_signup(request, chore_id, ts):
     except Exception as e:
        logger.error("Something else went wrong during delete: {0}".format(e))
        raise e
+    try:
+       context = {
+               'chore': chore,
+               'volunteer': request.user
+       }
+       subject = render_to_string('notify_email_nope.subject.txt', context).strip()
+       body =  render_to_string('notify_email_nope.txt', context)
+
+       EmailMessage(subject, body,
+            to=[request.user.email, settings.MAILINGLIST ],
+            from_email=settings.DEFAULT_FROM_EMAIL
+       ).send()
+    except Exception as e:
+       logger.error("Something else went wrong during remove mail sent: {0}".format(e))
 
     return redirect('chores')
