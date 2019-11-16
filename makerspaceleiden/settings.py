@@ -31,6 +31,8 @@ ALLOWED_HOSTS = [ '10.11.0.158', '*' ]
 #
 GRAND_AMNESTY = True
 
+# Harsher way to exclude storage module / top level
+STORAGE = False
 # Application definition
 
 INSTALLED_APPS = [
@@ -99,7 +101,7 @@ TEMPLATES = [
     },
 ]
 
-SETTINGS_EXPORT = [ 'GRAND_AMNESTY', 'ML_ADMINURL', ]
+SETTINGS_EXPORT = [ 'GRAND_AMNESTY', 'ML_ADMINURL', 'STORAGE' ]
 
 WSGI_APPLICATION = 'makerspaceleiden.wsgi.application'
 

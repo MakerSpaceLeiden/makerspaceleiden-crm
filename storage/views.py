@@ -263,3 +263,6 @@ def showhistory(request,pk,rev=None):
 
     historyAdmin = MySimpleHistoryAdmin(Storage,AdminSite())
     return historyAdmin.history_view(request,str(pk),context)
+
+def nope(request):
+      return HttpResponse("No storage functionality",  status=404,content_type="text/plain")

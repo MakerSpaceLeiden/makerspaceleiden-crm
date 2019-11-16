@@ -43,7 +43,9 @@ There are no wifi network passwords for members at the moment.
 	<li><a href="{% url 'add_instruction' %}">Record instructions you've just given</a> on a machine to someone.
 <p/>
 	<li><a href="{% url 'boxes' %}">Members box management</a>
+{%  if settings.STORAGE %}
 	<li><a href="{% url 'storage' %}">Storage management</a>
+{% endif %}
 	<li><a href="{% url 'chores' %}">Chores</a>
 	<p/>
 {% if mainsadmin or user.is_privileged %}
