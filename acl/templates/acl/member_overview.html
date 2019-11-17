@@ -159,6 +159,7 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
 		</td></tr>
 	{% endif %}
 
+{%  if settings.STORAGE %}
 	<tr><td colspan=2><h3><a href="{% url 'storage' %}">Storage</a></h3></tr>
 	{% if storage %}
         {% for box in storage %}
@@ -185,6 +186,7 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
 		<a href="{% url 'addstorage' %}">[request extra storage]</a>
 		</td></tr>
 	{% endif %}
+{% endif %}
 	{%if user.is_privileged or member == user %}
 	<tr><td colspan=2><h3>Machine recently used</h3></tr>
 	<tr><td></td><td>
