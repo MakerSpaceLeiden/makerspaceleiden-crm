@@ -12,7 +12,7 @@ from .decorators import superuser_or_mainsadmin_required
 from members.models import Tag,User,clean_tag_string
 from acl.models import Entitlement,PermitType
 
-from makerspaceleiden.decorators import superuser_or_bearer_required, superuser_or_groupmember_required
+from makerspaceleiden.decorators import superuser_or_bearer_required
 
 from .forms import NewMainssensorForm, MainssensorForm
 
