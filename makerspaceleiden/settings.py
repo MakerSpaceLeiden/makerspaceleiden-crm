@@ -241,6 +241,8 @@ UT_COUNT_CUTOFF = 10
 ML_PASSWORD = 'Foo'
 ML_ADMINURL = 'https://mailman.foo.com/mailman'
 
+SENSOR_USER_GROUP = 'mains Sensor Admins'
+
 # REGISTRATION_OPEN = False
 
 try:

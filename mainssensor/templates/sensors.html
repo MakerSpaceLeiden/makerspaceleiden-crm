@@ -11,11 +11,22 @@
   <td>0x{{ item.tag }}</td>
   <td>{{ item.name }} </td>
   <td>{{ item.description }} </td>
+{%if canedit %}
+  <td>
+	<a href="{% url 'changesensor' pk=item.id %}">[change]</a>
+        <a href="{% url 'deletesensor' pk=item.id  %}">[delete]</a>
+  </td>
+{% endif %}
 </tr>
 {% endfor %}
 </table>
 {% else %}
 No mains sensors.
 {% endif %}
+{%if canedit %}
+<hr>
+<p><a href="{% url 'addsensor' %}">[Add] </a> a sensor that is not yet in this overview.</p>
+{% endif %}
+
 
 {% endblock %}
