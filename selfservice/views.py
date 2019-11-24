@@ -81,7 +81,7 @@ def index(request):
         context['is_logged_in'] = request.user.is_authenticated
         context['member'] = request.user
         context['wifinetworks'] = WiFiNetwork.objects.order_by('network')
-        context['mainsadmin'] =  request.user.groups.filter(name='mains Sensor Admins').exists()
+        context['mainsadmin'] =  request.user.groups.filter(name=settings.SENSOR_USER_GROUP).exists()
 
     return render(request, 'index.html', context)
 
