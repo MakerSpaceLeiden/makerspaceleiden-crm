@@ -11,6 +11,7 @@ from django.urls import reverse_lazy
 from django import forms
 from django.forms import ModelForm
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils import timezone
 
 from django.views.decorators.csrf import csrf_exempt
 from makerspaceleiden.decorators import superuser_or_bearer_required
@@ -423,7 +424,13 @@ def api_getok(request, machine = None):
           r = RecentUse(user=owner,machine=machine)
           r.save()
        except Exception as e:
-          logger.error("Unexpected error when recording use of {} by {}: {}".format(machine,owner,e))
+          logger.error("Unexpected error when recording machine use of {} by {}: {}".format(machine,owner,e))
+
+    try:
+       tag.last_user = timezone.now()
+       tag.save()
+    except Exception as e:
+       logger.error("Unexpected error when recording tag use on {}: {}".format(tag,e))
 
     out = userdetails(owner)
     if tag.description:
