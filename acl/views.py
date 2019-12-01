@@ -427,8 +427,9 @@ def api_getok(request, machine = None):
           logger.error("Unexpected error when recording machine use of {} by {}: {}".format(machine,owner,e))
 
     try:
-       tag.last_user = timezone.now()
+       tag.last_used = timezone.now()
        tag.save()
+       # logger.error("Saved tag date on {}: {}".format(tag, tag.last_used))
     except Exception as e:
        logger.error("Unexpected error when recording tag use on {}: {}".format(tag,e))
 
