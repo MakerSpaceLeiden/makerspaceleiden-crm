@@ -41,6 +41,8 @@ class HexField(models.Field):
         return 'integer UNSIGNED'
 
     def get_prep_value(self, value):
+        if value == None:
+            return 0
         return int(value, 16)
 
     def from_db_value(self, value, expr, conn):
