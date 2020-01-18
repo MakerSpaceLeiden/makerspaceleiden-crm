@@ -18,12 +18,12 @@ from django import forms
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.utils import six
 from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import EmailMessage
 from django.urls import reverse
 from django.forms import widgets
+from six import wraps
 
 from makerspaceleiden.decorators import superuser_or_bearer_required
 

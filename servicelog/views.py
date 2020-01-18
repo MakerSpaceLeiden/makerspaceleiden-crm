@@ -24,7 +24,6 @@ from django import forms
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.utils import six
 from django.db.models import Q
 from simple_history.admin import SimpleHistoryAdmin
 from django.template.loader import render_to_string, get_template

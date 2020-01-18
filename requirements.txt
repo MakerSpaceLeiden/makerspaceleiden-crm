@@ -9,6 +9,7 @@ qrcode
 django-settings-export
 django-stdimage
 django-dynamic-filenames
+django-six
 
 # We're also including Pillow  as otherwise QR will fall back
 # to SVG - which is not as supported.
@@ -29,7 +30,7 @@ PyPDF2
 lxml
 
 # JSON fields in the DB model
-jsonfield
+jsonfield2
 
 # For production
 # mysqlclient

@@ -1,10 +1,11 @@
 #!/bin/sh
 set -e
-VERSION=${VERSION:-3.7}
+VERSION=${VERSION:-3}
 
 python${VERSION}  -mvenv venv
 . venv/bin/activate
 
+pip install --upgrade pip
 pip${VERSION} install -r requirements.txt 
 
 test -f db.sqlite3 && rm -f db.sqlite3
