@@ -1,20 +1,44 @@
 {% extends 'base.html' %}
+{% load isingroup %}
 
 {% block content %}
 
 {% if is_logged_in %}
 {% if wifinetworks %}
-<p>Wifi networks at the space for members:</p>
+<script>
+function showPw(fld) {
+  var x = document.getElementById(fld);
+  if (x.type === "password") {
+    x.type = "text";
+    window.setTimeout(function() { showPw(fld); }, 3000);
+  } else {
+    x.type = "password";
+  }
+}
+</script>
+<p>Passwords for members only:</p>
 <blockquote>
 <table>
-<tr><th>network</th><th>password</th></tr>
+<tr><th>network/use</th><th>password</th></tr>
 {% for e in wifinetworks %}
-<tr><td>{{ e.network }}</td><td><code>{{ e.password }}</code></td></tr>
+  {%if not e.adminsonly or reqest.user|isNetAdmin or request.user.is_privileged %}
+  <tr>
+	<td><input style="border:none" type=text value="{{ e.network }}"></td>
+
+	<td><input style="border:none; font-family: monospace;" value="{{ e.password }}" id="{{ e.network }}"
+        {% if e.adminsonly %}
+		type="password"/><input style="padding:5px" type=button value=show onClick="showPw('{{ e.network }}');"
+	{%endif%}
+		/>
+	</td>
+	</td>
+  </tr>
+{% endif %}
 {% endfor %}
 </table>
 </blockquote>
 {% else %}
-There are no wifi network passwords for members at the moment.
+There are no passwords for members at the moment.
 {% endif %}
 <h2>Manage your data</h2>
 <p>
@@ -48,7 +72,7 @@ There are no wifi network passwords for members at the moment.
 {% endif %}
 	<li><a href="{% url 'chores' %}">Chores</a>
 	<p/>
-{% if mainsadmin or user.is_privileged %}
+{% if request.user|isMainsAdmin or user.is_privileged %}
 	<li> Lucas MainsSensors : <a href="{% url 'mainsindex' %}">admin interface</a>
 	<li> List of <a href="/crm/api/v1/mainssensor/resolve">sensors</a> names, descriptions and IDs.
         <li> Or alternatively use ...<code>//crm/api/v1/mainssensor/resolve/1234</code> to get just the name (decimal number).
