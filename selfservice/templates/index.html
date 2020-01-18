@@ -21,21 +21,24 @@ function showPw(fld) {
 <table>
 <tr><th>network/use</th><th>password</th></tr>
 {% for e in wifinetworks %}
-  {%if not e.adminsonly or reqest.user|isNetAdmin or request.user.is_privileged %}
+{%if not e.adminsonly or user|isNetAdmin or user.is_privileged %}
   <tr>
-	<td><input style="border:none" type=text value="{{ e.network }}"></td>
-
+	<td><input style="border:none" type=text value="{{ e.network }}">
+		{%if e.adminsonly %}<font color="red">*</font>{% endif %}
+	</td>
 	<td><input style="border:none; font-family: monospace;" value="{{ e.password }}" id="{{ e.network }}"
         {% if e.adminsonly %}
 		type="password"/><input style="padding:5px" type=button value=show onClick="showPw('{{ e.network }}');"
 	{%endif%}
-		/>
-	</td>
+	/> 
 	</td>
   </tr>
 {% endif %}
 {% endfor %}
 </table>
+{% if user|isNetAdmin %}
+<i><font color=red>*)</font><i> This password is only visible to network administrators. Of which you are one. Do not share outside this group - or consult with one of the trustees first.</i><p/>
+{% endif %}
 </blockquote>
 {% else %}
 There are no passwords for members at the moment.

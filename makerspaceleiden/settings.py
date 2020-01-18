@@ -241,8 +241,9 @@ UT_COUNT_CUTOFF = 10
 ML_PASSWORD = 'Foo'
 ML_ADMINURL = 'https://mailman.foo.com/mailman'
 
+# Extact spelling as created in 'group' through the /admin/ interface.
 SENSOR_USER_GROUP = 'mains Sensor Admins'
-
+NETADMIN_USER_GROUP = 'network admins'
 # REGISTRATION_OPEN = False
 
 try:
