@@ -7,63 +7,74 @@ from acl.models import Machine,Location,PermitType,Entitlement
 from memberbox.models import Memberbox
 from storage.models import Storage
 
-import sys,os
+import argparse
 ''' 
-Expert a file like
+Imports tool/machine information according to the following table format:
 
-# Name,instruction-req,permit-req,permit-type,description,location
-3 Ton Pers,0,0,,3 Ton tandheugelpers,Metalshop
-12 Ton hydraulic pers,1,0,,12 Ton hydraulic pers,Metalshop
-3D-printer,1,0,,3D-printer,Frontroom
-metalmill,1,1,,Abene VHF3 Metaalfrees machine,Metalshop
-mitresaw,1,0,,AfkortZaag,Woodshop
-Borgringentangen,0,0,,Borgringentangen,Red Cabinet Metalshop
-Combi-tacker,0,0,,Combi-tacker,Woodshop
-jigsaw,1,0,,Decoupeerzaag (Electric Jigsaw),Woodshop
-Desoldeerbout,1,0,,Desoldeerbout,Electronics
-drillpress-wood,1,0,,Drill press / boorkolom,Woodshop
+| Name       | instruction-req | permit-req | permit-type | description | location  |
+| 3D printer | 1               | 0          |             | 3D-Printer  | Frontroom |
 '''
 
 class Command(BaseCommand):
-    help = 'Does some magical work'
+    help = 'Imports tool/machine data from file in csv format'
+    
+    def add_arguments(self, parser):
+        parser.add_argument('inputfile', nargs=1, type=argparse.FileType('r'))
 
-    def handle(self, *args, **options):
+    def handle(self, *args, **options):        
+        for file in options['inputfile']:
+            for line in file:
 
-        for line in sys.stdin:
-           line = line.strip()
-           print(line)
-           name, i, p, pt,  desc,location = line.split(',')
+                lineData = {'Name': None,
+                'instructionsRequired': None,
+                'permitRequired': None,
+                'permit': None,
+                'description': None,
+                'Location': None}
 
-           if name=='name' or name.startswith('#'):
-               continue
+                line = line.strip()
+                print(line)
 
-           permit = None
-           loc = None
-           machine = None
+                lineData['Name'], \
+                lineData['instructionsRequired'], \
+                lineData['permitRequired'], \
+                lineData['permit'], \
+                lineData['description'], \
+                lineData['Location'] \
+                = line.split(',') #name, instructionsRequired, permitRequired, permit, desc, location 
 
-           if pt:
-               permit,wasCreated = PermitType.objects.get_or_create(name=pt)
-               permit.description = 'Permit to use ' + pt
-               permit.changeReason = "Added during bulk import."
-               permit.save()
-               print(permit)
+                if lineData['Name']=='name' or lineData['Name'].startswith('#'):
+                    continue
 
-           if location:
-               loc,wasCreated = Location.objects.get_or_create(name=location)
-               loc.changeReason = "Added during bulk import."
-               loc.save()
-               print(loc)
+                tempPermit = None
+                tempLocation = None
+                machine = None
 
-           print(pt)
-           print(loc)
+                if lineData['permit']:
+                    tempPermit,wasCreated = PermitType.objects.get_or_create(name = lineData['permit'])
+                    tempPermit.description = 'Permit to use ' + lineData['permit']
+                    tempPermit.changeReason = "Added during bulk import."
+                    tempPermit.save()
+                    print(tempPermit)
 
-           machine,wasCreated = Machine.objects.get_or_create(name=name)
-           machine.description = desc
+                if lineData['Location']:
+                    tempLocation,wasCreated = Location.objects.get_or_create(name = lineData['Location'])
+                    tempLocation.changeReason = "Added during bulk import."
+                    tempLocation.save()
+                    print(tempLocation)
 
-           if location:
-                  machine.location = loc 
-           if pt:
-                  machine.requires_form = True
-                  machine.requres_permit = pt
-           machine.changeReason = "Added during bulk import."
-           machine.save()
+                print(lineData['permit'])
+                print(tempLocation)
+
+                machine,wasCreated = Machine.objects.get_or_create(name = lineData['Name'])
+                machine.description = lineData['description']
+
+                if lineData['Location']:
+                    machine.location = tempLocation
+
+                if lineData['permit']:
+                    machine.requires_form = True
+                    machine.requres_permit = lineData['permit']
+
+                machine.changeReason = "Added during bulk import."
+                machine.save()
