@@ -5,6 +5,8 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.shortcuts import redirect
 
+from acl.models import EntitlementViolation
+
 def admin_view(view, cacheable=False):
     def inner(request, *args, **kwargs):
         if not request.user.is_active and not request.user.is_staff:
@@ -14,8 +16,15 @@ def admin_view(view, cacheable=False):
            if not request.user.is_privileged:
               return redirect('sudo')
 
-        return view(request, *args, **kwargs)
+        try:
+           return view(request, *args, **kwargs)
+        except EntitlementViolation:
+           return HttpResponse("Not permitted to do that",  pk,status=404,content_type="text/plain")
 
+    context = {
+       'title': 'View history',
+    }
+ 
     if not cacheable:
         inner = never_cache(inner)
 

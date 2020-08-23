@@ -176,7 +176,7 @@ class Entitlement(models.Model):
         issuer_permit = PermitType.objects.get(pk = self.permit.pk)
 
         if issuer_permit and not Entitlement.objects.filter(permit=issuer_permit,holder=self.issuer):
-            if not user or not user.is_staff:
+            if not self.issuer or not self.issuer.is_staff:
                 logger.critical(f"Entitlement.save(): holder {self.issuer} cannot issue {self.permit} to {self.holder} as the holder lacks {issuer_permit}")
                 raise EntitlementViolation("issuer {} of this entitelment lacks the entitlement to issue it.".format(self.issuer))
             logger.critical(f"Entitlement.save(): STAFFF bypass of rule 'holder {self.issuer} cannot issue {self.permit} to {self.holder} as the holder lacks {issuer_permit}'")
