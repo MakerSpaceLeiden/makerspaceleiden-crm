@@ -11,6 +11,9 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import RegexValidator
 from django import forms
 
+import logging
+logger = logging.getLogger(__name__)
+
 from django.db.models.signals import pre_delete, pre_save
 # from stdimage.utils import pre_delete_delete_callback, pre_save_delete_callback
 
@@ -115,17 +118,23 @@ class User(AbstractUser):
            return True
 
         if not self.is_staff:
+           logger.debug("Rejected is_priv, not staff for {}".format(self.name));
            return False
 
         last = AuditRecord.last(self)
 
         if last == None:
+           logger.debug("Rejected is_priv, no recent audit for {}".format(self.name));
            return False
 
         endtime =  last +  datetime.timedelta(seconds=GDPR_ESCALATED_TIMESPAN_SECONDS)
         now = datetime.datetime.now(last.tzinfo)
 
-        return endtime > now
+        if endtime > now:
+            return True
+
+        logger.debug("Rejected is_priv, last sudo too long ago for {}".format(self.name));
+        return False
 
     @property
     def can_escalate_to_priveleged(self):

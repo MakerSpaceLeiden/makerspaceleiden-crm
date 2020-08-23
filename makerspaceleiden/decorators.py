@@ -15,9 +15,9 @@ logger = logging.getLogger(__name__)
 def superuser_or_bearer_required(function):
   @wraps(function)
   def wrap(request, *args, **kwargs):
-      if request.user:
+      if request.user and request.user.is_authenticated:
           if type(request.user).__name__ == 'User':
-              if request.user.is_privileged:
+              if request.user.is_privileged():
                   return function(request, *args, **kwargs)
 
       if hasattr(settings, 'UT_BEARER_SECRET'):
@@ -40,6 +40,7 @@ def superuser_or_bearer_required(function):
       request.POST 
 
       # raise PermissionDenied
+      logger.warnnig("XS was denied (decorator, superuser or bearer) to {} on {}".format(request.user,request.path))
       return HttpResponse("XS denied",status=403,content_type="text/plain")
   return wrap
 

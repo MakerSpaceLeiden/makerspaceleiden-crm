@@ -260,7 +260,6 @@ def member_overview(request,member_id = None):
 
     return render(request, 'acl/member_overview.html', context)
 
-@login_required
 @superuser_or_bearer_required
 def api_details(request,machine_id):
     try:
