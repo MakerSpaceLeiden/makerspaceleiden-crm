@@ -11,6 +11,7 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('record_instructions/', views.recordinstructions, name='add_instruction'),
     path('userdetails/', views.userdetails, name='userdetails'),
+    path('waiverform/', views.waiverformredir, name='waiverformredir'),
     path('waiver/<int:user_id>/form', views.waiverform, name='waiverform'),
     path('waiver/<int:user_id>/confirm', views.confirm_waiver, name='waiver_confirmation'),
 

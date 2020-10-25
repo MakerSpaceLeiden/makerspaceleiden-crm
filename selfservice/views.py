@@ -248,6 +248,9 @@ def confirmemail(request, uidb64, token, newemail):
     # return redirect('userdetails')
     return render(request, 'email_verification_ok.html')
 
+@login_required
+def waiverformredir(request):
+    return redirect('waiverform', user_id = request.user.id)     
 
 @login_required
 def waiverform(request, user_id=None):
