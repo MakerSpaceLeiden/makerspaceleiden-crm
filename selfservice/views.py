@@ -200,14 +200,7 @@ def recordinstructions(request):
                 logger.error("Something else went wrong during create: {0}".format(e))
                 raise e
     
-             if pt and pt.permit:
-                 # Entitlements that require instruction permits also
-                 # require a trustee OK. This gets reset on re-intruction.
-                 #
-                 record.active = False;
-             else:
-                 record.active = True;
-    
+             record.active = not pt.require_ok_trustee
              record.save(request=request)
              context['holder'].append(p)
 

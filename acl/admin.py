@@ -51,7 +51,7 @@ class EntitlementAdmin(ImportExportModelAdmin,SimpleHistoryAdmin):
 admin.site.register(Entitlement,EntitlementAdmin)
 
 class PermitAdmin(ImportExportModelAdmin,SimpleHistoryAdmin):
-    list_display = ('name','description')
+    list_display = ('name','description','require_ok_trustee','permit')
 admin.site.register(PermitType,PermitAdmin)
 
 class RecentUseAdmin(ImportExportModelAdmin,SimpleHistoryAdmin):

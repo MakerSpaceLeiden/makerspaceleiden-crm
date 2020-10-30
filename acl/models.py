@@ -23,6 +23,11 @@ DAYS_USERS_TRACKED = 3
 class PermitType(models.Model):
     name = models.CharField(max_length=40, unique=True)
     description =  models.CharField(max_length=200)
+    require_ok_trustee =  models.BooleanField(
+            default=False,
+            verbose_name="Requires explicit trustee OK",
+            help_text="i.e. the trustees need to also explictly approve it when the permit is granted.",
+    )
     permit = models.ForeignKey(
 	'self', 
 	on_delete=models.CASCADE,
@@ -177,8 +182,9 @@ class Entitlement(models.Model):
 
         if issuer_permit and not Entitlement.objects.filter(permit=issuer_permit,holder=self.issuer):
             if not self.issuer or not self.issuer.is_staff:
-                logger.critical(f"Entitlement.save(): holder {self.issuer} cannot issue {self.permit} to {self.holder} as the holder lacks {issuer_permit}")
-                raise EntitlementViolation("issuer {} of this entitelment lacks the entitlement to issue it.".format(self.issuer))
+                erm = "issuer {} of this entitelment lacks the entitlement {} to issue it ({}).".format(self.issuer,issuer_permit,  Entitlement.objects.filter(holder=self.issuer))
+                logger.critical(erm)
+                raise EntitlementViolation(erm)
             logger.critical(f"Entitlement.save(): STAFFF bypass of rule 'holder {self.issuer} cannot issue {self.permit} to {self.holder} as the holder lacks {issuer_permit}'")
         if self.active == None:
             # See if we can fetch an older approval for same that may already have
