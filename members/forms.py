@@ -4,6 +4,7 @@ from .models import Tag, clean_tag_string, AuditRecord
 from django.forms import ModelForm
 
 from members.models import User
+from mailinglists.models import Mailinglist, Subscription
 from unknowntags.models import Unknowntag
 
 import re
@@ -60,6 +61,12 @@ class NewUserForm(forms.Form):
 	required=False, help_text="Optional; only visible to the trustees and board delegated administrators")
     tag = forms.ModelChoiceField(queryset=Unknowntag.objects.all(), required = False, help_text="Optional. Leave blank to add later.")
     activate_doors = forms.BooleanField(initial = True, help_text='Also give this user door permits if they did not have it yet. Only applicable if above tag is specified.') 
+    mailing_lists = forms.ModelMultipleChoiceField(
+            queryset=Mailinglist.objects.all(), 
+            required=False, 
+            help_text="Lists to initially subscribe the user to.", 
+            widget=forms.CheckboxSelectMultiple(attrs={"checked":""}),
+    )
 
 class NewAuditRecordForm(ModelForm):
    return_to = forms.CharField(widget = forms.HiddenInput())

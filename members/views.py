@@ -16,10 +16,13 @@ from .forms import NewUserForm, NewAuditRecordForm
 
 from acl.models import Entitlement,PermitType
 from members.models import Tag,User,clean_tag_string,AuditRecord
+from mailinglists.models import Mailinglist, Subscription
 
 import logging
 import datetime
+import sys
 import re
+
 logger = logging.getLogger(__name__)
 
 @login_required
@@ -73,13 +76,23 @@ def newmember(request):
              newmember = User.objects.get(email = email)
 
              # Wire up the tag if one was provided.
-
              if form.cleaned_data.get('tag'):
                 tag.reassing_to_user(
                         newmember, 
                         request.user, 
                         activate = form.cleaned_data.get('activate_doors')
                 )
+
+             # Subscribe user if needed
+             for mlist_name in form.cleaned_data.get('mailing_lists'):
+                 try:
+                    mlist = Mailinglist.objects.get(name= mlist_name)
+                    s = Subscription.objects.create(mailinglist = mlist, member = newmember, active=True, digest=False)
+                    s.subscribe()
+                    # s.changeReason("Subscribed during form based new user create")
+                    s.save()
+                 except Exception as e:
+                    logger.error("Failed to subscribe user {} to {} : {}".format(request.user, mlist_name, e))
 
              # Send welcome email.
              form = PasswordResetForm({'email': newmember.email})
@@ -92,11 +105,15 @@ def newmember(request):
              )
              return redirect('index')
           except IntegrityError as e:
-             logger.error("Failed to create user : {}".format(e))
-             return HttpResponse("Create gone wrong. Was that email or name already added ?",status=500,content_type="text/plain")
+              logger.error("Failed to create user : {}".format(e))
+              return HttpResponse("Create gone wrong. Was that email or name already added ?",status=500,content_type="text/plain")
           except Exception as e:
-             logger.error("Failed to create user : {}".format(e))
-             return HttpResponse("Create gone wrong. Drat.",status=500,content_type="text/plain")
+              exc_type, exc_obj, tb = sys.exc_info()
+              f = tb.tb_frame
+              lineno = tb.tb_lineno
+              filename = f.f_code.co_filename
+              logger.error("Failed to create user : {} at {}:{}".format(filename, lineno,e ))
+              return HttpResponse("Create gone wrong. Drat.",status=500,content_type="text/plain")
         else:
           logger.debug("Form not valid")
 
