@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>{{ label }}</h2>
+
+The archives are confidential. Access to the archive is only for (current, active) members and those authorized by the trustees of the foundation.
+
+<table>
+	<tr>
+		<th></th>
+	{% for list in lists%}
+		<th>{{ list.name }}</th>
+	{% endfor %}
+	</tr>
+	{% for row in subs%}
+	<tr>
+		{% for i in row %}
+		<td>{{ i }}</td>
+		{% endfor %}
+	</tr>	
+	{% endfor %}
+</table>
+
+{% endblock %}

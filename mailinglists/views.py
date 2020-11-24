@@ -12,13 +12,14 @@ from django import forms
 from django.forms import ModelForm
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse
+from django.db.models import Q
 
 from time import strptime
 import datetime
 
 
 from django.views.decorators.csrf import csrf_exempt
-from makerspaceleiden.decorators import superuser_or_bearer_required
+from makerspaceleiden.decorators import superuser_or_bearer_required, superuser
 
 from .forms import SubscriptionForm
 from .mailman import MailmanService, MailmanAccount
@@ -100,7 +101,7 @@ def mailinglists_edit(request, user_id = None):
           'has_permission': request.user.is_authenticated,
     })
 
-
+@login_required
 def mailinglists_archives(request):
     return render(request,'lists.html', {
         'title': 'Mailing list archives',
@@ -109,7 +110,32 @@ def mailinglists_archives(request):
         'has_permission': request.user.is_authenticated,
     })
 
+@login_required
+@superuser
+def mailinglists_subs(request):
+    lists = Mailinglist.objects.all()
+    users = User.objects.all()
+    rows = []
+    for user in users:
+        item = [ user ]
+        for l in lists:
+            v = 'NO'
+            if Subscription.objects.filter(member = user, mailinglist = l, active = True).exists():
+                v = 'yes'
+            item.append(v)
+        rows.append(item)
+
+    return render(request,'subs.html', {
+        'title': 'Mailing list subscriptions',
+        'lists':  lists,
+        'users':  users,
+        'subs':  rows,
+        'back': 'home',
+        'has_permission': request.user.is_authenticated,
+    })
+
 # Todo: attachment (full URL intercept) & rewrite them.
+@login_required
 def mailinglists_archive(request, mlist, yearmonth = None, order = None, zip = None, attachment=None):
    # XXX - cache this 'per list' or make the loging 'admin level' cross lists.
    #

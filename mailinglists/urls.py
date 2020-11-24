@@ -13,4 +13,5 @@ urlpatterns = [
     path('archive/<str:mlist>/<str:yearmonth>/', views.mailinglists_archive, name='mailinglists_archive'),
     path('archive/<str:mlist>/', views.mailinglists_archive, name='mailinglists_archive'),
     path('archive', views.mailinglists_archives, name='mailinglists_archives'),
+    path('subs', views.mailinglists_subs, name='mailinglists_subs'),
 ]

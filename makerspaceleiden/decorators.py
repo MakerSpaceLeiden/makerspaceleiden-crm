@@ -12,6 +12,19 @@ MODERN_HEADER='HTTP_AUTHORIZATION'
 import logging
 logger = logging.getLogger(__name__)
 
+def superuser(function):
+  @wraps(function)
+  def wrap(request, *args, **kwargs):
+      if not request.user.is_anonymous and request.user.is_privileged:
+             return function(request, *args, **kwargs)
+
+      # Quell some odd 'code 400, message Bad request syntax ('tag=1-2-3-4')'
+      request.POST 
+
+      # raise PermissionDenied
+      return HttpResponse("XS denied",status=403,content_type="text/plain")
+  return wrap
+
 def superuser_or_bearer_required(function):
   @wraps(function)
   def wrap(request, *args, **kwargs):
