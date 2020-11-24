@@ -198,11 +198,15 @@ def recordinstructions(request):
                 record.changeReason = 'Created in the self-service interface by {0}'.format(i)
              except Exception as e:
                 logger.error("Something else went wrong during create: {0}".format(e))
-                raise e
+                return HttpResponse("Something went wrong. Could not understand this update. Sorry.",status=500,content_type="text/plain")
     
              record.active = not pt.require_ok_trustee
-             record.save(request=request)
-             context['holder'].append(p)
+             try:
+                record.save(request=request)
+                context['holder'].append(p)
+             except Exception as e:
+                logger.error("Updating of instructions failed: {0}".format(e))
+                return HttpResponse("Something went wrong. Could not record these instructions. Sorry.",status=500,content_type="text/plain")
 
          context["created"] = created
          context['machines'].append(m)
@@ -212,7 +216,7 @@ def recordinstructions(request):
        # except Exception as e:
        except Entitlement.DoesNotExist as e:
          logger.error("Unexpected error during save of intructions: {0}".format(e))
-
+         return HttpResponse("Something went wrong. Could not undertand these instructions. Sorry.",status=500,content_type="text/plain")
 
     context['saved'] = saved
     return render(request, 'record.html', context)
