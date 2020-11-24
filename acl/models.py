@@ -182,7 +182,7 @@ class Entitlement(models.Model):
 
         if issuer_permit and not Entitlement.objects.filter(permit=issuer_permit,holder=self.issuer):
             if not self.issuer or not self.issuer.is_staff:
-                erm = "issuer {} of this entitelment lacks the entitlement {} to issue it ({}).".format(self.issuer,issuer_permit,  Entitlement.objects.filter(holder=self.issuer))
+                erm = "issuer {} of this entitelment lacks the entitlement {} to issue this to {} ({}).".format(self.issuer,issuer_permit, user, Entitlement.objects.filter(holder=self.issuer))
                 logger.critical(erm)
                 raise EntitlementViolation(erm)
             logger.critical(f"Entitlement.save(): STAFFF bypass of rule 'holder {self.issuer} cannot issue {self.permit} to {self.holder} as the holder lacks {issuer_permit}'")
