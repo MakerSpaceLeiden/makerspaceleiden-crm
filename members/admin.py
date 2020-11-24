@@ -6,6 +6,7 @@ from search_admin_autocomplete.admin import SearchAutoCompleteAdmin
 
 from import_export.admin import ImportExportModelAdmin
 from import_export import resources
+from import_export import resources
 from simple_history.admin import SimpleHistoryAdmin
 from django.utils.translation import ugettext_lazy as _
 
@@ -23,7 +24,7 @@ class TagResource(resources.ModelResource):
        fields = [ 'owner', 'tag' ]
        import_id_fields = [ 'owner', 'tag' ]
 
-class UserAdmin(SearchAutoCompleteAdmin, ImportExportModelAdmin, BaseUserAdmin, SimpleHistoryAdmin):
+class UserAdmin(ImportExportModelAdmin, SearchAutoCompleteAdmin,BaseUserAdmin, SimpleHistoryAdmin):
     resource_class = UserResource
     fieldsets = (
         (None,                 {'fields': ('email', 'password')}),
@@ -38,10 +39,12 @@ class UserAdmin(SearchAutoCompleteAdmin, ImportExportModelAdmin, BaseUserAdmin, 
             'fields': ('email', 'password1', 'password2'),
         }),
     )
-    list_display = ('email', 'first_name', 'last_name', 'is_staff', 'form_on_file', 'last_login')
+    list_display = ('email', 'first_name', 'last_name', 'form_on_file', 'last_login','date_joined')
     search_fields = [ 'email', 'first_name', 'last_name' ]
     ordering = ('email', 'first_name', 'last_name')
+    import_id_fields = () # 'email', 'first_name', 'last_name', 'is_staff', 'form_on_file', 'last_login','date_joined')
 
+# admin.site.register(User,ImportExportModelAdmin)
 admin.site.register(User,UserAdmin)
 
 class TagAdmin(ImportExportModelAdmin,SimpleHistoryAdmin, SearchAutoCompleteAdmin):
@@ -56,4 +59,5 @@ class AuditRecordAdmin(ImportExportModelAdmin,SimpleHistoryAdmin):
     resource_class = AuditRecord
 
 admin.site.register(AuditRecord, AuditRecordAdmin)
+
 
