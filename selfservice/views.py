@@ -23,7 +23,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import EmailMessage
 from django.urls import reverse
 from django.forms import widgets
-from six import wraps
 
 from makerspaceleiden.decorators import superuser_or_bearer_required
 
@@ -33,6 +32,8 @@ from django.conf import settings
 
 import logging
 import json
+import sys
+import six
 
 from members.models import Tag,User
 from acl.models import Machine,Entitlement,PermitType
@@ -44,14 +45,18 @@ from .aggregator_adapter import get_aggregator_adapter
 def sentEmailVerification(request,user,new_email,ccOrNone = None, template='email_verification_email.txt'):
             current_site = get_current_site(request)
             subject = 'Confirm your email adddress ({})'.format(current_site.domain)
+            tmpuser = user
+            tmpuser.email = new_email
             context = {
                 'has_permission': request.user.is_authenticated,
                 'request': request,
                 'user': user,
 		'new_email': new_email,
                 'domain': current_site.domain,
-                'uid': urlsafe_base64_encode(force_bytes(user.pk)).decode(),
-                'token': email_check_token.make_token(user),
+                # possibly changed with Django 2.2
+                # 'uid': urlsafe_base64_encode(force_bytes(user.pk)).decode(),
+                'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                'token': email_check_token.make_token(tmpuser),
             }
 
             msg = render_to_string(template, context)
@@ -215,7 +220,12 @@ def recordinstructions(request):
          saved = True
        # except Exception as e:
        except Entitlement.DoesNotExist as e:
-         logger.error("Unexpected error during save of intructions: {0}".format(e))
+         exc_type, exc_obj, tb = sys.exc_info()
+         f = tb.tb_frame
+         lineno = tb.tb_lineno
+         filename = f.f_code.co_filename
+
+         logger.error("Unexpected error during save of intructions:: {} at {}:{}".format(filename, lineno,e ))
          return HttpResponse("Something went wrong. Could not undertand these instructions. Sorry.",status=500,content_type="text/plain")
 
     context['saved'] = saved
@@ -228,6 +238,7 @@ def confirmemail(request, uidb64, token, newemail):
         user = User.objects.get(pk=uid)
         if request.user != user:
            return HttpResponse("You can only change your own records.",status=500,content_type="text/plain")
+        email = user.email
         user.email = newemail
         if email_check_token.check_token(user, token):
            user.email = newemail
@@ -235,6 +246,8 @@ def confirmemail(request, uidb64, token, newemail):
            user.save()
         else:
            return HttpResponse("Failed to confirm",status=500,content_type="text/plain")
+
+        logger.debug("Change of email from '{}' to '{}' confirmed.".format(email, newemail))
     except (TypeError, ValueError, OverflowError, User.DoesNotExist) as e:
         # We perhaps should not provide the end user with feedback -- e.g. prentent all
         # went well. As we do not want to function as an oracle.
@@ -551,7 +564,12 @@ def userdetails(request):
 
              return render(request, 'userdetails.html', { 'form' : user, 'saved': True })
        except Exception as e:
-         logger.error("Unexpected error during save of user: {0}".format(e))
+         exc_type, exc_obj, tb = sys.exc_info()
+         f = tb.tb_frame
+         lineno = tb.tb_lineno
+         filename = f.f_code.co_filename
+
+         logger.error("Unexpected error during save of user '{}' : {} at {}:{}".format(save_user,filename, lineno,e ))
          return HttpResponse("Unexpected error during save",status=500,content_type="text/plain")
 
     form = UserForm(instance = request.user)

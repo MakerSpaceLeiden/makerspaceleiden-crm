@@ -108,5 +108,6 @@ def user_saved(sender, instance, created, **kwargs):
 post_delete.connect(sub_deleted, sender=Subscription)
 
 post_save.connect(user_saved, sender=User.is_active)
+post_save.connect(user_saved, sender=User.email)
 post_save.connect(sub_saved, sender=Subscription)
 

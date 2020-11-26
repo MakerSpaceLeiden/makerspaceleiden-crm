@@ -8,7 +8,7 @@ to:	{{ new_email }}
 
 Please click on the link below to confirm your email address change:
 
-{{ request.scheme  }}://{{ domain }}{% url 'confirm_email' uidb64=uid token=token newemail=user.email %}
+{{ request.scheme  }}://{{ domain }}{% url 'confirm_email' uidb64=uid token=token newemail=new_email %}
 
 
 {% endautoescape %}
