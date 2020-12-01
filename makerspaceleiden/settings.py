@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'mailinglists.apps.MailinglistsConfig',
     'chores.apps.ChoresConfig',
     'mainssensor.apps.MainssensorConfig',
+    'kwh.apps.KwhConfig',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -63,6 +64,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 #    'autocomplete_light',
     'django.contrib.sites',
+    'revproxy',
 ]
 
 SITE_ID = 1

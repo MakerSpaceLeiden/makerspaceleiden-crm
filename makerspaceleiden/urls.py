@@ -39,6 +39,7 @@ urlpatterns = [
 #   url(r'^autocomplete/', include('autocomplete_light.urls')),
     path('admin/', admin.site.urls),
 #   path('qr_code/', include(qr_code_urls, namespace='qr_code')),
+    path('kwh/',  include('kwh.urls')),
 ]
 
 urlpatterns += static(r'/favicon.ico', document_root='static/favicon.ico')
