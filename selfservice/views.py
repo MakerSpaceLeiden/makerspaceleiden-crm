@@ -569,7 +569,7 @@ def userdetails(request):
          lineno = tb.tb_lineno
          filename = f.f_code.co_filename
 
-         logger.error("Unexpected error during save of user '{}' : {} at {}:{}".format(save_user,filename, lineno,e ))
+         logger.error("Unexpected error during save of user '{}' : {} at {}:{}".format(user,filename, lineno,e ))
          return HttpResponse("Unexpected error during save",status=500,content_type="text/plain")
 
     form = UserForm(instance = request.user)
