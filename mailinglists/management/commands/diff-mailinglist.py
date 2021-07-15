@@ -55,10 +55,11 @@ class Command(BaseCommand):
 
            system = []
            for s in  Subscription.objects.all().filter(mailinglist__name = mlist):
-               system.append(s.member.email)
+               system.append(s.member.email.lower())
    
            for email in sorted(list(set(roster)|set(system))):
                 r = dr
+                email.lower()
                 if email in roster:
                     r = 'R'
                 s = '.' 

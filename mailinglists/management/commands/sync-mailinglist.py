@@ -66,7 +66,7 @@ class Command(BaseCommand):
            e2u = {}
            for u in users:
               known.append(u.email)
-              e2u[ u.email ] = u
+              e2u[ u.email.lower() ] = u
 
            # system = Subscription.objects.all().values_list('member__email', flat=True)
            subs = Subscription.objects.all().filter(mailinglist = mlist)
@@ -74,14 +74,14 @@ class Command(BaseCommand):
            e2s = {}
            for s in subs:
               system.append(s.member.email)
-              e2s[ s.member.email ] = s
+              e2s[ s.member.email.lower() ] = s
 
            account = MailmanAccount(service, mlist)
            roster = account.roster()
 
            for email in sorted(list(set(roster)|set(system)|set(known))):
                 if email in roster and email in system:
-                   sub = e2s[ email ]
+                   sub = e2s[ email.lower() ]
 
                    print(f'{email}\n\tboth on roster and on server.')
 
@@ -108,8 +108,8 @@ class Command(BaseCommand):
                              sub.save()
                        if push:
                           print(f"\tACTION: digest flag to {sub.digest } - crm is leading")
-                          if not dryrun:
-                             acount.digest (email, sub.digest)
+                          #if not dryrun:
+                          #   acount.digest(email, sub.digest)
                    else:
                        print(f'\tdigest flag in sync.')
  
@@ -119,12 +119,12 @@ class Command(BaseCommand):
                        print(f"\tDEFER: nothing - as we're pulling from the list")
 
                    if push:
-                       print(f"\tACTION: Subscribing on crm -- list is leading")
+                       print(f"\tACTION: Subscribing on list -- crm is leading")
                        if not dryrun:
-                         s = Subscription.objects.get(mailinglist == mlist, member.email == email)
-                         s.subscribe()
-                         # s.changeReason("Sync Subscribed during command sync")
-                         s.save()
+                         sub = e2s[ email.lower() ]
+                         sub.subscribe()
+                         # sub.changeReason("Sync Subscribed during command sync")
+                         sub.save()
 
                 elif email in known and email in roster:
                    print(f'{email}\n \ton the roster - but not recorded as subscribed.')
