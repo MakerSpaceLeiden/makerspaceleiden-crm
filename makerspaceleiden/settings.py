@@ -248,6 +248,8 @@ SENSOR_USER_GROUP = 'mains Sensor Admins'
 NETADMIN_USER_GROUP = 'network admins'
 # REGISTRATION_OPEN = False
 
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
 try:
     from .local import *
 except ImportError:
