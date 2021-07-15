@@ -112,6 +112,12 @@ class User(AbstractUser):
     def url(self):
         return  settings.BASE + self.path()
 
+    def image_img(self):
+         if self.image:
+             return str('<img src="%s" width=80/>' % self.image.url)
+         else:
+             return "No images uploaded yet."
+
     @property
     def is_privileged(self):
         if self.is_superuser:
@@ -158,7 +164,7 @@ class Tag(models.Model):
 def clean_tag_string(tag):
     try:
        bts = [ b for b in re.compile('[^0-9]+').split(tag.upper())
-                   if b is not None and b is not '' and int(b) >=0 and int(b) < 256]
+                   if b is not None and str(b) != '' and int(b) >=0 and int(b) < 256]
        if len(bts) < 3:
            return None
        return '-'.join(bts)
