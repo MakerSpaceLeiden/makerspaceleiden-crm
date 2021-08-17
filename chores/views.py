@@ -37,7 +37,8 @@ def index(request):
 
     event_groups = []
     ts = None
-    for event in data['events']:
+    if data != None:
+      for event in data['events']:
         event_ts = datetime.fromtimestamp(event['when']['timestamp'])
         event_ts_str = event_ts.strftime('%d%m%Y')
         event['time_str'] = event_ts.strftime('%H:%M')
