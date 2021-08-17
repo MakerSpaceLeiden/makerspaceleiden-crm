@@ -544,6 +544,8 @@ def userdetails(request):
     if request.method == "POST":
        try:
          user = UserForm(request.POST, request.FILES, instance = request.user)
+         logger.error("DEBUG: {}".format(user))
+
          save_user = user.save(commit=False)
          if user.is_valid():
              new_email = "{}".format(user.cleaned_data['email'])
@@ -569,8 +571,8 @@ def userdetails(request):
          lineno = tb.tb_lineno
          filename = f.f_code.co_filename
 
-         logger.error("Unexpected error during save of user '{}' : {} at {}:{}".format(user,filename, lineno,e ))
-         return HttpResponse("Unexpected error during save",status=500,content_type="text/plain")
+         logger.error("Unexpected error during save of user '{}' : {} at {}:{}".format(request.user,filename, lineno,e ))
+         return HttpResponse("Unexpected error during save of userdetails (does the phone number start with a +<country code>?)",status=500,content_type="text/plain")
 
     form = UserForm(instance = request.user)
     context = {

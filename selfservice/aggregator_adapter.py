@@ -56,10 +56,12 @@ class AggregatorAdapter(object):
         self._request_with_user_id('/space/checkout', user_id)
 
     def get_chores(self):
-        try:
-          return json.loads(self._request_with_user_id('/chores/overview'))
-        except Exception as e:
-          logger.error("Failed to parse the json chore.");
+        payload = self._request_with_user_id('/chores/overview')
+        if payload:
+          try:
+            return json.loads(payload)
+          except Exception as e:
+            logger.error("Failed to parse the json chore: '{}'.".format(payload));
         return None
 
 def initialize_aggregator_adapter(base_url, username, password):
