@@ -20,9 +20,9 @@ echo
 if test -f demo/example.json; then
 	python${VERSION} manage.py loaddata demo/example.json
 else
-	python${VERSION} manage.py import-wifi < demo/wifi.csv
-	python${VERSION} manage.py import-machines < demo/mac.csv 
-	python${VERSION} manage.py import-consolidated < demo/consolidated.txt 
+	python${VERSION} manage.py import-wifi demo/wifi.csv
+	python${VERSION} manage.py import-machines demo/mac.csv 
+	python${VERSION} manage.py import-consolidated demo/consolidated.txt 
 	echo " Reset all password and generate invites (Y, N, default is No) ?"
 	read I
 	if [ "x$I" = "xY" ]; then

@@ -10,9 +10,10 @@ django-settings-export
 django-stdimage
 django-dynamic-filenames
 django-six
+six
 django-import-export
 # django-proxy
-# django-revproxy
+django-revproxy
 
 # We're also including Pillow  as otherwise QR will fall back
 # to SVG - which is not as supported.
