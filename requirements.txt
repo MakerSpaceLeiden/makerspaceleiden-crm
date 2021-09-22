@@ -39,3 +39,5 @@ jsonfield2
 # For production
 # mysqlclient
 
+# Petty cash
+django-money

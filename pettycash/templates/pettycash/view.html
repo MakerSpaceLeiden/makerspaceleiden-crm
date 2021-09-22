@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load isingroup %}
+
+{% block content %}
+
+{% if lst %}
+<table>
+	<tr>
+		<th>Date</th>
+		<th>Who</th>
+		<th>What</th>
+		<th>IN</th>
+		<th>OUT</th>
+	</tr>
+	{% for tx in lst %}
+		<tr>
+			<td>{{ tx.date }}</td>
+			<td>
+			{% if tx.src == who %}
+				paid to {{ tx.dst }}
+			{% else %}
+				received from {{ tx.src }}
+			{% endif %}
+			</td>
+			<td>{{ tx.description }}</td>
+			{% if tx.src == who %}
+			<td></td>
+			<td align=right>{{ tx.amount }}</td>
+			{% else %}
+			<td align=right>{{ tx.amount }}</td>
+			<td></td>
+			{% endif %}
+		</tr>
+	{% endfor %}
+	        <tr>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td align=right>{{ in }}</td>
+			<td align=right>{{ out}}</td>
+		</tr>
+	        <tr>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td colspan=2 align=right><b>Balance:</b>{{ balance.balance }}</td>
+		</tr>
+</table>
+{% else %}
+<i>No transactions.</i>
+{% endif %}
+
+
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load isingroup %}
+{% load qr_code  %}
+
+{% block content %}
+
+<table>
+	<tr><th>Member</th><th>Last change</th><th>Balance</th></tr>
+	{% for b in lst %}
+          {% if user.is_privileged or b.owner.id > 1 %}
+		<tr>
+			<td><a href="{% url 'transactions' pk=b.owner.id %}">
+          		{% if b.owner.id <= 1 %}
+				centrale pot
+			{% else %}
+				{{b.owner }}
+			{% endif %}
+			</a></td>
+			<td>
+			{% if b.last %}
+				{{ b.last.date }}
+			{% else %}
+				<i>never</i>
+			{% endif %}
+			</td>
+			<td>{{ b.balance }}</td>
+			<td><a href="{% url 'invoice' pk=b.owner.id %}">[invoice]</a></td>
+			<td><a href="{% url 'deposit' pk=b.owner.id %}">[deposit]</a></td>
+		</tr>
+          {% endif %}
+	{% endfor %}
+</table>
+<pre>
+
+
+
+</pre>
+<hr>
+Test URL to pay 0.50 cent to makerspace:<br>
+<blockquote>
+        <a href="pay?description=Koffie&amount=0.50">"pay 0.50 for coffee"</a>
+	<br>
+       {% qr_from_text "http://localhost:800/pay?description=Koffie&amount=0.50" size="m" border=1 %}
+</blockquote>
+
+
+{% endblock %}

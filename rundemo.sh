@@ -2,6 +2,8 @@
 set -e
 VERSION=${VERSION:-3}
 
+export LC_ALL=en_US.UTF-8
+
 python${VERSION}  -mvenv venv
 . venv/bin/activate
 
