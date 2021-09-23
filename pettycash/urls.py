@@ -11,7 +11,9 @@ urlpatterns = [
     path('', views.index, name='balances'),
 
     path('show/<int:pk>', views.show, name='transactions'),
-    path('invoice/<int:pk>', views.invoice, name='invoice'),
-    path('deposit/<int:pk>', views.deposit, name='deposit'),
+    path('showtx/<int:pk>', views.showtx, name='transactiondetail'),
+    path('invoice/<int:src>', views.invoice, name='invoice'),
+    path('transfer/<int:src>/<int:dst>', views.transfer, name='transfer'),
+    path('deposit/<int:dst>', views.deposit, name='deposit'),
     path('pay', views.pay, name='pay'),
 ]

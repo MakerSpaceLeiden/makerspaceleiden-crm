@@ -7,6 +7,7 @@ from django.conf import settings
 from django.shortcuts import redirect
 from django.views.generic import ListView, CreateView, UpdateView
 from django.contrib.auth.decorators import login_required
+from makerspaceleiden.decorators import login_or_priveleged, superuser
 from django import forms
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect
@@ -70,15 +71,6 @@ def pettycash_redirect(pk = None):
       url = '{}#{}'.format(url, pk)
     return redirect(url)
 
-@login_required
-def index(request,days=30):
-    lst = PettycashBalanceCache.objects.all()
-    context = {
-        'title': 'Balances',
-        'lst': lst,
-       }
-    return render(request, 'pettycash/index.html', context)
-
 def transact(request,label,src=None,dst=None,description=None,amount=None):
     form = PettycashTransactionForm(request.POST or None, initial = { 'src': src, 'dst': dst, 'description': description, 'amount': amount })
     if form.is_valid():
@@ -88,7 +80,7 @@ def transact(request,label,src=None,dst=None,description=None,amount=None):
             if not item.description:
                 item.description = "Added by {}".format(request.user)
 
-            item.changeReason = "Created by {} through the website.".format(request.user)
+            item.change_reason = "Created by {} through the website.".format(request.user)
             item.save()
 
             # alertOwnersToChange(item, request.user, [ item.owner.email ])
@@ -111,34 +103,81 @@ def transact(request,label,src=None,dst=None,description=None,amount=None):
         }
     return render(request, 'pettycash/invoice.html', context)
 
+
 @login_required
-def invoice(request,pk):
+def index(request,days=30):
+    lst = PettycashBalanceCache.objects.all()
+    context = {
+        'title': 'Balances',
+        'lst': lst,
+        'settings': settings,
+       }
+    return render(request, 'pettycash/index.html', context)
+
+@login_required
+@login_or_priveleged
+def invoice(request,src):
     try:
-       user = User.objects.get(id=pk)
+       src= User.objects.get(id=src)
     except ObjectDoesNotExist as e:
         return HttpResponse("Not found",status=404,content_type="text/plain")
 
-    return transact(request,'%s to pay to makespace' % (user), src=pk,dst=1)
+    return transact(request,'%s to pay to %s ' % (src, settings.POT_LABEL), src=src, dst=settings.POT_ID)
 
 @login_required
-def deposit(request,pk):
+@login_or_priveleged
+def transfer(request,src,dst):
     try:
-       user = User.objects.get(id=pk)
+       src = User.objects.get(id=src)
+       dst = User.objects.get(id=dst)
     except ObjectDoesNotExist as e:
         return HttpResponse("Not found",status=404,content_type="text/plain")
 
-    return transact(request,'Deposit into account %s' % (user), dst=pk,src=1)
+    dst_label = dst
+    if dst.id == settings.POT_ID:
+       dst_label = settings.POT_LABEL
+
+    return transact(request,'%s to pay %s' % (src,dst_label), src=src, dst=dst)
+
+@superuser
+def deposit(request,dst):
+    try:
+      dst = User.objects.get(id=dst)
+    except ObjectDoesNotExist as e:
+        return HttpResponse("Not found",status=404,content_type="text/plain")
+
+    dst_label = dst
+    if dst.id == settings.POT_ID:
+       dst_label = settings.POT_LABEL
+
+    return transact(request,'Deposit into account %s' % (dst_label), dst=dst,src=settings.POT_ID)
 
 @login_required
 def pay(request):
     amount_str = request.GET.get('amount', None)
     description =  request.GET.get('description', None)
+
     if not amount_str and not description:
         return HttpResponse("Amount/Description parameters mandatory",status=400,content_type="text/plain")
     amount = Money(amount_str, EUR)
 
     return transact(request,"%s pays %s to the Makerspace" % (mtostr(amount),request.user),
-               src=request.user,dst=1,amount=amount,description=description)
+               src=request.user,dst=settings.POT_ID,amount=amount,description=description)
+
+@login_required
+def showtx(request,pk):
+    try:
+       tx = PettycashTransaction.objects.get(id=pk)
+    except ObjectDoesNotExist as e:
+        return HttpResponse("Not found",status=404,content_type="text/plain")
+
+    context = {
+        'title': 'Details transaction %s,  %s,  %s' % (tx.id, tx.dst, tx.date),
+        'tx': tx,
+	'settings': settings,
+        }
+    return render(request, 'pettycash/details.html', context)
+
 
 @login_required
 def show(request,pk):
@@ -152,7 +191,7 @@ def show(request,pk):
     moneys_out = 0 # Money(0,EUR)
     try:
        balance = PettycashBalanceCache.objects.get(owner=user)
-       lst= PettycashTransaction.objects.all().filter(Q(src=user) | Q(dst=user)).order_by('date')
+       lst= PettycashTransaction.objects.all().filter(Q(src=user) | Q(dst=user)).order_by('id')
        for tx in lst:
            if tx.dst == user:
               moneys_in += tx.amount
@@ -161,8 +200,12 @@ def show(request,pk):
     except ObjectDoesNotExist as e:
        pass
 
+    label = user
+    if user.id == settings.POT_ID:
+       label = settings.POT_LABEL
+
     context = {
-        'title': 'Balance and transactions for %s' % (user),
+        'title': 'Balance and transactions for %s' % (label),
         'balance': balance,
 	'who': user,
         'lst': lst,
@@ -170,4 +213,5 @@ def show(request,pk):
 	'out': moneys_out,
         }
     return render(request, 'pettycash/view.html', context)
+
 

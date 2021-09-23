@@ -3,52 +3,82 @@
 
 {% block content %}
 
+					{{ settings.POT_LABEL }}
 {% if lst %}
 <table>
 	<tr>
+		<th>id</th>
 		<th>Date</th>
 		<th>Who</th>
-		<th>What</th>
-		<th>IN</th>
-		<th>OUT</th>
+		<th>Description</th>
+		<th style="border-right: solid 1px;" align=right>IN</th>
+		<th style="border-right: solid 1px;" align=right>OUT</th>
+		<th align=right>Balance</th>
 	</tr>
 	{% for tx in lst %}
-		<tr>
-			<td>{{ tx.date }}</td>
-			<td>
-			{% if tx.src == who %}
-				paid to {{ tx.dst }}
+			{% if tx.src == who and tx.dst == who %}
+			<tr>
+				<td><a href="{% url 'transactiondetail' pk=tx.id %}"> {{ tx.id }}</a></td>
+				<td>{{ tx.date }}</td>
+				<td></td>
+				<td><i>(balance)</i></td>
+				<td style="border-right: solid 1px" >{{ tx.amount }}</td>
+				<td style="border-right: solid 1px" ></td>
+				<td align=right></td>
+			</tr>
 			{% else %}
-				received from {{ tx.src }}
-			{% endif %}
-			</td>
-			<td>{{ tx.description }}</td>
 			{% if tx.src == who %}
-			<td></td>
-			<td align=right>{{ tx.amount }}</td>
-			{% else %}
-			<td align=right>{{ tx.amount }}</td>
-			<td></td>
+			<tr>
+				<td><a href="{% url 'transactiondetail' pk=tx.id %}"> {{ tx.id }}</a></td>
+				<td>{{ tx.date }}</td>
+				<td>
+				{% if tx.dst.id == settings.POT_ID %}
+					{{ settings.POT_LABEL }}
+				{% else %}
+					{{ tx.dst }} 
+				{% endif %}
+					<i>(paid)</i></td>
+				<td>{{ tx.description }}</td>
+				<td style="border-right: solid 1px" ></td>
+				<td style="border-right: solid 1px" align=right>{{ tx.amount }}</td>
+				<td></td>
+			</tr>
 			{% endif %}
-		</tr>
+			{% if tx.dst == who %}
+			<tr>
+				<td><a href="{% url 'transactiondetail' pk=tx.id %}"> {{ tx.id }}</a></td>
+				<td>{{ tx.date }}</td>
+				<td>
+				{% if tx.src.id == settings.POT_ID %}
+					{{ settings.POT_LABEL }}
+				{% else %}
+					{{ tx.src }} 
+				{% endif %}
+				<i>(recieved)</i></td>
+				<td>{{ tx.description }}</td>
+				<td style="border-right: solid 1px" align=right>{{ tx.amount }}</td>
+				<td style="border-right: solid 1px" ></td>
+				<td></td>
+			</tr>
+			{% endif %}
+			{% endif %}
 	{% endfor %}
 	        <tr>
 			<td></td>
 			<td></td>
 			<td></td>
-			<td align=right>{{ in }}</td>
-			<td align=right>{{ out}}</td>
-		</tr>
-	        <tr>
 			<td></td>
-			<td></td>
-			<td></td>
-			<td colspan=2 align=right><b>Balance:</b>{{ balance.balance }}</td>
+			<td style="border-right: solid 1px" align=right>{{ in }}</td>
+			<td style="border-right: solid 1px"align=right>{{ out}}</td>
+			<td align=right><b>{{ balance.balance }}</b></td>
 		</tr>
 </table>
 {% else %}
 <i>No transactions.</i>
 {% endif %}
+
+<p>
+Return to the <a href="{% url 'balances' %}">[balances]</a>.
 
 
 {% endblock %}

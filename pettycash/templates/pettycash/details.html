@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load isingroup %}
+
+{% block content %}
+
+{% if tx %}
+<table>
+	<tr><td align=right>Date:</td><td>{{ tx.date }}</td><tr>
+	<tr><td align=right>From:</td><td>
+                                {% if tx.src.id == settings.POT_ID %}
+                                        {{ settings.POT_LABEL }}
+                                {% else %}
+                                        {{ tx.src }}
+                                {% endif %}
+		</td><tr>
+	<tr><td align=right>To:</td><td>
+                                {% if tx.dst.id == settings.POT_ID %}
+                                        {{ settings.POT_LABEL }}
+                                {% else %}
+                                        {{ tx.dst}}
+                                {% endif %}
+		</td><tr>
+	<tr><td align=right>Descripotion:</td><td>{{ tx.description}}</td><tr>
+	<tr><td align=right>Amount:</td><td>{{ tx.amount}}</td><tr>
+	<tr><td align=right></td><td>
+		<table>
+		<tr>
+ 		   <th>What</th><th>When</th><th>Who</th><th>Comments</th><tr>
+		<tr>
+		{% for h in tx.history.all %}
+		   <td>{{ h.get_history_type_display }}</td>
+		   <td>{{ h.date }}</td>
+		   <td>{{ h.history_user}}</td>
+		   <td>{{ h.history_change_reason }}</td>
+		{% endfor %}
+	</td></tr>
+		</table>
+</table>
+{% else %}
+<i>No transactions.</i>
+{% endif %}
+<p>
+Return to the <a href="{% url 'transactions' pk=tx.dst.id  %}">[transactions]</a>.
+
+
+{% endblock %}

@@ -101,7 +101,7 @@ TEMPLATES = [
     },
 ]
 
-SETTINGS_EXPORT = [ 'GRAND_AMNESTY', 'ML_ADMINURL', 'STORAGE' ]
+SETTINGS_EXPORT = [ 'GRAND_AMNESTY', 'ML_ADMINURL', 'STORAGE', 'POT_ID', 'POT_LABEL'  ]
 
 WSGI_APPLICATION = 'makerspaceleiden.wsgi.application'
 
@@ -253,6 +253,9 @@ NETADMIN_USER_GROUP = 'network admins'
 # REGISTRATION_OPEN = False
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
+POT_ID = 1
+POT_LABEL = 'Makerspace (de zwarte Pot)'
 
 try:
     from .local import *

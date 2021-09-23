@@ -4,6 +4,8 @@ from djmoney.models.fields import MoneyField
 from django.conf import settings
 from django.urls import reverse
 from django.core.exceptions import ObjectDoesNotExist
+from django.forms.models import ModelChoiceField
+from django.db.models import Q
 
 from django.db.models.signals import pre_delete, pre_save
 
@@ -20,7 +22,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 class PettycashBalanceCache(models.Model):
-     owner = models.ForeignKey(User, on_delete=models.CASCADE)
+     owner = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null = True)
+
      balance = MoneyField(max_digits=10, decimal_places=2, null=True, default_currency='EUR')
      last = models.ForeignKey('PettycashTransaction', on_delete=models.CASCADE,null=True)
 
@@ -37,8 +40,9 @@ def adjust_balance_cache(last, dst,amount):
            balance = PettycashBalanceCache.objects.get(owner=dst)
      except ObjectDoesNotExist as e:
            print("Warning - creating for dst=%s" % (dst))
-           balance =  PettycashBalanceCache.objects(owner=dst,balance=Money(0,EUR))
-           for tx in PettycashTransaction.objects.all().filter(Q(owner=dst)):
+
+           balance =  PettycashBalanceCache(owner=dst,balance=Money(0,EUR))
+           for tx in PettycashTransaction.objects.all().filter(Q(dst=dst)):
               balance.balance += tx.amount
 
      balance.balance += amount
@@ -46,10 +50,10 @@ def adjust_balance_cache(last, dst,amount):
      balance.save()
 
 class PettycashTransaction(models.Model):
-     dst = models.ForeignKey(User, on_delete=models.CASCADE, related_name = 'isReceivedBy')
+     dst = models.ForeignKey(User, on_delete=models.CASCADE, related_name = 'isReceivedBy', blank=True, null = True)
      src = models.ForeignKey(User, on_delete=models.CASCADE, related_name = 'isSentBy',  blank=True, null = True)
 
-     date =  models.DateField(blank=True, null = True)
+     date =  models.DateTimeField(blank=True, null = True)
 
      amount = MoneyField(max_digits=10, decimal_places=2, null=True, default_currency='EUR')
      description = models.CharField(max_length=300, blank=True, null=True)
