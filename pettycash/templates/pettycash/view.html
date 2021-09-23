@@ -20,11 +20,10 @@
 			<tr>
 				<td><a href="{% url 'transactiondetail' pk=tx.id %}"> {{ tx.id }}</a></td>
 				<td>{{ tx.date }}</td>
-				<td><i>balance previous billing cycle<i></td>
-				<td></td>
+				<td colspan=2><i>balance previous billing cycle<i></td>
+				<td style="border-right: solid 1px" >{{ tx.amount}} </td>
 				<td style="border-right: solid 1px" ></td>
-				<td style="border-right: solid 1px" ></td>
-				<td align=right>{{ tx.amount }}</td>
+				<td align=right></td>
 			</tr>
 			{% else %}
 			{% if tx.src == who %}
