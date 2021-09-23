@@ -71,16 +71,16 @@ def pettycash_redirect(pk = None):
       url = '{}#{}'.format(url, pk)
     return redirect(url)
 
-def transact(request,label,src=None,dst=None,description=None,amount=None,reason=""):
+def transact(request,label,src=None,dst=None,description=None,amount=None,reason=None):
     form = PettycashTransactionForm(request.POST or None, initial = { 'src': src, 'dst': dst, 'description': description, 'amount': amount })
     if form.is_valid():
         try:
             item = form.save(commit = False)
 
             if not item.description:
-                item.description = "Added by {}".format(request.user)
+                item.description = "Entered by {}".format(request.user)
 
-            item._change_reason = "Created by {}, {}.".format(request.user, reason)
+            item._change_reason = "Logged in as {}, {}.".format(request.user, reason)
             item.save()
 
             # alertOwnersToChange(item, request.user, [ item.owner.email ])
@@ -99,7 +99,7 @@ def transact(request,label,src=None,dst=None,description=None,amount=None,reason
     context = {
         'title': label,
         'form': form,
-        'action': 'Transact',
+        'action': 'Pay',
         }
     return render(request, 'pettycash/invoice.html', context)
 
@@ -171,7 +171,7 @@ def showtx(request,pk):
         return HttpResponse("Not found",status=404,content_type="text/plain")
 
     context = {
-        'title': 'Details transaction %s,  %s,  %s' % (tx.id, tx.dst, tx.date),
+        'title': 'Details transaction %s @ %s' % (tx.id, tx.date),
         'tx': tx,
 	'settings': settings,
         }

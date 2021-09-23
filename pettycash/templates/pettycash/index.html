@@ -60,12 +60,12 @@ Test QR's
        <code>{{ request.build_absolute_uri }}pay?description=Koffie&amount=0.50 </code>
 </td>
 <td align=center>
-        <a href="pay?description=Koffie&amount=0.50">"pay 1.25 for beer"</a><p>
-       {% qr_from_text "{{ request.build_absolute_uri }}/pay?description=Beer&amount=1.50" size="m" border=1 %}<br>
-       <code>{{ request.build_absolute_uri }}pay?description=Beer&amount=0.50 </code>
+        <a href="pay?description=Beer&amount=1.25">"pay 1.25 for beer"</a><p>
+       {% qr_from_text "{{ request.build_absolute_uri }}/pay?description=Beer&amount=1.25" size="m" border=1 %}<br>
+       <code>{{ request.build_absolute_uri }}pay?description=Beer&amount=0.25 </code>
 </td>
 <td align=center>
-        <a href="pay?description=Koffie&amount=0.50">"pay 2.50 for MIG gas"</a><p>
+        <a href="pay?description=Miggas&amount=2.50">"pay 2.50 for MIG gas"</a><p>
        {% qr_from_text "{{ request.build_absolute_uri }}/pay?description=Miggas&amount=2.50" size="m" border=1 %}<br>
        <code>{{ request.build_absolute_uri }}pay?description=Miggas&amount=2.50 </code>
 </td>

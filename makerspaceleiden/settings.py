@@ -7,6 +7,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 
 import os
 import locale
+from moneyed import EUR
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -256,6 +257,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 POT_ID = 1
 POT_LABEL = 'Makerspace (de zwarte Pot)'
+CURRENCIES = ['EUR']
 
 try:
     from .local import *
