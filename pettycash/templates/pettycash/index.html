@@ -46,13 +46,32 @@
 
 
 </pre>
+<center>
+<h2>
 <hr>
-Test URL to pay 0.50 cent to makerspace:<br>
-<blockquote>
-        <a href="pay?description=Koffie&amount=0.50">"pay 0.50 for coffee"</a>
-	<br>
-       {% qr_from_text "http://localhost:800/pay?description=Koffie&amount=0.50" size="m" border=1 %}
-</blockquote>
+Test QR's
+<hr>
+</h2>
+<table>
+<tr>
+<td align=center>
+        <a href="pay?description=Koffie&amount=0.50">"pay 0.50 for coffee"</a><p>
+       {% qr_from_text "{{ request.build_absolute_uri }}/pay?description=Koffie&amount=0.50" size="m" border=1 %}<br>
+       <code>{{ request.build_absolute_uri }}pay?description=Koffie&amount=0.50 </code>
+</td>
+<td align=center>
+        <a href="pay?description=Koffie&amount=0.50">"pay 1.25 for beer"</a><p>
+       {% qr_from_text "{{ request.build_absolute_uri }}/pay?description=Beer&amount=1.50" size="m" border=1 %}<br>
+       <code>{{ request.build_absolute_uri }}pay?description=Beer&amount=0.50 </code>
+</td>
+<td align=center>
+        <a href="pay?description=Koffie&amount=0.50">"pay 2.50 for MIG gas"</a><p>
+       {% qr_from_text "{{ request.build_absolute_uri }}/pay?description=Miggas&amount=2.50" size="m" border=1 %}<br>
+       <code>{{ request.build_absolute_uri }}pay?description=Miggas&amount=2.50 </code>
+</td>
+</tr>
+</table>
+</center>
 
 
 {% endblock %}
