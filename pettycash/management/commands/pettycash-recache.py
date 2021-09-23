@@ -33,16 +33,12 @@ class Command(BaseCommand):
 
            trns = []
            try:
-              trns =  PettycashTransaction.objects.all().filter(Q(dst=user))
+              trns =  PettycashTransaction.objects.all().filter(Q(dst=user) | Q(src=user))
               for tx in trns:
-                  balance.balance += tx.amount
-           except ObjectDoesNotExist as e:
-              pass
-
-           try:
-              trns =  PettycashTransaction.objects.all().filter(Q(src=user))
-              for tx in trns:
-                  balance.balance -= tx.amount
+                  if tx.dst == user:
+                      balance.balance += tx.amount
+                  else:
+                      balance.balance -= tx.amount
            except ObjectDoesNotExist as e:
               pass
 

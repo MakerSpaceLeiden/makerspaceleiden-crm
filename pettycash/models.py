@@ -12,7 +12,8 @@ from django.db.models.signals import pre_delete, pre_save
 from django.db import models
 from members.models import User
 
-import datetime
+from django.utils import timezone
+from datetime import datetime, timedelta
 import uuid
 import os
 import re
@@ -25,7 +26,7 @@ class PettycashBalanceCache(models.Model):
      owner = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null = True)
 
      balance = MoneyField(max_digits=10, decimal_places=2, null=True, default_currency='EUR')
-     last = models.ForeignKey('PettycashTransaction', on_delete=models.CASCADE,null=True)
+     last = models.ForeignKey('PettycashTransaction', on_delete=models.SET_DEFAULT, null=True, blank=True, default = None)
 
      history = HistoricalRecords()
 
@@ -67,13 +68,26 @@ class PettycashTransaction(models.Model):
        return reverse('transactions', kwargs = { 'pk' :  self.id })
 
      def __str__(self):
-         return self.description
+         if self.dst == self.src:
+            return "@%s BALANCE %s" % (self.date, self.amount)
+         return "@%s %s->%s '%s' %s" % (self.date, self.src, self.dst, self.description, self.amount)
+
+     def delete(self, * args, ** kwargs):
+         rc = super(PettycashTransaction,self).delete(*args, **kwargs)
+         try:
+             adjust_balance_cache(self, self.src, self.amount)
+             adjust_balance_cache(self, self.dst, -self.amount)
+         except Exception as e:
+             print("Transaction cache failure on delete: %s" % (e))
+
+         return rc
 
      def save(self, * args, ** kwargs):
          if self.pk:
             raise ValidationError("you may not edit an existing Transaction - instead create a new one")
 
-         self.date =  datetime.date.today()
+         if not self.date:
+             self.date = datetime.now(tz=timezone.utc)
          
          rc = super(PettycashTransaction,self).save(*args, **kwargs)
          try:

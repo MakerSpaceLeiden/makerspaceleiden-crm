@@ -71,7 +71,7 @@ def pettycash_redirect(pk = None):
       url = '{}#{}'.format(url, pk)
     return redirect(url)
 
-def transact(request,label,src=None,dst=None,description=None,amount=None):
+def transact(request,label,src=None,dst=None,description=None,amount=None,reason=""):
     form = PettycashTransactionForm(request.POST or None, initial = { 'src': src, 'dst': dst, 'description': description, 'amount': amount })
     if form.is_valid():
         try:
@@ -80,7 +80,7 @@ def transact(request,label,src=None,dst=None,description=None,amount=None):
             if not item.description:
                 item.description = "Added by {}".format(request.user)
 
-            item.change_reason = "Created by {} through the website.".format(request.user)
+            item._change_reason = "Created by {}, {}.".format(request.user, reason)
             item.save()
 
             # alertOwnersToChange(item, request.user, [ item.owner.email ])
@@ -122,7 +122,7 @@ def invoice(request,src):
     except ObjectDoesNotExist as e:
         return HttpResponse("Not found",status=404,content_type="text/plain")
 
-    return transact(request,'%s to pay to %s ' % (src, settings.POT_LABEL), src=src, dst=settings.POT_ID)
+    return transact(request,'%s to pay to %s ' % (src, settings.POT_LABEL), src=src, dst=settings.POT_ID, reason="Invoice via website")
 
 @login_required
 @login_or_priveleged
@@ -137,7 +137,7 @@ def transfer(request,src,dst):
     if dst.id == settings.POT_ID:
        dst_label = settings.POT_LABEL
 
-    return transact(request,'%s to pay %s' % (src,dst_label), src=src, dst=dst)
+    return transact(request,'%s to pay %s' % (src,dst_label), src=src, dst=dst, reason="Transfer form website")
 
 @superuser
 def deposit(request,dst):
@@ -150,7 +150,7 @@ def deposit(request,dst):
     if dst.id == settings.POT_ID:
        dst_label = settings.POT_LABEL
 
-    return transact(request,'Deposit into account %s' % (dst_label), dst=dst,src=settings.POT_ID)
+    return transact(request,'Deposit into account %s' % (dst_label), dst=dst,src=settings.POT_ID, reason="Deposit via website")
 
 @login_required
 def pay(request):
@@ -161,8 +161,7 @@ def pay(request):
         return HttpResponse("Amount/Description parameters mandatory",status=400,content_type="text/plain")
     amount = Money(amount_str, EUR)
 
-    return transact(request,"%s pays %s to the Makerspace" % (mtostr(amount),request.user),
-               src=request.user,dst=settings.POT_ID,amount=amount,description=description)
+    return transact(request,"%s pays %s to the Makerspace" % (mtostr(amount), request.user), src=request.user,dst=settings.POT_ID,amount=amount,description=description, reason="Pay via website")
 
 @login_required
 def showtx(request,pk):
