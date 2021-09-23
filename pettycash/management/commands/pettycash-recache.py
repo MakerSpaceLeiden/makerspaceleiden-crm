@@ -47,7 +47,7 @@ class Command(BaseCommand):
            if old_balance != Money(0,EUR):
                 err = ' (error: %s)' % old_balance
 
-           print("%s: %s%s", user, balance.balance, err)
+           print("%s: %s%s", % (user, balance.balance, err))
 
            balance.save()
            

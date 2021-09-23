@@ -150,7 +150,7 @@ def deposit(request,dst):
     if dst.id == settings.POT_ID:
        dst_label = settings.POT_LABEL
 
-    return transact(request,'Deposit into account %s' % (dst_label), dst=dst,src=settings.POT_ID, reason="Deposit via website")
+    return transact(request,'Deposit into account %s' % (dst_label), dst=dst,src=settings.POT_ID, reason="Deposit via website", description = "Deposit" )
 
 @login_required
 def pay(request):

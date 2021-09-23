@@ -149,11 +149,15 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-LC_ALL='en_US.UTF-8'
-locale.setlocale(locale.LC_ALL, LC_ALL)
+if not os.getenv('LANG'):
+    LANG='en_US.UTF-8'
+    os.environ['LANG'] = LANG
+    # locale.setlocale(locale.LANG, LANG)
 
-# LANG='en_US.UTF-8'
-# locale.setlocale(locale.LANG, LANG)
+if not os.getenv('LC_ALL'):
+    LC_ALL='en_US.utf8'
+    os.environ['LC_ALL'] = LC_ALL
+    locale.setlocale(locale.LC_ALL, LC_ALL)
 
 TIME_ZONE = 'Europe/Amsterdam'
 
