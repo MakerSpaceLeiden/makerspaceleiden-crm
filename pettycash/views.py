@@ -64,10 +64,14 @@ def alertOwnersToChange(tx, userThatMadeTheChange = None, toinform = [], reason=
 
     if tx.src.id == settings.POT_ID:
         src_label = settings.POT_LABEL
+    else:
+        toinform.append(tx.src.email)
 
     if tx.dst.id == settings.POT_ID:
         dst_label = settings.POT_LABEL
         label = src_label
+    else:
+        toinform.append(tx.dst.email)
 
     context = {
            'user': userThatMadeTheChange,
@@ -83,8 +87,8 @@ def alertOwnersToChange(tx, userThatMadeTheChange = None, toinform = [], reason=
     if userThatMadeTheChange.email not in toinform:
         toinform.append(userThatMadeTheChange.email)
 
-    if settings.ALSO_INFORM_EMAIL_ADDRESSES:
-        toinform.extend(settings.ALSO_INFORM_EMAIL_ADDRESSES)
+    # if settings.ALSO_INFORM_EMAIL_ADDRESSES:
+    #    toinform.extend(settings.ALSO_INFORM_EMAIL_ADDRESSES)
 
     subject = render_to_string('email_subject_tx.txt', context).strip()
     message = render_to_string('email_tx.txt', context)
@@ -106,7 +110,7 @@ def transact_raw(request,src=None,dst=None,description=None,amount=None,reason=N
         tx = PettycashTransaction(src=src,dst=dst,description=description,amount=amount)
         tx._change_reason = reason
         tx.save()
-        alertOwnersToChange(tx, user, [ tx.src.email, tx.dst.email ])
+        alertOwnersToChange(tx, user, [])
 
     except Exception as e:
         logger.error("Unexpected error during initial save of new pettycash: {}".format(e))
@@ -125,7 +129,6 @@ def transact(request,label,src=None,dst=None,description=None,amount=None,reason
         if transact_raw(request, src=item.src,dst=item.dst,description=item.description,amount=item.amount,reason="Logged in as {}, {}.".format(request.user, reason),user=request.user):
              return pettycash_redirect(item.id)
 
-        logger.error("Unexpected error during initial save of new pettycash: {}".format(e))
         return HttpResponse("Something went wrong ??",status=500,content_type="text/plain")
  
     if src:

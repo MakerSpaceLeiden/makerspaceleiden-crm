@@ -11,6 +11,7 @@
 <table>
 	<tr><th>Member</th><th>Last change</th><th>Balance</th></tr>
 	{% for b in lst %}
+	{% if b.owner|isInPettycashDemGroupo %}
           {% if user.is_privileged or b.owner.id != settings.POT_ID or 1 %}
 		<tr>
 			<td>
@@ -38,6 +39,7 @@
 				<td><a href="{% url 'deposit' dst=b.owner.id %}">[deposit]</a></td>
 			{% endif %}
 		</tr>
+            {% endif %}
           {% endif %}
 	{% endfor %}
 </table>
