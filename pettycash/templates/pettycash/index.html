@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load isingroup %}
+{% load qr_code  %}
+
+{% block content %}
+
+{% if user.is_privileged %}
+	Warning - you are currently privileged and can see more than a normal member.
+	<p>
+{% endif %}
+<table>
+	<tr><th>Member</th><th>Last change</th><th>Balance</th></tr>
+	{% for b in lst %}
+          {% if user.is_privileged or b.owner.id != settings.POT_ID or 1 %}
+		<tr>
+			<td>
+			<a href="{% url 'transactions' pk=b.owner.id %}">
+          		{% if b.owner.id == settings.POT_ID %}
+				{{ settings.POT_LABEL }}
+			{% else %}
+				{{b.owner }}
+			{% endif %}
+			</a></td>
+			<td>
+			{% if b.last %}
+				{{ b.last.date }}
+			{% else %}
+				<i>never</i>
+			{% endif %}
+			</td>
+			<td>{{ b.balance }}</td>
+                        {% if user.id == b.owner.id %}
+				<td><a href="{% url 'invoice' src=b.owner.id %}">[pay to {{ settings.POT_LABEL }}]</a></td>
+                        {% else %}
+				<td><a href="{% url 'transfer' src=user.id dst=b.owner.id %}">[pay]</a></td>
+			{% endif %}
+			{% if user.is_privileged and b.owner.id != settings.POT_ID %}
+				<td><a href="{% url 'deposit' dst=b.owner.id %}">[deposit]</a></td>
+			{% endif %}
+		</tr>
+          {% endif %}
+	{% endfor %}
+</table>
+<pre>
+
+
+
+</pre>
+<center>
+<h2>
+<hr>
+Test QR's
+<hr>
+</h2>
+<table>
+<tr>
+<td align=center>
+        <a href="pay?description=Koffie&amount=0.50">"pay 0.50 for coffee"</a><p>
+       {% qr_from_text "{{ request.build_absolute_uri }}/pay?description=Koffie&amount=0.50" size="m" border=1 %}<br>
+       <code>{{ request.build_absolute_uri }}pay?description=Koffie&amount=0.50 </code>
+</td>
+<td align=center>
+        <a href="pay?description=Beer&amount=1.25">"pay 1.25 for beer"</a><p>
+       {% qr_from_text "{{ request.build_absolute_uri }}/pay?description=Beer&amount=1.25" size="m" border=1 %}<br>
+       <code>{{ request.build_absolute_uri }}pay?description=Beer&amount=0.25 </code>
+</td>
+<td align=center>
+        <a href="pay?description=Miggas&amount=2.50">"pay 2.50 for MIG gas"</a><p>
+       {% qr_from_text "{{ request.build_absolute_uri }}/pay?description=Miggas&amount=2.50" size="m" border=1 %}<br>
+       <code>{{ request.build_absolute_uri }}pay?description=Miggas&amount=2.50 </code>
+</td>
+</tr>
+</table>
+</center>
+
+
+{% endblock %}

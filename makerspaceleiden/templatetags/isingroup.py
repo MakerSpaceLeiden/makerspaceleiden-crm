@@ -14,3 +14,7 @@ def isMainsAdmin(user):
 @register.filter(name='isNetAdmin')
 def isNetAdmin(user):
     return user.groups.filter(name=settings.NETADMIN_USER_GROUP).exists() 
+
+@register.filter(name='isInPettycashDemGroupo')
+def isInPettycashDemGroupo(user):
+    return user.groups.filter(name=settings.PETTYCASH_DEMO_USER_GROUP).exists() 

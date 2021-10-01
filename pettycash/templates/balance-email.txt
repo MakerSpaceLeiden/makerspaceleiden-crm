@@ -1,0 +1,23 @@
+Dear {{ user }},
+
+Your current account balanace is {{ balance.balance }}; which means that 
+you {% if goodstanding  %}do not have to do anything{% else %}should do a payment to XX as soon as possible{% endif %}.
+
+Below are your most recent transactions. 
+
+See {{ base }}{% url 'transactions' pk=user.id %} for the full details.
+
+Yours,
+
+the makerspace bot, on behalf of the trusteeds (bestuur@makerspaceleiden.nl).
+
+
+{% for tx in transactions %}
+{% if tx.src == who and tx.dst == who %}
+Balance previous billing cycle                     {{ tx.amount}}{% else %}{% if tx.src == user %}{{tx.date}} {{ tx.description }}
+                                                af {{ tx.amount }}{% endif %}{% if tx.dst == user %}{{tx.date}} {{ tx.description }}
+                                               bij {{ tx.amount }}{% endif %}{% endif %}{% endfor %}
+                                         Balance   {{ balance.balance }}
+
+See more at {{ base }}{% url 'transactions' pk=user.id%}
+

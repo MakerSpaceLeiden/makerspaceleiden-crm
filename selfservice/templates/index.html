@@ -55,6 +55,9 @@ There are no passwords for members at the moment.
 	<li><a href="{% url 'overview' %}">All members </a>
 <p/>
 	<li><a href="{% url 'personal_page' %}">Your data</a>
+{% if user|isInPettycashDemGroupo or user.is_privileged  %}
+	<li><a href="{% url 'balances' %}">Your cash balance</a>, do payments, see a transaction history, etc.
+{% endif %}
 {%if settings.ML_ADMINURL%}
 	<li><a href="{% url 'mailinglists_edit' %}">Mailing lists subscriptions</a> and digest settings.
 	<li><a href="{% url 'mailinglists_archives' %}">Historic archives</a> of the mailing lists.

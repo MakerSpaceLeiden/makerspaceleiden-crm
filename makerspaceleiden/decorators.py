@@ -77,4 +77,10 @@ def user_or_kiosk_required(function):
       return HttpResponse("XS denied",status=403,content_type="text/plain")
   return wrap
 
-
+def login_or_priveleged(function):
+   @wraps(function)
+   def wrap(request, *args, **kwargs):
+       if not request.user.is_privileged and request.user.id != kwargs['src']:
+           return HttpResponse("Denied - are not that user - nor are you priveleged",status=404,content_type="text/plain")
+       return function(request, *args, **kwargs)
+   return wrap

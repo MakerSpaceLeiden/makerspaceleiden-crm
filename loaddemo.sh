@@ -12,6 +12,7 @@ test -f db.sqlite3 && rm -f db.sqlite3
 
 python${VERSION} manage.py makemigrations
 python${VERSION} manage.py migrate
+ export LC_ALL=en_US.UTF-8
 
 echo
 echo Importing data
@@ -23,6 +24,7 @@ else
 	python${VERSION} manage.py import-wifi demo/wifi.csv
 	python${VERSION} manage.py import-machines demo/mac.csv 
 	python${VERSION} manage.py import-consolidated demo/consolidated.txt 
+	python${VERSION} manage.py pettycash-recache
 	echo " Reset all password and generate invites (Y, N, default is No) ?"
 	read I
 	if [ "x$I" = "xY" ]; then
