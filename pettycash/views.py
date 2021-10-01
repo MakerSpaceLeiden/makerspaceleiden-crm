@@ -128,7 +128,6 @@ def transact(request,label,src=None,dst=None,description=None,amount=None,reason
               return HttpResponse("Only transactions between %s and %s" % (Money(0,EUR), settings.MAX_PAY_API), status=406,content_type="text/plain")
            logger.info("Allowing super user perms to do a non compliant transaction %s" % (item))
 
-
         if not item.description:
              item.description = "Entered by {}".format(request.user)
 
@@ -272,8 +271,14 @@ def api_pay(request):
     except Exception as e:
         return HttpResponse("Params problems",status=400,content_type="text/plain")
 
-    if None in [ tagstr, amount_str, description, amount, node ] or amount < Money(0,EUR)  or amount > settings.MAX_PAY_API:
+    if None in [ tagstr, amount_str, description, amount, node ]:
         return HttpResponse("Mandatory params missing",status=400,content_type="text/plain")
+
+    if amount < Money(0,EUR):
+        return HttpResponse("Invalid param",status=400,content_type="text/plain")
+
+    if amount > settings.MAX_PAY_API:
+        return HttpResponse("Payment Limit exceeded",status=400,content_type="text/plain")
 
     try:
          tag = Tag.objects.get(tag = tagstr)
