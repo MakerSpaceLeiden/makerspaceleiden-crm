@@ -24,6 +24,11 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import EmailMultiAlternatives
 from django.urls import reverse
 from django.forms import widgets
+from django.http import JsonResponse
+
+
+from django.views.decorators.csrf import csrf_exempt
+from makerspaceleiden.decorators import superuser_or_bearer_required
 
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
@@ -46,24 +51,45 @@ logger = logging.getLogger(__name__)
 from .models import PettycashTransaction, PettycashBalanceCache
 from .admin import PettycashBalanceCacheAdmin, PettycashTransactionAdmin
 from .forms import PettycashTransactionForm
-from members.models import User
+from members.models import User, Tag
 
 # Note - we do this here; rather than in the model its save() - as this
 # lets admins change things through the database interface silently. 
 # Which can help when sheparding the community.
 #
-def alertOwnersToChange(items, userThatMadeTheChange = None, toinform = []):
+def alertOwnersToChange(tx, userThatMadeTheChange = None, toinform = [], reason=None ):
+    src_label = "%s" % tx.src
+    dst_label = "%s" % tx.dst
+    label = dst_label
+
+    if tx.src.id == settings.POT_ID:
+        src_label = settings.POT_LABEL
+
+    if tx.dst.id == settings.POT_ID:
+        dst_label = settings.POT_LABEL
+        label = src_label
+
     context = {
            'user': userThatMadeTheChange,
            'base': settings.BASE,
+           'reason': reason,
+           'tx': tx,
+           'src_label' : src_label,
+           'dst_label' : dst_label,
+           'label' : label,
+           'settings': settings,
     }
-    if userThatMadeTheChange:
-      toinform.append(userThatMadeTheChange.email)
+
+    if userThatMadeTheChange.email not in toinform:
+        toinform.append(userThatMadeTheChange.email)
 
     if settings.ALSO_INFORM_EMAIL_ADDRESSES:
-       toinform.extend(settings.ALSO_INFORM_EMAIL_ADDRESSES)
+        toinform.extend(settings.ALSO_INFORM_EMAIL_ADDRESSES)
 
-    return emailPettycashInfo(items, 'email_notification', toinform = [], context = {})
+    subject = render_to_string('email_subject_tx.txt', context).strip()
+    message = render_to_string('email_tx.txt', context)
+
+    return EmailMessage(subject, message, to=toinform, from_email=settings.DEFAULT_FROM_EMAIL).send()
 
 def pettycash_redirect(pk = None):
     url = reverse('balances')
@@ -71,24 +97,35 @@ def pettycash_redirect(pk = None):
       url = '{}#{}'.format(url, pk)
     return redirect(url)
 
+def transact_raw(request,src=None,dst=None,description=None,amount=None,reason=None,user=None):
+    if None in [ src, dst, description, amount, reason, user ]:
+        logger.error("Transact raw called with missing arguments. bug.")
+        return 0
+
+    try:
+        tx = PettycashTransaction(src=src,dst=dst,description=description,amount=amount)
+        tx._change_reason = reason
+        tx.save()
+        alertOwnersToChange(tx, user, [ tx.src.email, tx.dst.email ])
+
+    except Exception as e:
+        logger.error("Unexpected error during initial save of new pettycash: {}".format(e))
+        return 0
+
+    return 1
+    
 def transact(request,label,src=None,dst=None,description=None,amount=None,reason=None):
     form = PettycashTransactionForm(request.POST or None, initial = { 'src': src, 'dst': dst, 'description': description, 'amount': amount })
     if form.is_valid():
-        try:
-            item = form.save(commit = False)
+        item = form.save(commit = False)
 
-            if not item.description:
-                item.description = "Entered by {}".format(request.user)
+        if not item.description:
+             item.description = "Entered by {}".format(request.user)
 
-            item._change_reason = "Logged in as {}, {}.".format(request.user, reason)
-            item.save()
+        if transact_raw(request, src=item.src,dst=item.dst,description=item.description,amount=item.amount,reason="Logged in as {}, {}.".format(request.user, reason),user=request.user):
+             return pettycash_redirect(item.id)
 
-            # alertOwnersToChange(item, request.user, [ item.owner.email ])
-            return pettycash_redirect(item.id)
-
-        except Exception as e:
-            logger.error("Unexpected error during initial save of new pettycash: {}".format(e))
-
+        logger.error("Unexpected error during initial save of new pettycash: {}".format(e))
         return HttpResponse("Something went wrong ??",status=500,content_type="text/plain")
  
     if src:
@@ -153,17 +190,6 @@ def deposit(request,dst):
     return transact(request,'Deposit into account %s' % (dst_label), dst=dst,src=settings.POT_ID, reason="Deposit via website", description = "Deposit" )
 
 @login_required
-def pay(request):
-    amount_str = request.GET.get('amount', None)
-    description =  request.GET.get('description', None)
-
-    if not amount_str and not description:
-        return HttpResponse("Amount/Description parameters mandatory",status=400,content_type="text/plain")
-    amount = Money(amount_str, EUR)
-
-    return transact(request,"%s pays %s to the Makerspace" % (mtostr(amount), request.user), src=request.user,dst=settings.POT_ID,amount=amount,description=description, reason="Pay via website")
-
-@login_required
 def showtx(request,pk):
     try:
        tx = PettycashTransaction.objects.get(id=pk)
@@ -214,3 +240,40 @@ def show(request,pk):
     return render(request, 'pettycash/view.html', context)
 
 
+@login_required
+def pay(request):
+    amount_str = request.GET.get('amount', None)
+    description =  request.GET.get('description', None)
+
+    if not amount_str and not description:
+        return HttpResponse("Amount/Description parameters mandatory",status=400,content_type="text/plain")
+    amount = Money(amount_str, EUR)
+
+    return transact(request,"%s pays %s to the Makerspace" % (mtostr(amount), request.user), src=request.user,dst=settings.POT_ID,amount=amount,description=description, reason="Pay via website")
+
+@csrf_exempt
+@superuser_or_bearer_required
+def api_pay(request):
+    try: 
+       node = request.GET.get('node', None)
+       tagstr = request.GET.get('src', None)
+       amount_str = request.GET.get('amount', None)
+       description =  request.GET.get('description', None)
+       amount = Money(amount_str, EUR)
+    except Exception as e:
+        return HttpResponse("Params problems",status=400,content_type="text/plain")
+
+    if None in [ tagstr, amount_str, description, amount, node ] or amount < Money(0,EUR)  or amount > settings.MAX_PAY_API:
+        return HttpResponse("Mandatory params missing",status=400,content_type="text/plain")
+
+    try:
+         tag = Tag.objects.get(tag = tagstr)
+    except ObjectDoesNotExist as e:
+         logger.error("Tag %s not found, denied" % (tagstr) )
+         return HttpResponse("Tag not found",status=404,content_type="text/plain")
+
+    if transact_raw(request,src=tag.owner,dst=User.objects.get(id = settings.POT_ID),description=description,amount=amount,
+               reason="Payment via API; tagid=%s (owned by %s) from payment node:  %s" % (tag.id,tag.owner,node) ,user=tag.owner):
+         return JsonResponse({ 'result': True })
+
+    return HttpResponse("FAIL",status=500,content_type="text/plain")
