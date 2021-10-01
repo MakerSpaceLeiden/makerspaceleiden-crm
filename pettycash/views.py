@@ -283,6 +283,11 @@ def api_pay(request):
 
     if transact_raw(request,src=tag.owner,dst=User.objects.get(id = settings.POT_ID),description=description,amount=amount,
                reason="Payment via API; tagid=%s (owned by %s) from payment node:  %s" % (tag.id,tag.owner,node) ,user=tag.owner):
-         return JsonResponse({ 'result': True })
+        label = "%s" % tag.owner.first_name
+        if len(label) < 1:
+           label = "%s" % tag.owner.last_name
+        if len(label) < 1:
+           label = "%s" % tag.owner
+        return JsonResponse({ 'result': True, 'amount': amount.amount, 'user': label})
 
     return HttpResponse("FAIL",status=500,content_type="text/plain")
