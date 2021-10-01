@@ -7,7 +7,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 
 import os
 import locale
-from moneyed import EUR
+from moneyed import Money, EUR
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -102,7 +102,7 @@ TEMPLATES = [
     },
 ]
 
-SETTINGS_EXPORT = [ 'GRAND_AMNESTY', 'ML_ADMINURL', 'STORAGE', 'POT_ID', 'POT_LABEL'  ]
+SETTINGS_EXPORT = [ 'GRAND_AMNESTY', 'ML_ADMINURL', 'STORAGE', 'POT_ID', 'POT_LABEL' , 'TRUSTEES' ]
 
 WSGI_APPLICATION = 'makerspaceleiden.wsgi.application'
 
@@ -242,7 +242,7 @@ ALSO_INFORM_EMAIL_ADDRESSES = []
 # a ling to what the person also has in store
 STORAGE_HIGHLIGHT_LIMIT = 3
 
-UT_BEARER_SECRET = None
+UT_BEARER_SECRET = 'not-so-very-secret-127.0.0.1'
 
 # Only show the past 7 days of unknown tags. And up to 10.
 #
@@ -255,6 +255,9 @@ ML_ADMINURL = 'https://mailman.foo.com/mailman'
 # Extact spelling as created in 'group' through the /admin/ interface.
 SENSOR_USER_GROUP = 'mains Sensor Admins'
 NETADMIN_USER_GROUP = 'network admins'
+PETTYCASH_DEMO_USER_GROUP='pettycash demo group'
+
+
 # REGISTRATION_OPEN = False
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
@@ -262,6 +265,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 POT_ID = 1
 POT_LABEL = 'Makerspace (de zwarte Pot)'
 CURRENCIES = ['EUR']
+MAX_PAY_API = Money(10.00,EUR)
 
 try:
     from .local import *
