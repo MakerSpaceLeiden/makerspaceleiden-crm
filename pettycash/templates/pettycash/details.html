@@ -25,15 +25,15 @@
 	<tr><td align=right></td><td>
 		<table>
 		<tr>
- 		   <th>What</th><th>When</th><th>Who</th><th>Comments</th><tr>
-		<tr>
+ 		   <th>What</th><th>When</th><th>Who</th><th>Comments</th>
 		{% for h in tx.history.all %}
+		<tr>
 		   <td>{{ h.get_history_type_display }}</td>
 		   <td>{{ h.date }}</td>
 		   <td>{{ h.history_user}}</td>
 		   <td>{{ h.history_change_reason }}</td>
+           	</tr>
 		{% endfor %}
-	</td></tr>
 		</table>
 </table>
 {% else %}

@@ -123,6 +123,12 @@ def transact(request,label,src=None,dst=None,description=None,amount=None,reason
     if form.is_valid():
         item = form.save(commit = False)
 
+        if item.amount < Money(0,EUR)  or item.amount > settings.MAX_PAY_API:
+           if not request.user.is_privileged:
+              return HttpResponse("Only transactions between %s and %s" % (Money(0,EUR), settings.MAX_PAY_API), status=406,content_type="text/plain")
+           logger.info("Allowing super user perms to do a non compliant transaction %s" % (item))
+
+
         if not item.description:
              item.description = "Entered by {}".format(request.user)
 

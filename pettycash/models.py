@@ -3,7 +3,7 @@ from simple_history.models import HistoricalRecords
 from djmoney.models.fields import MoneyField
 from django.conf import settings
 from django.urls import reverse
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist,ValidationError
 from django.forms.models import ModelChoiceField
 from django.db.models import Q
 
@@ -83,8 +83,14 @@ class PettycashTransaction(models.Model):
          return rc
 
      def save(self, * args, ** kwargs):
+         bypass = False
+         if kwargs is not None and 'bypass' in kwargs:
+             bypass = kwargs['bypass']
+             del kwargs['bypass']
          if self.pk:
-            raise ValidationError("you may not edit an existing Transaction - instead create a new one")
+             if not bypass:
+                 raise ValidationError("you may not edit an existing Transaction - instead create a new one")
+             logger.info("Bypass used on save of %s" % self)
 
          if not self.date:
              self.date = datetime.now(tz=timezone.utc)

@@ -13,4 +13,3 @@ class PettycashBalanceCacheAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
 
 admin.site.register(PettycashTransaction, PettycashTransactionAdmin)
 admin.site.register(PettycashBalanceCache, PettycashBalanceCacheAdmin)
-
