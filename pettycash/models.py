@@ -22,11 +22,16 @@ from moneyed import Money, EUR
 import logging
 logger = logging.getLogger(__name__)
 
+class PettycashSku(models.Model):
+     name = models.CharField(max_length=300, blank=True, null=True)
+     description = models.CharField(max_length=300, blank=True, null=True)
+     amount = MoneyField(max_digits=10, decimal_places=2, null=True, default_currency='EUR')
+
 class PettycashBalanceCache(models.Model):
      owner = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null = True)
 
      balance = MoneyField(max_digits=10, decimal_places=2, null=True, default_currency='EUR')
-     last = models.ForeignKey('PettycashTransaction', on_delete=models.SET_DEFAULT, null=True, blank=True, default = None)
+     last = models.ForeignKey('PettycashTransaction', on_delete=models.SET_DEFAULT, null=True, blank=True, default = None, verbose_name = 'Last transaction that changed the balance')
 
      history = HistoricalRecords()
 
@@ -51,10 +56,10 @@ def adjust_balance_cache(last, dst,amount):
      balance.save()
 
 class PettycashTransaction(models.Model):
-     dst = models.ForeignKey(User, on_delete=models.CASCADE, related_name = 'isReceivedBy', blank=True, null = True)
-     src = models.ForeignKey(User, on_delete=models.CASCADE, related_name = 'isSentBy',  blank=True, null = True)
+     dst = models.ForeignKey(User, verbose_name='Paid to', on_delete=models.CASCADE, related_name = 'isReceivedBy', blank=True, null = True)
+     src = models.ForeignKey(User, verbose_name='Paid by', on_delete=models.CASCADE, related_name = 'isSentBy',  blank=True, null = True)
 
-     date =  models.DateTimeField(blank=True, null = True)
+     date =  models.DateTimeField(blank=True, null = True, verbose_name = 'Date of transaction')
 
      amount = MoneyField(max_digits=10, decimal_places=2, null=True, default_currency='EUR')
      description = models.CharField(max_length=300, blank=True, null=True)

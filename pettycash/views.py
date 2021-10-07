@@ -39,6 +39,8 @@ import uuid
 import zipfile
 import os
 import re
+import secrets
+
 from moneyed import Money, EUR
 from moneyed.l10n import format_money
 
@@ -48,7 +50,7 @@ def mtostr(m):
 import logging
 logger = logging.getLogger(__name__)
 
-from .models import PettycashTransaction, PettycashBalanceCache
+from .models import PettycashTransaction, PettycashBalanceCache, PettycashSku
 from .admin import PettycashBalanceCacheAdmin, PettycashTransactionAdmin
 from .forms import PettycashTransactionForm
 from members.models import User, Tag
@@ -296,3 +298,51 @@ def api_pay(request):
         return JsonResponse({ 'result': True, 'amount': amount.amount, 'user': label})
 
     return HttpResponse("FAIL",status=500,content_type="text/plain")
+
+def get_nonce(age = 0):
+    now = time.time()
+    m = hashlib.sha256()
+    m.update(int(now / settings.NONCE_AGE) - age)
+    m.update(settings.NONCE_SEED)
+    m.update(client_cert)
+    m.update(server_cert)
+    return m.hexdigest() 
+
+def check_nonce(nonce):
+    for tm in [ 0, 1, 2]:
+        if tm == nonce:
+            return True
+    return False
+
+@csrf_exempt
+def api_nonce(request):
+    nonce = get_nonce()
+    return HttpResponse(nonce, status=500,content_type="text/plain")
+
+@csrf_exempt
+def api_verify(request):
+    token = request.GET.get('node', None)
+
+    if not check_nonce(token):
+       HttpResponse("FAIL",status=400,content_type="text/plain")
+
+    return HttpResponse("OK",status=200,content_type="text/plain")
+
+@csrf_exempt
+def api_get_skus(request):
+    out =[]
+    for item in PettycashSku.objects.all():
+       out.append({ 'id': item.pk,  'name': item.name, 'description': item.description, 'price': item.amount.amount })
+    
+    return JsonResponse(out, safe=False)
+
+@csrf_exempt
+def api_get_sku(request,sku):
+    try:
+       item = PettycashSku.objects.get(pk=sku)
+       return JsonResponse({ 'id': item.pk,  'name': item.name, 'description': item.description, 'price': item.amount.amount })
+    except ObjectDoesNotExist as e:
+         logger.error("SKU %d not found, denied" % (sku) )
+         return HttpResponse("SKU not found",status=404,content_type="text/plain")
+    
+    return HttpResponse("Error",status=500,content_type="text/plain")
