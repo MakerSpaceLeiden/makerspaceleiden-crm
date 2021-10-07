@@ -269,15 +269,19 @@ def api_pay(request):
        description =  request.GET.get('description', None)
        amount = Money(amount_str, EUR)
     except Exception as e:
+        logger.error("Tag %s payment has param issues." % (tagstr) )
         return HttpResponse("Params problems",status=400,content_type="text/plain")
 
     if None in [ tagstr, amount_str, description, amount, node ]:
+        logger.error("Missing param, Payment Tag %s denied" % (tagstr) )
         return HttpResponse("Mandatory params missing",status=400,content_type="text/plain")
 
     if amount < Money(0,EUR):
+        logger.error("Invalid param. Payment Tag %s denied" % (tagstr) )
         return HttpResponse("Invalid param",status=400,content_type="text/plain")
 
     if amount > settings.MAX_PAY_API:
+        logger.error("Payment too high, rejected, Tag %s denied" % (tagstr) )
         return HttpResponse("Payment Limit exceeded",status=400,content_type="text/plain")
 
     try:
