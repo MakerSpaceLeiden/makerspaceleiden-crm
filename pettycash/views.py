@@ -344,7 +344,7 @@ def api_get_skus(request):
 def api_get_sku(request,sku):
     try:
        item = PettycashSku.objects.get(pk=sku)
-       return JsonResponse({ 'id': item.pk,  'name': item.name, 'description': item.description, 'price': item.amount.amount })
+       return JsonResponse({ 'id': item.pk,  'name': item.name, 'description': item.description, 'price': float(item.amount.amount) })
     except ObjectDoesNotExist as e:
          logger.error("SKU %d not found, denied" % (sku) )
          return HttpResponse("SKU not found",status=404,content_type="text/plain")

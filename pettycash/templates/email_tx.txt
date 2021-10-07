@@ -2,14 +2,18 @@ L.S.
 
 Just to let you know; we had the following transaction made:
 
-    id {{ tx.pk }} <{{ base }}{% url 'transactiondetail' pk=tx.pk  %}>
-  from {{ src_label }}
-    to {{ dst_label }}
+  from   {{ src_label }}
+    to   {{ dst_label }}
 
-    {{ tx.amount }}
+  when   {{ tx.date }}
 
-    {{ tx.description}}
+         {{ tx.amount }}
 
-Should this be wrong; let one of the trustee's know at {{ settings.TRUSTEES }}.
+         {{ tx.description}}
+
+Should this be wrong; let one of the trustee's know at {{ settings.TRUSTEES }}. The 
+full details of this transaction can be seen at  <{{ base }}{% url 'transactiondetail' pk=tx.pk  %}>.
 
 Your friendly makerbot.
+-- 
+Makerspace Leiden, internal payment notifcations.
