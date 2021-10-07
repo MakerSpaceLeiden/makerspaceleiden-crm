@@ -75,5 +75,17 @@ Test QR's
 </table>
 </center>
 
+<h2>Pricelist</h2>
+<table>
+	<tr><th>Price</th><th>Name</th><th>Description</th></tr>
+	{% for item in pricelist %}
+	<tr>
+		<td>{{item.amount}}</td>
+		<td>{{item.name}}</td>
+		<td>{{item.description}}</td>
+	</tr>
+	{% endfor %}
+</table>
 
 {% endblock %}
+

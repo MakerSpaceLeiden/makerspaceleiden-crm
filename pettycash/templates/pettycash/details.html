@@ -33,13 +33,23 @@
 		   <td>{{ h.history_user}}</td>
 		   <td>{{ h.history_change_reason }}</td>
            	</tr>
+		<tr><td colspan=3>
+<h3>Wrong transaction ? </h3>
+<p>
+If you feel this is not correct - you can <a href="{% url 'delete' pk=tx.id  %}">[delete]</a> this transaction.
+			</td>
 		{% endfor %}
 		</table>
 </table>
 {% else %}
-<i>No transactions.</i>
+<i>No transaction found.</i>
 {% endif %}
-<p>
+
+<pre>
+
+
+</pre>
+<hr>
 Return to the <a href="{% url 'transactions' pk=tx.dst.id  %}">[transactions]</a>.
 
 

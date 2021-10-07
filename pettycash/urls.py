@@ -15,6 +15,7 @@ urlpatterns = [
     path('invoice/<int:src>', views.invoice, name='invoice'),
     path('transfer/<int:src>/<int:dst>', views.transfer, name='transfer'),
     path('deposit/<int:dst>', views.deposit, name='deposit'),
+    path('delete/<int:pk>', views.delete, name='delete'),
 
     # User interface - need to be logged in
     path('pay', views.pay, name='pay'),

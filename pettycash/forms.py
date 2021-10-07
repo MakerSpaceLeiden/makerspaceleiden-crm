@@ -21,4 +21,5 @@ class PettycashTransactionForm(ModelForm):
        model = PettycashTransaction
        fields = [ 'src', 'dst', 'description', 'amount' ]
 
-
+class PettycashDeleteForm(forms.Form):
+    reason = forms.CharField(max_length=300, required=False,help_text='Reason for removing this transaction')

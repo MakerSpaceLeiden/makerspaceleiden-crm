@@ -52,14 +52,14 @@ logger = logging.getLogger(__name__)
 
 from .models import PettycashTransaction, PettycashBalanceCache, PettycashSku
 from .admin import PettycashBalanceCacheAdmin, PettycashTransactionAdmin
-from .forms import PettycashTransactionForm
+from .forms import PettycashTransactionForm, PettycashDeleteForm
 from members.models import User, Tag
 
 # Note - we do this here; rather than in the model its save() - as this
 # lets admins change things through the database interface silently. 
 # Which can help when sheparding the community.
 #
-def alertOwnersToChange(tx, userThatMadeTheChange = None, toinform = [], reason=None ):
+def alertOwnersToChange(tx, userThatMadeTheChange = None, toinform = [], reason=None, template = 'email_tx.txt' ):
     src_label = "%s" % tx.src
     dst_label = "%s" % tx.dst
     label = dst_label
@@ -92,8 +92,8 @@ def alertOwnersToChange(tx, userThatMadeTheChange = None, toinform = [], reason=
     # if settings.ALSO_INFORM_EMAIL_ADDRESSES:
     #    toinform.extend(settings.ALSO_INFORM_EMAIL_ADDRESSES)
 
-    subject = render_to_string('email_subject_tx.txt', context).strip()
-    message = render_to_string('email_tx.txt', context)
+    subject = render_to_string('subject_%s' % template, context).strip()
+    message = render_to_string(template, context)
 
     return EmailMessage(subject, message, to=toinform, from_email=settings.DEFAULT_FROM_EMAIL).send()
 
@@ -154,10 +154,12 @@ def transact(request,label,src=None,dst=None,description=None,amount=None,reason
 @login_required
 def index(request,days=30):
     lst = PettycashBalanceCache.objects.all()
+    prices = PettycashSku.objects.all()
     context = {
         'title': 'Balances',
         'lst': lst,
         'settings': settings,
+        'pricelist': prices,
        }
     return render(request, 'pettycash/index.html', context)
 
@@ -249,7 +251,6 @@ def show(request,pk):
         }
     return render(request, 'pettycash/view.html', context)
 
-
 @login_required
 def pay(request):
     amount_str = request.GET.get('amount', None)
@@ -260,6 +261,35 @@ def pay(request):
     amount = Money(amount_str, EUR)
 
     return transact(request,"%s pays %s to the Makerspace" % (mtostr(amount), request.user), src=request.user,dst=settings.POT_ID,amount=amount,description=description, reason="Pay via website")
+
+@login_required
+def delete(request, pk):
+    try:
+       tx = PettycashTransaction.objects.get(id=pk)
+    except ObjectDoesNotExist as e:
+        return HttpResponse("Not found",status=404,content_type="text/plain")
+
+    if request.user != tx.src and request.user != tx.dst and not request.user.is_privileged:
+        return HttpResponse("Not allowed (you can only delete your own payments.",status=404,content_type="text/plain")
+
+    form = PettycashDeleteForm(request.POST or None)
+    if form.is_valid():
+        reason = "%s (by %s)" % (form.cleaned_data['reason'], request.user)
+        tx._change_reason = reason
+        tx.delete();
+        alertOwnersToChange(tx, request.user, [ tx.src.email, tx.dst.email ], reason , 'delete_tx.txt')
+        return redirect('transactions', pk = request.user.id)
+
+    context = {
+        'title': 'Delete transaction %s @ %s' % (tx.id, tx.date),
+        'tx': tx,
+	'settings': settings,
+        'form': form,
+        'user': request.user,
+        'action': 'delete',
+        }
+
+    return render(request, 'pettycash/delete.html', context)
 
 @csrf_exempt
 @superuser_or_bearer_required
