@@ -47,12 +47,20 @@ from moneyed.l10n import format_money
 def mtostr(m):
    return format_money(m, locale='nl_NL')
 
+def client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        return x_forwarded_for.split(',')[0]
+    return request.META.get('REMOTE_ADDR')
+
 import logging
 logger = logging.getLogger(__name__)
 
-from .models import PettycashTransaction, PettycashBalanceCache, PettycashSku
+from .models import PettycashTransaction, PettycashBalanceCache, PettycashSku, PettycashTerminal, PettycashStation
 from .admin import PettycashBalanceCacheAdmin, PettycashTransactionAdmin
-from .forms import PettycashTransactionForm, PettycashDeleteForm
+from .forms import PettycashTransactionForm, PettycashDeleteForm, PettycashPairForm
+
+from .models import pemToSHA256Fingerprint, hexsha2pin
 from members.models import User, Tag
 
 # Note - we do this here; rather than in the model its save() - as this
@@ -187,6 +195,78 @@ def transfer(request,src,dst):
        dst_label = settings.POT_LABEL
 
     return transact(request,'%s to pay %s' % (src,dst_label), src=src, dst=dst, reason="Transfer form website")
+
+@login_required
+def unpaired(request):
+    lst = PettycashTerminal.objects.all().filter(Q(accepted = False) | Q(station = None))
+    paired = PettycashStation.objects.all().filter(~Q(terminal = None))
+    unpaired = PettycashStation.objects.all().filter(Q(terminal = None))
+    context = {
+        'title': 'Unpaired terminals',
+        'lst': lst,
+        'paired': paired,
+        'unpaired': unpaired,
+        'settings': settings,
+       }
+    return render(request, 'pettycash/unpaired.html', context)
+
+@superuser
+def pair(request,pk):
+    try:
+       tx = PettycashTerminal.objects.get(id=pk)
+    except ObjectDoesNotExist as e:
+        return HttpResponse("Not found",status=404,content_type="text/plain")
+
+    form = PettycashPairForm(request.POST or None)
+    if form.is_valid():
+        station = form.cleaned_data['station']
+        reason = "%s. %s paired to %s (by %s)" % (form.cleaned_data['reason'], tx, station, request.user)
+
+        tx.accepted = True
+        tx._change_reason = reason
+        tx.save()
+
+        station.terminal = tx
+        station._change_reason = reason
+        station.save()
+
+        return redirect('unpaired')
+
+    context = {
+        'title': 'Pair %s' % (tx.name),
+        'tx': tx,
+	'settings': settings,
+        'form': form,
+        'user': request.user,
+        'action': 'pair',
+        }
+
+    return render(request, 'pettycash/pair.html', context)
+
+@csrf_exempt
+@superuser_or_bearer_required
+def api_pay(request):
+    try: 
+       node = request.GET.get('node', None)
+       tagstr = request.GET.get('src', None)
+       amount_str = request.GET.get('amount', None)
+       description =  request.GET.get('description', None)
+       amount = Money(amount_str, EUR)
+    except Exception as e:
+        logger.error("Tag %s payment has param issues." % (tagstr) )
+        return HttpResponse("Params problems",status=400,content_type="text/plain")
+
+    if None in [ tagstr, amount_str, description, amount, node ]:
+        logger.error("Missing param, Payment Tag %s denied" % (tagstr) )
+        return HttpResponse("Mandatory params missing",status=400,content_type="text/plain")
+
+    if amount < Money(0,EUR):
+        logger.error("Invalid param. Payment Tag %s denied" % (tagstr) )
+        return HttpResponse("Invalid param",status=400,content_type="text/plain")
+
+    if amount > settings.MAX_PAY_API:
+        logger.error("Payment too high, rejected, Tag %s denied" % (tagstr) )
+    pass
 
 @superuser
 def deposit(request,dst):
@@ -361,6 +441,52 @@ def api_verify(request):
        HttpResponse("FAIL",status=400,content_type="text/plain")
 
     return HttpResponse("OK",status=200,content_type="text/plain")
+
+@csrf_exempt
+def api_register(request):
+    ip = client_ip(request)
+
+    cert = os.environ.get('SSL_CLIENT_CERT')
+    if cert == None:
+       return HttpResponse("No client identifier, rejecting",status=400,content_type="text/plain")
+
+    sha = pemToSHA256Fingerprint(cert)
+
+    try:
+        terminal = PettycashTerminal.objects.get(fingerprint = sha)
+    except ObjectDoesNotExist as e:
+         logger.info("Fingerprint %d not found, adding to the list of unknowns")
+
+         name = request.GET.get('name', None)
+         if not name:
+             return HttpResponse("Bad request, missing name",status=400,content_type="text/plain")
+
+         terminal = PettycashTerminal(fingerprint = sha, name = name, accepted = False)
+         terminal._change_reason = 'Added on first contact; from IP address %s' %( ip )
+         terminal.save()
+         return JsonResponse({})
+
+    if not terminal.accepted:
+         return JsonResponse({})
+
+    try:
+         station = PettycashStation.objects.get(terminal = terminal)
+    except ObjectDoesNotExist as e:
+         return JsonResponse({})
+
+    avail = []
+    for item in station.available_skus.all():
+         avail.append({ 
+             'name': item.name, 
+             'description': item.description, 
+             'price': item.amount.amount,
+             'default': item == station.default_sku
+         })
+    return JsonResponse({
+        'name':		terminal.name,
+        'description':	station.description,
+        'pricelist':	avail,
+    }, safe = False)
 
 @csrf_exempt
 def api_get_skus(request):

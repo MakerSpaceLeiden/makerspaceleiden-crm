@@ -154,11 +154,6 @@ if not os.getenv('LANG'):
     os.environ['LANG'] = LANG
     # locale.setlocale(locale.LANG, LANG)
 
-if not os.getenv('LC_ALL'):
-    LC_ALL='en_US.utf8'
-    os.environ['LC_ALL'] = LC_ALL
-    locale.setlocale(locale.LC_ALL, LC_ALL)
-
 TIME_ZONE = 'Europe/Amsterdam'
 
 USE_I18N = True
@@ -266,6 +261,14 @@ POT_ID = 1
 POT_LABEL = 'Makerspace (de zwarte Pot)'
 CURRENCIES = ['EUR']
 MAX_PAY_API = Money(10.00,EUR)
+
+# Days and max number of unknown terminals to keep.
+# (accepted number of terminals is unconstrained) - this
+# is just for the short period between booting one for
+# the first time and pairing it.
+#
+TERMS_MAX_UNKNOWN=5
+TERMS_DAYS_CUTOFF=5
 
 try:
     from .local import *

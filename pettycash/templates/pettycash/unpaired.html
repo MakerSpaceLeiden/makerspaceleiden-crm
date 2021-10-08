@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% if lst %}
+Pair a <b>Terminal</b> to a <b>Station</b>:
+<p>
+<table>
+	<tr><th>Paircode</th><th>Self/firmware identifier</th><th>First seen</th><th>action</th></tr>
+	{% for b in lst %}
+		<tr>
+			<td>{{ b.paircode }}</td>
+			<td>{{ b.name }}</td>
+			<td>{{ b.date }}</td>
+			<td><a href="{% url 'pair' pk=b.id %}">[ pair ]</a></td>
+		</tr>
+	{% endfor %}
+</table>
+<p/>
+Note: <i>Devices will disappear from this list after {{ settings.TERMS_DAYS_CUTOFF }} days; 
+and only the most recent {{ settings.TERMS_MAX_UNKNOWN }} devices are shown.</i>
+
+{% else %}
+There are currently <b>no</b> unpaired terminals (be sure to start them; and check that they have wifi/network access).
+<p>
+{% endif %}
+
+<p>
+<h3>Paired Stations</h3>
+{% if paired %}
+<table>
+	<tr><th>Terminal identifier</th><th>Station Description</th><th>Station Location</th></tr>
+	{% for b in paired %}
+		<tr>
+			<td>{{ b.terminal.name  }}</td>
+			<td>{{ b.description }}</td>
+			<td>{{ b.location }}</td>
+		</tr>
+		<tr><td></td><td colspan=2</td>
+			<i>
+{%if b.available_skus %}
+	{% for i in b.available_skus.all %}
+		{% if i == b.default_sku %}
+			<b>{{ i }}</b>
+		{% else %}
+			{{ i }}
+		{% endif %}
+	{% endfor %}
+{%else%}
+anything / you can enter a amount.
+{%endif%}
+<a href="{% url 'admin:pettycash_pettycashstation_change' b.id %}">[edit]</a>
+		</td></tr>
+	{% endfor %}
+</table>
+{% else %}
+No paired stations.
+{% endif %}
+
+<h3>Unpaired Stations</h3>
+{% if unpaired %}
+<table>
+	<tr><th>Station Description</th><th>Station Location</th></tr>
+	{% for b in unpaired %}
+		<tr>
+			<td>{{ b.description }}</td>
+			<td>{{ b.location }}</td>
+		</tr>
+		<tr><td></td><td colspan=2</td>
+			<i>
+{%if b.available_skus.all %}
+	{% for i in b.available_skus.all %}
+		{% if i == b.default_sku %}
+			<b>{{ i }}</b>
+		{% else %}
+			{{ i }}
+		{% endif %}
+	{% endfor %}
+{%else%}
+anything / you can enter a amount.
+{%endif%}
+<a href="{% url 'admin:pettycash_pettycashstation_change' b.id %}">[edit]</a>
+		</td></tr>
+	{% endfor %}
+</table>
+{% else %}
+No paired statins.
+{% endif %}
+{% endblock %}
+

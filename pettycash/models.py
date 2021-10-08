@@ -6,8 +6,11 @@ from django.urls import reverse
 from django.core.exceptions import ObjectDoesNotExist,ValidationError
 from django.forms.models import ModelChoiceField
 from django.db.models import Q
+from django.utils import timezone
 
 from django.db.models.signals import pre_delete, pre_save
+
+from acl.models import Location
 
 from django.db import models
 from members.models import User
@@ -17,21 +20,96 @@ from datetime import datetime, timedelta
 import uuid
 import os
 import re
+import base64
+import hashlib
+import binascii
+
 from moneyed import Money, EUR
 
 import logging
 logger = logging.getLogger(__name__)
 
+import base64
+import hashlib
+
+def pemToSHA256Fingerprint(pem):
+    pem = '\n'.join(pem[-1].split('\n')[1:-1])
+    der = base64.b64decode(pem.encode('ascii'))
+    return hashlib.sha256(der).hexdigest()
+
+def hexsha2pin(sha256_hex_a, sha256_hex_b):
+    a = binascii.unhexlify(sha256_hex_a)
+    b = binascii.unhexlify(sha256_hex_b)
+    if (len(a) != 32) or (len(b) != 32):
+        raise NameError('Not a SHA256')
+    fp = hashlib.sha256(a + b).hexdigest()
+    return fp[:6].upper()
+
 class PettycashSku(models.Model):
      name = models.CharField(max_length=300, blank=True, null=True)
      description = models.CharField(max_length=300, blank=True, null=True)
      amount = MoneyField(max_digits=10, decimal_places=2, null=True, default_currency='EUR')
+     history = HistoricalRecords()
+
+     def __str__(self):
+        return '%s (%s)' % (self.name, self.amount)
+
+class PettycashTerminal(models.Model):
+     name = models.CharField(max_length=300, blank=True, null=True, 
+	help_text = 'Name, initially as reported by the firmware. Potentially not unique!')
+     fingerprint = models.CharField(max_length=64, blank=True, null=True,
+	help_text = 'SHA256 fingerprint of the client certificate.')
+     date = models.DateTimeField(blank=True, null = True, 
+	help_text = 'Time and date the device was first seen', auto_now_add = True)
+     accepted = models.BooleanField(default = False,
+	help_text = 'Wether an administrator has checked the fingerprint against the display on the device and accepted it.')
+     history = HistoricalRecords()
+
+     def __str__(self):
+        return self.name
+
+     def paircode(self):
+        cert = os.environ.get('SSL_SERVER_CERT')
+        if cert == None:
+              raise NameError('Not an SSL connection')
+        server_fp = pemToSHA256Fingerprint(cert)
+        client_fp = self.fingerprint
+        logger.info('Paircode: S=%s, C=%s' % (server_fp,client_fp))
+
+        return hexsha2pin(client_fp, server_fp)
+
+     def save(self, * args, ** kwargs):
+        days = settings.TERMS_DAYS_CUTOFF
+        cutoff = timezone.now() - timedelta(days=days)
+
+        # Drop anything that is too old; and only keep the most recent up to
+        # cap -- feeble attempt at foiling obvious DOS.
+        stale = PettycashTerminal.objects.all().filter(Q(accepted = False)).order_by('date')
+        for s in stale.filter(Q(date__lt = cutoff)):
+            s.delete()
+        for s in stale[settings.TERMS_MAX_UNKNOWN:]:
+            s.delete()
+
+        return super(PettycashTerminal,self).save(*args, **kwargs)
+
+class PettycashStation(models.Model):
+     terminal =  models.ForeignKey(PettycashTerminal,related_name='station', on_delete=models.SET_NULL, null = True, blank=True)
+     description = models.CharField(max_length=300, blank=True, null=True)
+     location = models.ForeignKey(Location,related_name="terminalIsLocated",on_delete=models.SET_NULL,null=True)
+     default_sku = models.ForeignKey(PettycashSku,on_delete=models.SET_NULL,blank=True, null=True, related_name='defaultSku', 
+	help_text = 'Default SKU (or the only one) at boot time and reverted to after 60 seconds')
+     available_skus = models.ManyToManyField(PettycashSku,blank=True, related_name='availableSku', 
+	help_text = 'SKUs avaialble at this terminal, when supported (or empty)')
+     history = HistoricalRecords()
+
+     def __str__(self):
+        return self.description
 
 class PettycashBalanceCache(models.Model):
      owner = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null = True)
 
      balance = MoneyField(max_digits=10, decimal_places=2, null=True, default_currency='EUR')
-     last = models.ForeignKey('PettycashTransaction', on_delete=models.SET_DEFAULT, null=True, blank=True, default = None, verbose_name = 'Last transaction that changed the balance')
+     last = models.ForeignKey('PettycashTransaction', on_delete=models.SET_DEFAULT, null=True, blank=True, default = None, help_text = 'Last transaction that changed the balance')
 
      history = HistoricalRecords()
 
@@ -45,7 +123,7 @@ def adjust_balance_cache(last, dst,amount):
      try:
            balance = PettycashBalanceCache.objects.get(owner=dst)
      except ObjectDoesNotExist as e:
-           print("Warning - creating for dst=%s" % (dst))
+           logger.info("Warning - creating for dst=%s" % (dst))
 
            balance =  PettycashBalanceCache(owner=dst,balance=Money(0,EUR))
            for tx in PettycashTransaction.objects.all().filter(Q(dst=dst)):
@@ -56,10 +134,10 @@ def adjust_balance_cache(last, dst,amount):
      balance.save()
 
 class PettycashTransaction(models.Model):
-     dst = models.ForeignKey(User, verbose_name='Paid to', on_delete=models.CASCADE, related_name = 'isReceivedBy', blank=True, null = True)
-     src = models.ForeignKey(User, verbose_name='Paid by', on_delete=models.CASCADE, related_name = 'isSentBy',  blank=True, null = True)
+     dst = models.ForeignKey(User, help_text='Paid to', on_delete=models.CASCADE, related_name = 'isReceivedBy', blank=True, null = True)
+     src = models.ForeignKey(User, help_text='Paid by', on_delete=models.CASCADE, related_name = 'isSentBy',  blank=True, null = True)
 
-     date =  models.DateTimeField(blank=True, null = True, verbose_name = 'Date of transaction')
+     date =  models.DateTimeField(blank=True, null = True, help_text = 'Date of transaction')
 
      amount = MoneyField(max_digits=10, decimal_places=2, null=True, default_currency='EUR')
      description = models.CharField(max_length=300, blank=True, null=True)
@@ -83,7 +161,7 @@ class PettycashTransaction(models.Model):
              adjust_balance_cache(self, self.src, self.amount)
              adjust_balance_cache(self, self.dst, -self.amount)
          except Exception as e:
-             print("Transaction cache failure on delete: %s" % (e))
+             logger.error("Transaction cache failure on delete: %s" % (e))
 
          return rc
 
@@ -105,6 +183,7 @@ class PettycashTransaction(models.Model):
              adjust_balance_cache(self, self.src, -self.amount)
              adjust_balance_cache(self, self.dst, self.amount)
          except Exception as e:
-             print("Transaction cache failure: %s" % (e))
+             logger.error("Transaction cache failure: %s" % (e))
 
          return rc
+

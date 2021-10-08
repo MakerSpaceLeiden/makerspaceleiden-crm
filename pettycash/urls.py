@@ -17,6 +17,9 @@ urlpatterns = [
     path('deposit/<int:dst>', views.deposit, name='deposit'),
     path('delete/<int:pk>', views.delete, name='delete'),
 
+    path('unpaired', views.unpaired, name='unpaired'),
+    path('pair/<int:pk>', views.pair, name='pair'),
+
     # User interface - need to be logged in
     path('pay', views.pay, name='pay'),
 
@@ -27,4 +30,5 @@ urlpatterns = [
     path('api/v1/nonce', views.api_nonce, name='acl-v1-noce'),
     path('api/v1/skus', views.api_get_skus, name='acl-v1-get-skus'),
     path('api/v1/sku/<int:sku>', views.api_get_sku, name='acl-v1-get-sku'),
+    path('api/v1/register', views.api_register, name='acl-v1-register'),
 ]
