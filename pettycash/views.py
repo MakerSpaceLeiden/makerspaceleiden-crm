@@ -492,7 +492,7 @@ def api_register(request):
 def api_get_skus(request):
     out =[]
     for item in PettycashSku.objects.all():
-       out.append({ 'id': item.pk,  'name': item.name, 'description': item.description, 'price': item.amount.amount })
+       out.append({ 'name': item.name, 'description': item.description, 'price': item.amount.amount })
     
     return JsonResponse(out, safe=False)
 
