@@ -15,7 +15,8 @@ class PettycashSkuAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     pass
 
 class PettycashTerminalAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
-    list_display = ('accepted', 'paircode', 'name', 'date')
+    list_display = ('accepted', 'name', 'date')
+    readonly_fields = ['fingerprint','nonce']
     pass
 
 class PettycashStationAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):

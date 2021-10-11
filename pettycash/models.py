@@ -70,16 +70,6 @@ class PettycashTerminal(models.Model):
      def __str__(self):
         return self.name
 
-     def paircode(self):
-        cert = os.environ.get('SSL_SERVER_CERT')
-        if cert == None:
-              raise NameError('Not an SSL connection')
-        server_fp = pemToSHA256Fingerprint(cert)
-        client_fp = self.fingerprint
-        logger.info('Paircode: S=%s, C=%s' % (server_fp,client_fp))
-
-        return hexsha2pin(client_fp, server_fp)
-
      def save(self, * args, ** kwargs):
         days = settings.TERMS_DAYS_CUTOFF
         cutoff = timezone.now() - timedelta(days=days)

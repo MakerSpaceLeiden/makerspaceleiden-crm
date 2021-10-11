@@ -1,28 +1,6 @@
 {% extends 'base.html' %}
 
 {% block content %}
-{% if tx.accepted %}
-<!-- this unit was accepted before -->
-{% else %}
-<h2>Important</h2>
-
-<p>This is the first time this terminal gets paired.</p>
-
-<p>To make sure that the connection is secure, double check that the pairing code
-that is currently shown on the display is correct.  </p>
-
-<p>The display should show:</p>
-<p>
-	<blockquote>PAIR <code><font size=+4>{{ tx.paircode }}</code></font></blockquote>
-</p>
-And only continue if these two numbers are identical. </p>
-<p>If not then something is not secure.</p>
-<pre>
-
-
-</pre>
-{%endif%}
-
 <form method="post"  enctype="multipart/form-data">
 <table>
     {% csrf_token %}

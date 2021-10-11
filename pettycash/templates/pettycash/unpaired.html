@@ -9,7 +9,6 @@ Pair a <b>Terminal</b> to a <b>Station</b>:
 	<tr><th>Paircode</th><th>Self/firmware identifier</th><th>First seen</th><th>action</th></tr>
 	{% for b in lst %}
 		<tr>
-			<td>{{ b.paircode }}</td>
 			<td>{{ b.name }}</td>
 			<td>{{ b.date }}</td>
 			<td><a href="{% url 'pair' pk=b.id %}">[ pair ]</a></td>
