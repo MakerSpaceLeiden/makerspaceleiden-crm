@@ -202,7 +202,7 @@ def transfer(request,src,dst):
 def unpaired(request):
     lst = PettycashTerminal.objects.all().filter(Q(accepted = False) | Q(station = None))
     paired = PettycashStation.objects.all().filter(~Q(terminal = None))
-    unpaired = PettycashStation.objects.all().filter(Q(terminal = None))
+    unpaired = PettycashStation.objects.all().filter(Q(terminal = None) & Q(activated = True))
     context = {
         'title': 'Unpaired terminals',
         'lst': lst,
