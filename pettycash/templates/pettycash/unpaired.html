@@ -3,29 +3,48 @@
 {% block content %}
 
 {% if lst %}
-Pair a <b>Terminal</b> to a <b>Station</b>:
+Assign a <b>Terminal</b> to a <b>Station</b>:
 <p>
 <table>
-	<tr><th>Paircode</th><th>Self/firmware identifier</th><th>First seen</th><th>action</th></tr>
+	<tr><th>Self/firmware identifier</th><th>Fingerprint</th><th>Accepted on</th><th>action</th></tr>
 	{% for b in lst %}
 		<tr>
 			<td>{{ b.name }}</td>
+			<td><code>{{ b.fingerprint}}</code></td>
 			<td>{{ b.date }}</td>
 			<td><a href="{% url 'pair' pk=b.id %}">[ pair ]</a></td>
 		</tr>
 	{% endfor %}
 </table>
 <p/>
-Note: <i>Devices will disappear from this list after {{ settings.TERMS_DAYS_CUTOFF }} days; 
-and only the most recent {{ settings.TERMS_MAX_UNKNOWN }} devices are shown.</i>
+Note: <i>Only devices that have been fully paired & accepte show up here.</i>
 
 {% else %}
-There are currently <b>no</b> unpaired terminals (be sure to start them; and check that they have wifi/network access).
+There are currently <b>no</b> unassigned terminals (be sure to start them; and check that they have wifi/network access).
 <p>
 {% endif %}
 
+{% if unlst %}
+<h3>Terminals waiting for acceptance</h3>
+
+The following terminal(s) have not yet been accepted (e.g. with a tag-swipe by an admin).
 <p>
-<h3>Paired Stations</h3>
+<table>
+	<tr><th>Self/firmware identifier</th><th>Fingerprint</th><th>Last attempt</th></tr>
+	{% for b in unlst %}
+		<tr>
+			<td>{{ b.name }}</td>
+			<td><code>{{ b.fingerprint}}</code></td>
+			<td>{{ b.date }}</td>
+		</tr>
+	{% endfor %}
+</table>
+{% else %}
+There are currently no terminals waiting for acceptance.
+{%endif %}
+
+<p>
+<h3>Stations with terminals assigned</h3>
 {% if paired %}
 <table>
 	<tr><th>Terminal identifier</th><th>Station Description</th><th>Station Location</th></tr>
@@ -53,10 +72,10 @@ anything / you can enter a amount.
 	{% endfor %}
 </table>
 {% else %}
-No paired stations.
+No stations.
 {% endif %}
 
-<h3>Unpaired Stations</h3>
+<h3>Stations without a terminal</h3>
 {% if unpaired %}
 <table>
 	<tr><th>Station Description</th><th>Station Location</th></tr>
@@ -83,7 +102,7 @@ anything / you can enter a amount.
 	{% endfor %}
 </table>
 {% else %}
-No paired statins.
+No stations that lack a terminal.
 {% endif %}
 {% endblock %}
 

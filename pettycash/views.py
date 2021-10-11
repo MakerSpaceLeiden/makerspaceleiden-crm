@@ -200,12 +200,14 @@ def transfer(request,src,dst):
 
 @login_required
 def unpaired(request):
-    lst = PettycashTerminal.objects.all().filter(Q(accepted = False) | Q(station = None))
+    lst = PettycashTerminal.objects.all().filter(Q(accepted = True) & Q(station = None))
+    unlst = PettycashTerminal.objects.all().filter(Q(accepted = False))
     paired = PettycashStation.objects.all().filter(~Q(terminal = None))
-    unpaired = PettycashStation.objects.all().filter(Q(terminal = None) & Q(activated = True))
+    unpaired = PettycashStation.objects.all().filter(Q(terminal = None))
     context = {
-        'title': 'Unpaired terminals',
+        'title': 'Assigning terminal',
         'lst': lst,
+        'unlst': unlst,
         'paired': paired,
         'unpaired': unpaired,
         'settings': settings,
