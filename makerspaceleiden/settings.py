@@ -251,7 +251,7 @@ ML_ADMINURL = 'https://mailman.foo.com/mailman'
 SENSOR_USER_GROUP = 'mains Sensor Admins'
 NETADMIN_USER_GROUP = 'network admins'
 PETTYCASH_DEMO_USER_GROUP='pettycash demo group'
-
+PETTYCASH_ADMIN_GROUP=PETTYCASH_DEMO_USER_GROUP
 
 # REGISTRATION_OPEN = False
 
@@ -261,6 +261,7 @@ POT_ID = 1
 POT_LABEL = 'Makerspace (de zwarte Pot)'
 CURRENCIES = ['EUR']
 MAX_PAY_API = Money(10.00,EUR)
+PAY_MAXNONCE_AGE_MINUTES = 20
 
 # Days and max number of unknown terminals to keep.
 # (accepted number of terminals is unconstrained) - this

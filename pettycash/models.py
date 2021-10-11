@@ -59,8 +59,10 @@ class PettycashTerminal(models.Model):
 	help_text = 'Name, initially as reported by the firmware. Potentially not unique!')
      fingerprint = models.CharField(max_length=64, blank=True, null=True,
 	help_text = 'SHA256 fingerprint of the client certificate.')
+     nonce = models.CharField(max_length=64, blank=True, null=True,
+	help_text = '256 bit nonce (as HEX)')
      date = models.DateTimeField(blank=True, null = True, 
-	help_text = 'Time and date the device was first seen', auto_now_add = True)
+	help_text = 'Time and date the device was last seen', auto_now_add = True)
      accepted = models.BooleanField(default = False,
 	help_text = 'Wether an administrator has checked the fingerprint against the display on the device and accepted it.')
      history = HistoricalRecords()

@@ -413,61 +413,65 @@ def api_pay(request):
 
     return HttpResponse("FAIL",status=500,content_type="text/plain")
 
-def get_nonce(age = 0):
-    now = time.time()
-    m = hashlib.sha256()
-    m.update(int(now / settings.NONCE_AGE) - age)
-    m.update(settings.NONCE_SEED)
-    m.update(client_cert)
-    m.update(server_cert)
-    return m.hexdigest() 
-
-def check_nonce(nonce):
-    for tm in [ 0, 1, 2]:
-        if tm == nonce:
-            return True
-    return False
-
-@csrf_exempt
-def api_nonce(request):
-    nonce = get_nonce()
-    return HttpResponse(nonce, status=500,content_type="text/plain")
-
-@csrf_exempt
-def api_verify(request):
-    token = request.GET.get('node', None)
-
-    if not check_nonce(token):
-       HttpResponse("FAIL",status=400,content_type="text/plain")
-
-    return HttpResponse("OK",status=200,content_type="text/plain")
-
 @csrf_exempt
 def api_register(request):
     ip = client_ip(request)
 
-    cert = os.environ.get('SSL_CLIENT_CERT')
+    cert = os.environ.get('SSL_CLIENT_CERT', None)
     if cert == None:
        return HttpResponse("No client identifier, rejecting",status=400,content_type="text/plain")
 
-    sha = pemToSHA256Fingerprint(cert)
+    client_sha = pemToSHA256Fingerprint(cert)
+    server_sha = pemToSHA256Fingerprint(os.environ['SSL_SERVER_CERT'])
 
     try:
-        terminal = PettycashTerminal.objects.get(fingerprint = sha)
+        terminal = PettycashTerminal.objects.get(fingerprint = client_sha)
+
     except ObjectDoesNotExist as e:
-         logger.info("Fingerprint %d not found, adding to the list of unknowns")
+         logger.info("Fingerprint %s not found, adding to the list of unknowns" % sha)
 
          name = request.GET.get('name', None)
          if not name:
              return HttpResponse("Bad request, missing name",status=400,content_type="text/plain")
 
          terminal = PettycashTerminal(fingerprint = sha, name = name, accepted = False)
+         terminal.nonce = secrets.token_hex(64)
+         terminal.accepted = False
          terminal._change_reason = 'Added on first contact; from IP address %s' %( ip )
          terminal.save()
-         return JsonResponse({})
+         return HttpResponse(terminal.nonce,status=401,content_type="text/plain")
 
     if not terminal.accepted:
-         return JsonResponse({})
+         cutoff = timezone.now() - datetime.timedelta(minutes=settings.PAY_MAXNONCE_AGE_MINUTES)
+         if cutoff > terminal.date:
+             logger.info("Fingerprint %s known, but too old. Issuing new one." % client_sha)
+             terminal.nonce = secrets.token_hex(64)
+             terminal._change_reason = "Updating nonce, repeat register; but the old one was too old."
+             terminal.save()
+             return HttpResponse(terminal.nonce,status=401,content_type="text/plain")
+
+         response= request.GET.get('response', None)
+         if not response:
+             return HttpResponse("Bad request, missing response",status=400,content_type="text/plain")
+
+         # This response should be the SHA256 of nonce + tag + client-cert-sha256 + server-cert-256.
+         # and the tag should be owned by someone whcih has the right admin rights.
+         #
+         for tag in Tag.objects.all().filter(owner__groups__name = PETTYCASH_ADMIN_GROUP):
+            m = hashlib.sha256()
+            m.update(terminal.nonce)
+            m.update(tag.tag)
+            m.update(client_sha)
+            m.update(server_sha)
+            if h.hexdigest() == response:
+                terminal.accepted = True
+                terminal._change_reason = "Terminal %s, IP=%s was activated by tag %d of %s" % (terminal, ip, tag.id, tag.owner)
+                terminal.save()
+                logger.info("Terminal %s accepted, tag swipe by %s matched." % (terminal, tag.owner))
+                return HttpResponse("OK",status=200,content_type="text/plain")
+
+         logger.info("Nonce & fingerprint ok; but response could not be correlated to a tag (%s, ip=%si)" % (terminal, ip))
+         return HttpResponse("Pairing failed",status=400,content_type="text/plain")
 
     try:
          station = PettycashStation.objects.get(terminal = terminal)
@@ -482,6 +486,7 @@ def api_register(request):
              'price': item.amount.amount,
              'default': item == station.default_sku
          })
+
     return JsonResponse({
         'name':		terminal.name,
         'description':	station.description,
