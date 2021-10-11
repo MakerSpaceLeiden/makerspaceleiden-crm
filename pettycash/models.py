@@ -33,7 +33,7 @@ import base64
 import hashlib
 
 def pemToSHA256Fingerprint(pem):
-    pem = '\n'.join(pem[-1].split('\n')[1:-1])
+    pem = pem[27:-25]
     der = base64.b64decode(pem.encode('ascii'))
     return hashlib.sha256(der).hexdigest()
 

@@ -40,6 +40,8 @@ import zipfile
 import os
 import re
 import secrets
+import hashlib
+from django.utils import timezone
 
 from moneyed import Money, EUR
 from moneyed.l10n import format_money
@@ -417,60 +419,66 @@ def api_pay(request):
 def api_register(request):
     ip = client_ip(request)
 
-    cert = os.environ.get('SSL_CLIENT_CERT', None)
+    cert = request.META.get('SSL_CLIENT_CERT', None)
     if cert == None:
        return HttpResponse("No client identifier, rejecting",status=400,content_type="text/plain")
 
     client_sha = pemToSHA256Fingerprint(cert)
-    server_sha = pemToSHA256Fingerprint(os.environ['SSL_SERVER_CERT'])
+    server_sha = pemToSHA256Fingerprint(request.META.get('SSL_SERVER_CERT'))
 
     try:
         terminal = PettycashTerminal.objects.get(fingerprint = client_sha)
 
     except ObjectDoesNotExist as e:
-         logger.info("Fingerprint %s not found, adding to the list of unknowns" % sha)
+         logger.info("Fingerprint %s not found, adding to the list of unknowns" % client_sha)
 
          name = request.GET.get('name', None)
          if not name:
+             logger.error("Bad request, missing name for %s at %s" % (client_sha, ip))
              return HttpResponse("Bad request, missing name",status=400,content_type="text/plain")
 
-         terminal = PettycashTerminal(fingerprint = sha, name = name, accepted = False)
-         terminal.nonce = secrets.token_hex(64)
+         terminal = PettycashTerminal(fingerprint = client_sha, name = name, accepted = False)
+         terminal.nonce = secrets.token_hex(32)
          terminal.accepted = False
          terminal._change_reason = 'Added on first contact; from IP address %s' %( ip )
          terminal.save()
+
+         logger.info("Issuing first time nonce to %s at %s" % (client_sha, ip))
          return HttpResponse(terminal.nonce,status=401,content_type="text/plain")
 
     if not terminal.accepted:
          cutoff = timezone.now() - datetime.timedelta(minutes=settings.PAY_MAXNONCE_AGE_MINUTES)
          if cutoff > terminal.date:
              logger.info("Fingerprint %s known, but too old. Issuing new one." % client_sha)
-             terminal.nonce = secrets.token_hex(64)
+             terminal.nonce = secrets.token_hex(32)
+             terminal.date = timezone.now()
              terminal._change_reason = "Updating nonce, repeat register; but the old one was too old."
              terminal.save()
+             logger.info("Updating nonce for  %s at %s" % (client_sha, ip))
              return HttpResponse(terminal.nonce,status=401,content_type="text/plain")
 
          response= request.GET.get('response', None)
          if not response:
+             logger.error("Bad request, missing response for %s at %s" % (client_sha, ip))
              return HttpResponse("Bad request, missing response",status=400,content_type="text/plain")
 
          # This response should be the SHA256 of nonce + tag + client-cert-sha256 + server-cert-256.
          # and the tag should be owned by someone whcih has the right admin rights.
          #
-         for tag in Tag.objects.all().filter(owner__groups__name = PETTYCASH_ADMIN_GROUP):
+         for tag in Tag.objects.all().filter(owner__groups__name = settings.PETTYCASH_ADMIN_GROUP):
             m = hashlib.sha256()
-            m.update(terminal.nonce)
-            m.update(tag.tag)
-            m.update(client_sha)
-            m.update(server_sha)
-            if h.hexdigest() == response:
+            m.update(terminal.nonce.encode('ascii'))
+            m.update(tag.tag.encode('ascii'))
+            m.update(client_sha.encode('ascii'))
+            m.update(server_sha.encode('ascii'))
+            if m.hexdigest() == response:
                 terminal.accepted = True
                 terminal._change_reason = "Terminal %s, IP=%s was activated by tag %d of %s" % (terminal, ip, tag.id, tag.owner)
                 terminal.save()
                 logger.info("Terminal %s accepted, tag swipe by %s matched." % (terminal, tag.owner))
                 return HttpResponse("OK",status=200,content_type="text/plain")
 
-         logger.info("Nonce & fingerprint ok; but response could not be correlated to a tag (%s, ip=%si)" % (terminal, ip))
+         logger.error("Nonce & fingerprint ok; but response could not be correlated to a tag (%s, ip=%si)" % (terminal, ip))
          return HttpResponse("Pairing failed",status=400,content_type="text/plain")
 
     try:
