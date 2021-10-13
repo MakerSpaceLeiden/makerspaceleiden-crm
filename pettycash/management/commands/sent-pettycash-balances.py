@@ -40,6 +40,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
+        verbosity = int(options['verbosity'])
         rc = 0
 
         if options['save']:
@@ -50,7 +51,9 @@ class Command(BaseCommand):
         if options['to']:
            dest = options['to']
 
-        balances = PettycashBalanceCache.objects.all().order_by('balance')
+        balances = PettycashBalanceCache.objects.order_by('balance')
+        if  verbosity < 2:
+            balances = balances.filter(Q(balance__gt = Money(0,EUR)) | Q(balance__lt  = Money(0,EUR)))
         sendEmail(balances, dest)
 
         sys.exit(rc)

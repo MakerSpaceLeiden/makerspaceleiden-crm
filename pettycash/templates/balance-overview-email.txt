@@ -21,7 +21,6 @@ the makerspace bot, on behalf of the trusteeds (bestuur@makerspaceleiden.nl).
 Balances as of {{ date }}
 
 {% for b in balances %}
-{{ b.owner|rjust:30 }} {{ b.balance }}
-{% endfor %}
+{{ b.owner|rjust:30 }} {{ b.balance }}{% endfor %}
 
 
