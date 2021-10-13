@@ -16,7 +16,7 @@ Or consult your personal page at:
 
 Yours,
 
-the makerspace bot, on behalf of the trusteeds (bestuur@makerspaceleiden.nl).
+the makerspace bot, on behalf of the trustees (bestuur@makerspaceleiden.nl).
 
 Balances as of {{ date }}
 
