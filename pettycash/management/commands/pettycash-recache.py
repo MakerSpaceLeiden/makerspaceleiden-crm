@@ -26,6 +26,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         rc = 0
+        verbosity = int(options['verbosity'])
 
         for user in User.objects.all():
            balance =  PettycashBalanceCache(owner=user, balance=Money(0,EUR))
@@ -58,6 +59,7 @@ class Command(BaseCommand):
                 if not options['dryrun']:
                      balance._change_reason = act
                      balance.save()
-           print("%s: %s%s" % (user, balance.balance, err))
+           if err != '' or verbosity > 1:
+              print("%s: %s%s" % (user, balance.balance, err))
 
         sys.exit(rc)
