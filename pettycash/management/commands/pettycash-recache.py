@@ -58,7 +58,6 @@ class Command(BaseCommand):
                 if not options['dryrun']:
                      balance._change_reason = act
                      balance.save()
-
-           print("%s: %s%s (ok, no changes)" % (user, balance.balance, err))
+           print("%s: %s%s" % (user, balance.balance, err))
 
         sys.exit(rc)
