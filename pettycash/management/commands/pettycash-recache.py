@@ -16,17 +16,26 @@ import datetime
 class Command(BaseCommand):
     help = 'Recache all balances'
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '--dry-run',
+            action='store_true',
+            dest='dryrun',
+            help='Do a dry-run; do not actually save.',
+        )
+
     def handle(self, *args, **options):
         rc = 0
 
         for user in User.objects.all():
            balance =  PettycashBalanceCache(owner=user, balance=Money(0,EUR))
            old_balance = Money(0,EUR)
-
+           act = 'correction'
            try:
               balance = PettycashBalanceCache.objects.get(owner=user)
               old_balance = balance.balance
            except ObjectDoesNotExist as e:
+              act = 'initial creation'
               pass
 
            balance.balance = Money(0,EUR)
@@ -44,11 +53,12 @@ class Command(BaseCommand):
 
            old_balance = old_balance - balance.balance
            err = ''
-           if old_balance != Money(0,EUR):
-                err = ' (error: %s)' % old_balance
+           if old_balance != Money(0,EUR) or act == 'initial creation':
+                err = ' (%s: %s)' % (act, old_balance)
+                if not options['dryrun']:
+                     balance._change_reason = act
+                     balance.save()
 
-           print("%s: %s%s" % (user, balance.balance, err))
+           print("%s: %s%s (ok, no changes)" % (user, balance.balance, err))
 
-           balance.save()
-           
         sys.exit(rc)
