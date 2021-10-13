@@ -1,0 +1,27 @@
+L.S.,
+
+It is that time of the month again. Your spacebot has been doing the
+sums; and below are everyones balances.
+
+As always - you can see the complete list at
+
+	{{ base }}{% url 'balances' %} 
+
+where you can also browse to the specific transactions.  And here you 
+can also fix any mistakes.
+
+Or consult your personal page at:
+
+	{{ base }}{% url 'personal_page' %} 
+
+Yours,
+
+the makerspace bot, on behalf of the trusteeds (bestuur@makerspaceleiden.nl).
+
+Balances as of {{ date }}
+
+{% for b in balances %}
+{{ b.owner|rjust:30 }} {{ b.balance }}
+{% endfor %}
+
+
