@@ -25,6 +25,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.urls import reverse
 from django.forms import widgets
 from django.http import JsonResponse
+from django.middleware.csrf import CsrfViewMiddleware
 
 
 from django.views.decorators.csrf import csrf_exempt
@@ -60,9 +61,10 @@ logger = logging.getLogger(__name__)
 
 from .models import PettycashTransaction, PettycashBalanceCache, PettycashSku, PettycashTerminal, PettycashStation
 from .admin import PettycashBalanceCacheAdmin, PettycashTransactionAdmin
-from .forms import PettycashTransactionForm, PettycashDeleteForm, PettycashPairForm
-
+from .forms import PettycashTransactionForm, PettycashDeleteForm, PettycashPairForm, CamtUploadForm, ImportProcessForm
 from .models import pemToSHA256Fingerprint, hexsha2pin
+from .camt53 import camt53_process
+
 from members.models import User, Tag
 
 # Note - we do this here; rather than in the model its save() - as this
@@ -213,6 +215,76 @@ def unpaired(request):
         'settings': settings,
        }
     return render(request, 'pettycash/unpaired.html', context)
+
+@superuser
+def cam53upload(request):
+    if request.method == 'POST':
+        form = CamtUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            try:
+               file = request.FILES['cam53file']
+               print(file)
+               txs = camt53_process(file)
+                
+               valids = any(d['success'] for d in txs)
+
+               ids = []
+               for tx in txs:
+                   if tx['success']:
+                      ids.append({ 'description' : tx['description'], 'user': tx['user'], 'amount': tx['amount'], 
+                          'change_reason': "TXREF=%s HOLDER=%s IBAN=%s import, ran by %s" % (tx['ref'], tx['name_str'],tx['iban_str'], request.user ) })
+
+               okf = ImportProcessForm(ids) # list(map(lambda x: x['id'], txs)))
+
+               context = { 'title': 'Import log', 'settings': settings, 'txs': txs, 'valids': valids, 'form': okf, 'action': 'Deposit for real' }
+               return render(request, 'pettycash/importlog.html', context)
+ 
+            except Exception as e:
+                return HttpResponse("FAIL: %s" % e,status=500,content_type="text/plain")
+
+            # Redirect to the document list after POST
+            return HttpResponse("Unknown FAIL",status=500,content_type="text/plain")
+    else:
+        form = CamtUploadForm() # A empty, unbound form
+
+    context = {
+        'title': 'Upload CAM53 transactions',
+	'settings': settings,
+        'form': form,
+        'action': 'upload',
+        }
+    return render(request,'pettycash/upload.html', context)
+
+@superuser
+def cam53process(request):
+    if request.method != 'POST':
+       return HttpResponse("Unknown FAIL",status=400,content_type="text/plain")
+
+    reason = CsrfViewMiddleware().process_view(request, None, (), {})
+    if reason:
+       return HttpResponse("CSRF FAIL",status=400,content_type="text/plain")
+
+    ok = []
+    failed= []
+    skipped = []
+    vals = request.POST.dict()
+    for i in range(int(vals['vals'])):
+      try:
+          if vals.get('ok_%d' % i,'off') == 'on':
+               user = User.objects.get(id = vals['user_%d' % i])
+               amount = Money(vals['amount_%d' % i], EUR)
+               tx = PettycashTransaction(src=User.objects.get(id = settings.POT_ID), dst=user, amount=amount)
+               tx.description = vals['description_%d' % i]
+               tx._change_reason = vals['change_reason_%d' % i]
+               tx.save()
+               ok.append(tx)
+          else:
+               skipped.append('%s: %s' % (vals.get('description_%d' % i, "??"), vals.get('amount_%d' % i, "??")))
+      except Exception as e:
+         failed.append('%d: %s %s: %s<br>%s' % (i, vals.get('change_reason_%d' % i, "??"), vals.get('description_%d' % i, "??"), vals.get('amount_%d' % i, "??"),e))
+
+    context = { 'title': 'Import Results', 'settings': settings, 'ok': ok, 'failed': failed, 'skipped': skipped }
+    return render(request, 'pettycash/importlog-results.html', context)
 
 @superuser
 def pair(request,pk):

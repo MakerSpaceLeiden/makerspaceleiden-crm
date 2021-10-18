@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<form method="post"  enctype="multipart/form-data">
+<table>
+    {% csrf_token %}
+    {{ form.as_table }}
+    <tr>
+	    <td></td>
+	    <td>
+		    <button type="submit">{{ action }}</button>
+			or <a href='{% url "balances" %}'>cancel</a>.
+	    </td></tr>
+</table>
+</form>
+{% endblock %}

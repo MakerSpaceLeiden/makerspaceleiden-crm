@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load isingroup %}
+
+{% block content %}
+
+{% if failed %}
+<h1>FAILED</h1>
+<ul>
+	{% for i in failed %}
+		<li> {{ i }}
+	{% endfor %}
+</ul>
+<h1>Processed</h1>
+{% else %}
+All selected transactions successfuly processed.
+<p>
+{% endif %}
+
+{% if ok %}
+<ul>
+	{% for i in ok %}
+		<li> {{ i.description }} -- {{ i.amount }}
+	{% endfor %}
+</ul>
+{% else %}
+No transactions processed.
+{% endif %}
+
+{% if skipped %}
+<h1>Skipped</h1>
+
+Deselected transactions that were skipped:
+<ul>
+	{% for i in skipped %}
+		<li> {{ i }}
+	{% endfor %}
+</ul>
+{% endif %}
+<p>
+Return to the <a href="{% url 'balances' %}">[balances]</a>.
+
+{% endblock %}
+

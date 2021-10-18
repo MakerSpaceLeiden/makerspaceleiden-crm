@@ -17,6 +17,9 @@ urlpatterns = [
     path('deposit/<int:dst>', views.deposit, name='deposit'),
     path('delete/<int:pk>', views.delete, name='delete'),
 
+    path('cam53upload', views.cam53upload, name='cam53upload'),
+    path('cam53process', views.cam53process, name='cam53process'),
+
     path('unpaired', views.unpaired, name='unpaired'),
     path('pair/<int:pk>', views.pair, name='pair'),
 

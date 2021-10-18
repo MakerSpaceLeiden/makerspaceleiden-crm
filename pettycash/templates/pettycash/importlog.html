@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load isingroup %}
+
+{% block content %}
+
+{{ form.errors }}
+{{ form.non_field_errors }}
+
+<h1>Depositing</h1>
+
+<form method="post"  enctype="multipart/form-data"  action={% url 'cam53process' %}>
+{%if valids %}
+{% csrf_token %}
+{{ form.as_table}}
+<p>
+<button type="submit">{{ action }}</button>
+                        or <a href='{% url "cam53upload" %}'>cancel</a>.
+{% else %}
+No valid transactions. Nothing deposited.
+{% endif %}
+<p/>
+</form>
+
+<h1>Ignoring</h1>
+<table>
+{% for tx in txs %}
+	<tr>
+		<td>{{ tx.ref}}</td>
+		<td>{{ tx.iban_str}}</td>
+		<td>{{ tx.amount_str}}</td>
+		<td>{{ tx.name_str}}</td>
+		<td>{{ tx.details}}</td>
+	</tr>
+	<tr>
+		<td></td>
+		<td colspan=4>
+			<font 
+				{% if tx.error %} color=red>{% endif %}
+			>
+			{{ tx.msg }}
+			</font>
+		</td>
+	</tr>
+{% endfor %}
+</table>
+
+<pre>
+
+
+</pre>
+{% endblock %}
