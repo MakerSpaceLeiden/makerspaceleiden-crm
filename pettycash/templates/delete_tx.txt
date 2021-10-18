@@ -16,6 +16,10 @@ by {{ user }}:
 
 Should this be wrong; let one of the trustee's know at {{ settings.TRUSTEES }}. 
 
+Or consult your personal page at: 
+
+        {{ base }}{% url 'mytransactions' %} 
+
 Your friendly makerbot.
 -- 
 Makerspace Leiden, internal payment notifcations.

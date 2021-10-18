@@ -12,7 +12,9 @@ can also fix any mistakes.
 
 Or consult your personal page at:
 
-	{{ base }}{% url 'personal_page' %} 
+	{{ base }}{% url 'mytransactions' %} 
+
+for just your own transadtions.
 
 Yours,
 

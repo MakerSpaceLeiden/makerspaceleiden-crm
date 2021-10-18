@@ -301,6 +301,10 @@ def showtx(request,pk):
 
 
 @login_required
+def show_mine(request):
+    return show(request,request.user.id)
+
+@login_required
 def show(request,pk):
     try:
        user = User.objects.get(id=pk)
