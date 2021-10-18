@@ -28,7 +28,7 @@ See {{ base }}{% url 'mytransactions' %} for the full details.
 
 Yours,
 
-the makerspace bot, on behalf of the trusteeds (bestuur@makerspaceleiden.nl).
+the makerspace bot, on behalf of the trustees (bestuur@makerspaceleiden.nl).
 
 
 {% for tx in transactions %}
