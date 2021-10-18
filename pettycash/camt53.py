@@ -132,7 +132,7 @@ def process(e,namespaces):
 
         try:
            h = PettycashTransaction.history.filter(Q(history_change_reason__contains = ref))
-           if h.count() > 10:
+           if h.count() > 0:
               out['msg'] = "ERROR - Skipping, already %d transction(s) in the history with identifier=%s: first:%s" % (h.count(),ref,h.first())
               out['error'] = True
               return out

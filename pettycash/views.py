@@ -277,6 +277,7 @@ def cam53process(request):
                tx.description = vals['description_%d' % i]
                tx._change_reason = vals['change_reason_%d' % i]
                tx.save()
+               alertOwnersToChange(tx, request.user, [ tx.src.email, tx.dst.email ], "Banking transaction processed; %s deposited" % tx.amount, 'deposit_tx.txt')
                ok.append(tx)
           else:
                skipped.append('%s: %s' % (vals.get('description_%d' % i, "??"), vals.get('amount_%d' % i, "??")))
