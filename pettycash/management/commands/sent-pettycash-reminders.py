@@ -15,19 +15,23 @@ def sendEmail(transactions, balance, user, to, template = 'balance-email.txt'):
     subject = "[makerbot] Account balance %s: %s" % (user,balance.balance)
 
     gs = False
+    topup = 0
     if balance.balance > Money(0,EUR):
        gs = True
+    else:
+       topup = int((-float(balance.balance.amount) + settings.PETTYCASH_TOPUP)/5+0.5) * 5;
 
     context = {
            'transactions': transactions,
            'balance': balance,
            'goodstanding': gs,
+           'topup': topup,
            'user': user,
            'base': settings.BASE,
     }
     message = render_to_string(template, context)
 
-    EmailMessage(subject, message, to=[to], from_email=settings.DEFAULT_FROM_EMAIL).send()
+    EmailMessage(subject, message, to=to, from_email=settings.DEFAULT_FROM_EMAIL).send()
 
 class Command(BaseCommand):
     help = 'Sent balances and stuff..'

@@ -34,6 +34,18 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
+            '--direct',
+            dest='direct', action='store_true',
+            help='Sent the message directly to the users, rather than to the mailing list.'
+        )
+
+        parser.add_argument(
+            '--all',
+            dest='all', action='store_true',
+            help='Also include people with a 0 balance.'
+        )
+
+        parser.add_argument(
             '--save',
             dest='save', type = str, 
             help='Save the message as rfc822 blobs rather than sending. Useful as we sort out dkim on the server. Pass the output directory as an argument',
@@ -47,13 +59,17 @@ class Command(BaseCommand):
             settings.EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
             settings.EMAIL_FILE_PATH = options['save']
 
+        balances = PettycashBalanceCache.objects.order_by('balance')
+        if  not options['all']:
+            balances = balances.filter(Q(balance__gt = Money(0,EUR)) | Q(balance__lt  = Money(0,EUR)))
+
         dest = settings.MAILINGLIST
         if options['to']:
            dest = options['to']
 
-        balances = PettycashBalanceCache.objects.order_by('balance')
-        if  verbosity < 2:
-            balances = balances.filter(Q(balance__gt = Money(0,EUR)) | Q(balance__lt  = Money(0,EUR)))
+        if options['direct']:
+           dest = (balances.values_list('owner__email', flat=True))
+        
         sendEmail(balances, dest)
 
         sys.exit(rc)
