@@ -59,7 +59,7 @@ class Command(BaseCommand):
                 if not options['dryrun']:
                      balance._change_reason = act
                      balance.save()
-           if err != '' or verbosity > 1:
+           if (err != '' and act != 'initial creation') or verbosity > 1:
               print("%s: %s%s" % (user, balance.balance, err))
 
         sys.exit(rc)
