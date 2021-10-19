@@ -157,6 +157,14 @@ class PettycashTransaction(models.Model):
 
          return rc
 
+     def correction_booking(self):
+         new_transaction = PettycashTransaction()
+         new_transaction.src = self.src
+         new_transaction.dst = self.dst
+         new_transaction.amount = -self.amount
+         new_transaction.description = "correction %s (%d)" % (self.description, self.pk)
+         new_transaction.save()
+
      def save(self, * args, ** kwargs):
          bypass = False
          if kwargs is not None and 'bypass' in kwargs:
