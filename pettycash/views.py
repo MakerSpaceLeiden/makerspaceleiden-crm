@@ -437,7 +437,8 @@ def delete(request, pk):
     if form.is_valid():
         reason = "%s (by %s)" % (form.cleaned_data['reason'], request.user)
         tx._change_reason = reason
-        tx.delete();
+        #tx.delete();
+        tx.correction_booking()
         alertOwnersToChange(tx, request.user, [ tx.src.email, tx.dst.email ], reason , 'delete_tx.txt')
         return redirect('transactions', pk = request.user.id)
 
