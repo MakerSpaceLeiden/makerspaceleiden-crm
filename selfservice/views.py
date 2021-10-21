@@ -1,21 +1,12 @@
-import os
 import re
 
-from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.template.loader import render_to_string
-from django.contrib.auth.tokens import default_token_generator
-from django.template import loader
 from django.http import HttpResponse
-from django.conf import settings
-from django.shortcuts import redirect
-from django.views.generic import ListView, CreateView, UpdateView
-from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
 from django import forms
-from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.db.models import Q
@@ -35,39 +26,38 @@ import json
 import sys
 import six
 
-from members.models import Tag,User
-from acl.models import Machine,Entitlement,PermitType
-from selfservice.forms import UserForm, SignUpForm, SignalNotificationSettingsForm, EmailNotificationSettingsForm
+from members.models import User
+from acl.models import Machine, Entitlement, PermitType
+from selfservice.forms import UserForm, SignalNotificationSettingsForm, EmailNotificationSettingsForm
 from .models import WiFiNetwork
 from .waiverform.waiverform import generate_waiverform_fd
 from .aggregator_adapter import get_aggregator_adapter
 
-def sentEmailVerification(request,user,new_email,ccOrNone = None, template='email_verification_email.txt'):
-            current_site = get_current_site(request)
-            subject = 'Confirm your email adddress ({})'.format(current_site.domain)
-            tmpuser = user
-            tmpuser.email = new_email
-            context = {
-                'has_permission': request.user.is_authenticated,
-                'request': request,
-                'user': user,
-		'new_email': new_email,
-                'domain': current_site.domain,
-                # possibly changed with Django 2.2
-                # 'uid': urlsafe_base64_encode(force_bytes(user.pk)).decode(),
-                'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-                'token': email_check_token.make_token(tmpuser),
-            }
 
-            msg = render_to_string(template, context)
-            EmailMessage(subject, msg, to=[user.email], from_email=settings.DEFAULT_FROM_EMAIL).send()
+def send_email_verification(request, user, new_email, old_email=None, template='email_verification_email.txt'):
+    current_site = get_current_site(request)
+    subject = 'Confirm your email adddress ({})'.format(current_site.domain)
+    context = {
+        'has_permission': request.user.is_authenticated,
+        'request': request,
+        'user': user,
+        'new_email': new_email,
+        'old_email': old_email,
+        'domain': current_site.domain,
+        # possibly changed with Django 2.2
+        # 'uid': urlsafe_base64_encode(force_bytes(user.pk)).decode(),
+        'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+        'token': email_check_token.make_token(user),
+    }
 
-            if ccOrNone:
-                subject = '[spacebot] User {} {} is changing is or her email adddress'.format(user.first_name, user.last_name)
-                msg = render_to_string('email_verification_email_inform.txt', context)
-                EmailMessage(subject, msg, to=ccOrNone, from_email=settings.DEFAULT_FROM_EMAIL).send()
+    msg = render_to_string(template, context)
+    EmailMessage(subject, msg, to=[user.email], from_email=settings.DEFAULT_FROM_EMAIL).send()
 
-            return render(request, 'email_verification_email.html')
+    if old_email:
+        subject = '[spacebot] User {} {} is changing their email address'.format(user.first_name, user.last_name)
+        msg = render_to_string('email_verification_email_inform.txt', context)
+        EmailMessage(subject, msg, to=[old_email, settings.TRUSTEES], from_email=settings.DEFAULT_FROM_EMAIL).send()
+
 
 class AccountActivationTokenGenerator(PasswordResetTokenGenerator):
     def _make_hash_value(self, user, timestamp):
@@ -554,7 +544,7 @@ def userdetails(request):
              save_user.changeReason = 'Updated through the self-service interface by {0}'.format(request.user)
              save_user.save()
 
-             user = UserForm(request.POST, instance = save_user)
+             user = UserForm(request.POST, instance=save_user)
              for f in user.fields:
                user.fields[f].disabled = True
 
@@ -562,7 +552,8 @@ def userdetails(request):
                 member.email_confirmed = False
                 member.changeReason = "Reset email validation, email changed."
                 member.save()
-                return sentEmailVerification(request,save_user,new_email, [ old_email, settings.TRUSTEES ])
+                send_email_verification(request, save_user, new_email, old_email)
+                return render(request, 'email_verification_email.html')
 
              return render(request, 'userdetails.html', { 'form' : user, 'saved': True })
        except Exception as e:
@@ -584,24 +575,6 @@ def userdetails(request):
     }
     return render(request, 'userdetails.html', context)
 
-def signup(request):
-    if (request.user.is_authenticated):
-       return HttpResponse("You are perhaps logged in already ?",status=500,content_type="text/plain")
-
-    if request.method == 'POST':
-        form = SignUpForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            email = form.cleaned_data.get('email')
-            raw_password = form.cleaned_data.get('password1')
-            return sentEmailVerification(request,user,email,[ settings.TRUSTEES ],'signup_email.txt' )
-
-            user = authenticate(email=email, password=raw_password)
-            login(request, user)
-            return redirect('index')
-    else:
-        form = SignUpForm()
-    return render(request, 'signup.html', {'form': form})
 
 class AmnestyForm(forms.Form):
 
