@@ -6,18 +6,19 @@
 # Bash set -e equivalent for powershell, which doesn't respond directly to python/pip error codes
 function RunWithErrorCheck ([string]$command) 
 {
-    iex $command 
-
+    Invoke-Expression $command 
+    
     if($lastexitcode -ne 0)
     {
-        write-Warning "Script terminated due to an error"
+        Write-Warning "Script terminated due to an error"
         exit
     }
 }
 
-write-host "Loading demo for Makerspace CRM/CMS"
+Write-Host "Loading demo for Makerspace CRM/CMS"
 
 RunWithErrorCheck "python -m venv ./venv/bin/activate" #create virtual environment for crm
+RunWithErrorCheck ".\venv\bin\activate\Scripts\Activate.ps1"
 RunWithErrorCheck "pip install -r requirements.txt" 
 
 if(Test-Path .\db.sqlite3) #rebuild db using migrations
@@ -28,7 +29,7 @@ if(Test-Path .\db.sqlite3) #rebuild db using migrations
 RunWithErrorCheck "python manage.py makemigrations"
 RunWithErrorCheck "python manage.py migrate"
 
-write-host "Importing Data"
+Write-Host "Importing Data"
 if(Test-Path .\demo\example.json)
 {
     RunWithErrorCheck "manage.py loaddata demo/example.json"
@@ -39,15 +40,15 @@ else
     RunWithErrorCheck "python manage.py import-machines demo/mac.csv "
     RunWithErrorCheck "python manage.py import-consolidated demo/consolidated.txt"
     
-    $I = read-host "Reset all passwords and generate invites? (Y/N Default: N)"
+    $I = Read-Host "Reset all passwords and generate invites? (Y/N Default: N)"
     if($I -eq "Y")
     {
         RunWithErrorCheck "python manage.py sent-invite --reset --all #typo: send-invite"
     }
     else
     {
-        write-host "No invites with password-set requests sent. Passwords are all hardcoded to 1234 for:"
-        get-content .\demo\consolidated.txt
+        Write-Host "No invites with password-set requests sent. Passwords are all hardcoded to 1234 for:"
+        Get-Content .\demo\consolidated.txt | Select-String -Pattern "@"
     }
 }
 
