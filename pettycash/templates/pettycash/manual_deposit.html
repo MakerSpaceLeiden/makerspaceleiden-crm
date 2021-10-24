@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% load isingroup %}
+
+{% block content %}
+
+To make a deposit to your balance you should do a wire transfer to the following IBAN. 
+<br>
+Return to the <a href="{% url 'balances' %}">[balances]</a>.
+
+{% endblock %}

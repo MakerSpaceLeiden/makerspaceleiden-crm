@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load isingroup %}
+
+{% block content %}
+
+Current balance {{ balance.balance }}
+
+{% if balance.balance.amount < 0 %}
+<a href="{% url 'invoice' src=who.id %}">Make payment</a>
+
+{% else %}
+<a href="{% url 'invoice' src=who.id %}">Ask payment</a>
+
+{% endif %}
+
+<br>
+<a href="{% url 'manual_deposit' %}">Deposit money</a><br>
+
+{% if balance.balance.amount > 0 %}
+<a href="#">Withdraw money</a><br>
+{% endif %}
+
+<p>
+	<a href="{% url 'transactions' user.id %}">View transactions</a>
+</p>
+
+
+<br>
+Return to the <a href="{% url 'balances' %}">[balances]</a>.
+
+
+{% endblock %}

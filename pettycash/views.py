@@ -137,7 +137,7 @@ def transact(request,label,src=None,dst=None,description=None,amount=None,reason
     if form.is_valid():
         item = form.save(commit = False)
 
-        if item.amount < Money(0,EUR)  or item.amount > settings.MAX_PAY_API:
+        if item.amount < Money(0,EUR) or item.amount > settings.MAX_PAY_API:
            if not request.user.is_privileged:
               return HttpResponse("Only transactions between %s and %s" % (Money(0,EUR), settings.MAX_PAY_API), status=406,content_type="text/plain")
            logger.info("Allowing super user perms to do a non compliant transaction %s" % (item))
@@ -368,14 +368,46 @@ def showtx(request,pk):
     context = {
         'title': 'Details transaction %s @ %s' % (tx.id, tx.date),
         'tx': tx,
-	'settings': settings,
-        }
+	    'settings': settings,
+    }
+
     return render(request, 'pettycash/details.html', context)
 
 
 @login_required
 def show_mine(request):
-    return show(request,request.user.id)
+    user = request.user
+
+    moneys_out = 0
+    moneys_in = 0
+
+    try:
+       balance = PettycashBalanceCache.objects.get(owner=user)
+       lst = PettycashTransaction.objects.all().filter(Q(src=user) | Q(dst=user)).order_by('id')
+    except ObjectDoesNotExist as e:
+       pass
+
+    label = user
+    if user.id == settings.POT_ID:
+       label = settings.POT_LABEL
+
+    context = {
+        'title': 'Your balance ',
+        'balance': balance,
+    	'who': user,
+        'lst': lst
+    }
+
+    return render(request, 'pettycash/view_mine.html', context)
+
+@login_required
+def manual_deposit(request):
+    context = {
+        'title': 'Perform a manual deposit'
+    }
+
+    return render(request, 'pettycash/manual_deposit.html', context)
+
 
 @login_required
 def show(request,pk):
@@ -405,11 +437,12 @@ def show(request,pk):
     context = {
         'title': 'Balance and transactions for %s' % (label),
         'balance': balance,
-	'who': user,
+    	'who': user,
         'lst': lst,
-	'in': moneys_in,
-	'out': moneys_out,
-        }
+    	'in': moneys_in,
+    	'out': moneys_out,
+    }
+
     return render(request, 'pettycash/view.html', context)
 
 @login_required
