@@ -2,9 +2,9 @@
 Trustees,
 
 This is to let you know that {{ user.name }} is in the process of changing
-his or her email address for {{ user.email }} to {{ new_email }}
+his or her email address from {{ old_email }} to {{ new_email }}
 
-A copy has been sent to the members old email address too.
+A copy of this message has been sent to {{ user.name }}'s old email address as well.
 
 Your friendly spacebot.
 
