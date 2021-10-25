@@ -278,4 +278,5 @@ TERMS_DAYS_CUTOFF=5
 try:
     from .local import *
 except ImportError:
+  print("WARNING -- no local configs. You propably want to copy makerspaceleiden/debug.py to local.py & tweak it !!") 
   pass
