@@ -3,6 +3,32 @@
 
 {% block content %}
 
-To make a deposit to your balance you should do a wire transfer to the following IBAN. 
+To make a deposit to your balance you should do a wire transfer to the following account:
+
+<table>
+	<tr>
+		<td align=right>IBAN</td>
+		<td>NL30TRIO0197694519</td>
+	</tr>
+	<tr>
+		<td align=right>ten name van:</td>
+		<td>Stichting Makerspace Leiden</td>
+	</tr>
+	<tr>
+		<td align=right>onder vermelding van</td>
+		<td>Storting Spacepot {{ user.id }} / {{ user }}</td>
+	</tr>
+</table>
+<pre>
+
+
+</pre>
+If your bank supports it - you can also scan the QR code below (usually with your banking app).
+<p>
+<blockquote>
+<img src="https://epc-qr.eu/?bname=Stichting%20Makerspace%20Leiden&iban=NL30TRIO0197694519&euro=25.00&info=Storting+Spacepot+{{ user.id | urlencode}}+{{ user |urlencode }}"/>
+<br>
+<code>https://epc-qr.eu/?bname=Stichting%20Makerspace%20Leiden&iban=NL30TRIO0197694519&euro=25.00&info=Storting+Spacepot+{{ user.id | urlencode}}+{{ user |urlencode }}</code>
+</blockquote>
 
 {% endblock %}
