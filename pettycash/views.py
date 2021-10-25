@@ -456,7 +456,9 @@ def manual_deposit(request):
         'settings' : settings,
         'user': request.user,
         # String according to Quick Response Code richtlijnen van de Europese Betalingsraad (EPC). 
-        # See: https://epc-qr.eu
+        # See: https://epc-qr.eu. We need to do this here; rather than in the template; as the
+        # latter does not allow for for line breaks (qr_from_text).
+        #
         'epc' :	 "BCD\n002\n1\nSCT\n\n%s\n%s\nEUR%.2f\n\n\nStorting Spacepot %s / %s\n" % (
               settings.PETTYCASH_TNS, settings.PETTYCASH_IBAN, topup, request.user.pk, request.user
 	)
