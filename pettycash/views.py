@@ -592,6 +592,8 @@ def api_pay(request):
 def api_register(request):
     ip = client_ip(request)
 
+    # 1. We're always offered an x509 client cert.
+    #
     cert = request.META.get('SSL_CLIENT_CERT', None)
     if cert == None:
        logger.error("Bad request, missing cert")
@@ -600,6 +602,9 @@ def api_register(request):
     client_sha = pemToSHA256Fingerprint(cert)
     server_sha = pemToSHA256Fingerprint(request.META.get('SSL_SERVER_CERT'))
 
+    # 2. If we do not yet now this cert - add its fingrerprint to the database
+    #    and mark it as pending. Return a secret/nonce.
+    #
     try:
         terminal = PettycashTerminal.objects.get(fingerprint = client_sha)
 
@@ -620,6 +625,10 @@ def api_register(request):
          logger.info("Issuing first time nonce to %s at %s" % (client_sha, ip))
          return HttpResponse(terminal.nonce,status=401,content_type="text/plain")
 
+    # 3. If this is a new terminal; check that it has the right nonce from the initial
+    #    exchange; and verify that it knows a secret (the tag id of an admin). If so
+    #    auto approve it.
+    #
     if not terminal.accepted:
          cutoff = timezone.now() - datetime.timedelta(minutes=settings.PAY_MAXNONCE_AGE_MINUTES)
          if cutoff > terminal.date:
@@ -654,6 +663,7 @@ def api_register(request):
 
                 # proof to the terminal that we know the tag too. This prolly 
                 # should be an HMAC
+                #
                 m = hashlib.sha256()
                 m.update(tag.tag.encode('ascii'))
                 m.update(bytes.fromhex(sha))
@@ -663,6 +673,9 @@ def api_register(request):
          logger.error("Nonce & fingerprint ok; but response could not be correlated to a tag (%s, ip=%si)" % (terminal, ip))
          return HttpResponse("Pairing failed",status=400,content_type="text/plain")
 
+    # 4. We're talking to an approved terminal - give it its SKU list if it has
+    #    been wired to a station; or just an empty list if we do not know yet.
+    #
     try:
          station = PettycashStation.objects.get(terminal = terminal)
     except ObjectDoesNotExist as e:
