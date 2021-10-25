@@ -122,6 +122,7 @@ def transact_raw(request,src=None,dst=None,description=None,amount=None,reason=N
 
     try:
         tx = PettycashTransaction(src=src,dst=dst,description=description,amount=amount)
+        logger.error("Info: %s" % reason)
         tx._change_reason = reason
         tx.save()
         alertOwnersToChange(tx, user, [])
@@ -560,7 +561,7 @@ def api_pay(request):
          return HttpResponse("Tag not found",status=404,content_type="text/plain")
 
     if transact_raw(request,src=tag.owner,dst=User.objects.get(id = settings.POT_ID),description=description,amount=amount,
-               reason="Payment via API; tagid=%s (owned by %s) from payment node:  %s" % (tag.id,tag.owner,node) ,user=tag.owner):
+               reason="via API; tagid=%s (%s) @%s" % (tag.id,tag.owner,node) ,user=tag.owner):
         label = "%s" % tag.owner.first_name
         if len(label) < 1:
            label = "%s" % tag.owner.last_name
@@ -576,6 +577,7 @@ def api_register(request):
 
     cert = request.META.get('SSL_CLIENT_CERT', None)
     if cert == None:
+       logger.error("Bad request, missing cert")
        return HttpResponse("No client identifier, rejecting",status=400,content_type="text/plain")
 
     client_sha = pemToSHA256Fingerprint(cert)
@@ -624,14 +626,22 @@ def api_register(request):
             m = hashlib.sha256()
             m.update(terminal.nonce.encode('ascii'))
             m.update(tag.tag.encode('ascii'))
-            m.update(client_sha.encode('ascii'))
-            m.update(server_sha.encode('ascii'))
-            if m.hexdigest() == response:
+            m.update(bytes.fromhex(client_sha))
+            m.update(bytes.fromhex(server_sha))
+            sha = m.hexdigest()
+            if sha.lower() == response.lower():
                 terminal.accepted = True
                 terminal._change_reason = "Terminal %s, IP=%s was activated by tag %d of %s" % (terminal, ip, tag.id, tag.owner)
                 terminal.save()
                 logger.info("Terminal %s accepted, tag swipe by %s matched." % (terminal, tag.owner))
-                return HttpResponse("OK",status=200,content_type="text/plain")
+
+                # proof to the terminal that we know the tag too. This prolly 
+                # should be an HMAC
+                m = hashlib.sha256()
+                m.update(tag.tag.encode('ascii'))
+                m.update(bytes.fromhex(sha))
+                sha = m.hexdigest()
+                return HttpResponse(sha,status=200,content_type="text/plain")
 
          logger.error("Nonce & fingerprint ok; but response could not be correlated to a tag (%s, ip=%si)" % (terminal, ip))
          return HttpResponse("Pairing failed",status=400,content_type="text/plain")
