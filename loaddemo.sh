@@ -25,14 +25,10 @@ else
 	python${VERSION} manage.py import-machines demo/mac.csv 
 	python${VERSION} manage.py import-consolidated demo/consolidated.txt 
 	python${VERSION} manage.py pettycash-recache
-	echo " Reset all password and generate invites (Y, N, default is No) ?"
-	read I
-	if [ "x$I" = "xY" ]; then
-		python${VERSION} manage.py sent-invite --reset --all
-	else
-		echo No invites with password-set requests sent. Passwords are all hardcoded to 1234 for:
-		grep @  demo/consolidated.txt
-	fi
+        python${VERSION} manage.py pettycash-activate-all-users
+        echo 
+	echo No invites with password-set requests sent. Passwords are all hardcoded to 1234 for:
+	grep @  demo/consolidated.txt
 fi
 
 python${VERSION} manage.py runserver
