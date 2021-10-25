@@ -5,7 +5,7 @@
 
 {% if tx %}
 <table>
-	<tr><td align=right>Date:</td><td>{{ tx.date }}</td><tr>
+	<tr><td align=right>Date:</td><td>{{ tx.date|date:'Y-m-d H:i' }}</td><tr>
 	<tr><td align=right>From:</td><td>
                                 {% if tx.src.id == settings.POT_ID %}
                                         {{ settings.POT_LABEL }}
@@ -20,7 +20,7 @@
                                         {{ tx.dst}}
                                 {% endif %}
 		</td><tr>
-	<tr><td align=right>Descripotion:</td><td>{{ tx.description}}</td><tr>
+	<tr><td align=right>Description:</td><td>{{ tx.description}}</td><tr>
 	<tr><td align=right>Amount:</td><td>{{ tx.amount}}</td><tr>
 	<tr><td align=right></td><td>
 		<table>
@@ -29,7 +29,7 @@
 		{% for h in tx.history.all %}
 		<tr>
 		   <td>{{ h.get_history_type_display }}</td>
-		   <td>{{ h.date }}</td>
+		   <td>{{ h.date|date:'Y-m-d H:i' }}</td>
 		   <td>{{ h.history_user}}</td>
 		   <td>{{ h.history_change_reason }}</td>
            	</tr>

@@ -56,7 +56,7 @@ There are no passwords for members at the moment.
 <p/>
 	<li><a href="{% url 'personal_page' %}">Your data</a>
 {% if user|isInPettycashDemGroupo or user.is_privileged  %}
-	<li><a href="{% url 'transactions' user.id  %}">Your cash balance</a>, do payments, see all 
+	<li><a href="{% url 'mytransactions' %}">Your cash balance</a>, do payments, see all 
 		<a href="{% url 'balances' %}">balances</a>, etc.
 {% endif %}
 {%if settings.ML_ADMINURL%}

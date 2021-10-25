@@ -12,7 +12,7 @@ from members.models import User
 
 from moneyed import Money, EUR
 
-import sys,os,pwd
+import sys,os
 import datetime
 
 def camt53_process(file):

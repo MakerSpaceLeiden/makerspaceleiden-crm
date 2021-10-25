@@ -14,7 +14,7 @@ Or consult your personal page at:
 
 	{{ base }}{% url 'mytransactions' %} 
 
-for just your own transadtions.
+for just your own transactions.
 
 Yours,
 

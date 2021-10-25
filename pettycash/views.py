@@ -110,7 +110,7 @@ def alertOwnersToChange(tx, userThatMadeTheChange = None, toinform = [], reason=
     return EmailMessage(subject, message, to=toinform, from_email=settings.DEFAULT_FROM_EMAIL).send()
 
 def pettycash_redirect(pk = None):
-    url = reverse('balances')
+    url = reverse('mytransactions')
     if pk:
       url = '{}#{}'.format(url, pk)
     return redirect(url)
@@ -138,7 +138,7 @@ def transact(request,label,src=None,dst=None,description=None,amount=None,reason
     if form.is_valid():
         item = form.save(commit = False)
 
-        if item.amount < Money(0,EUR)  or item.amount > settings.MAX_PAY_API:
+        if item.amount < Money(0,EUR) or item.amount > settings.MAX_PAY_API:
            if not request.user.is_privileged:
               return HttpResponse("Only transactions between %s and %s" % (Money(0,EUR), settings.MAX_PAY_API), status=406,content_type="text/plain")
            logger.info("Allowing super user perms to do a non compliant transaction %s" % (item))
@@ -156,10 +156,15 @@ def transact(request,label,src=None,dst=None,description=None,amount=None,reason
     if dst:
         form.fields['dst'].widget = widgets.HiddenInput()
 
+    products = None
+    if dst == settings.POT_ID:
+        products = PettycashSku.objects.all()
+    
     context = {
         'title': label,
         'form': form,
         'action': 'Pay',
+        'products' : products
         }
     return render(request, 'pettycash/invoice.html', context)
 
@@ -177,6 +182,22 @@ def index(request,days=30):
     return render(request, 'pettycash/index.html', context)
 
 @login_required
+def qrcode(request):
+    description =  request.GET.get('description', None)
+    amount_str = request.GET.get('amount', 0)
+    # LR: A bit ugly but money will produce amounts with a comma.
+    amount_str = amount_str.replace(',', '.')
+    amount = Money(amount_str, EUR)
+
+    context = {
+        'title': 'QR code',
+        'description': description,
+        'amount' : amount,
+        'url' : "%s?description=%s&amount=%s" % (request.build_absolute_uri('/pettycash/pay'), description, amount_str)
+    }
+    return render(request, 'pettycash/qrcode.html', context)
+
+@login_required
 @login_or_priveleged
 def invoice(request,src):
     try:
@@ -185,6 +206,31 @@ def invoice(request,src):
         return HttpResponse("Not found",status=404,content_type="text/plain")
 
     return transact(request,'%s to pay to %s ' % (src, settings.POT_LABEL), src=src, dst=settings.POT_ID, reason="Invoice via website")
+
+
+@login_required
+@login_or_priveleged
+def transfer_to_member(request,src):
+
+    src = request.user
+    description = "Transfer"
+    amount = Money(0)
+    form = PettycashTransactionForm(request.POST or None, initial = { 'src': src, 'description': description, 'amount': amount })
+
+    if form.is_valid():
+        reason = "Transfer"
+        item = form.save(commit = False)
+        if transact_raw(request, src=item.src,dst=item.dst,description=item.description,amount=item.amount,reason="Logged in as {}, {}.".format(request.user, reason),user=request.user):
+            return pettycash_redirect(item.id)
+
+    if src:
+        form.fields['src'].widget = widgets.HiddenInput()
+
+    context = {
+        'form': form
+    }
+
+    return render(request, 'pettycash/transfer_to_member.html', context)
 
 @login_required
 @login_or_priveleged
@@ -369,14 +415,41 @@ def showtx(request,pk):
     context = {
         'title': 'Details transaction %s @ %s' % (tx.id, tx.date),
         'tx': tx,
-	'settings': settings,
-        }
+	    'settings': settings,
+    }
+
     return render(request, 'pettycash/details.html', context)
 
 
 @login_required
 def show_mine(request):
-    return show(request,request.user.id)
+    user = request.user
+    balance = 0
+    lst = []
+
+    try:
+       balance = PettycashBalanceCache.objects.get(owner=user)
+       lst = PettycashTransaction.objects.all().filter(Q(src=user) | Q(dst=user)).order_by('id')
+    except ObjectDoesNotExist as e:
+        pass
+
+    context = {
+        'title': 'SpaceTegoed',
+        'balance': balance,
+    	'who': user,
+        'lst': lst
+    }
+
+    return render(request, 'pettycash/view_mine.html', context)
+
+@login_required
+def manual_deposit(request):
+    context = {
+        'title': 'Perform a manual deposit'
+    }
+
+    return render(request, 'pettycash/manual_deposit.html', context)
+
 
 @login_required
 def show(request,pk):
@@ -406,23 +479,26 @@ def show(request,pk):
     context = {
         'title': 'Balance and transactions for %s' % (label),
         'balance': balance,
-	'who': user,
+    	'who': user,
         'lst': lst,
-	'in': moneys_in,
-	'out': moneys_out,
-        }
+    	'in': moneys_in,
+    	'out': moneys_out,
+    }
+
     return render(request, 'pettycash/view.html', context)
 
 @login_required
 def pay(request):
     amount_str = request.GET.get('amount', None)
+    # LR: A bit ugly but money will produce amounts with a comma.
+    amount_str = amount_str.replace(',', '.')
     description =  request.GET.get('description', None)
 
     if not amount_str and not description:
         return HttpResponse("Amount/Description parameters mandatory",status=400,content_type="text/plain")
     amount = Money(amount_str, EUR)
 
-    return transact(request,"%s pays %s to the Makerspace" % (mtostr(amount), request.user), src=request.user,dst=settings.POT_ID,amount=amount,description=description, reason="Pay via website")
+    return transact(request,"%s pays %s to the Makerspace for %s" % (request.user, mtostr(amount), description), src=request.user,dst=settings.POT_ID,amount=amount,description=description, reason="Pay via website")
 
 @login_required
 def delete(request, pk):
@@ -438,7 +514,8 @@ def delete(request, pk):
     if form.is_valid():
         reason = "%s (by %s)" % (form.cleaned_data['reason'], request.user)
         tx._change_reason = reason
-        tx.delete();
+        #tx.delete();
+        tx.refund_booking()
         alertOwnersToChange(tx, request.user, [ tx.src.email, tx.dst.email ], reason , 'delete_tx.txt')
         return redirect('transactions', pk = request.user.id)
 

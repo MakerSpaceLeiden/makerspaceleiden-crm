@@ -2,6 +2,7 @@
 {% load isingroup %}
 
 {% block content %}
+
 {% if lst %}
 <table>
 	<tr>
@@ -51,7 +52,7 @@
 				{% else %}
 					{{ tx.src }} 
 				{% endif %}
-				<i>(recieved)</i></td>
+				<i>(received)</i></td>
 				<td>{{ tx.description }}</td>
 				<td style="border-right: solid 1px" align=right>{{ tx.amount }}</td>
 				<td style="border-right: solid 1px" ></td>
@@ -75,7 +76,7 @@
 {% endif %}
 
 <p>
-Return to the <a href="{% url 'balances' %}">[balances]</a>.
+Return to the <a href="{% url 'mytransactions' %}">[balance]</a>.
 
 
 {% endblock %}

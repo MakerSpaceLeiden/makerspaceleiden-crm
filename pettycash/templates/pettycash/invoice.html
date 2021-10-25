@@ -1,19 +1,45 @@
 {% extends 'base.html' %}
 
 {% block content %}
+
+{% if products %}
+  <h2>Products</h2>
+  <table>
+    <tr>
+      <th>Name</th>
+      <th>Description</th>
+      <th>Price</th>
+      <th>Action</th>
+    </tr>
+    {% for item in products %}
+    <tr>
+      <td>{{item.name}}</td>
+      <td>{{item.description}}</td>
+      <td>{{item.amount}}</td>
+      <td>
+        <a href="{% url 'pay' %}?description={{item.description}}&amount={{item.amount.amount}}">Pay</a>
+        <a href="{% url 'qrcode' %}?description={{item.description}}&amount={{item.amount.amount}}">QR-code</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+{% endif %}
+
   <h2>{{ label }}</h2>
   <form method="post"  enctype="multipart/form-data">
   <table>
     {% csrf_token %}
     {{ form.as_table }}
-    <tr><td></td><td><button type="submit">{{ action }}</button></td></tr>
+    <tr><td></td><td>
+      <button name="submit" value="pay" type="submit">{{ action }}</button>
+    </td></tr>
   </table>
   </form>
   </p>
 
 <hr>
 <p>
-<a href="{% url "balances" %}">back</a> to the overview.
+<a href="{% url "mytransactions" %}">back</a> to the overview.
 <p>
 {{ form.errors }}
 {{ form.non_field_errors }}

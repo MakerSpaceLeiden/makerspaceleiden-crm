@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load isingroup %}
+
+{% block content %}
+
+Current balance {% if balance == 0 %}&euro; 0,-{% else %}{{ balance.balance }}{% endif %}
+<br>
+<br>
+<a href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/SpaceTegoed">What is SpaceTegoed</a>
+<br>
+<a href="{% url 'transactions' user.id %}">View transactions</a>
+<br>
+<a href="{% url 'invoice' src=who.id %}">Pay for a product</a>
+<br>
+<a href="{% url 'transfer_to_member' src=who.id %}">Transfer SpaceTegoed to other member</a>
+
+<br>
+<a href="{% url 'manual_deposit' %}">Deposit money</a><br>
+
+{% if balance.balance.amount > 0 %}
+<a href="#">Withdraw money</a><br>
+{% endif %}
+
+{% endblock %}

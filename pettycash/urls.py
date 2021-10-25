@@ -12,8 +12,13 @@ urlpatterns = [
 
     path('show/<int:pk>', views.show, name='transactions'),
     path('show', views.show_mine, name='mytransactions'),
+    path('qrcode', views.qrcode, name='qrcode'),
+    path('manual_deposit', views.manual_deposit, name='manual_deposit'),
+
     path('showtx/<int:pk>', views.showtx, name='transactiondetail'),
     path('invoice/<int:src>', views.invoice, name='invoice'),
+
+    path('transfer_to_member/<int:src>', views.transfer_to_member, name='transfer_to_member'),
     path('transfer/<int:src>/<int:dst>', views.transfer, name='transfer'),
     path('deposit/<int:dst>', views.deposit, name='deposit'),
     path('delete/<int:pk>', views.delete, name='delete'),
