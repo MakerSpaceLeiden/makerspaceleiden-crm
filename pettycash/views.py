@@ -184,8 +184,9 @@ def index(request,days=30):
 @login_required
 def qrcode(request):
     description =  request.GET.get('description', None)
-    amount_str = request.GET.get('price', 0)
+    amount_str = request.GET.get('amount', 0)
     # LR: A bit ugly but money will produce amounts with a comma.
+    amount_str = amount_str.replace(',', '.')
     amount = Money(amount_str, EUR)
 
     context = {
