@@ -8,11 +8,12 @@ from django.core.exceptions import ObjectDoesNotExist
 from pettycash.models import PettycashBalanceCache, PettycashTransaction
 from members.models import User
 
-import sys,os
+import sys, os
 import datetime
 
+
 class Command(BaseCommand):
-    help = 'Show all balances'
+    help = "Show all balances"
 
     def handle(self, *args, **options):
         rc = 0
@@ -20,10 +21,10 @@ class Command(BaseCommand):
         print("# Member,Balance,lastchange")
 
         for balance in PettycashBalanceCache.objects.all():
-           dt = 'None'
-           if balance.last:
-             dt = balance.last.date
+            dt = "None"
+            if balance.last:
+                dt = balance.last.date
 
-           print("%s,%s,%s" % (balance.owner, balance.balance,dt))
-           
+            print("%s,%s,%s" % (balance.owner, balance.balance, dt))
+
         sys.exit(rc)
