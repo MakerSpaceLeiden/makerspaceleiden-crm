@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load qr_code  %}
 {% load isingroup %}
 
 {% block content %}
@@ -26,6 +27,8 @@ To make a deposit to your balance you should do a wire transfer to the following
 If your bank supports it - you can also scan the QR code below (usually with your banking app).
 <p>
 <blockquote>
+	<!-- {% qr_from_text "BCD\\n002\\n1\\nSCT\\n\\nStichting Makerspace Leiden\\nNL30TRIO0197694519\\nEUR25.00\\n\\n\\nStorting Spacepot {{ user.id }} / {{ user }}\\n" size="m" border=1 %} -->
+<p>
 <img src="https://epc-qr.eu/?bname=Stichting%20Makerspace%20Leiden&iban=NL30TRIO0197694519&euro=25.00&info=Storting+Spacepot+{{ user.id | urlencode}}+{{ user |urlencode }}"/>
 <br>
 <code>https://epc-qr.eu/?bname=Stichting%20Makerspace%20Leiden&iban=NL30TRIO0197694519&euro=25.00&info=Storting+Spacepot+{{ user.id | urlencode}}+{{ user |urlencode }}</code>
