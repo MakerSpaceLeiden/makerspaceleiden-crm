@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>Transfer money to other member</h2>
+  <form method="post"  enctype="multipart/form-data">
+  <table>
+    {% csrf_token %}
+    {{ form.as_table }}
+    <tr><td></td><td>
+      <button name="submit" value="pay" type="submit">Transfer money</button>
+    </td></tr>
+  </table>
+  </form>
+
+  <br>
+  <hr>
+<p>
+<a href="{% url "mytransactions" %}">back</a> to the overview.
+</p>
+
+{% endblock %}

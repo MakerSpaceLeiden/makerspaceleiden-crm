@@ -14,7 +14,7 @@ from pettycash.camt53 import camt53_process
 
 from moneyed import Money, EUR
 
-import sys,os,pwd
+import sys,os
 import datetime
 
 class Command(BaseCommand):

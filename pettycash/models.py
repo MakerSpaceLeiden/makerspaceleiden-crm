@@ -119,7 +119,9 @@ def adjust_balance_cache(last, dst,amount):
 
            balance =  PettycashBalanceCache(owner=dst,balance=Money(0,EUR))
            for tx in PettycashTransaction.objects.all().filter(Q(dst=dst)):
-              balance.balance += tx.amount
+               # Exclude the current transaction we are working with
+               if tx.id is not last.id:
+                   balance.balance += tx.amount
 
      balance.balance += amount
      balance.last = last
@@ -157,12 +159,15 @@ class PettycashTransaction(models.Model):
 
          return rc
 
-     def correction_booking(self):
+     def refund_booking(self):
+         '''
+         Refund a booking by doing a new 'reverse' booking, this way all amounts stay positive
+         '''
          new_transaction = PettycashTransaction()
-         new_transaction.src = self.src
-         new_transaction.dst = self.dst
-         new_transaction.amount = -self.amount
-         new_transaction.description = "correction %s (%d)" % (self.description, self.pk)
+         new_transaction.src = self.dst
+         new_transaction.dst = self.src
+         new_transaction.amount = self.amount
+         new_transaction.description = "refund %s (%d)" % (self.description, self.pk)
          new_transaction.save()
 
      def save(self, * args, ** kwargs):
