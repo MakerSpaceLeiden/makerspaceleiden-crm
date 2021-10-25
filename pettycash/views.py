@@ -444,8 +444,22 @@ def show_mine(request):
 
 @login_required
 def manual_deposit(request):
+    topup = settings.PETTYCASH_TOPUP
+    try:
+        balance = PettycashBalanceCache.objects.get(owner=request.user)
+        topup = int((-float(balance.balance.amount) + settings.PETTYCASH_TOPUP)/5+0.5) * 5;
+    except ObjectDoesNotExist as e:
+       pass
+
     context = {
-        'title': 'Perform a manual deposit'
+        'title': 'Perform a manual deposit',
+        'settings' : settings,
+        'user': request.user,
+        # String according to Quick Response Code richtlijnen van de Europese Betalingsraad (EPC). 
+        # See: https://epc-qr.eu
+        'epc' :	 "BCD\n002\n1\nSCT\n\n%s\n%s\nEUR%.2f\n\n\nStorting Spacepot %s / %s\n" % (
+              settings.PETTYCASH_TNS, settings.PETTYCASH_IBAN, topup, request.user.pk, request.user
+	)
     }
 
     return render(request, 'pettycash/manual_deposit.html', context)

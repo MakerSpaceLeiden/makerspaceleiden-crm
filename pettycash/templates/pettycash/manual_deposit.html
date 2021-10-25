@@ -9,29 +9,32 @@ To make a deposit to your balance you should do a wire transfer to the following
 <table>
 	<tr>
 		<td align=right>IBAN</td>
-		<td>NL30TRIO0197694519</td>
+		<td>{{ settings.PETTYCASH_IBAN }} </td>
 	</tr>
 	<tr>
 		<td align=right>ten name van:</td>
-		<td>Stichting Makerspace Leiden</td>
+		<td>{{ settings.PETTYCASH_TNS }} </td>
 	</tr>
 	<tr>
 		<td align=right>onder vermelding van</td>
-		<td>Storting Spacepot {{ user.id }} / {{ user }}</td>
+		<td>
+			<code>Storting Spacepot {{ user.id }} / {{ user }}</code>
+		</td>
 	</tr>
 </table>
+<p>
+<i>You must use exactly above descriptive strings; as this is what automates the process. 
+<p>
+If you don't it may take longer. Or you may have to remind the trustee's in a few weeks time.
+</i>
 <pre>
 
 
 </pre>
-If your bank supports it - you can also scan the QR code below (usually with your banking app).
+If your bank supports it - you can also scan the EPC QR code below (usually with your banking app).
 <p>
 <blockquote>
-	<!-- {% qr_from_text "BCD\\n002\\n1\\nSCT\\n\\nStichting Makerspace Leiden\\nNL30TRIO0197694519\\nEUR25.00\\n\\n\\nStorting Spacepot {{ user.id }} / {{ user }}\\n" size="m" border=1 %} -->
-<p>
-<img src="https://epc-qr.eu/?bname=Stichting%20Makerspace%20Leiden&iban=NL30TRIO0197694519&euro=25.00&info=Storting+Spacepot+{{ user.id | urlencode}}+{{ user |urlencode }}"/>
-<br>
-<code>https://epc-qr.eu/?bname=Stichting%20Makerspace%20Leiden&iban=NL30TRIO0197694519&euro=25.00&info=Storting+Spacepot+{{ user.id | urlencode}}+{{ user |urlencode }}</code>
+{% qr_from_text epc size="m" border=1 %}
 </blockquote>
 
 {% endblock %}

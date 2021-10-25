@@ -4,25 +4,12 @@ Your current account balanace is {{ balance.balance }}; which means that
 you {% if goodstanding  %}do not have to do anything.
 {% else %}should do a payment as soon as possible.
 
-Do this by wiring your balance plus a little extra (for exampole
-{{ topup }} euro) to:
+Do this by wiring your balance plus a little extra {{ topup }} euro) 
+to the {{ settings.PETTYCASH_IBAN }} its bank account.
 
-     Stichting Makerspace Leiden
-     NL30TRIO0197694519
-
-with in the description field the text:
-
-     "Storting Spacepot {{ user.id }} / {{ user }}"
-     
-Including your name and that number({{ user.id }}) is important; as otherwise your
-transaction needs to be manually handled. If your bank supports it,
-you can go this URL:
-
-     https://epc-qr.eu/?bname=Stichting%20Makerspace%20Leiden&iban=NL30TRIO0197694519&euro={{ topup }}
-
-for a SEPA QR payment code.
+You can find the account details and a QR code (if your bank supports
+this) on {{ base }}{% url 'manual_deposit' %}.
 {% endif %}
-Below are your most recent transactions. 
 
 See {{ base }}{% url 'mytransactions' %} for the full details.
 
