@@ -7,6 +7,7 @@ from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.forms.models import ModelChoiceField
 from django.db.models import Q
 from django.utils import timezone
+from djmoney.models.validators import MaxMoneyValidator, MinMoneyValidator
 
 from django.db.models.signals import pre_delete, pre_save
 
@@ -203,7 +204,8 @@ class PettycashTransaction(models.Model):
     date = models.DateTimeField(blank=True, null=True, help_text="Date of transaction")
 
     amount = MoneyField(
-        max_digits=10, decimal_places=2, null=True, default_currency="EUR"
+        max_digits=10, decimal_places=2, null=True, default_currency="EUR",
+        validators=[ MinMoneyValidator(0) ]
     )
     description = models.CharField(max_length=300, blank=True, null=True)
 
@@ -249,6 +251,7 @@ class PettycashTransaction(models.Model):
 
     def save(self, *args, **kwargs):
         bypass = False
+
         if kwargs is not None and "bypass" in kwargs:
             bypass = kwargs["bypass"]
             del kwargs["bypass"]
@@ -261,6 +264,11 @@ class PettycashTransaction(models.Model):
 
         if not self.date:
             self.date = datetime.now(tz=timezone.utc)
+
+        if self.amount < Money(0,EUR):
+            if not bypas:
+                  raise ValidationError("Blocked negative transaction.")
+            logger.info("Bypass for negative transaction used on save of %s" % self)
 
         rc = super(PettycashTransaction, self).save(*args, **kwargs)
         try:
