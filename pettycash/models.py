@@ -186,7 +186,7 @@ def adjust_balance_cache(last, dst, amount):
 class PettycashTransaction(models.Model):
     dst = models.ForeignKey(
         User,
-        help_text="Paid to",
+        help_text="Whom to pay the money to",
         on_delete=models.CASCADE,
         related_name="isReceivedBy",
         blank=True,
@@ -194,7 +194,7 @@ class PettycashTransaction(models.Model):
     )
     src = models.ForeignKey(
         User,
-        help_text="Paid by",
+        help_text="Whom paid you",
         on_delete=models.CASCADE,
         related_name="isSentBy",
         blank=True,
@@ -210,7 +210,7 @@ class PettycashTransaction(models.Model):
         default_currency="EUR",
         validators=[MinMoneyValidator(0)],
     )
-    description = models.CharField(max_length=300, blank=True, null=True)
+    description = models.CharField(max_length=300, blank=True, null=True, help_text = "Description / omschrijving van waarvoor deze betaling is")
 
     history = HistoricalRecords()
 
