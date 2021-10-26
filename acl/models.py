@@ -18,6 +18,11 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+# We log unknown tags; to make adding them from a
+# recently seen list easy. But we do not want the
+# table to grow endlessly. So these are some hard
+# caps put on it.
+#
 MAX_USERS_TRACKED = 5
 DAYS_USERS_TRACKED = 3
 
