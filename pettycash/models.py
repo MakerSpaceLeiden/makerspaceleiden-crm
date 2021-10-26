@@ -204,8 +204,11 @@ class PettycashTransaction(models.Model):
     date = models.DateTimeField(blank=True, null=True, help_text="Date of transaction")
 
     amount = MoneyField(
-        max_digits=10, decimal_places=2, null=True, default_currency="EUR",
-        validators=[ MinMoneyValidator(0) ]
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        default_currency="EUR",
+        validators=[MinMoneyValidator(0)],
     )
     description = models.CharField(max_length=300, blank=True, null=True)
 
@@ -265,9 +268,9 @@ class PettycashTransaction(models.Model):
         if not self.date:
             self.date = datetime.now(tz=timezone.utc)
 
-        if self.amount < Money(0,EUR):
+        if self.amount < Money(0, EUR):
             if not bypas:
-                  raise ValidationError("Blocked negative transaction.")
+                raise ValidationError("Blocked negative transaction.")
             logger.info("Bypass for negative transaction used on save of %s" % self)
 
         rc = super(PettycashTransaction, self).save(*args, **kwargs)

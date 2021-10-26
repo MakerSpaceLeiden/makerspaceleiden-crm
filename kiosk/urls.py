@@ -8,5 +8,5 @@ from acl.models import Machine
 from . import views
 
 urlpatterns = [
-    path('kiosk', views.kiosk, name='kiosk'),
+    path("kiosk", views.kiosk, name="kiosk"),
 ]

@@ -5,8 +5,9 @@ from simple_history.admin import SimpleHistoryAdmin
 
 from .models import Mainssensor
 
-class MainssensorAdmin(ImportExportModelAdmin,SimpleHistoryAdmin):
+
+class MainssensorAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     resource_class = Mainssensor
 
-admin.site.register(Mainssensor,MainssensorAdmin)
 
+admin.site.register(Mainssensor, MainssensorAdmin)
