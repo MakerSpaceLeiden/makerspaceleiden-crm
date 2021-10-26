@@ -5,9 +5,9 @@ from simple_history.admin import SimpleHistoryAdmin
 
 from .models import Unknowntag
 
-class UnknownagAdmin(ImportExportModelAdmin,SimpleHistoryAdmin):
+
+class UnknownagAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     resource_class = Unknowntag
 
-admin.site.register(Unknowntag,UnknownagAdmin)
 
-
+admin.site.register(Unknowntag, UnknownagAdmin)

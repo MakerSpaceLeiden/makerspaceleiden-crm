@@ -17,49 +17,58 @@ from makerspaceleiden.utils import upload_to_pattern
 
 
 from django.db.models.signals import pre_delete, pre_save
+
 # from stdimage.utils import pre_delete_delete_callback, pre_save_delete_callback
 
 import re
 
+
 class Servicelog(models.Model):
     # UNKNOWN = 'UKNOWN'
-    FOUND_BROKEN = 'FOUND_BROKEN'
-    FOUND_FIX_BROKEN = 'FOUND_FIX_BROKEN'
-    BROKEN = 'BROKEN'
-    BROKEN_FIXED = 'BROKEN_FIXED'
-    OTHER= 'OTHER'
-    FIXED =  'FIXED'
+    FOUND_BROKEN = "FOUND_BROKEN"
+    FOUND_FIX_BROKEN = "FOUND_FIX_BROKEN"
+    BROKEN = "BROKEN"
+    BROKEN_FIXED = "BROKEN_FIXED"
+    OTHER = "OTHER"
+    FIXED = "FIXED"
 
     CAUSES = (
-        (FOUND_BROKEN, 'I found it already in this state' ),
-        (FOUND_FIX_BROKEN, 'I found it in this state, and fixed/cleaned it' ),
-        (BROKEN, 'I accidentally broke it and need help fixing it'),
-        (BROKEN_FIXED , 'I accidentally broke it and fixed it'),
-        (OTHER , 'Other - describe the situation in the descrition field'),
-        (FIXED , 'Checked and put back in operation'),
+        (FOUND_BROKEN, "I found it already in this state"),
+        (FOUND_FIX_BROKEN, "I found it in this state, and fixed/cleaned it"),
+        (BROKEN, "I accidentally broke it and need help fixing it"),
+        (BROKEN_FIXED, "I accidentally broke it and fixed it"),
+        (OTHER, "Other - describe the situation in the descrition field"),
+        (FIXED, "Checked and put back in operation"),
     )
 
-    machine = models.ForeignKey(Machine, on_delete = models.CASCADE)
+    machine = models.ForeignKey(Machine, on_delete=models.CASCADE)
 
-    reporter = models.ForeignKey(User, on_delete=models.CASCADE, related_name = 'isReportedBy')
+    reporter = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="isReportedBy"
+    )
     reported = models.DateTimeField(auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True)
 
-    description = models.TextField(max_length = 16 *1024)
+    description = models.TextField(max_length=16 * 1024)
 
-    image = StdImageField(delete_orphans=True,
-             upload_to=upload_to_pattern,
-             blank = True,
-             variations=settings.IMG_VARIATIONS,validators=settings.IMG_VALIDATORS,
-             help_text='Upload an image; if relevant - optional. Fine to leave blank, upload later or post someting later to the mailing list')
+    image = StdImageField(
+        delete_orphans=True,
+        upload_to=upload_to_pattern,
+        blank=True,
+        variations=settings.IMG_VARIATIONS,
+        validators=settings.IMG_VALIDATORS,
+        help_text="Upload an image; if relevant - optional. Fine to leave blank, upload later or post someting later to the mailing list",
+    )
 
-    situation = models.CharField(max_length=20, choices=CAUSES, default=BROKEN, blank=False, null = True)
+    situation = models.CharField(
+        max_length=20, choices=CAUSES, default=BROKEN, blank=False, null=True
+    )
 
     def url(self):
-       return  settings.BASE + self.path()
+        return settings.BASE + self.path()
 
     def path(self):
-       return reverse('service_log_view', kwargs = { 'machine_id' :  self.id })
+        return reverse("service_log_view", kwargs={"machine_id": self.id})
 
 
 # Handle image cleanup.

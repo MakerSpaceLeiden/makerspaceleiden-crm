@@ -6,12 +6,14 @@ from members.models import User
 import jsonfield
 import json
 
+
 def validate_json(payload):
-     return
-     try:
+    return
+    try:
         json.loads(payload)
-     except Exception as e:
-         raise exceptions.ValidationError("Invalid json {}".format(e));
+    except Exception as e:
+        raise exceptions.ValidationError("Invalid json {}".format(e))
+
 
 class Chore(models.Model):
     name = models.CharField(max_length=40, unique=True)
@@ -22,7 +24,7 @@ class Chore(models.Model):
         User,
         on_delete=models.SET_NULL,
         null=True,
-        related_name='createdBy',
+        related_name="createdBy",
     )
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -37,13 +39,13 @@ class ChoreVolunteer(models.Model):
         User,
         null=False,
         on_delete=models.CASCADE,
-        related_name='volunteer',
+        related_name="volunteer",
     )
     chore = models.ForeignKey(
         Chore,
         null=False,
         on_delete=models.CASCADE,
-        related_name='chore',
+        related_name="chore",
     )
     timestamp = models.IntegerField(null=False)
 

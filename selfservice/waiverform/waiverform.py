@@ -8,10 +8,10 @@ import PyPDF2
 import qrcode
 
 
-MM_2_UNITS = mm/inch*72
-pt = inch/27
+MM_2_UNITS = mm / inch * 72
+pt = inch / 27
 
-DOCUMENT_SIZE = (210*MM_2_UNITS, 297*MM_2_UNITS)
+DOCUMENT_SIZE = (210 * MM_2_UNITS, 297 * MM_2_UNITS)
 
 FONT_SIZE = 11  # Implicitly "pt"
 
@@ -26,7 +26,7 @@ NAME_COORDINATES = (89 * mm, 228 * mm)
 QR_CODE_COORDS = (20 * mm, 200 * mm, 40 * mm, 40 * mm)
 
 
-WAIVER_TEXT = '''
+WAIVER_TEXT = """
 Leiden, {data.date}
 
 Ref: waiver: waiver-2019-01-v1.01/{data.user_id}
@@ -38,18 +38,20 @@ apparatuur die ernstig blijvend letsel kan veroorzaken met eventueel de dood tot
 
 {data.user_name} vrijwaart het bestuur en de deelnemers van MakerSpace Leiden van
 aansprakelijkheid door hem/haar zelf, dan wel door derden.
-'''
+"""
 
-FormData = namedtuple('FormData', 'date user_id user_name')
+FormData = namedtuple("FormData", "date user_id user_name")
 
-template_filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'waiverform template.pdf')
+template_filepath = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "waiverform template.pdf"
+)
 
 
 def generate_waiverform_fd(user_id, user_name, confirmation_url):
     form_data = FormData(
-        date = datetime.datetime.now().strftime('%d/%m/%Y'),
-        user_id = user_id,
-        user_name = user_name,
+        date=datetime.datetime.now().strftime("%d/%m/%Y"),
+        user_id=user_id,
+        user_name=user_name,
     )
 
     # Read template page from PDF
@@ -80,9 +82,13 @@ def _generate_overlay(form_data, confirmation_url):
     # Waiver text
     c.setFont("Helvetica", FONT_SIZE)
     y = MARGIN_TOP
-    for idx, line in enumerate(WAIVER_TEXT.strip().split('\n')):
+    for idx, line in enumerate(WAIVER_TEXT.strip().split("\n")):
         if line.strip():
-            c.drawString(MARGIN_LEFT if idx > 0 else MARGIN_LEFT_DATE, y, line.format(data=form_data))
+            c.drawString(
+                MARGIN_LEFT if idx > 0 else MARGIN_LEFT_DATE,
+                y,
+                line.format(data=form_data),
+            )
         y += LEADING
 
     # Date

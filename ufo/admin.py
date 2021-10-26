@@ -5,8 +5,9 @@ from django.contrib import admin
 
 from .models import Ufo
 
+
 class UfoAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     pass
 
-admin.site.register(Ufo, UfoAdmin)
 
+admin.site.register(Ufo, UfoAdmin)

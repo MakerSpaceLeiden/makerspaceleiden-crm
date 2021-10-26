@@ -8,21 +8,21 @@ from .models import Chore, ChoreVolunteer
 
 class ChoreAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     list_display = (
-        'name',
-        'description',
-        'class_type',
-        'configuration',
-        'creator',
-        'created_at',
+        "name",
+        "description",
+        "class_type",
+        "configuration",
+        "creator",
+        "created_at",
     )
 
 
 class ChoreVolunteerAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     list_display = (
-        'user',
-        'chore',
-        'timestamp',
-        'created_at',
+        "user",
+        "chore",
+        "timestamp",
+        "created_at",
     )
 
 

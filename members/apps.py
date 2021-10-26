@@ -1,4 +1,5 @@
 from django.apps import AppConfig
 
+
 class UserConfig(AppConfig):
-    name = 'members'
+    name = "members"

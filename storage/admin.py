@@ -5,8 +5,9 @@ from django.contrib import admin
 
 from .models import Storage
 
+
 class StorageAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     pass
 
-admin.site.register(Storage, StorageAdmin)
 
+admin.site.register(Storage, StorageAdmin)
