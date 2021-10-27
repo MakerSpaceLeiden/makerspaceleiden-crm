@@ -112,16 +112,20 @@ def alertOwnersToChange(
     # if settings.ALSO_INFORM_EMAIL_ADDRESSES:
     #    toinform.extend(settings.ALSO_INFORM_EMAIL_ADDRESSES)
 
-    return emailPlain(template, toinform=toinform, context={
-        "user": userThatMadeTheChange,
-        "base": settings.BASE,
-        "reason": reason,
-        "tx": tx,
-        "src_label": src_label,
-        "dst_label": dst_label,
-        "label": label,
-        "settings": settings,
-    })
+    return emailPlain(
+        template,
+        toinform=toinform,
+        context={
+            "user": userThatMadeTheChange,
+            "base": settings.BASE,
+            "reason": reason,
+            "tx": tx,
+            "src_label": src_label,
+            "dst_label": dst_label,
+            "label": label,
+            "settings": settings,
+        },
+    )
 
 
 def pettycash_redirect(pk=None):
