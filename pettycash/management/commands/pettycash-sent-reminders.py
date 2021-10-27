@@ -13,6 +13,7 @@ import sys, os
 from datetime import datetime
 from moneyed import Money, EUR
 
+
 def sendEmail(transactions, balance, user, toinform, template="balance-email.txt"):
     gs = False
     topup = 0
@@ -23,15 +24,20 @@ def sendEmail(transactions, balance, user, toinform, template="balance-email.txt
             int((-float(balance.balance.amount) + settings.PETTYCASH_TOPUP) / 5 + 0.5)
             * 5
         )
-    return emailPlain(template, toinform=toinform, context={
-        "base": settings.BASE,
-        "balance": balance,
-        "date": datetime.now(tz=timezone.utc),
-        "transactions": transactions,
-        "goodstanding": gs,
-        "topup": topup,
-        "user": user,
-    })
+    return emailPlain(
+        template,
+        toinform=toinform,
+        context={
+            "base": settings.BASE,
+            "balance": balance,
+            "date": datetime.now(tz=timezone.utc),
+            "transactions": transactions,
+            "goodstanding": gs,
+            "topup": topup,
+            "user": user,
+        },
+    )
+
 
 class Command(BaseCommand):
     help = "Sent balances and stuff.."

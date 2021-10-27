@@ -16,11 +16,16 @@ from moneyed import Money, EUR
 
 
 def sendEmail(balances, toinform, template="balance-overview-email.txt"):
-    return emailPlain(template, toinform=toinform, context={
-        "balances": balances,
-        "date": datetime.now(tz=timezone.utc),
-        "base": settings.BASE
-    })
+    return emailPlain(
+        template,
+        toinform=toinform,
+        context={
+            "balances": balances,
+            "date": datetime.now(tz=timezone.utc),
+            "base": settings.BASE,
+        },
+    )
+
 
 class Command(BaseCommand):
     help = "Sent balance overview of everyone"

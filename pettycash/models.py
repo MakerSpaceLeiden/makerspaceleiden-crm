@@ -210,7 +210,12 @@ class PettycashTransaction(models.Model):
         default_currency="EUR",
         validators=[MinMoneyValidator(0)],
     )
-    description = models.CharField(max_length=300, blank=True, null=True, help_text = "Description / omschrijving van waarvoor deze betaling is")
+    description = models.CharField(
+        max_length=300,
+        blank=True,
+        null=True,
+        help_text="Description / omschrijving van waarvoor deze betaling is",
+    )
 
     history = HistoricalRecords()
 
