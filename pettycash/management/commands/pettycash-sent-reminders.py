@@ -4,17 +4,16 @@ from django.template.loader import render_to_string, get_template
 from django.conf import settings
 from django.core.mail import EmailMessage
 from django.db.models import Q
+from django.utils import timezone
 
 from pettycash.models import PettycashTransaction, PettycashBalanceCache
+from makerspaceleiden.mail import emailPlain
 
 import sys, os
-import datetime
+from datetime import datetime
 from moneyed import Money, EUR
 
-
-def sendEmail(transactions, balance, user, to, template="balance-email.txt"):
-    subject = "[makerbot] Account balance %s: %s" % (user, balance.balance)
-
+def sendEmail(transactions, balance, user, toinform, template="balance-email.txt"):
     gs = False
     topup = 0
     if balance.balance > Money(0, EUR):
@@ -24,19 +23,15 @@ def sendEmail(transactions, balance, user, to, template="balance-email.txt"):
             int((-float(balance.balance.amount) + settings.PETTYCASH_TOPUP) / 5 + 0.5)
             * 5
         )
-
-    context = {
-        "transactions": transactions,
+    return emailPlain(template, toinform=toinform, context={
+        "base": settings.BASE,
         "balance": balance,
+        "date": datetime.now(tz=timezone.utc),
+        "transactions": transactions,
         "goodstanding": gs,
         "topup": topup,
         "user": user,
-        "base": settings.BASE,
-    }
-    message = render_to_string(template, context)
-
-    EmailMessage(subject, message, to=to, from_email=settings.DEFAULT_FROM_EMAIL).send()
-
+    })
 
 class Command(BaseCommand):
     help = "Sent balances and stuff.."

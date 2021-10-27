@@ -1,3 +1,4 @@
+Subject: [makerbot] Cash transaction for {{ tx.amount }} -- {{ label }}
 L.S.
 
 Just to let you know; we had the following transaction made:

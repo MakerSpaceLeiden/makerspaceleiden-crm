@@ -16,7 +16,7 @@ from moneyed import Money, EUR
 
 import sys, os
 import datetime
-
+import pwd
 
 class Command(BaseCommand):
     help = "Recache all balances"

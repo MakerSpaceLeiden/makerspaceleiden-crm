@@ -1,1 +1,0 @@
-[makerbot] Deleted transaction for {{ tx.amount }} -- {{ label }}

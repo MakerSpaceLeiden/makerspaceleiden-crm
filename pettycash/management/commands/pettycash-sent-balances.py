@@ -6,26 +6,21 @@ from django.core.mail import EmailMessage
 from django.db.models import Q
 
 from pettycash.models import PettycashTransaction, PettycashBalanceCache
+from makerspaceleiden.mail import emailPlain
 
-import sys, os
+import sys, os, pwd
+
 from datetime import datetime, timedelta
 from django.utils import timezone
 from moneyed import Money, EUR
 
 
-def sendEmail(balances, to, template="balance-overview-email.txt"):
-    subject = "[makerbot] Account balances for this month"
-
-    context = {
+def sendEmail(balances, toinform, template="balance-overview-email.txt"):
+    return emailPlain(template, toinform=toinform, context={
         "balances": balances,
         "date": datetime.now(tz=timezone.utc),
-        "base": settings.BASE,
-    }
-    message = render_to_string(template, context)
-    EmailMessage(
-        subject, message, to=[to], from_email=settings.DEFAULT_FROM_EMAIL
-    ).send()
-
+        "base": settings.BASE
+    })
 
 class Command(BaseCommand):
     help = "Sent balance overview of everyone"

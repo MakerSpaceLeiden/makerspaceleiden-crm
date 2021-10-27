@@ -1,3 +1,5 @@
+Subject:  "[makerbot] Account balance {{ user}} {{ balance.balance }}
+
 Dear {{ user }},
 
 Your current account balanace is {{ balance.balance }}; which means that 

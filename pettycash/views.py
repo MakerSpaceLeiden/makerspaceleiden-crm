@@ -43,6 +43,7 @@ import re
 import secrets
 import hashlib
 from django.utils import timezone
+from makerspaceleiden.mail import emailPlain
 
 from moneyed import Money, EUR
 from moneyed.l10n import format_money
@@ -105,7 +106,13 @@ def alertOwnersToChange(
     else:
         toinform.append(tx.dst.email)
 
-    context = {
+    if userThatMadeTheChange.email not in toinform:
+        toinform.append(userThatMadeTheChange.email)
+
+    # if settings.ALSO_INFORM_EMAIL_ADDRESSES:
+    #    toinform.extend(settings.ALSO_INFORM_EMAIL_ADDRESSES)
+
+    return emailPlain(template, toinform=toinform, context={
         "user": userThatMadeTheChange,
         "base": settings.BASE,
         "reason": reason,
@@ -114,20 +121,7 @@ def alertOwnersToChange(
         "dst_label": dst_label,
         "label": label,
         "settings": settings,
-    }
-
-    if userThatMadeTheChange.email not in toinform:
-        toinform.append(userThatMadeTheChange.email)
-
-    # if settings.ALSO_INFORM_EMAIL_ADDRESSES:
-    #    toinform.extend(settings.ALSO_INFORM_EMAIL_ADDRESSES)
-
-    subject = render_to_string("subject_%s" % template, context).strip()
-    message = render_to_string(template, context)
-
-    return EmailMessage(
-        subject, message, to=toinform, from_email=settings.DEFAULT_FROM_EMAIL
-    ).send()
+    })
 
 
 def pettycash_redirect(pk=None):

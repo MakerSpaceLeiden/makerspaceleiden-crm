@@ -11,19 +11,29 @@ from email.mime.multipart import MIMEMultipart
 
 import datetime
 import logging
+import re
 
 logger = logging.getLogger(__name__)
 
 
-def emailPlain(template, toinform=[], context={}):
+def emailPlain(template, subject=None, toinform=[], context={}):
     # Weed out duplicates.
     to = list(set(toinform))
 
     context["base"] = settings.BASE
 
-    body = render_to_string(template, context).split("\n")
-    subject = body[0].rstrip()
-    body = "\n".join(body[1:])
+    body = render_to_string(template, context)
+
+    if not subject:
+        body = body.split("\n")
+        subject = body[0].rstrip()
+        subject = re.sub("^Subject:\s+", string=subject, repl="", flags=re.IGNORECASE)
+        body = "\n".join(body[1:])
+
+    body_html = (
+        "<html><head><title>%s</title></head><body><pre>%s</pre></body><html>"
+        % (subject, body)
+    )
 
     msg = MIMEMultipart("alternative")
 
@@ -31,15 +41,13 @@ def emailPlain(template, toinform=[], context={}):
     msg.attach(part1)
 
     part2 = MIMEMultipart("related")
-    part2.attach(
-        "<html><head><title>%s</title></head><body><pre>%s</pre></body><html>"
-        % (subject, body),
-        "html",
-    )
+    part2.attach(MIMEText(body_html, "html"))
+
     msg.attach(part2)
 
     email = EmailMessage(
         subject.strip(), None, to=to, from_email=settings.DEFAULT_FROM_EMAIL
     )
+
     email.attach(msg)
     email.send()

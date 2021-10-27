@@ -1,3 +1,4 @@
+Subject: [makerbot] {{ tx.amount }} was deposited into your space account
 L.S.
 
 Just to let you know; {{ tx.amount }} was deposited into yours

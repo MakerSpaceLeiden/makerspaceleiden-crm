@@ -1,3 +1,4 @@
+Subject: [makerbot] Deleted transaction for {{ tx.amount }} -- {{ label }}
 L.S.
 
 Just to let you know; we had the transaction below was DELETED 
