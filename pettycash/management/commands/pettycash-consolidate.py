@@ -36,7 +36,6 @@ class Command(BaseCommand):
         torollup = PettycashTransaction.objects.all().filter(date__lt=cutoff_date)
 
         for user in User.objects.all():
-            print("Consolidating: %s" % user)
 
             records = torollup.filter(Q(dst=user) | Q(src=user))
 
@@ -57,7 +56,7 @@ class Command(BaseCommand):
 
             if rollup.amount:
                 print(
-                    " = %s consolided %d records: %s"
+                    "User %s consolided %d records: %s"
                     % (user, records.count(), rollup.amount)
                 )
                 if not options["dryrun"]:
@@ -65,12 +64,13 @@ class Command(BaseCommand):
                     rollup.save()
                     print("  -  saved: %s" % rollup)
 
-            print()
+                print()
 
-        print("Deleting %d records" % torollup.count())
+        if torollup:
+            print("Deleting %d records" % torollup.count())
+
         if not options["dryrun"]:
             torollup._change_reason = "Purged during manual rollup"
             torollup.delete()
-            print("deleted.")
 
         sys.exit(rc)
