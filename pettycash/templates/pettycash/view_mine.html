@@ -3,8 +3,23 @@
 
 {% block content %}
 
-Current balance {% if balance == 0 %}&euro; 0,-{% else %}{{ balance.balance }}{% endif %}
-<br>
+Your balance 
+{% if balance == 0 %}
+	&euro; 0,-
+{% else %}
+	{{ balance.balance }}
+{% endif %}
+{% if balance.balance.amount > 5 %}
+	<i>(Positive balance, so you have money to spend)</i>.
+{% else %}
+{% if balance.balance.amount > 0 %}
+	So there just a few euro's left in your acount. You may want to make a <a href="{% url 'manual_deposit' %}">deposit</a> 
+	before this runs out. As it takes a few days (or more) before the monies wired will show up in your account.
+{%else%}
+	<b>Negative, so you owe the space money; and should make a <a href="{% url 'manual_deposit' %}">deposit</a> as soon as possible.</b>
+{% endif %}
+{% endif %}
+<p>
 <br>
 <a href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/SpaceTegoed">What is SpaceTegoed</a>
 <br>
@@ -13,12 +28,13 @@ Current balance {% if balance == 0 %}&euro; 0,-{% else %}{{ balance.balance }}{%
 <a href="{% url 'invoice' src=who.id %}">Pay for a product</a>
 <br>
 <a href="{% url 'transfer_to_member' src=who.id %}">Transfer SpaceTegoed to other member</a>
-
 <br>
-<a href="{% url 'manual_deposit' %}">Deposit money</a><br>
-
-{% if balance.balance.amount > 0 %}
-<a href="#">Withdraw money</a><br>
+<a href="{% url 'manual_deposit' %}">Deposit money</a>
+<br>
+<a href="{% url 'pricelist' %}">See the current pricelist</a>
+<br>
+{% if balance.balance.amount > 25 %}
+Withdraw money <i>-- Not yet available; contact the trustees</i><br>
 {% endif %}
 
 {% endblock %}
