@@ -1,6 +1,6 @@
 from django import template
 from django.conf import settings
-from pettycash.models import PettycashBalanceCache 
+from pettycash.models import PettycashBalanceCache
 
 
 register = template.Library()
@@ -23,30 +23,31 @@ def isNetAdmin(user):
 
 @register.filter(name="isPettycashUser")
 def isPettycashUser(user):
-    if 'PETTYCASH_DEMO_USER_GROUP' in globals():
-         return user.groups.filter(name=settings.PETTYCASH_DEMO_USER_GROUP).exists()
+    if "PETTYCASH_DEMO_USER_GROUP" in globals():
+        return user.groups.filter(name=settings.PETTYCASH_DEMO_USER_GROUP).exists()
 
-    # check if non-zero balance or if there was a transaction 
+    # check if non-zero balance or if there was a transaction
     # in last PETTYCASH_NOUSE_DAYS days
     #
     try:
-          b=PettycashBalanceCache.objects.get(owner = user)
-          print(b)
-          if b.balance.amount != 0:
-                return True
+        b = PettycashBalanceCache.objects.get(owner=user)
+        print(b)
+        if b.balance.amount != 0:
+            return True
 
-          cutoff = datetime.now(tz=timezone.utc) - settings.PETTYCASH_NOUSE_DAYS
-          if b.date > cutoff:
-                return True
+        cutoff = datetime.now(tz=timezone.utc) - settings.PETTYCASH_NOUSE_DAYS
+        if b.date > cutoff:
+            return True
 
     except ObjectDoesNotExist as e:
-          pass
+        pass
 
     return False
+
 
 @register.filter(name="isPettycashAdmin")
 def isInPettycashAdmin(user):
     if user.is_privileged:
-          return True
+        return True
 
     return user.groups.filter(name=settings.PETTYCASH_ADMIN_GROUP).exists()

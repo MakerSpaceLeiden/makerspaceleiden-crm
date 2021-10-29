@@ -264,7 +264,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 # will not show people with 0-balance and no transactions
 # for PETTYCASH_NOUSE_DAYS
 # PETTYCASH_DEMO_USER_GROUP = "pettycash demo group"
-PETTYCASH_NOUSE_DAYS=60
+PETTYCASH_NOUSE_DAYS = 60
 PETTYCASH_ADMIN_GROUP = "pettycash admin group"
 PETTYCASH_TOPUP = 15
 PETTYCASH_TNS = "Stichting Makerspace Leiden"
