@@ -253,16 +253,22 @@ ML_ADMINURL = "https://mailman.foo.com/mailman"
 # Extact spelling as created in 'group' through the /admin/ interface.
 SENSOR_USER_GROUP = "mains Sensor Admins"
 NETADMIN_USER_GROUP = "network admins"
-PETTYCASH_DEMO_USER_GROUP = "pettycash demo group"
-PETTYCASH_ADMIN_GROUP = PETTYCASH_DEMO_USER_GROUP
+
+
+# REGISTRATION_OPEN = False
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+
+# Payment system
+#
+# When not defined - available all; but listings limited
+# will not show people with 0-balance and no transactions
+# for PETTYCASH_NOUSE_DAYS
+# PETTYCASH_DEMO_USER_GROUP = "pettycash demo group"
+PETTYCASH_NOUSE_DAYS=60
+PETTYCASH_ADMIN_GROUP = "pettycash admin group"
 PETTYCASH_TOPUP = 15
 PETTYCASH_TNS = "Stichting Makerspace Leiden"
 PETTYCASH_IBAN = "NL18RABO0123459876"
-
-# REGISTRATION_OPEN = False
-
-DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
-
 POT_ID = 1
 POT_LABEL = "Makerspace (de zwarte Pot)"
 CURRENCIES = ["EUR"]
