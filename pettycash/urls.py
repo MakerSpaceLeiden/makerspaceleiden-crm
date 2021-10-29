@@ -32,6 +32,8 @@ urlpatterns = [
     # Essentially the same - but for M2M - with bearer token over
     # localhost allowed to impersonate a known/authenticated user.
     #
+    path("api/none", views.api_none, name="api-none"),
+    path("api/v1/pay", views.api_pay, name="acl-v1-pay"),
     path("api/v1/pay", views.api_pay, name="acl-v1-pay"),
     path("api/v1/skus", views.api_get_skus, name="acl-v1-get-skus"),
     path("api/v1/sku/<int:sku>", views.api_get_sku, name="acl-v1-get-sku"),
