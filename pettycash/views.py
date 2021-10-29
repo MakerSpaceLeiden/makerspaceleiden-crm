@@ -525,11 +525,13 @@ def pair(request, pk):
 
     return render(request, "pettycash/pair.html", context)
 
+
 @csrf_exempt
 def api_none(request):
     # Very short reply - for CA_fetch/tests by IoT hardware with
     # limited heap/memory.
     return HttpResponse("OK\n", status=200, content_type="text/plain")
+
 
 @csrf_exempt
 @superuser_or_bearer_required
