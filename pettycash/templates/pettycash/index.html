@@ -4,11 +4,15 @@
 
 {% block content %}
 
+{% if user|isPettycashUser %}<!-- is PCU -->{% endif %}
+{% if user.is_priveleged %}<!-- is PLD -->{% endif %}
+{% if user|isPettycashAdmin   %}<!-- is PCA -->{% endif %}
+
 <table>
 	<tr><th>Member</th><th>Last change</th><th>Balance</th></tr>
 	{% for b in lst %}
 	{% if b.owner|isPettycashUser %}
-          {% if user.is_privileged or b.owner.id != settings.POT_ID or 1 %}
+          {% if user|isPettycashAdmin or b.owner.id != settings.POT_ID %}
 		<tr>
 			<td>
 			<a href="{% url 'transactions' pk=b.owner.id %}">
@@ -29,7 +33,7 @@
                         {% if user.id == b.owner.id %}
 				<td><a href="{% url 'invoice' src=b.owner.id %}">[pay to {{ settings.POT_LABEL }}]</a></td>
                         {% else %}
-				<td><a href="{% url 'transfer' src=user.id dst=b.owner.id %}">[pay]</a></td>
+				<td><a href="{% url 'transfer' src=user.id dst=b.owner.id %}">[pay this person]</a></td>
 			{% endif %}
 			{% if user.is_privileged and b.owner.id != settings.POT_ID %}
 				<td><a href="{% url 'deposit' dst=b.owner.id %}">[deposit]</a></td>

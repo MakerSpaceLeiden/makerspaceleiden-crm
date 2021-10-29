@@ -1,7 +1,10 @@
 from django import template
 from django.conf import settings
 from pettycash.models import PettycashBalanceCache
+from django.core.exceptions import ObjectDoesNotExist
+from django.utils import timezone
 
+from datetime import datetime, timedelta
 
 register = template.Library()
 
@@ -31,12 +34,11 @@ def isPettycashUser(user):
     #
     try:
         b = PettycashBalanceCache.objects.get(owner=user)
-        print(b)
         if b.balance.amount != 0:
             return True
 
-        cutoff = datetime.now(tz=timezone.utc) - settings.PETTYCASH_NOUSE_DAYS
-        if b.date > cutoff:
+        cutoff = datetime.now(tz=timezone.utc) - timedelta(days = settings.PETTYCASH_NOUSE_DAYS)
+        if b.last and b.last.date > cutoff:
             return True
 
     except ObjectDoesNotExist as e:
@@ -49,5 +51,5 @@ def isPettycashUser(user):
 def isInPettycashAdmin(user):
     if user.is_privileged:
         return True
-
+    
     return user.groups.filter(name=settings.PETTYCASH_ADMIN_GROUP).exists()
