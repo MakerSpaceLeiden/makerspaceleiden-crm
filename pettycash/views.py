@@ -867,9 +867,11 @@ def api_register(request):
 
             if sha.lower() == response.lower():
                 terminal.accepted = True
-                terminal._change_reason = (
-                    "%s, IP=%s tag-=%d %s"
-                    % (terminal.name, ip, tag.id, tag.owner)
+                terminal._change_reason = "%s, IP=%s tag-=%d %s" % (
+                    terminal.name,
+                    ip,
+                    tag.id,
+                    tag.owner,
                 )
                 terminal.save()
                 logger.info(

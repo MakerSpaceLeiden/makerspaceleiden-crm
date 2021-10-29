@@ -91,7 +91,12 @@ class PettycashTerminal(models.Model):
     history = HistoricalRecords()
 
     def __str__(self):
-        return "%s@%s %s...%s" % ( self.name, self.date.strftime("%Y/%m/%d %H:%M"), self.fingerprint[:3], self.fingerprint[-3:])
+        return "%s@%s %s...%s" % (
+            self.name,
+            self.date.strftime("%Y/%m/%d %H:%M"),
+            self.fingerprint[:3],
+            self.fingerprint[-3:],
+        )
 
     def save(self, *args, **kwargs):
         days = settings.TERMS_DAYS_CUTOFF
