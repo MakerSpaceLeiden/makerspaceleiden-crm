@@ -17,8 +17,11 @@ Current balance {% if balance == 0 %}&euro; 0,-{% else %}{{ balance.balance }}{%
 <br>
 <a href="{% url 'manual_deposit' %}">Deposit money</a><br>
 
-{% if balance.balance.amount > 0 %}
-<a href="#">Withdraw money</a><br>
+{% if balance.balance.amount > 5 %}
+<a href="#">Withdraw money</a> (not yet implemented)<br>
 {% endif %}
 
+<p>
+<hr>
+<a href="{% url 'index' %}">back to the main page</a>
 {% endblock %}
