@@ -226,6 +226,7 @@ def index(request, days=30):
     }
     return render(request, "pettycash/index.html", context)
 
+
 @login_required
 def pricelist(request, days=30):
     prices = PettycashSku.objects.all()
@@ -235,6 +236,7 @@ def pricelist(request, days=30):
         "pricelist": prices,
     }
     return render(request, "pettycash/pricelist.html", context)
+
 
 @login_required
 def qrcode(request):
