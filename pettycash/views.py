@@ -873,11 +873,14 @@ def api_register(request):
             m.update(bytes.fromhex(client_sha))
             m.update(bytes.fromhex(server_sha))
             sha = m.hexdigest()
+
             if sha.lower() == response.lower():
                 terminal.accepted = True
-                terminal._change_reason = (
-                    "Terminal %s, IP=%s was activated by tag %d of %s"
-                    % (terminal, ip, tag.id, tag.owner)
+                terminal._change_reason = "%s, IP=%s tag-=%d %s" % (
+                    terminal.name,
+                    ip,
+                    tag.id,
+                    tag.owner,
                 )
                 terminal.save()
                 logger.info(
