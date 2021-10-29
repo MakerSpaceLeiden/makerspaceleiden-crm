@@ -37,7 +37,9 @@ def isPettycashUser(user):
         if b.balance.amount != 0:
             return True
 
-        cutoff = datetime.now(tz=timezone.utc) - timedelta(days = settings.PETTYCASH_NOUSE_DAYS)
+        cutoff = datetime.now(tz=timezone.utc) - timedelta(
+            days=settings.PETTYCASH_NOUSE_DAYS
+        )
         if b.last and b.last.date > cutoff:
             return True
 
@@ -51,5 +53,5 @@ def isPettycashUser(user):
 def isInPettycashAdmin(user):
     if user.is_privileged:
         return True
-    
+
     return user.groups.filter(name=settings.PETTYCASH_ADMIN_GROUP).exists()

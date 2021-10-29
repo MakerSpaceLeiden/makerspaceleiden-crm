@@ -210,7 +210,13 @@ def transact(
     if dst == settings.POT_ID:
         products = PettycashSku.objects.all()
 
-    context = {"title": label, "form": form, "action": "Pay", "products": products}
+    context = {
+        "title": label,
+        "form": form,
+        "action": "Pay",
+        "products": products,
+        "has_permission": request.user.is_authenticated,
+    }
     return render(request, "pettycash/invoice.html", context)
 
 
@@ -223,6 +229,8 @@ def index(request, days=30):
         "lst": lst,
         "settings": settings,
         "pricelist": prices,
+        "has_permission": request.user.is_authenticated,
+        "user": request.user,
     }
     return render(request, "pettycash/index.html", context)
 
@@ -233,6 +241,7 @@ def pricelist(request, days=30):
     context = {
         "title": "Pricelist",
         "settings": settings,
+        "has_permission": request.user.is_authenticated,
         "pricelist": prices,
     }
     return render(request, "pettycash/pricelist.html", context)
@@ -250,6 +259,7 @@ def qrcode(request):
         "title": "QR code",
         "description": description,
         "amount": amount,
+        "has_permission": request.user.is_authenticated,
         "url": "%s?description=%s&amount=%s"
         % (request.build_absolute_uri("/pettycash/pay"), description, amount_str),
     }
@@ -302,7 +312,10 @@ def transfer_to_member(request, src):
     if src:
         form.fields["src"].widget = widgets.HiddenInput()
 
-    context = {"form": form}
+    context = {
+        "form": form,
+        "has_permission": request.user.is_authenticated,
+    }
 
     return render(request, "pettycash/transfer_to_member.html", context)
 
@@ -337,6 +350,7 @@ def unpaired(request):
     unpaired = PettycashStation.objects.all().filter(Q(terminal=None))
     context = {
         "title": "Assigning terminal",
+        "has_permission": request.user.is_authenticated,
         "lst": lst,
         "unlst": unlst,
         "paired": paired,
@@ -380,6 +394,7 @@ def cam53upload(request):
 
                 context = {
                     "title": "Import log",
+                    "has_permission": request.user.is_authenticated,
                     "settings": settings,
                     "txs": txs,
                     "valids": valids,
@@ -400,6 +415,7 @@ def cam53upload(request):
 
     context = {
         "title": "Upload CAM53 transactions",
+        "has_permission": request.user.is_authenticated,
         "settings": settings,
         "form": form,
         "action": "upload",
@@ -465,6 +481,7 @@ def cam53process(request):
         "ok": ok,
         "failed": failed,
         "skipped": skipped,
+        "has_permission": request.user.is_authenticated,
     }
     return render(request, "pettycash/importlog-results.html", context)
 
@@ -503,6 +520,7 @@ def pair(request, pk):
         "form": form,
         "user": request.user,
         "action": "pair",
+        "has_permission": request.user.is_authenticated,
     }
 
     return render(request, "pettycash/pair.html", context)
@@ -573,6 +591,7 @@ def showtx(request, pk):
         "title": "Details transaction %s @ %s" % (tx.id, tx.date),
         "tx": tx,
         "settings": settings,
+        "has_permission": request.user.is_authenticated,
     }
 
     return render(request, "pettycash/details.html", context)
@@ -594,7 +613,13 @@ def show_mine(request):
     except ObjectDoesNotExist as e:
         pass
 
-    context = {"title": "SpaceTegoed", "balance": balance, "who": user, "lst": lst}
+    context = {
+        "title": "SpaceTegoed",
+        "balance": balance,
+        "who": user,
+        "lst": lst,
+        "has_permission": request.user.is_authenticated,
+    }
 
     return render(request, "pettycash/view_mine.html", context)
 
@@ -615,6 +640,7 @@ def manual_deposit(request):
         "title": "Perform a manual deposit",
         "settings": settings,
         "user": request.user,
+        "has_permission": request.user.is_authenticated,
         # String according to Quick Response Code richtlijnen van de Europese Betalingsraad (EPC).
         # See: https://epc-qr.eu. We need to do this here; rather than in the template; as the
         # latter does not allow for for line breaks (qr_from_text).
@@ -663,6 +689,7 @@ def show(request, pk):
 
     context = {
         "title": "Balance and transactions for %s" % (label),
+        "has_permission": request.user.is_authenticated,
         "balance": balance,
         "who": user,
         "lst": lst,
@@ -731,6 +758,7 @@ def delete(request, pk):
 
     context = {
         "title": "Delete transaction %s @ %s" % (tx.id, tx.date),
+        "has_permission": request.user.is_authenticated,
         "tx": tx,
         "settings": settings,
         "form": form,
