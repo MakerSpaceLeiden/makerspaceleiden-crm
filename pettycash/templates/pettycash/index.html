@@ -7,7 +7,7 @@
 <table>
 	<tr><th>Member</th><th>Last change</th><th>Balance</th></tr>
 	{% for b in lst %}
-	{% if b.owner|isInPettycashDemGroupo %}
+	{% if b.owner|isPettycashUser %}
           {% if user.is_privileged or b.owner.id != settings.POT_ID or 1 %}
 		<tr>
 			<td>

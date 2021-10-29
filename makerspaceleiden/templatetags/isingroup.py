@@ -21,9 +21,8 @@ def isNetAdmin(user):
     return user.groups.filter(name=settings.NETADMIN_USER_GROUP).exists()
 
 
-@register.filter(name="isInPettycashDemGroupo")
-def isInPettycashDemGroupo(user):
-
+@register.filter(name="isPettycashUser")
+def isPettycashUser(user):
     if 'PETTYCASH_DEMO_USER_GROUP' in globals():
          return user.groups.filter(name=settings.PETTYCASH_DEMO_USER_GROUP).exists()
 
@@ -32,6 +31,7 @@ def isInPettycashDemGroupo(user):
     #
     try:
           b=PettycashBalanceCache.objects.get(owner = user)
+          print(b)
           if b.balance.amount != 0:
                 return True
 
@@ -43,3 +43,10 @@ def isInPettycashDemGroupo(user):
           pass
 
     return False
+
+@register.filter(name="isPettycashAdmin")
+def isInPettycashAdmin(user):
+    if user.is_privileged:
+          return True
+
+    return user.groups.filter(name=settings.PETTYCASH_ADMIN_GROUP).exists()

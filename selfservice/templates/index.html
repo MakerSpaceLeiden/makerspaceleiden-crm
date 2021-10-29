@@ -55,9 +55,9 @@ There are no passwords for members at the moment.
 	<li><a href="{% url 'overview' %}">All members </a>
 <p/>
 	<li><a href="{% url 'personal_page' %}">Your data</a>
-{% if user|isInPettycashDemGroupo or user.is_privileged  %}
-	<li><a href="{% url 'mytransactions' %}">Your cash balance</a>, do payments, see all 
-		<a href="{% url 'balances' %}">balances</a>, etc.
+{% if user|isPettycashUser %}
+	<li><a href="{% url 'mytransactions' %}">Your cash balance</a>,  see all 
+		<a href="{% url 'balances' %}">balances</a>, the <a href="{% url 'pricelist' %}">pricelist</a> and so on.
 {% endif %}
 {%if settings.ML_ADMINURL%}
 	<li><a href="{% url 'mailinglists_edit' %}">Mailing lists subscriptions</a> and digest settings.
@@ -89,6 +89,10 @@ There are no passwords for members at the moment.
 	<li> List of <a href="/crm/api/v1/mainssensor/resolve">sensors</a> names, descriptions and IDs.
         <li> Or alternatively use ...<code>//crm/api/v1/mainssensor/resolve/1234</code> to get just the name (decimal number).
 	</p>
+{% endif %}
+
+{% if user|isPettycashAdmin %}
+	<li>List of <a href='{% url "unpaired" %}'>payment stations</a> and pairing.
 {% endif %}
 
 {%if user.is_privileged %}

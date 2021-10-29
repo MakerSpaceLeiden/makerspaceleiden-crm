@@ -39,6 +39,11 @@ Your balance
 <br>
 {% if balance.balance.amount > 25 %}
 Withdraw money <i>-- Not yet available; contact the trustees</i><br>
+<br>
+{% endif %}
+{% if user|isPettycashAdmin %}
+List of <a href='{% url "unpaired" %}'>stations</a> and pairing.
+<br>
 {% endif %}
 
 <p>
