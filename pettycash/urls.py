@@ -6,11 +6,11 @@ from makerspaceleiden import converters
 
 register_converter(converters.FloatUrlParameterConverter, "float")
 
-
 urlpatterns = [
     path("", views.index, name="balances"),
     path("show/<int:pk>", views.show, name="transactions"),
     path("show", views.show_mine, name="mytransactions"),
+    path("pricelist", views.pricelist, name="pricelist"),
     path("qrcode", views.qrcode, name="qrcode"),
     path("manual_deposit", views.manual_deposit, name="manual_deposit"),
     path("showtx/<int:pk>", views.showtx, name="transactiondetail"),

@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load isingroup %}
+{% load qr_code  %}
+
+{% block content %}
+
+<h2>Current Pricelist</h2>
+{% if pricelist %}
+<table>
+	<tr><th>Price</th><th>Name</th><th>Description</th></tr>
+	{% for item in pricelist %}
+	<tr>
+		<td>{{item.amount}}</td>
+		<td>{{item.name}}</td>
+		<td>{{item.description}}</td>
+	</tr>
+	{% endfor %}
+</table>
+{%else %}
+<i>There is currently no pricelist set up. </i>
+{%endif %}
+
+<h2>Terminal and station management</h2>
+See <a href='{% url "unpaired" %}'>this page</a>.
+
+{% endblock %}
+
