@@ -925,6 +925,22 @@ def api2_register(request):
                     % (terminal, tag.owner)
                 )
 
+                toinform = (
+                    User.objects.all()
+                    .filter(groups__name=settings.PETTYCASH_ADMIN_GROUP)
+                    .values_list("email", flat=True)
+                )
+                emailPlain(
+                    "email_accept.txt",
+                    toinform=toinform,
+                    context={
+                        "base": settings.BASE,
+                        "settings": settings,
+                        "tag": tag,
+                        "terminal": terminal,
+                    },
+                )
+
                 # proof to the terminal that we know the tag too. This prolly
                 # should be an HMAC
                 #
