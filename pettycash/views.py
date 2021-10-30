@@ -146,7 +146,7 @@ def transact_raw(
         tx = PettycashTransaction(
             src=src, dst=dst, description=description, amount=amount
         )
-        logger.error("Info: %s" % reason)
+        logger.error("payment via API: %s" % reason)
         tx._change_reason = reason
         tx.save()
         alertOwnersToChange(tx, user, [])
@@ -824,7 +824,7 @@ def api_pay(request):
 
 
 @csrf_exempt
-def api_register(request):
+def api2_register(request):
     ip = client_ip(request)
 
     # 1. We're always offered an x509 client cert.
@@ -933,8 +933,8 @@ def api_register(request):
                 return HttpResponse(sha, status=200, content_type="text/plain")
 
         logger.error(
-            "Nonce & fingerprint ok; but response could not be correlated to a tag (%s, ip=%si)"
-            % (terminal, ip)
+            "RQ ok; but response could not be correlated to a tag (%s, ip=%s, c=%s)"
+            % (terminal, ip, client_sha)
         )
         return HttpResponse("Pairing failed", status=400, content_type="text/plain")
 
@@ -999,3 +999,90 @@ def api_get_sku(request, sku):
         return HttpResponse("SKU not found", status=404, content_type="text/plain")
 
     return HttpResponse("Error", status=500, content_type="text/plain")
+
+@csrf_exempt
+def api2_pay(request):
+    # 1. We're always offered an x509 client cert.
+    #
+    cert = request.META.get("SSL_CLIENT_CERT", None)
+    if cert == None:
+        logger.error("Bad request, missing cert")
+        return HttpResponse(
+            "No client identifier, rejecting", status=400, content_type="text/plain"
+        )
+
+    client_sha = pemToSHA256Fingerprint(cert)
+
+    # 2. Is this terminal acticated and assigned.
+    #
+    try:
+        terminal = PettycashTerminal.objects.get(fingerprint=client_sha)
+    except ObjectDoesNotExist as e:
+        logger.error("Unknwon terminal; fingerprint=%s" % client_sha)
+        return HttpResponse(
+            "No client identifier, rejecting", status=400, content_type="text/plain"
+        )
+
+    if not terminal.accepted:
+        logger.error("Terminal %s not activated; rejecting." % terminal.name)
+        return HttpResponse(
+            "Terminal not activated, rejecting", status=400, content_type="text/plain"
+        )
+    try:
+        station = PettycashStation.objects.get(terminal = terminal)
+    except ObjectDoesNotExist as e:
+        logger.error("No station for terminal; fingerprint=%s" % client_sha)
+        return HttpResponse(
+            "Terminal not paired, rejecting", status=400, content_type="text/plain"
+        )
+
+    try:
+        tagstr = request.GET.get("src", None)
+        amount_str = request.GET.get("amount", None)
+        description = request.GET.get("description", None)
+        amount = Money(amount_str, EUR)
+    except Exception as e:
+        logger.error("Param issue for terminal %s@%s" % (terminal.name, station.description))
+        return HttpResponse("Params problems", status=400, content_type="text/plain")
+
+    if None in [tagstr, amount_str, description, amount ]:
+        logger.error("Missing param for terminal %s@%s" % (terminal.name, station.description))
+        return HttpResponse(
+            "Mandatory params missing", status=400, content_type="text/plain"
+        )
+
+    try:
+        tag = Tag.objects.get(tag=tagstr)
+    except ObjectDoesNotExist as e:
+        logger.error("Tag %s not found, terminal %s@%s" % (terminal.name, station.description ))
+        return HttpResponse("Tag not found", status=404, content_type="text/plain")
+
+
+    if amount < Money(0, EUR):
+        logger.error("Amount under 0, terminal %s@%s - %s" % (terminal.name, station.description ,tag.owner))
+        return HttpResponse("Invalid param", status=400, content_type="text/plain")
+
+    if amount > settings.MAX_PAY_API:
+        logger.error("Payment too high, rejected, terminal %s@%s - %s" % (terminal.name, station.description, tag.owner))
+        return HttpResponse(
+            "Payment Limit exceeded", status=400, content_type="text/plain"
+        )
+
+    if transact_raw(
+        request,
+        src=tag.owner,
+        dst=User.objects.get(id=settings.POT_ID),
+        description=description,
+        amount=amount,
+        reason="via API; tagid=%s (%s) @%s" % (tag.id, tag.owner, station.description),
+        user=tag.owner,
+    ):
+        label = "%s" % tag.owner.first_name
+        if len(label) < 1:
+            label = "%s" % tag.owner.last_name
+        if len(label) < 1:
+            label = "%s" % tag.owner
+        return JsonResponse({"result": True, "amount": amount.amount, "user": label})
+
+    return HttpResponse("FAIL", status=500, content_type="text/plain")
+
