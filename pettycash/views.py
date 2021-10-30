@@ -1002,6 +1002,7 @@ def api_get_sku(request, sku):
 
     return HttpResponse("Error", status=500, content_type="text/plain")
 
+
 @csrf_exempt
 def api2_pay(request):
     # 1. We're always offered an x509 client cert.
@@ -1031,7 +1032,7 @@ def api2_pay(request):
             "Terminal not activated, rejecting", status=400, content_type="text/plain"
         )
     try:
-        station = PettycashStation.objects.get(terminal = terminal)
+        station = PettycashStation.objects.get(terminal=terminal)
     except ObjectDoesNotExist as e:
         logger.error("No station for terminal; fingerprint=%s" % client_sha)
         return HttpResponse(
@@ -1044,11 +1045,15 @@ def api2_pay(request):
         description = request.GET.get("description", None)
         amount = Money(amount_str, EUR)
     except Exception as e:
-        logger.error("Param issue for terminal %s@%s" % (terminal.name, station.description))
+        logger.error(
+            "Param issue for terminal %s@%s" % (terminal.name, station.description)
+        )
         return HttpResponse("Params problems", status=400, content_type="text/plain")
 
-    if None in [tagstr, amount_str, description, amount ]:
-        logger.error("Missing param for terminal %s@%s" % (terminal.name, station.description))
+    if None in [tagstr, amount_str, description, amount]:
+        logger.error(
+            "Missing param for terminal %s@%s" % (terminal.name, station.description)
+        )
         return HttpResponse(
             "Mandatory params missing", status=400, content_type="text/plain"
         )
@@ -1056,16 +1061,23 @@ def api2_pay(request):
     try:
         tag = Tag.objects.get(tag=tagstr)
     except ObjectDoesNotExist as e:
-        logger.error("Tag %s not found, terminal %s@%s" % (terminal.name, station.description ))
+        logger.error(
+            "Tag %s not found, terminal %s@%s" % (terminal.name, station.description)
+        )
         return HttpResponse("Tag not found", status=404, content_type="text/plain")
 
-
     if amount < Money(0, EUR):
-        logger.error("Amount under 0, terminal %s@%s - %s" % (terminal.name, station.description ,tag.owner))
+        logger.error(
+            "Amount under 0, terminal %s@%s - %s"
+            % (terminal.name, station.description, tag.owner)
+        )
         return HttpResponse("Invalid param", status=400, content_type="text/plain")
 
     if amount > settings.MAX_PAY_API:
-        logger.error("Payment too high, rejected, terminal %s@%s - %s" % (terminal.name, station.description, tag.owner))
+        logger.error(
+            "Payment too high, rejected, terminal %s@%s - %s"
+            % (terminal.name, station.description, tag.owner)
+        )
         return HttpResponse(
             "Payment Limit exceeded", status=400, content_type="text/plain"
         )
@@ -1087,4 +1099,3 @@ def api2_pay(request):
         return JsonResponse({"result": True, "amount": amount.amount, "user": label})
 
     return HttpResponse("FAIL", status=500, content_type="text/plain")
-
