@@ -920,7 +920,7 @@ def api2_register(request):
                     tag.owner,
                 )
                 terminal.save()
-                logger.info(
+                logger.error(
                     "Terminal %s accepted, tag swipe by %s matched."
                     % (terminal, tag.owner)
                 )
