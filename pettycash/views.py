@@ -950,14 +950,14 @@ def api2_register(request):
 
     avail = []
     for item in station.available_skus.all():
-        avail.append(
-            {
-                "name": item.name,
-                "description": item.description,
-                "price": item.amount.amount,
-                "default": item == station.default_sku,
-            }
-        )
+        e = {
+            "name": item.name,
+            "description": item.description,
+            "price": item.amount.amount,
+        }
+        if item == station.default_sku:
+            a["default"] = True
+        avail.append(e)
 
     return JsonResponse(
         {
