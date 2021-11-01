@@ -854,7 +854,7 @@ def api2_register(request):
 
         name = request.GET.get("name", None)
         if not name:
-            logger.error("Bad request, missing name for %s at %s" % (client_sha, ip))
+            logger.error("Bad request, client unknown, but no name provided (%s @ %s" % (client_sha, ip))
             return HttpResponse(
                 "Bad request, missing name", status=400, content_type="text/plain"
             )
