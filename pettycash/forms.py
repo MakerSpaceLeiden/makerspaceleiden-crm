@@ -12,7 +12,6 @@ from .models import (
     PettycashReimbursementRequest,
 )
 
-
 class UserChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
         return "test {}".format(obj.name)
