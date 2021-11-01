@@ -320,16 +320,19 @@ class PettycashTransaction(models.Model):
 
 class PettycashReimbursementRequest(models.Model):
     dst = models.ForeignKey(
-        User, 
+        User,
         help_text="Person to reemburse (usually you, yourself)",
         on_delete=models.CASCADE,
         related_name="isReimbursedTo",
     )
 
-    date = models.DateTimeField(help_text="Date of expense", default=datetime.date.today)
+    date = models.DateTimeField(
+        help_text="Date of expense", default=datetime.date.today
+    )
 
     submitted = models.DateTimeField(
-        help_text="Date the request was submitted", default=datetime.date.today,
+        help_text="Date the request was submitted",
+        default=datetime.date.today,
     )
 
     amount = MoneyField(

@@ -12,6 +12,7 @@ from .models import (
     PettycashReimbursementRequest,
 )
 
+
 class UserChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
         return "test {}".format(obj.name)
@@ -45,6 +46,7 @@ class PettycashReimbursementRequestForm(ModelForm):
     class Meta:
         model = PettycashReimbursementRequest
         fields = ["dst", "description", "amount", "date", "viaTheBank", "scan"]
+
 
 class PettycashReimburseHandleForm(forms.Form):
     pk = forms.IntegerField(widget=forms.HiddenInput())
