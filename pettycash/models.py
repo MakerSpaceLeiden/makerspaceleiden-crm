@@ -29,6 +29,7 @@ import re
 import base64
 import hashlib
 import binascii
+import datetime
 
 from moneyed import Money, EUR
 
@@ -319,18 +320,16 @@ class PettycashTransaction(models.Model):
 
 class PettycashReimbursementRequest(models.Model):
     dst = models.ForeignKey(
-        User,
+        User, 
         help_text="Person to reemburse (usually you, yourself)",
         on_delete=models.CASCADE,
         related_name="isReimbursedTo",
-        blank=True,
-        null=True,
     )
 
-    date = models.DateTimeField(blank=True, null=True, help_text="Date of expense")
+    date = models.DateTimeField(help_text="Date of expense", default=datetime.date.today)
 
     submitted = models.DateTimeField(
-        blank=True, null=True, help_text="Date the request was submitted"
+        help_text="Date the request was submitted", default=datetime.date.today,
     )
 
     amount = MoneyField(
@@ -353,8 +352,6 @@ class PettycashReimbursementRequest(models.Model):
 
     description = models.CharField(
         max_length=300,
-        blank=True,
-        null=True,
         help_text="Description / omschrijving van waarvoor deze betaling is",
     )
 

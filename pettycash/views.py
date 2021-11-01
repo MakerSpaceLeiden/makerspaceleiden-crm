@@ -787,7 +787,10 @@ def delete(request, pk):
 @login_required
 def reimburseform(request):
     form = PettycashReimbursementRequestForm(
-        request.POST or None, request.FILES, initial={"dst": request.user}
+       request.POST or None, request.FILES, initial={ 
+            "dst": request.user, 
+            "date":  datetime.now(tz=timezone.utc) ,
+       },
     )
     context = {
         "settings": settings,
