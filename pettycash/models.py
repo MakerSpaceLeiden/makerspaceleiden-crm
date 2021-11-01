@@ -326,9 +326,7 @@ class PettycashReimbursementRequest(models.Model):
         related_name="isReimbursedTo",
     )
 
-    date = models.DateTimeField(
-        help_text="Date of expense", default=datetime.date.today
-    )
+    date = models.DateField(help_text="Date of expense", default=datetime.date.today)
 
     submitted = models.DateTimeField(
         help_text="Date the request was submitted",
@@ -338,7 +336,6 @@ class PettycashReimbursementRequest(models.Model):
     amount = MoneyField(
         max_digits=8,
         decimal_places=2,
-        null=True,
         default_currency="EUR",
         validators=[
             MinMoneyValidator(0),

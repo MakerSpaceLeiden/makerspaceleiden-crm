@@ -44,7 +44,7 @@ import secrets
 import hashlib
 from django.utils import timezone
 from makerspaceleiden.mail import emailPlain
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 
 from moneyed import Money, EUR
 from moneyed.l10n import format_money
@@ -66,7 +66,7 @@ def image2mime(img):
     name = img.name.split("/")[-1]
     attachment = MIMEImage(img.read(), ext)
     attachment.add_header("Content-Disposition", 'inline; filename="' + name + '"')
-    attachments.append(attachment)
+    return attachment
 
 
 import logging
@@ -788,10 +788,10 @@ def delete(request, pk):
 def reimburseform(request):
     form = PettycashReimbursementRequestForm(
         request.POST or None,
-        request.FILES,
+        request.FILES or None,
         initial={
             "dst": request.user,
-            "date": datetime.now(tz=timezone.utc),
+            "date": date.today(),
         },
     )
     context = {
