@@ -49,14 +49,24 @@ from datetime import datetime, timedelta
 from moneyed import Money, EUR
 from moneyed.l10n import format_money
 
+
 def mtostr(m):
     return format_money(m, locale="nl_NL")
+
 
 def client_ip(request):
     x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
     if x_forwarded_for:
         return x_forwarded_for.split(",")[0]
     return request.META.get("REMOTE_ADDR")
+
+
+def image2mime(img):
+    ext = img.name.split(".")[-1]
+    name = img.name.split("/")[-1]
+    attachment = MIMEImage(img.read(), ext)
+    attachment.add_header("Content-Disposition", 'inline; filename="' + name + '"')
+    attachments.append(attachment)
 
 
 import logging
@@ -622,6 +632,7 @@ def show_mine(request):
         "balance": balance,
         "who": user,
         "lst": lst,
+        "queue": PettycashReimbursementRequest.objects.all().count(),
         "has_permission": request.user.is_authenticated,
     }
 
@@ -772,94 +783,116 @@ def delete(request, pk):
 
     return render(request, "pettycash/delete.html", context)
 
+
 @login_required
 def reimburseform(request):
     form = PettycashReimbursementRequestForm(
-        request.POST or None,
-        initial={"dst": request.user}
+        request.POST or None, request.FILES, initial={"dst": request.user}
     )
     context = {
-            'settings': settings,
-            'form': form,
-            'label': 'Reimburse', 
-            'action': 'request',
-            'user': request.user,
-            "has_permission": request.user.is_authenticated,
+        "settings": settings,
+        "form": form,
+        "label": "Reimburse",
+        "action": "request",
+        "user": request.user,
+        "has_permission": request.user.is_authenticated,
     }
 
     if form.is_valid():
+        print(request.POST)
         item = form.save(commit=False)
         if not item.date:
-            item.date =  datetime.now(tz=timezone.utc)
+            item.date = datetime.now(tz=timezone.utc)
         if not item.submitted:
-            item.submitted =  datetime.now(tz=timezone.utc)
-   
+            item.submitted = datetime.now(tz=timezone.utc)
+
         item.save()
-        context['item'] = item
+        context["item"] = item
+
+        attachments = []
+        if item.scan:
+            attachments.append(image2mime(item.scan))
 
         emailPlain(
             "email_imbursement_notify.txt",
-            toinform=[ settings.TRUSTEES, request.user.email ],
+            toinform=[settings.TRUSTEES, request.user.email],
             context=context,
+            attachments=attachments,
         )
-        
-        return render(request, "pettycash/reimburse_ok.html", context = context);
 
-    return render(request, "pettycash/reimburse_form.html", context = context );
- 
+        return render(request, "pettycash/reimburse_ok.html", context=context)
+
+    return render(request, "pettycash/reimburse_form.html", context=context)
+
+
 @superuser
 def reimburseque(request):
     context = {
-            'settings': settings,
-            'label': 'Reimburse', 
-            'action': 'request',
-            'user': request.user,
-            "has_permission": request.user.is_authenticated,
+        "settings": settings,
+        "label": "Reimburse",
+        "action": "request",
+        "user": request.user,
+        "has_permission": request.user.is_authenticated,
     }
     form = PettycashReimburseHandleForm(request.POST or None)
     if form.is_valid():
-       pk = form.cleaned_data["pk"]
-       approved = form.cleaned_data["approved"]
-       try:
-          item = PettycashReimbursementRequest.objects.get(id=pk)
-          context['item'] =  item
-          context['approved'] = approved
-          if approved:
-              if item.viaTheBank:
-                  emailPlain(
-                     "email_imbursement_bank_approved.txt",
-                     toinform=[ settings.TRUSTEES, request.user.email ],
-                     context=context,
-                  )
-              else:
-                  transact_raw(request, src = User.objects.get(id=settings.POT_ID), dst = item.dst, 
-                      description = item.description, amount = item.amount, 
-                      reason = 'Reimbursement approved by %s' % request.user, 
-                      user = request.user)
-          else:
-              emailPlain(
-                  "email_imbursement_rejected.txt",
-                  toinform=[ settings.TRUSTEES, request.user.email ],
-                  context=context,
-              )
-          item.delete()
-          
-          return redirect(reverse("reimburse_queue"))
+        pk = form.cleaned_data["pk"]
+        approved = form.cleaned_data["approved"]
+        try:
+            item = PettycashReimbursementRequest.objects.get(id=pk)
+            context["item"] = item
+            context["approved"] = approved
 
-       except ObjectDoesNotExist as e:
-          logger.error("Reimbursment %d not found" % (pk))
-          return HttpResponse("Reimbursement not found", status=404, content_type="text/plain")
-   
+            attachments = []
+            if item.scan:
+                attachments.append(image2mime(item.scan))
+
+            if approved:
+                if item.viaTheBank:
+                    emailPlain(
+                        "email_imbursement_bank_approved.txt",
+                        toinform=[settings.TRUSTEES, request.user.email],
+                        context=context,
+                        attachments=attachments,
+                    )
+                else:
+                    transact_raw(
+                        request,
+                        src=User.objects.get(id=settings.POT_ID),
+                        dst=item.dst,
+                        description=item.description,
+                        amount=item.amount,
+                        reason="Reimbursement approved by %s" % request.user,
+                        user=request.user,
+                    )
+            else:
+                emailPlain(
+                    "email_imbursement_rejected.txt",
+                    toinform=[settings.TRUSTEES, request.user.email],
+                    context=context,
+                    attachments=attachments,
+                )
+            item.delete()
+
+            return redirect(reverse("reimburse_queue"))
+
+        except ObjectDoesNotExist as e:
+            logger.error("Reimbursment %d not found" % (pk))
+            return HttpResponse(
+                "Reimbursement not found", status=404, content_type="text/plain"
+            )
+
     items = []
-    for tx in PettycashReimbursementRequest.objects.all().order_by('submitted'):
-      item = {}
-      item['tx'] = tx
-      item['form'] = PettycashReimburseHandleForm(initial={"pk": tx.pk})
-      item['action'] = 'foo'
-      items.append(item)
+    for tx in PettycashReimbursementRequest.objects.all().order_by("submitted"):
+        item = {}
+        item["tx"] = tx
+        item["form"] = PettycashReimburseHandleForm(initial={"pk": tx.pk})
+        item["action"] = "foo"
+        items.append(item)
 
-    context['items'] =  items
-    return render(request, "pettycash/reimburse_queue.html", context = context)
+    context["items"] = items
+    return render(request, "pettycash/reimburse_queue.html", context=context)
+
 
 @csrf_exempt
 @superuser_or_bearer_required

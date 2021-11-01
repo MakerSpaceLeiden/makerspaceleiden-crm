@@ -12,8 +12,12 @@
             {{ item.tx.date }}<br>
             <b>{{ item.tx.dst }}</b><br>
 	    <p>
-            <i>Submitted {{ item.tx.submitted }}</i>
-            </d>
+            <i>Submitted {{ item.tx.submitted }}</i><br>
+            {% if item.tx.scan %}
+                <a href="{{ item.tx.scan.url }}"><img alt="" src="{{ item.tx.scan.thumbnail.url   }}"/></a>
+            {% else %}
+                no scan supplied.<br
+            {% endif %}
             <form method="post"  enctype="multipart/form-data">{% csrf_token %}
              <table>
               {{ item.form.as_table }}

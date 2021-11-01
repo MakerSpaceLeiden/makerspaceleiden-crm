@@ -3,8 +3,13 @@ from django.contrib.auth.forms import UserCreationForm
 from django.forms import ModelForm
 from django.conf import settings
 
-from .models import PettycashTransaction, PettycashStation,  PettycashReimbursementRequest
+from .models import (
+    PettycashTransaction,
+    PettycashStation,
+    PettycashReimbursementRequest,
+)
 import uuid
+
 
 class UserChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
@@ -17,6 +22,7 @@ class PettycashPairForm(forms.Form):
         max_length=300, required=False, help_text="Reason for this change"
     )
 
+
 class PettycashTransactionForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(PettycashTransactionForm, self).__init__(*args, **kwargs)
@@ -27,24 +33,29 @@ class PettycashTransactionForm(ModelForm):
         model = PettycashTransaction
         fields = ["src", "dst", "description", "amount"]
 
+
 class PettycashDeleteForm(forms.Form):
     reason = forms.CharField(
         max_length=300, required=False, help_text="Reason for removing this transaction"
     )
 
+
 class PettycashReimbursementRequestForm(ModelForm):
     class Meta:
-        model =  PettycashReimbursementRequest
-        fields = ["dst", "description", "amount", "date", "viaTheBank"]
+        model = PettycashReimbursementRequest
+        fields = ["dst", "description", "amount", "date", "viaTheBank", "scan"]
+
 
 class PettycashReimburseHandleForm(forms.Form):
-     pk = forms.IntegerField(widget=forms.HiddenInput())
-     approved = forms.BooleanField( initial=True, required=False, label="Approve")
+    pk = forms.IntegerField(widget=forms.HiddenInput())
+    approved = forms.BooleanField(initial=True, required=False, label="Approve")
+
 
 class CamtUploadForm(forms.Form):
     cam53file = forms.FileField(
         label="Select a file", help_text="CAM52 (xml) export of transactions"
     )
+
 
 class ImportProcessForm(forms.Form):
     def __init__(self, valids, *args, **kwargs):

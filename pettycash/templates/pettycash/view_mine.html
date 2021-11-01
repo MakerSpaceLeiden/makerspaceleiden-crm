@@ -46,7 +46,11 @@ List of <a href='{% url "unpaired" %}'>stations</a> and pairing.
 <br>
 {% endif %}
 {% if user.is_privileged %}
-<a href='{% url "reimburse_queue" %}'>Attend to pending expense reports</a>.
+{% if queue > 0 %}
+	<a href='{% url "reimburse_queue" %}'>Attend to <b>{{ queue }}</b> pending expense reports</a>.
+{% else %}
+	There are no pending expense reports.
+{% endif %}
 <br>
 {% endif %}
 

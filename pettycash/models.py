@@ -8,6 +8,8 @@ from django.forms.models import ModelChoiceField
 from django.db.models import Q
 from django.utils import timezone
 from djmoney.models.validators import MaxMoneyValidator, MinMoneyValidator
+from stdimage.models import StdImageField
+from stdimage.validators import MinSizeValidator, MaxSizeValidator
 
 from django.db.models.signals import pre_delete, pre_save
 
@@ -17,6 +19,7 @@ from django.db import models
 from members.models import User
 
 from makerspaceleiden.mail import emailPlain
+from makerspaceleiden.utils import upload_to_pattern
 
 from django.utils import timezone
 from datetime import datetime, timedelta
@@ -313,6 +316,7 @@ class PettycashTransaction(models.Model):
 
         return rc
 
+
 class PettycashReimbursementRequest(models.Model):
     dst = models.ForeignKey(
         User,
@@ -325,20 +329,26 @@ class PettycashReimbursementRequest(models.Model):
 
     date = models.DateTimeField(blank=True, null=True, help_text="Date of expense")
 
-    submitted = models.DateTimeField(blank=True, null=True, help_text="Date the request was submitted")
-
-    amount = MoneyField(
-        max_digits = 8,
-        decimal_places = 2,
-        null = True,
-        default_currency = "EUR",
-        validators = [MinMoneyValidator(0), MaxMoneyValidator(settings.MAX_PAY_REIMBURSE.amount)],
-        help_text = "This system will only accept reimbursement up to %s. Above that; contact the trustees directly (%s)" % (settings.MAX_PAY_REIMBURSE.amount, settings.TRUSTEES)
+    submitted = models.DateTimeField(
+        blank=True, null=True, help_text="Date the request was submitted"
     )
 
-    viaTheBank= models.BooleanField(
+    amount = MoneyField(
+        max_digits=8,
+        decimal_places=2,
+        null=True,
+        default_currency="EUR",
+        validators=[
+            MinMoneyValidator(0),
+            MaxMoneyValidator(settings.MAX_PAY_REIMBURSE.amount),
+        ],
+        help_text="This system will only accept reimbursement up to %s. Above that; contact the trustees directly (%s)"
+        % (settings.MAX_PAY_REIMBURSE.amount, settings.TRUSTEES),
+    )
+
+    viaTheBank = models.BooleanField(
         default=False,
-        help_text="Check this box if you want to be paid via a IBAN/SEPA transfer; otherwise the amount will be credited to your Makerspace petty cash acount"
+        help_text="Check this box if you want to be paid via a IBAN/SEPA transfer; otherwise the amount will be credited to your Makerspace petty cash acount",
     )
 
     description = models.CharField(
@@ -348,5 +358,13 @@ class PettycashReimbursementRequest(models.Model):
         help_text="Description / omschrijving van waarvoor deze betaling is",
     )
 
+    scan = StdImageField(
+        upload_to=upload_to_pattern,
+        delete_orphans=True,
+        variations=settings.IMG_VARIATIONS,
+        validators=settings.IMG_VALIDATORS,
+        blank=True,
+        null=True,
+        help_text="Scan, photo or similar of the receipt",
+    )
     history = HistoricalRecords()
-

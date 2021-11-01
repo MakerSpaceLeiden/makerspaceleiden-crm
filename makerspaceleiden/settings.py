@@ -272,8 +272,10 @@ PETTYCASH_IBAN = "NL18RABO0123459876"
 POT_ID = 1
 POT_LABEL = "Makerspace (de zwarte Pot)"
 CURRENCIES = ["EUR"]
+
 MAX_PAY_API = Money(10.00, EUR)
 MAX_PAY_DEPOSITI = Money(100.00, EUR)
+MAX_PAY_REIMBURSE = Money(100.00, EUR)
 PAY_MAXNONCE_AGE_MINUTES = 20
 
 # Days and max number of unknown terminals to keep.
