@@ -16,6 +16,8 @@ from acl.models import Location
 from django.db import models
 from members.models import User
 
+from makerspaceleiden.mail import emailPlain
+
 from django.utils import timezone
 from datetime import datetime, timedelta
 import uuid
@@ -99,18 +101,38 @@ class PettycashTerminal(models.Model):
         )
 
     def save(self, *args, **kwargs):
-        days = settings.TERMS_DAYS_CUTOFF
-        cutoff = timezone.now() - timedelta(days=days)
+        cutoff = timezone.now() - timedelta(
+            minutes=settings.PETTYCASH_TERMS_MINS_CUTOFF
+        )
 
         # Drop anything that is too old; and only keep the most recent up to
-        # cap -- feeble attempt at foiling obvious DOS.
+        # a cap -- feeble attempt at foiling obvious DOS. Mainly as the tags
+        # can be as short as 32 bits and we did not want to also add a shared
+        # scecret in the Arduino code. As these easily get committed to github
+        # by accident.
         stale = (
             PettycashTerminal.objects.all().filter(Q(accepted=False)).order_by("date")
         )
+        if len(stale) > settings.PETTYCASH_TERMS_MAX_UNKNOWN:
+            lst = (
+                User.objects.all()
+                .filter(groups__name=settings.PETTYCASH_ADMIN_GROUP)
+                .values_list("email", flat=True)
+            )
+            emailPlain(
+                "pettycash-dos-warn.txt",
+                toinform=lst,
+                context={"base": settings.BASE, "settings": settings, "stale": stale},
+            )
+            logger.info("DOS mail set about too many terminals in waiting.")
+        todel = set()
         for s in stale.filter(Q(date__lt=cutoff)):
+            todel.add(s)
+        for s in stale[settings.PETTYCASH_TERMS_MIN_UNKNOWN :]:
+            todel.add(s)
+        for s in todel:
             s.delete()
-        for s in stale[settings.TERMS_MAX_UNKNOWN :]:
-            s.delete()
+
 
         return super(PettycashTerminal, self).save(*args, **kwargs)
 
