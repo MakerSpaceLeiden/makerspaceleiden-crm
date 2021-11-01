@@ -133,7 +133,6 @@ class PettycashTerminal(models.Model):
         for s in todel:
             s.delete()
 
-
         return super(PettycashTerminal, self).save(*args, **kwargs)
 
 
