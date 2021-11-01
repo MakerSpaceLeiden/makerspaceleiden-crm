@@ -313,6 +313,7 @@ class PettycashTransaction(models.Model):
 
         return rc
 
+
 class PettycashReimbursementRequest(models.Model):
     dst = models.ForeignKey(
         User,
@@ -325,20 +326,26 @@ class PettycashReimbursementRequest(models.Model):
 
     date = models.DateTimeField(blank=True, null=True, help_text="Date of expense")
 
-    submitted = models.DateTimeField(blank=True, null=True, help_text="Date the request was submitted")
-
-    amount = MoneyField(
-        max_digits = 8,
-        decimal_places = 2,
-        null = True,
-        default_currency = "EUR",
-        validators = [MinMoneyValidator(0), MaxMoneyValidator(settings.MAX_PAY_REIMBURSE.amount)],
-        help_text = "This system will only accept reimbursement up to %s. Above that; contact the trustees directly (%s)" % (settings.MAX_PAY_REIMBURSE.amount, settings.TRUSTEES)
+    submitted = models.DateTimeField(
+        blank=True, null=True, help_text="Date the request was submitted"
     )
 
-    viaTheBank= models.BooleanField(
+    amount = MoneyField(
+        max_digits=8,
+        decimal_places=2,
+        null=True,
+        default_currency="EUR",
+        validators=[
+            MinMoneyValidator(0),
+            MaxMoneyValidator(settings.MAX_PAY_REIMBURSE.amount),
+        ],
+        help_text="This system will only accept reimbursement up to %s. Above that; contact the trustees directly (%s)"
+        % (settings.MAX_PAY_REIMBURSE.amount, settings.TRUSTEES),
+    )
+
+    viaTheBank = models.BooleanField(
         default=False,
-        help_text="Check this box if you want to be paid via a IBAN/SEPA transfer; otherwise the amount will be credited to your Makerspace petty cash acount"
+        help_text="Check this box if you want to be paid via a IBAN/SEPA transfer; otherwise the amount will be credited to your Makerspace petty cash acount",
     )
 
     description = models.CharField(
@@ -349,4 +356,3 @@ class PettycashReimbursementRequest(models.Model):
     )
 
     history = HistoricalRecords()
-
