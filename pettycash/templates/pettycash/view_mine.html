@@ -31,18 +31,22 @@ Your balance
 <br>
 <a href="{% url 'transfer_to_member' src=who.id %}">Transfer SpaceTegoed to other member</a>
 <br>
-<a href="{% url 'manual_deposit' %}">Deposit money</a><br>
-
+<a href="{% url 'reimburseform' %}">Get reimbursed by the space for something</a>
+<br>
 <a href="{% url 'manual_deposit' %}">Deposit money</a>
 <br>
-<a href="{% url 'pricelist' %}">See the current pricelist</a>
-<br>
 {% if balance.balance.amount > 25 %}
-Withdraw money <i>-- Not yet available; contact the trustees</i><br>
+<a href="{% url 'reimburseform' %}">Withdraw money</a>
 <br>
 {% endif %}
+<a href="{% url 'pricelist' %}">See the current pricelist</a>
+<br>
 {% if user|isPettycashAdmin %}
 List of <a href='{% url "unpaired" %}'>stations</a> and pairing.
+<br>
+{% endif %}
+{% if user.is_privileged %}
+<a href='{% url "reimburse_queue" %}'>Attend to pending expense reports</a>.
 <br>
 {% endif %}
 

@@ -27,6 +27,11 @@ urlpatterns = [
     path("cam53process", views.cam53process, name="cam53process"),
     path("unpaired", views.unpaired, name="unpaired"),
     path("pair/<int:pk>", views.pair, name="pair"),
+
+    # Reimbursement related
+    path("reimburse_request", views.reimburseform, name="reimburseform"),
+    path("reimburse_queue", views.reimburseque, name="reimburse_queue"),
+
     # User interface - need to be logged in
     path("pay", views.pay, name="pay"),
     # Essentially the same - but for M2M - with bearer token over

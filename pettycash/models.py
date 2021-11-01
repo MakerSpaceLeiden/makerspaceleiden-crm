@@ -56,7 +56,7 @@ class PettycashSku(models.Model):
     name = models.CharField(max_length=300, blank=True, null=True)
     description = models.CharField(max_length=300, blank=True, null=True)
     amount = MoneyField(
-        max_digits=10, decimal_places=2, null=True, default_currency="EUR"
+        max_digits=8, decimal_places=2, null=True, default_currency="EUR"
     )
     history = HistoricalRecords()
 
@@ -172,7 +172,7 @@ class PettycashBalanceCache(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
 
     balance = MoneyField(
-        max_digits=10, decimal_places=2, null=True, default_currency="EUR"
+        max_digits=8, decimal_places=2, null=True, default_currency="EUR"
     )
     last = models.ForeignKey(
         "PettycashTransaction",
@@ -230,7 +230,7 @@ class PettycashTransaction(models.Model):
     date = models.DateTimeField(blank=True, null=True, help_text="Date of transaction")
 
     amount = MoneyField(
-        max_digits=10,
+        max_digits=8,
         decimal_places=2,
         null=True,
         default_currency="EUR",
@@ -312,3 +312,41 @@ class PettycashTransaction(models.Model):
             logger.error("Transaction cache failure: %s" % (e))
 
         return rc
+
+class PettycashReimbursementRequest(models.Model):
+    dst = models.ForeignKey(
+        User,
+        help_text="Person to reemburse (usually you, yourself)",
+        on_delete=models.CASCADE,
+        related_name="isReimbursedTo",
+        blank=True,
+        null=True,
+    )
+
+    date = models.DateTimeField(blank=True, null=True, help_text="Date of expense")
+
+    submitted = models.DateTimeField(blank=True, null=True, help_text="Date the request was submitted")
+
+    amount = MoneyField(
+        max_digits = 8,
+        decimal_places = 2,
+        null = True,
+        default_currency = "EUR",
+        validators = [MinMoneyValidator(0), MaxMoneyValidator(settings.MAX_PAY_REIMBURSE.amount)],
+        help_text = "This system will only accept reimbursement up to %s. Above that; contact the trustees directly (%s)" % (settings.MAX_PAY_REIMBURSE.amount, settings.TRUSTEES)
+    )
+
+    viaTheBank= models.BooleanField(
+        default=False,
+        help_text="Check this box if you want to be paid via a IBAN/SEPA transfer; otherwise the amount will be credited to your Makerspace petty cash acount"
+    )
+
+    description = models.CharField(
+        max_length=300,
+        blank=True,
+        null=True,
+        help_text="Description / omschrijving van waarvoor deze betaling is",
+    )
+
+    history = HistoricalRecords()
+

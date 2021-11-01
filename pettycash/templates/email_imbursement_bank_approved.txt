@@ -1,0 +1,21 @@
+Subject: Reimbursement to be paid by bank({{ item.dst }} {{ item.amount }}, {{ item.description }})
+
+L.S.
+
+This is a reminder that below reimbursement is to be paid
+by manual bank transfer.
+
+Your spacebot (on behalf of {{ user }}.
+
+Details:
+
+Date:        {{ item.date }}
+To pay to:   {{ item.dst }}
+Amount:      {{ item.amount }}
+Deascription:{{ item.description }}
+Submitted:   {{ item.submitted }}
+
+{% if user != item.dst %}
+NOTE:that this request was not made by {{ item.dst }} but by {{ user }}.
+{% endif %}
+
