@@ -52,6 +52,7 @@ from datetime import datetime, timedelta, date
 from moneyed import Money, EUR
 from moneyed.l10n import format_money
 
+
 def mtostr(m):
     return format_money(m, locale="nl_NL")
 
@@ -62,6 +63,7 @@ def client_ip(request):
         return x_forwarded_for.split(",")[0]
     return request.META.get("REMOTE_ADDR")
 
+
 def image2mime(img):
     ext = img.name.split(".")[-1]
     name = img.name.split("/")[-1]
@@ -69,11 +71,22 @@ def image2mime(img):
     attachment.add_header("Content-Disposition", 'inline; filename="' + name + '"')
     return attachment
 
+
 def pettycash_admin_emails():
-    return list(User.objects.all().filter(groups__name=settings.PETTYCASH_ADMIN_GROUP).values_list("email", flat=True))
+    return list(
+        User.objects.all()
+        .filter(groups__name=settings.PETTYCASH_ADMIN_GROUP)
+        .values_list("email", flat=True)
+    )
+
 
 def pettycash_treasurer_emails():
-    return list(User.objects.all().filter(groups__name=settings.PETTYCASH_TREASURER_GROUP).values_list("email", flat=True))
+    return list(
+        User.objects.all()
+        .filter(groups__name=settings.PETTYCASH_TREASURER_GROUP)
+        .values_list("email", flat=True)
+    )
+
 
 import logging
 
