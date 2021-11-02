@@ -13,7 +13,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
 def superuser(function):
     @wraps(function)
     def wrap(request, *args, **kwargs):
@@ -27,7 +26,6 @@ def superuser(function):
         return HttpResponse("XS denied", status=403, content_type="text/plain")
 
     return wrap
-
 
 def superuser_or_bearer_required(function):
     @wraps(function)
@@ -99,3 +97,12 @@ def login_or_priveleged(function):
         return function(request, *args, **kwargs)
 
     return wrap
+
+def login_and_treasurer(function):
+    @wraps(function)
+    def wrap(request, *args, **kwargs):
+       if request.user.is_privileged or request.user.groups.filter(name=settings.PETTYCASH_TREASURER_GROUP).exists():
+           return function(request, *args, **kwargs)
+
+       return HttpResponse("XS denied", status=403, content_type="text/plain")
+

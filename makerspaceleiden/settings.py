@@ -111,6 +111,8 @@ WSGI_APPLICATION = "makerspaceleiden.wsgi.application"
 
 MAILINGLIST = "deelnemers@makerspaceleiden.nl"
 TRUSTEES = "hetbestuur@makerspaceleiden.nl"
+TREASURER = "dirkx@webweaving.org"
+
 DEFAULT_FROM_EMAIL = "noc@makerspaceleiden.nl"
 # Leave it to FORCE_SCRPT do do the psotfix right
 BASE = "https://makerspaceleiden.nl"
@@ -266,6 +268,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 # PETTYCASH_DEMO_USER_GROUP = "pettycash demo group"
 PETTYCASH_NOUSE_DAYS = 60
 PETTYCASH_ADMIN_GROUP = "pettycash admin group"
+PETTYCASH_TREASURER_GROUP = "pettycash admin group"
 PETTYCASH_TOPUP = 15
 PETTYCASH_TNS = "Stichting Makerspace Leiden"
 PETTYCASH_IBAN = "NL18RABO0123459876"

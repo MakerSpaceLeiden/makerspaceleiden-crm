@@ -45,19 +45,19 @@ def emailPlain(template, subject=None, toinform=[], context={}, attachments=[]):
     msg = MIMEMultipart("alternative")
 
     part1 = MIMEText(body, "plain", _charset=cs)
-    msg.attach(part1)
 
     part2 = MIMEMultipart("related")
     part2.attach(MIMEText(body_html, "html", _charset=cs))
-    msg.attach(part2)
 
     email = EmailMessage(
         subject.strip(), None, to=to, from_email=settings.DEFAULT_FROM_EMAIL
     )
 
-    email.attach(msg)
-
     for attachment in attachments:
-        msg.attach(attachment)
+        part2.attach(attachment)
 
+    msg.attach(part1)
+    msg.attach(part2)
+
+    email.attach(msg)
     email.send()
