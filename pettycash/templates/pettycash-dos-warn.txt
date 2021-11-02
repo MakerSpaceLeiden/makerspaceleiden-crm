@@ -1,0 +1,20 @@
+Petty Cash admins,
+
+This is to let you know that a somewhat unusual number (more than {{ settings.PETTYCASH_TERMS_MAX_UNKNOWN }}) of failed join attempts queued up.
+
+Hopefully this is as someone is debugging or fixing something. But it may also be the result of some hacking/brute force attack on the tags (as they se are relatively short; some as short as 32 bits) and hence can be brute forced.
+
+A list is below.
+
+Your spacebot,
+
+-- 
+
+List:
+
+{% for e in stale %}
+- {{ e }}
+{% endfor %}
+
+
+

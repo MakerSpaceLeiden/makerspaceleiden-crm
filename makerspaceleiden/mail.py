@@ -18,7 +18,7 @@ import re
 logger = logging.getLogger(__name__)
 
 
-def emailPlain(template, subject=None, toinform=[], context={}):
+def emailPlain(template, subject=None, toinform=[], context={}, attachments=[]):
     # try to stick to rfc822 (django default is base64) religiously; also
     # as it helps with spam filters.
     cs = Charset("utf-8")
@@ -56,4 +56,8 @@ def emailPlain(template, subject=None, toinform=[], context={}):
     )
 
     email.attach(msg)
+
+    for attachment in attachments:
+        msg.attach(attachment)
+
     email.send()

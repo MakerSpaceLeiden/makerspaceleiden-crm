@@ -6,7 +6,7 @@ Your current account balanace is {{ balance.balance }}; which means that
 you {% if goodstanding  %}do not have to do anything.
 {% else %}should do a payment as soon as possible.
 
-Do this by wiring your balance plus a little extra {{ topup }} euro) 
+Do this by wiring your balance plus a little extra, {{ topup }} euro,
 to the {{ settings.PETTYCASH_IBAN }} its bank account.
 
 You can find the account details and a QR code (if your bank supports
@@ -22,10 +22,14 @@ the makerspace bot, on behalf of the trustees (bestuur@makerspaceleiden.nl).
 
 {% for tx in transactions %}
 {% if tx.src == who and tx.dst == who %}
-Balance previous billing cycle                     {{ tx.amount}}{% else %}{% if tx.src == user %}{{tx.date}} {{ tx.description }}
-                                                af {{ tx.amount }}{% endif %}{% if tx.dst == user %}{{tx.date}} {{ tx.description }}
-                                               bij {{ tx.amount }}{% endif %}{% endif %}{% endfor %}
-                                         Balance   {{ balance.balance }}
+Balance previous billing cycle      {{ tx.amount}}
+{% else %}{% if tx.src == user %}{{tx.date}} {{ tx.description }}
+                                 af {{ tx.amount }}
+{% endif %}{% if tx.dst == user %}{{tx.date}}
+     {{ tx.description }}
+                                bij {{ tx.amount }}
+{% endif %}{% endif %}{% endfor %}
+                          Balance   {{ balance.balance }}
 
 See more at {{ base }}{% url 'transactions' pk=user.id%}
 

@@ -44,6 +44,7 @@ import secrets
 import hashlib
 from django.utils import timezone
 from makerspaceleiden.mail import emailPlain
+from datetime import datetime, timedelta, date
 
 from moneyed import Money, EUR
 from moneyed.l10n import format_money
@@ -60,6 +61,14 @@ def client_ip(request):
     return request.META.get("REMOTE_ADDR")
 
 
+def image2mime(img):
+    ext = img.name.split(".")[-1]
+    name = img.name.split("/")[-1]
+    attachment = MIMEImage(img.read(), ext)
+    attachment.add_header("Content-Disposition", 'inline; filename="' + name + '"')
+    return attachment
+
+
 import logging
 
 logger = logging.getLogger(__name__)
@@ -70,6 +79,7 @@ from .models import (
     PettycashSku,
     PettycashTerminal,
     PettycashStation,
+    PettycashReimbursementRequest,
 )
 from .admin import PettycashBalanceCacheAdmin, PettycashTransactionAdmin
 from .forms import (
@@ -78,6 +88,8 @@ from .forms import (
     PettycashPairForm,
     CamtUploadForm,
     ImportProcessForm,
+    PettycashReimbursementRequestForm,
+    PettycashReimburseHandleForm,
 )
 from .models import pemToSHA256Fingerprint, hexsha2pin
 from .camt53 import camt53_process
@@ -620,6 +632,7 @@ def show_mine(request):
         "balance": balance,
         "who": user,
         "lst": lst,
+        "queue": PettycashReimbursementRequest.objects.all().count(),
         "has_permission": request.user.is_authenticated,
     }
 
@@ -771,6 +784,121 @@ def delete(request, pk):
     return render(request, "pettycash/delete.html", context)
 
 
+@login_required
+def reimburseform(request):
+    form = PettycashReimbursementRequestForm(
+        request.POST or None,
+        request.FILES or None,
+        initial={
+            "dst": request.user,
+            "date": date.today(),
+        },
+    )
+    context = {
+        "settings": settings,
+        "form": form,
+        "label": "Reimburse",
+        "action": "request",
+        "user": request.user,
+        "has_permission": request.user.is_authenticated,
+    }
+
+    if form.is_valid():
+        print(request.POST)
+        item = form.save(commit=False)
+        if not item.date:
+            item.date = datetime.now(tz=timezone.utc)
+        if not item.submitted:
+            item.submitted = datetime.now(tz=timezone.utc)
+
+        item.save()
+        context["item"] = item
+
+        attachments = []
+        if item.scan:
+            attachments.append(image2mime(item.scan))
+
+        emailPlain(
+            "email_imbursement_notify.txt",
+            toinform=[settings.TRUSTEES, request.user.email],
+            context=context,
+            attachments=attachments,
+        )
+
+        return render(request, "pettycash/reimburse_ok.html", context=context)
+
+    return render(request, "pettycash/reimburse_form.html", context=context)
+
+
+@superuser
+def reimburseque(request):
+    context = {
+        "settings": settings,
+        "label": "Reimburse",
+        "action": "request",
+        "user": request.user,
+        "has_permission": request.user.is_authenticated,
+    }
+    form = PettycashReimburseHandleForm(request.POST or None)
+    if form.is_valid():
+        pk = form.cleaned_data["pk"]
+        approved = form.cleaned_data["approved"]
+        try:
+            item = PettycashReimbursementRequest.objects.get(id=pk)
+            context["item"] = item
+            context["approved"] = approved
+
+            attachments = []
+            if item.scan:
+                attachments.append(image2mime(item.scan))
+
+            if approved:
+                if item.viaTheBank:
+                    emailPlain(
+                        "email_imbursement_bank_approved.txt",
+                        toinform=[settings.TRUSTEES, request.user.email],
+                        context=context,
+                        attachments=attachments,
+                    )
+                else:
+                    transact_raw(
+                        request,
+                        src=User.objects.get(id=settings.POT_ID),
+                        dst=item.dst,
+                        description=item.description,
+                        amount=item.amount,
+                        reason="Reimbursement approved by %s" % request.user,
+                        user=request.user,
+                    )
+            else:
+                emailPlain(
+                    "email_imbursement_rejected.txt",
+                    toinform=[settings.TRUSTEES, request.user.email],
+                    context=context,
+                    attachments=attachments,
+                )
+            item.delete()
+
+            return redirect(reverse("reimburse_queue"))
+
+        except ObjectDoesNotExist as e:
+            logger.error("Reimbursment %d not found" % (pk))
+            return HttpResponse(
+                "Reimbursement not found", status=404, content_type="text/plain"
+            )
+
+    items = []
+    for tx in PettycashReimbursementRequest.objects.all().order_by("submitted"):
+        item = {}
+        item["tx"] = tx
+        item["form"] = PettycashReimburseHandleForm(initial={"pk": tx.pk})
+        item["action"] = "foo"
+        items.append(item)
+
+    context["items"] = items
+    return render(request, "pettycash/reimburse_queue.html", context=context)
+
+
 @csrf_exempt
 @superuser_or_bearer_required
 def api_pay(request):
@@ -854,7 +982,10 @@ def api2_register(request):
 
         name = request.GET.get("name", None)
         if not name:
-            logger.error("Bad request, missing name for %s at %s" % (client_sha, ip))
+            logger.error(
+                "Bad request, client unknown, but no name provided (%s @ %s"
+                % (client_sha, ip)
+            )
             return HttpResponse(
                 "Bad request, missing name", status=400, content_type="text/plain"
             )
@@ -920,7 +1051,7 @@ def api2_register(request):
                     tag.owner,
                 )
                 terminal.save()
-                logger.info(
+                logger.error(
                     "Terminal %s accepted, tag swipe by %s matched."
                     % (terminal, tag.owner)
                 )

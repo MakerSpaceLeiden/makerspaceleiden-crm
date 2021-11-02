@@ -3,8 +3,14 @@ from django.contrib.auth.forms import UserCreationForm
 from django.forms import ModelForm
 from django.conf import settings
 
-from .models import PettycashTransaction, PettycashStation
+import datetime
 import uuid
+
+from .models import (
+    PettycashTransaction,
+    PettycashStation,
+    PettycashReimbursementRequest,
+)
 
 
 class UserChoiceField(forms.ModelChoiceField):
@@ -34,6 +40,17 @@ class PettycashDeleteForm(forms.Form):
     reason = forms.CharField(
         max_length=300, required=False, help_text="Reason for removing this transaction"
     )
+
+
+class PettycashReimbursementRequestForm(ModelForm):
+    class Meta:
+        model = PettycashReimbursementRequest
+        fields = ["dst", "description", "amount", "date", "viaTheBank", "scan"]
+
+
+class PettycashReimburseHandleForm(forms.Form):
+    pk = forms.IntegerField(widget=forms.HiddenInput())
+    approved = forms.BooleanField(initial=True, required=False, label="Approve")
 
 
 class CamtUploadForm(forms.Form):

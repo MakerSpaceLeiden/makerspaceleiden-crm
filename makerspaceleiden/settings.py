@@ -272,17 +272,21 @@ PETTYCASH_IBAN = "NL18RABO0123459876"
 POT_ID = 1
 POT_LABEL = "Makerspace (de zwarte Pot)"
 CURRENCIES = ["EUR"]
+
 MAX_PAY_API = Money(10.00, EUR)
 MAX_PAY_DEPOSITI = Money(100.00, EUR)
+MAX_PAY_REIMBURSE = Money(100.00, EUR)
 PAY_MAXNONCE_AGE_MINUTES = 20
 
 # Days and max number of unknown terminals to keep.
 # (accepted number of terminals is unconstrained) - this
 # is just for the short period between booting one for
-# the first time and pairing it.
+# the first time and pairing it. Once we hit MAX
+# bring it back to MIN.
 #
-TERMS_MAX_UNKNOWN = 5
-TERMS_DAYS_CUTOFF = 5
+PETTYCASH_TERMS_MAX_UNKNOWN = 4
+PETTYCASH_TERMS_MIN_UNKNOWN = 1
+PETTYCASH_TERMS_MINS_CUTOFF = 10
 
 try:
     from .local import *

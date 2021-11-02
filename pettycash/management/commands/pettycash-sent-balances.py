@@ -16,15 +16,16 @@ from moneyed import Money, EUR
 
 
 def sendEmail(balances, toinform, template="balance-overview-email.txt"):
-    return emailPlain(
-        template,
-        toinform=toinform,
-        context={
-            "balances": balances,
-            "date": datetime.now(tz=timezone.utc),
-            "base": settings.BASE,
-        },
-    )
+    for e in [toinform] if isinstance(toinform, str) else toinform:
+        emailPlain(
+            template,
+            toinform=[e],
+            context={
+                "balances": balances,
+                "date": datetime.now(tz=timezone.utc),
+                "base": settings.BASE,
+            },
+        )
 
 
 class Command(BaseCommand):

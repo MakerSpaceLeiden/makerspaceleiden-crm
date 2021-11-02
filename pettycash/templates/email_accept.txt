@@ -7,8 +7,8 @@ Just to let you know; the terminal:
 fingerprint: {{ terminal.fingerprint }}
        date: {{ terminal.date }}
 
-has been accepted/added as a via a swipe by {{ tag.id }} 
-which is owned by {{ tag.owner }}.
+has been accepted/added as a via a swipe by tag #{{ tag.id }} which
+is owned by {{ tag.owner }}.
 
 Your friendly makerbot.
 -- 

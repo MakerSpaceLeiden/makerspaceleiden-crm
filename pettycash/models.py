@@ -8,6 +8,8 @@ from django.forms.models import ModelChoiceField
 from django.db.models import Q
 from django.utils import timezone
 from djmoney.models.validators import MaxMoneyValidator, MinMoneyValidator
+from stdimage.models import StdImageField
+from stdimage.validators import MinSizeValidator, MaxSizeValidator
 
 from django.db.models.signals import pre_delete, pre_save
 
@@ -15,6 +17,9 @@ from acl.models import Location
 
 from django.db import models
 from members.models import User
+
+from makerspaceleiden.mail import emailPlain
+from makerspaceleiden.utils import upload_to_pattern
 
 from django.utils import timezone
 from datetime import datetime, timedelta
@@ -24,6 +29,7 @@ import re
 import base64
 import hashlib
 import binascii
+import datetime
 
 from moneyed import Money, EUR
 
@@ -54,7 +60,7 @@ class PettycashSku(models.Model):
     name = models.CharField(max_length=300, blank=True, null=True)
     description = models.CharField(max_length=300, blank=True, null=True)
     amount = MoneyField(
-        max_digits=10, decimal_places=2, null=True, default_currency="EUR"
+        max_digits=8, decimal_places=2, null=True, default_currency="EUR"
     )
     history = HistoricalRecords()
 
@@ -99,17 +105,36 @@ class PettycashTerminal(models.Model):
         )
 
     def save(self, *args, **kwargs):
-        days = settings.TERMS_DAYS_CUTOFF
-        cutoff = timezone.now() - timedelta(days=days)
+        cutoff = timezone.now() - timedelta(
+            minutes=settings.PETTYCASH_TERMS_MINS_CUTOFF
+        )
 
         # Drop anything that is too old; and only keep the most recent up to
-        # cap -- feeble attempt at foiling obvious DOS.
+        # a cap -- feeble attempt at foiling obvious DOS. Mainly as the tags
+        # can be as short as 32 bits and we did not want to also add a shared
+        # scecret in the Arduino code. As these easily get committed to github
+        # by accident.
         stale = (
             PettycashTerminal.objects.all().filter(Q(accepted=False)).order_by("date")
         )
+        if len(stale) > settings.PETTYCASH_TERMS_MAX_UNKNOWN:
+            lst = (
+                User.objects.all()
+                .filter(groups__name=settings.PETTYCASH_ADMIN_GROUP)
+                .values_list("email", flat=True)
+            )
+            emailPlain(
+                "pettycash-dos-warn.txt",
+                toinform=lst,
+                context={"base": settings.BASE, "settings": settings, "stale": stale},
+            )
+            logger.info("DOS mail set about too many terminals in waiting.")
+        todel = set()
         for s in stale.filter(Q(date__lt=cutoff)):
-            s.delete()
-        for s in stale[settings.TERMS_MAX_UNKNOWN :]:
+            todel.add(s)
+        for s in stale[settings.PETTYCASH_TERMS_MIN_UNKNOWN :]:
+            todel.add(s)
+        for s in todel:
             s.delete()
 
         return super(PettycashTerminal, self).save(*args, **kwargs)
@@ -151,7 +176,7 @@ class PettycashBalanceCache(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
 
     balance = MoneyField(
-        max_digits=10, decimal_places=2, null=True, default_currency="EUR"
+        max_digits=8, decimal_places=2, null=True, default_currency="EUR"
     )
     last = models.ForeignKey(
         "PettycashTransaction",
@@ -209,7 +234,7 @@ class PettycashTransaction(models.Model):
     date = models.DateTimeField(blank=True, null=True, help_text="Date of transaction")
 
     amount = MoneyField(
-        max_digits=10,
+        max_digits=8,
         decimal_places=2,
         null=True,
         default_currency="EUR",
@@ -291,3 +316,52 @@ class PettycashTransaction(models.Model):
             logger.error("Transaction cache failure: %s" % (e))
 
         return rc
+
+
+class PettycashReimbursementRequest(models.Model):
+    dst = models.ForeignKey(
+        User,
+        help_text="Person to reemburse (usually you, yourself)",
+        on_delete=models.CASCADE,
+        related_name="isReimbursedTo",
+    )
+
+    date = models.DateField(help_text="Date of expense", default=datetime.date.today)
+
+    submitted = models.DateTimeField(
+        help_text="Date the request was submitted",
+        default=datetime.date.today,
+    )
+
+    amount = MoneyField(
+        max_digits=8,
+        decimal_places=2,
+        default_currency="EUR",
+        validators=[
+            MinMoneyValidator(0),
+            MaxMoneyValidator(settings.MAX_PAY_REIMBURSE.amount),
+        ],
+        help_text="This system will only accept reimbursement up to %s. Above that; contact the trustees directly (%s)"
+        % (settings.MAX_PAY_REIMBURSE.amount, settings.TRUSTEES),
+    )
+
+    viaTheBank = models.BooleanField(
+        default=False,
+        help_text="Check this box if you want to be paid via a IBAN/SEPA transfer; otherwise the amount will be credited to your Makerspace petty cash acount",
+    )
+
+    description = models.CharField(
+        max_length=300,
+        help_text="Description / omschrijving van waarvoor deze betaling is",
+    )
+
+    scan = StdImageField(
+        upload_to=upload_to_pattern,
+        delete_orphans=True,
+        variations=settings.IMG_VARIATIONS,
+        validators=settings.IMG_VALIDATORS,
+        blank=True,
+        null=True,
+        help_text="Scan, photo or similar of the receipt",
+    )
+    history = HistoricalRecords()

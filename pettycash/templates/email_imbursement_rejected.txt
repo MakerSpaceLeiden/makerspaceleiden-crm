@@ -1,0 +1,23 @@
+Subject: Reimbursement rejected ({{ item.dst }} {{ item.amount }}, {{ item.description }})
+
+L.S.
+
+Could you be so kind to contact the {{ settings.TRUSTEES }} ? As your
+reimbursement for below was rejected.
+
+Your spacebot (on behalf of {{ user }}.
+
+Details:
+
+Date:        {{ item.date }}
+To pay to:   {{ item.dst }}
+Amount:      {{ item.amount }}
+Deascription:{{ item.description }}
+Submitted:   {{ item.submitted }}
+
+Requested to be paid into {% if item.viaTheBank %}the bank account{% else %}the {{ settings.POT_LABEL }}{%endif %}.
+
+{% if user != item.dst %}
+NOTE:that this request was not made by {{ item.dst }} but by {{ user }}.
+{% endif %}
+

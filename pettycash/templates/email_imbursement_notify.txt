@@ -1,0 +1,28 @@
+Subject: Reimbursement request by {{ item.dst }}, {{ item.amount }}, {{ item.description }}
+
+Dear Trustees,
+
+Participant {{ user }} has requested{% if user != item.dst %}, on behalf of user {{ item.dst }},{% endif %} a reimbursement.
+
+The details are below. You can approve or reject this at
+
+     {{ base }}{% url 'reimburse_queue' %} 
+
+And you will get a reminder of this every other week.
+
+Your spacebot,
+
+Details:
+
+Date:        {{ item.date }}
+To pay to:   {{ item.dst }}
+Amount:      {{ item.amount }}
+Deascription:{{ item.description }}
+Submitted:   {{ item.submitted }}
+
+Requested to be paid into {% if item.viaTheBank %}the bank account{% else %}the {{ settings.POT_LABEL }}{%endif %}.
+
+{% if user != item.dst %}
+NOTE:that this request was not made by {{ item.dst }} but by {{ user }}.
+{% endif %}
+
