@@ -29,7 +29,10 @@ from django.middleware.csrf import CsrfViewMiddleware
 
 
 from django.views.decorators.csrf import csrf_exempt
-from makerspaceleiden.decorators import superuser_or_bearer_required
+from makerspaceleiden.decorators import (
+    superuser_or_bearer_required,
+    login_and_treasurer,
+)
 
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
@@ -820,7 +823,7 @@ def reimburseform(request):
 
         emailPlain(
             "email_imbursement_notify.txt",
-            toinform=[settings.TRUSTEES, request.user.email],
+            toinform=[settings.TREASURER, request.user.email],
             context=context,
             attachments=attachments,
         )
@@ -830,7 +833,8 @@ def reimburseform(request):
     return render(request, "pettycash/reimburse_form.html", context=context)
 
 
-@superuser
+@login_required
+# @login_and_treasurer
 def reimburseque(request):
     context = {
         "settings": settings,
@@ -856,7 +860,7 @@ def reimburseque(request):
                 if item.viaTheBank:
                     emailPlain(
                         "email_imbursement_bank_approved.txt",
-                        toinform=[settings.TRUSTEES, request.user.email],
+                        toinform=[settings.TREASURER, request.user.email],
                         context=context,
                         attachments=attachments,
                     )
@@ -873,7 +877,7 @@ def reimburseque(request):
             else:
                 emailPlain(
                     "email_imbursement_rejected.txt",
-                    toinform=[settings.TRUSTEES, request.user.email],
+                    toinform=[settings.TREASURER, request.user.email],
                     context=context,
                     attachments=attachments,
                 )

@@ -29,7 +29,6 @@ import re
 import base64
 import hashlib
 import binascii
-import datetime
 
 from moneyed import Money, EUR
 
@@ -301,7 +300,7 @@ class PettycashTransaction(models.Model):
             logger.info("Bypass used on save of %s" % self)
 
         if not self.date:
-            self.date = datetime.now(tz=timezone.utc)
+            self.date = timezone.now()
 
         if self.amount < Money(0, EUR):
             if not bypas:
@@ -326,11 +325,11 @@ class PettycashReimbursementRequest(models.Model):
         related_name="isReimbursedTo",
     )
 
-    date = models.DateField(help_text="Date of expense", default=datetime.date.today)
+    date = models.DateField(help_text="Date of expense", default=timezone.now())
 
     submitted = models.DateTimeField(
         help_text="Date the request was submitted",
-        default=datetime.date.today,
+        default=timezone.now(),
     )
 
     amount = MoneyField(

@@ -18,6 +18,7 @@
             {% else %}
                 no scan supplied.<br
             {% endif %}
+	    <!-- start form -->
             <form method="post"  enctype="multipart/form-data">{% csrf_token %}
              <table>
               {{ item.form.as_table }}
@@ -27,6 +28,7 @@
               </td></tr>
              </table>
             </form>  
+	    <!-- end form -->
 	</td>
 </tr>
 {% endfor %}
