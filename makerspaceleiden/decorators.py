@@ -100,12 +100,13 @@ def login_or_priveleged(function):
 
     return wrap
 
+
 def login_and_treasurer(function):
     @wraps(function)
     def wrap(request, *args, **kwargs):
         if (
-            not request.user.is_anonymous 
-            and  request.user.is_privileged
+            not request.user.is_anonymous
+            and request.user.is_privileged
             and request.user.groups.filter(
                 name=settings.PETTYCASH_TREASURER_GROUP
             ).exists()

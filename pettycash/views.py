@@ -836,13 +836,13 @@ def reimburseform(request):
 @login_required
 def reimburseque(request):
     if not request.user.is_anonymous and request.user.can_escalate_to_priveleged:
-       if not request.user.is_privileged:
-                return redirect("sudo")
+        if not request.user.is_privileged:
+            return redirect("sudo")
     if not request.user.is_privileged:
-       return HttpResponse("XS denied", status=401, content_type="text/plain")
+        return HttpResponse("XS denied", status=401, content_type="text/plain")
 
     if not request.user.groups.filter(name=settings.PETTYCASH_TREASURER_GROUP).exists():
-       return HttpResponse("XS denied", status=401, content_type="text/plain")
+        return HttpResponse("XS denied", status=401, content_type="text/plain")
 
     context = {
         "settings": settings,
