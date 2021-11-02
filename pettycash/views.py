@@ -810,9 +810,9 @@ def reimburseform(request):
         print(request.POST)
         item = form.save(commit=False)
         if not item.date:
-            item.date = datetime.now(tz=timezone.utc)
+            item.date = datetime.now()
         if not item.submitted:
-            item.submitted = datetime.now(tz=timezone.utc)
+            item.submitted = datetime.now()
 
         item.save()
         context["item"] = item
@@ -834,8 +834,16 @@ def reimburseform(request):
 
 
 @login_required
-# @login_and_treasurer
 def reimburseque(request):
+    if not request.user.is_anonymous and request.user.can_escalate_to_priveleged:
+       if not request.user.is_privileged:
+                return redirect("sudo")
+    if not request.user.is_privileged:
+       return HttpResponse("XS denied", status=401, content_type="text/plain")
+
+    if not request.user.groups.filter(name=settings.PETTYCASH_TREASURER_GROUP).exists():
+       return HttpResponse("XS denied", status=401, content_type="text/plain")
+
     context = {
         "settings": settings,
         "label": "Reimburse",
