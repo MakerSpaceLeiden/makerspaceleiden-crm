@@ -6,7 +6,6 @@ from django.urls import reverse
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.forms.models import ModelChoiceField
 from django.db.models import Q
-from django.utils import timezone
 from djmoney.models.validators import MaxMoneyValidator, MinMoneyValidator
 from stdimage.models import StdImageField
 from stdimage.validators import MinSizeValidator, MaxSizeValidator
@@ -22,7 +21,6 @@ from makerspaceleiden.mail import emailPlain
 from makerspaceleiden.utils import upload_to_pattern
 
 from django.utils import timezone
-from datetime import datetime, timedelta
 import uuid
 import os
 import re
@@ -325,11 +323,11 @@ class PettycashReimbursementRequest(models.Model):
         related_name="isReimbursedTo",
     )
 
-    date = models.DateField(help_text="Date of expense", default=timezone.now())
+    date = models.DateField(help_text="Date of expense", default=timezone.now)
 
     submitted = models.DateTimeField(
         help_text="Date the request was submitted",
-        default=timezone.now(),
+        default=timezone.now,
     )
 
     amount = MoneyField(
