@@ -972,7 +972,7 @@ def api2_register(request):
             "price": item.amount.amount,
         }
         if item == station.default_sku:
-            a["default"] = True
+            e["default"] = True
         avail.append(e)
 
     return JsonResponse(
