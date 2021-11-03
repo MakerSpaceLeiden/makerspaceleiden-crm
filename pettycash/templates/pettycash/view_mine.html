@@ -10,51 +10,51 @@ Your balance
 	{{ balance.balance }}
 {% endif %}
 {% if balance.balance.amount > 5 %}
-	<i>(Positive balance, so you have money to spend)</i>.
+	<i>(Positive balance, so you have money left to spend)</i>.
 {% else %}
 {% if balance.balance.amount > 0 %}
-	So there just a few euro's left in your acount. You may want to make a <a href="{% url 'manual_deposit' %}">deposit</a> 
-	before this runs out. As it takes a few days (or more) before the monies wired will show up in your account.
+So there just a few euro's left in your acount. <p>
+Thererfore you may want to make a <a href="{% url 'manual_deposit' %}">deposit</a> 
+before this runs out. As it takes a few days (or more) before the monies wired will show up in your account.
 {%else%}
 	<b>Negative, so you owe the space money; and should make a <a href="{% url 'manual_deposit' %}">deposit</a> as soon as possible.</b>
 {% endif %}
 {% endif %}
-<p>
+<ul>
+	<li> <a href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/SpaceTegoed">What is SpaceTegoed</a>
 <br>
-<a href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/SpaceTegoed">What is SpaceTegoed</a>
+<li> <a href="{% url 'transactions' user.id %}">View your past transactions</a>
 <br>
-<a href="{% url 'transactions' user.id %}">View transactions</a>
+<li> <a href="{% url 'balances' %}">View everyone else</a> their transactions
 <br>
-<a href="{% url 'balances' %}">View everyone else</a>
+<li> <a href="{% url 'invoice' src=who.id %}">Pay for a product</a> to the space.
 <br>
-<a href="{% url 'invoice' src=who.id %}">Pay for a product</a>
+<li> <a href="{% url 'transfer_to_member' src=who.id %}">Transfer SpaceTegoed to other member</a>
 <br>
-<a href="{% url 'transfer_to_member' src=who.id %}">Transfer SpaceTegoed to other member</a>
+<li> <a href="{% url 'reimburseform' %}">Get reimbursed by the space for something</a> that you paid for.
 <br>
-<a href="{% url 'reimburseform' %}">Get reimbursed by the space for something</a>
-<br>
-<a href="{% url 'manual_deposit' %}">Deposit money</a>
+<li> <a href="{% url 'manual_deposit' %}">Deposit money</a> into your space account.
 <br>
 {% if balance.balance.amount > 25 %}
-<a href="{% url 'reimburseform' %}">Withdraw money</a>
+<li> <a href="{% url 'reimburseform' %}">Withdraw money</a>
 <br>
 {% endif %}
-<a href="{% url 'pricelist' %}">See the current pricelist</a>
+<li> <a href="{% url 'pricelist' %}">See the current pricelist</a>
 <br>
 {% if user|isPettycashAdmin %}
-List of <a href='{% url "unpaired" %}'>stations</a> and pairing. (<i>only visible to pettycash admins</i>.)
+<li> List of <a href='{% url "unpaired" %}'>stations</a> and pairing. (<i>only visible to pettycash admins</i>.)
 <br>
 {% endif %}
 {% if user|isTreasurer %}
 {% if queue > 0 %}
-<a href='{% url "reimburse_queue" %}'>Attend to <b>{{ queue }}</b> pending expense reports</a>. <i>only visible for treasurers</i>
+<li> <a href='{% url "reimburse_queue" %}'>Attend to <b>{{ queue }}</b> pending expense reports</a>.
 {% else %}
-	There are no pending expense reports.
+<li> 	There are no pending expense reports.
 {% endif %}
 (<i>only visible for treasurers.</i>)
 <br>
 {% endif %}
-
+</ul>
 <p>
 <hr>
 <a href="{% url 'index' %}">back to the main page</a>
