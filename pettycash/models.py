@@ -16,7 +16,7 @@ from acl.models import Location
 
 from django.db import models
 from members.models import User
-
+from datetime import timedelta
 from makerspaceleiden.mail import emailPlain
 from makerspaceleiden.utils import upload_to_pattern
 

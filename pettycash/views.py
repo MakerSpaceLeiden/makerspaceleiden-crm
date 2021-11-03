@@ -1032,7 +1032,7 @@ def api2_register(request):
     #    auto approve it.
     #
     if not terminal.accepted:
-        cutoff = timezone.now() - datetime.timedelta(
+        cutoff = timezone.now() - timedelta(
             minutes=settings.PAY_MAXNONCE_AGE_MINUTES
         )
         if cutoff > terminal.date:
