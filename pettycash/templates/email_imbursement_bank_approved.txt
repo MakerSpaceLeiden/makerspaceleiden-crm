@@ -15,7 +15,3 @@ Amount:      {{ item.amount }}
 Deascription:{{ item.description }}
 Submitted:   {{ item.submitted }}
 
-{% if user != item.dst %}
-NOTE:that this request was not made by {{ item.dst }} but by {{ user }}.
-{% endif %}
-
