@@ -25,6 +25,7 @@ There are currently <b>no</b> unassigned terminals (be sure to start them; and c
 {% endif %}
 
 {% if unlst %}
+<p>
 <h3>Terminals waiting for acceptance</h3>
 
 The following terminal(s) have not yet been accepted (e.g. with a tag-swipe by an admin).
@@ -40,6 +41,7 @@ The following terminal(s) have not yet been accepted (e.g. with a tag-swipe by a
 	{% endfor %}
 </table>
 {% else %}
+<p>
 There are currently no terminals waiting for acceptance.
 {%endif %}
 
@@ -55,8 +57,11 @@ There are currently no terminals waiting for acceptance.
 			<td>{{ b.location }}</td>
 		</tr>
 		<tr><td></td><td colspan=2</td>
-			<i>
+			<code>Fingerprint: {{ b.terminal.fingerprint}}</code>
+		</td></tr>
+		<tr><td></td><td colspan=2</td>
 {%if b.available_skus %}
+	Pricelist: <i>
 	{% for i in b.available_skus.all %}
 		{% if i == b.default_sku %}
 			<b>{{ i }}</b>
@@ -64,6 +69,7 @@ There are currently no terminals waiting for acceptance.
 			{{ i }}
 		{% endif %}
 	{% endfor %}
+	</i>
 {%else%}
 anything / you can enter a amount.
 {%endif%}
@@ -85,8 +91,8 @@ No stations.
 			<td>{{ b.location }}</td>
 		</tr>
 		<tr><td></td><td colspan=2</td>
-			<i>
 {%if b.available_skus.all %}
+	Pricelist:	<i>
 	{% for i in b.available_skus.all %}
 		{% if i == b.default_sku %}
 			<b>{{ i }}</b>
