@@ -1032,9 +1032,7 @@ def api2_register(request):
     #    auto approve it.
     #
     if not terminal.accepted:
-        cutoff = timezone.now() - timedelta(
-            minutes=settings.PAY_MAXNONCE_AGE_MINUTES
-        )
+        cutoff = timezone.now() - timedelta(minutes=settings.PAY_MAXNONCE_AGE_MINUTES)
         if cutoff > terminal.date:
             logger.info(
                 "Fingerprint %s known, but too old. Issuing new one." % client_sha
