@@ -527,10 +527,8 @@ def pair(request, pk):
     form = PettycashPairForm(request.POST or None)
     if form.is_valid():
         station = form.cleaned_data["station"]
-        reason = "%s. %s paired to %s (by %s)" % (
+        reason = "%s (by %s)" % (
             form.cleaned_data["reason"],
-            tx,
-            station,
             request.user,
         )
 
