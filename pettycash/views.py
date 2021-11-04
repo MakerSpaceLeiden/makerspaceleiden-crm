@@ -177,7 +177,7 @@ def transact_raw(
         tx = PettycashTransaction(
             src=src, dst=dst, description=description, amount=amount
         )
-        logger.error("payment: %s" % reason)
+        logger.info("payment: %s" % reason)
         tx._change_reason = reason
         tx.save()
         alertOwnersToChange(tx, user, [])
