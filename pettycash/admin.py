@@ -30,13 +30,15 @@ class PettycashTerminalAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
 
     def get_station(self, terminal):
         try:
-           station = PettycashStation.objects.get(terminal = terminal)
-           return station.description
+            station = PettycashStation.objects.get(terminal=terminal)
+            return station.description
         except ObjectDoesNotExist as e:
-           pass
-        return '-'
-    get_station.short_description = 'Station'
-    get_station.admin_order_field = 'station__name'
+            pass
+        return "-"
+
+    get_station.short_description = "Station"
+    get_station.admin_order_field = "station__name"
+
 
 class PettycashStationAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     list_display = ("description", "location", "terminal")
