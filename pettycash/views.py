@@ -169,6 +169,7 @@ def pettycash_redirect(pk=None):
 def transact_raw(
     request, src=None, dst=None, description=None, amount=None, reason=None, user=None
 ):
+
     if None in [src, dst, description, amount, reason, user]:
         logger.error("Transact raw called with missing arguments. bug.")
         return 0
@@ -329,9 +330,11 @@ def transfer_to_member(request, src):
     if form.is_valid():
         reason = "Transfer"
         item = form.save(commit=False)
+        if not item.dst:
+            item.dst = User.objects.get(id=settings.POT_ID)
         if transact_raw(
             request,
-            src=item.src,
+            src=request.user,
             dst=item.dst,
             description=item.description,
             amount=item.amount,
