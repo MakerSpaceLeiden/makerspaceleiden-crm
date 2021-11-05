@@ -1231,7 +1231,8 @@ def api2_pay(request):
         tag = Tag.objects.get(tag=tagstr)
     except ObjectDoesNotExist as e:
         logger.error(
-            "Tag %s not found, terminal %s@%s" % (terminal.name, station.description)
+            "Tag %s not found, terminal %s@%s"
+            % (tagstr, terminal.name, station.description)
         )
         return HttpResponse("Tag not found", status=404, content_type="text/plain")
 

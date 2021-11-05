@@ -12,8 +12,8 @@ Your balance
 {% if balance.balance.amount > 5 %}
 	<i>(Positive balance, so you have money left to spend)</i>.
 {% else %}
-{% if balance.balance.amount > 0 %}
-So there just a few euro's left in your acount. <p>
+{% if balance.balance.amount >= 0 %}
+So there little, if any, left in your acount. <p>
 Thererfore you may want to make a <a href="{% url 'manual_deposit' %}">deposit</a> 
 before this runs out. As it takes a few days (or more) before the monies wired will show up in your account.
 {%else%}
