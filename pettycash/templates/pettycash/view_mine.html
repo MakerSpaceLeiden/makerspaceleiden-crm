@@ -64,6 +64,11 @@ before this runs out. As it takes a few days (or more) before the monies wired w
 (<i>only visible for treasurers.</i>)
 <br>
 {% endif %}
+<li> People that can help with fixing (erroneous) payments and other issues: 
+	{% for user in admins %}
+	{% if forloop.first %}{% else %}{% if forloop.last %} and {% else %}, {% endif %}{% endif %}
+	<a href="mailto:{{user.email}}">{{ user }}</a>
+	{% endfor %}. For everything else - contact the trustees at <a href="mailto:{{ settings.TRUSTEES }}">{{ settings.TRUSTEES }}</a>.
 </ul>
 <p>
 <hr>

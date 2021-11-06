@@ -654,6 +654,9 @@ def show_mine(request):
         "lst": lst,
         "queue": PettycashReimbursementRequest.objects.all().count(),
         "has_permission": request.user.is_authenticated,
+        "admins": User.objects.all()
+        .filter(groups__name=settings.PETTYCASH_ADMIN_GROUP)
+        .order_by("last_name"),
     }
 
     return render(request, "pettycash/view_mine.html", context)
