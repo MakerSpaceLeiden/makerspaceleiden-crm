@@ -179,7 +179,7 @@ def transact_raw(
             src=src, dst=dst, description=description, amount=amount
         )
         logger.info("payment: %s" % reason)
-        tx._change_reason = reason
+        tx._change_reason = reason[:100]
         tx.save()
         alertOwnersToChange(tx, user, [])
 
@@ -479,7 +479,7 @@ def cam53process(request):
                     src=User.objects.get(id=settings.POT_ID), dst=user, amount=amount
                 )
                 tx.description = vals["description_%d" % i]
-                tx._change_reason = vals["change_reason_%d" % i]
+                tx._change_reason = vals["change_reason_%d" % i][:100]
                 tx.save()
                 alertOwnersToChange(
                     tx,
@@ -536,11 +536,11 @@ def pair(request, pk):
         )
 
         tx.accepted = True
-        tx._change_reason = reason
+        tx._change_reason = reason[:100]
         tx.save()
 
         station.terminal = tx
-        station._change_reason = reason
+        station._change_reason = reason[:100]
         station.save()
 
         return redirect("unpaired")
@@ -786,7 +786,7 @@ def delete(request, pk):
     form = PettycashDeleteForm(request.POST or None)
     if form.is_valid():
         reason = "%s (by %s)" % (form.cleaned_data["reason"], request.user)
-        tx._change_reason = reason
+        tx._change_reason = reason[:100]
         # tx.delete();
         tx.refund_booking()
         alertOwnersToChange(
@@ -1025,7 +1025,8 @@ def api2_register(request):
         terminal = PettycashTerminal(fingerprint=client_sha, name=name, accepted=False)
         terminal.nonce = secrets.token_hex(32)
         terminal.accepted = False
-        terminal._change_reason = "Added on first contact; from IP address %s" % (ip)
+        reason = "Added on first contact; from IP address %s" % (ip)
+        terminal._change_reason = reason[:100]
         terminal.save()
 
         logger.info("Issuing first time nonce to %s at %s" % (client_sha, ip))
@@ -1074,12 +1075,13 @@ def api2_register(request):
 
             if sha.lower() == response.lower():
                 terminal.accepted = True
-                terminal._change_reason = "%s, IP=%s tag-=%d %s" % (
+                reason = "%s, IP=%s tag-=%d %s" % (
                     terminal.name,
                     ip,
                     tag.id,
                     tag.owner,
                 )
+                terminal._change_reason = reason[:100]
                 terminal.save()
                 logger.error(
                     "Terminal %s accepted, tag swipe by %s matched."
