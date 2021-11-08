@@ -17,7 +17,3 @@ Submitted:   {{ item.submitted }}
 
 Requested to be paid into {% if item.viaTheBank %}the bank account{% else %}the {{ settings.POT_LABEL }}{%endif %}.
 
-{% if user != item.dst %}
-NOTE:that this request was not made by {{ item.dst }} but by {{ user }}.
-{% endif %}
-

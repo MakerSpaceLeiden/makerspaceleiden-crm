@@ -130,7 +130,7 @@ def process(e, namespaces):
 
     matches = [
         w
-        for w in ["space", "tegoed", "zwarte pot", "zwartepot", "storting"]
+        for w in ["space", "tegoed", "zwarte pot", "zwartepot", "storting", "spacepot"]
         if w in details.lower()
     ]
     if len(matches) < 2:

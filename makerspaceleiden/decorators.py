@@ -105,8 +105,9 @@ def login_and_treasurer(function):
     @wraps(function)
     def wrap(request, *args, **kwargs):
         if (
-            request.user.is_privileged
-            or request.user.groups.filter(
+            not request.user.is_anonymous
+            and request.user.is_privileged
+            and request.user.groups.filter(
                 name=settings.PETTYCASH_TREASURER_GROUP
             ).exists()
         ):

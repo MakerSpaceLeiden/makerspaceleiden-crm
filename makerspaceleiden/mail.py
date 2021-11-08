@@ -18,6 +18,19 @@ import re
 logger = logging.getLogger(__name__)
 
 
+def flatten(t):
+    out = []
+    if isinstance(t, list):
+        for i in t:
+            if isinstance(i, list):
+                out.extend(flatten(i))
+            else:
+                out.append(i)
+    else:
+        out.append(t)
+    return out
+
+
 def emailPlain(template, subject=None, toinform=[], context={}, attachments=[]):
     # try to stick to rfc822 (django default is base64) religiously; also
     # as it helps with spam filters.
@@ -25,7 +38,7 @@ def emailPlain(template, subject=None, toinform=[], context={}, attachments=[]):
     cs.body_encoding = QP
 
     # Weed out duplicates.
-    to = list(set(toinform))
+    to = list(set(flatten(toinform)))
 
     context["base"] = settings.BASE
 

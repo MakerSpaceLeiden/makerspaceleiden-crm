@@ -72,6 +72,22 @@ def image2mime(img):
     return attachment
 
 
+def pettycash_admin_emails():
+    return list(
+        User.objects.all()
+        .filter(groups__name=settings.PETTYCASH_ADMIN_GROUP)
+        .values_list("email", flat=True)
+    )
+
+
+def pettycash_treasurer_emails():
+    return list(
+        User.objects.all()
+        .filter(groups__name=settings.PETTYCASH_TREASURER_GROUP)
+        .values_list("email", flat=True)
+    )
+
+
 import logging
 
 logger = logging.getLogger(__name__)
@@ -153,6 +169,7 @@ def pettycash_redirect(pk=None):
 def transact_raw(
     request, src=None, dst=None, description=None, amount=None, reason=None, user=None
 ):
+
     if None in [src, dst, description, amount, reason, user]:
         logger.error("Transact raw called with missing arguments. bug.")
         return 0
@@ -161,8 +178,8 @@ def transact_raw(
         tx = PettycashTransaction(
             src=src, dst=dst, description=description, amount=amount
         )
-        logger.error("payment: %s" % reason)
-        tx._change_reason = reason
+        logger.info("payment: %s" % reason)
+        tx._change_reason = reason[:100]
         tx.save()
         alertOwnersToChange(tx, user, [])
 
@@ -313,9 +330,11 @@ def transfer_to_member(request, src):
     if form.is_valid():
         reason = "Transfer"
         item = form.save(commit=False)
+        if not item.dst:
+            item.dst = User.objects.get(id=settings.POT_ID)
         if transact_raw(
             request,
-            src=item.src,
+            src=request.user,
             dst=item.dst,
             description=item.description,
             amount=item.amount,
@@ -395,7 +414,7 @@ def cam53upload(request):
                                 "description": tx["description"],
                                 "user": tx["user"],
                                 "amount": tx["amount"],
-                                "change_reason": "TXREF=%s HOLDER=%s IBAN=%s import, ran by %s"
+                                "change_reason": "TXREF=%s,%s %s by %s"
                                 % (
                                     tx["ref"],
                                     tx["name_str"],
@@ -460,7 +479,7 @@ def cam53process(request):
                     src=User.objects.get(id=settings.POT_ID), dst=user, amount=amount
                 )
                 tx.description = vals["description_%d" % i]
-                tx._change_reason = vals["change_reason_%d" % i]
+                tx._change_reason = vals["change_reason_%d" % i][:100]
                 tx.save()
                 alertOwnersToChange(
                     tx,
@@ -511,19 +530,17 @@ def pair(request, pk):
     form = PettycashPairForm(request.POST or None)
     if form.is_valid():
         station = form.cleaned_data["station"]
-        reason = "%s. %s paired to %s (by %s)" % (
+        reason = "%s (by %s)" % (
             form.cleaned_data["reason"],
-            tx,
-            station,
             request.user,
         )
 
         tx.accepted = True
-        tx._change_reason = reason
+        tx._change_reason = reason[:100]
         tx.save()
 
         station.terminal = tx
-        station._change_reason = reason
+        station._change_reason = reason[:100]
         station.save()
 
         return redirect("unpaired")
@@ -637,6 +654,9 @@ def show_mine(request):
         "lst": lst,
         "queue": PettycashReimbursementRequest.objects.all().count(),
         "has_permission": request.user.is_authenticated,
+        "admins": User.objects.all()
+        .filter(groups__name=settings.PETTYCASH_ADMIN_GROUP)
+        .order_by("last_name"),
     }
 
     return render(request, "pettycash/view_mine.html", context)
@@ -766,7 +786,7 @@ def delete(request, pk):
     form = PettycashDeleteForm(request.POST or None)
     if form.is_valid():
         reason = "%s (by %s)" % (form.cleaned_data["reason"], request.user)
-        tx._change_reason = reason
+        tx._change_reason = reason[:100]
         # tx.delete();
         tx.refund_booking()
         alertOwnersToChange(
@@ -810,9 +830,9 @@ def reimburseform(request):
         print(request.POST)
         item = form.save(commit=False)
         if not item.date:
-            item.date = datetime.now(tz=timezone.utc)
+            item.date = datetime.now()
         if not item.submitted:
-            item.submitted = datetime.now(tz=timezone.utc)
+            item.submitted = datetime.now()
 
         item.save()
         context["item"] = item
@@ -823,7 +843,7 @@ def reimburseform(request):
 
         emailPlain(
             "email_imbursement_notify.txt",
-            toinform=[settings.TREASURER, request.user.email],
+            toinform=[pettycash_treasurer_emails(), request.user.email],
             context=context,
             attachments=attachments,
         )
@@ -834,8 +854,16 @@ def reimburseform(request):
 
 
 @login_required
-# @login_and_treasurer
 def reimburseque(request):
+    if not request.user.is_anonymous and request.user.can_escalate_to_priveleged:
+        if not request.user.is_privileged:
+            return redirect("sudo")
+    if not request.user.is_privileged:
+        return HttpResponse("XS denied", status=401, content_type="text/plain")
+
+    if not request.user.groups.filter(name=settings.PETTYCASH_TREASURER_GROUP).exists():
+        return HttpResponse("XS denied", status=401, content_type="text/plain")
+
     context = {
         "settings": settings,
         "label": "Reimburse",
@@ -860,7 +888,7 @@ def reimburseque(request):
                 if item.viaTheBank:
                     emailPlain(
                         "email_imbursement_bank_approved.txt",
-                        toinform=[settings.TREASURER, request.user.email],
+                        toinform=[pettycash_treasurer_emails(), request.user.email],
                         context=context,
                         attachments=attachments,
                     )
@@ -877,7 +905,7 @@ def reimburseque(request):
             else:
                 emailPlain(
                     "email_imbursement_rejected.txt",
-                    toinform=[settings.TREASURER, request.user.email],
+                    toinform=[pettycash_treasurer_emails(), request.user.email],
                     context=context,
                     attachments=attachments,
                 )
@@ -997,7 +1025,8 @@ def api2_register(request):
         terminal = PettycashTerminal(fingerprint=client_sha, name=name, accepted=False)
         terminal.nonce = secrets.token_hex(32)
         terminal.accepted = False
-        terminal._change_reason = "Added on first contact; from IP address %s" % (ip)
+        reason = "Added on first contact; from IP address %s" % (ip)
+        terminal._change_reason = reason[:100]
         terminal.save()
 
         logger.info("Issuing first time nonce to %s at %s" % (client_sha, ip))
@@ -1008,9 +1037,7 @@ def api2_register(request):
     #    auto approve it.
     #
     if not terminal.accepted:
-        cutoff = timezone.now() - datetime.timedelta(
-            minutes=settings.PAY_MAXNONCE_AGE_MINUTES
-        )
+        cutoff = timezone.now() - timedelta(minutes=settings.PAY_MAXNONCE_AGE_MINUTES)
         if cutoff > terminal.date:
             logger.info(
                 "Fingerprint %s known, but too old. Issuing new one." % client_sha
@@ -1048,26 +1075,22 @@ def api2_register(request):
 
             if sha.lower() == response.lower():
                 terminal.accepted = True
-                terminal._change_reason = "%s, IP=%s tag-=%d %s" % (
+                reason = "%s, IP=%s tag-=%d %s" % (
                     terminal.name,
                     ip,
                     tag.id,
                     tag.owner,
                 )
+                terminal._change_reason = reason[:100]
                 terminal.save()
                 logger.error(
                     "Terminal %s accepted, tag swipe by %s matched."
                     % (terminal, tag.owner)
                 )
 
-                toinform = (
-                    User.objects.all()
-                    .filter(groups__name=settings.PETTYCASH_ADMIN_GROUP)
-                    .values_list("email", flat=True)
-                )
                 emailPlain(
                     "email_accept.txt",
-                    toinform=toinform,
+                    toinform=pettycash_admin_emails(),
                     context={
                         "base": settings.BASE,
                         "settings": settings,
@@ -1213,7 +1236,8 @@ def api2_pay(request):
         tag = Tag.objects.get(tag=tagstr)
     except ObjectDoesNotExist as e:
         logger.error(
-            "Tag %s not found, terminal %s@%s" % (terminal.name, station.description)
+            "Tag %s not found, terminal %s@%s"
+            % (tagstr, terminal.name, station.description)
         )
         return HttpResponse("Tag not found", status=404, content_type="text/plain")
 

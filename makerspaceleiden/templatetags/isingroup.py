@@ -51,10 +51,10 @@ def isPettycashUser(user):
 
 @register.filter(name="isTreasurer")
 def isTreasurer(user):
-    if user.is_privileged:
-        return True
-
-    return user.groups.filter(name=settings.PETTYCASH_TREASURER_GROUP).exists()
+    return (
+        user.is_privileged
+        and user.groups.filter(name=settings.PETTYCASH_TREASURER_GROUP).exists()
+    )
 
 
 @register.filter(name="isPettycashAdmin")
