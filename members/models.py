@@ -181,6 +181,25 @@ class User(AbstractUser):
     def escalate_to_priveleged(self, request, action):
         ar = AuditRecord(user=self, action=action)
 
+    # Bit of a temporary hack - we do not want to delete
+    # the entitlements issued by this user; and leave some
+    # sort of audit of that persons name; even if the main
+    # user record is gone. However - while we can do things
+    # like 'on_delete=SET(function)' -- we cannot pass any
+    # arguments; so a bulk delete will not trigger the save()
+    # where the issuer is set to None of the Entitlement.
+    #
+    # So instead we do this manually for now (as the pre_delete
+    # hook suffers from the same issue AFAIK). However this
+    # gives us an ugly cyclic dependency - which we sort of
+    # solve here runtime and pray.
+    #
+    def delete(self, *args, **kwargs):
+        from acl.models import Entitlement
+
+        Entitlement.delete_issuer_leaving_breadcrum(self)
+        return super(User, self).delete(*args, **kwargs)
+
 
 class Tag(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
