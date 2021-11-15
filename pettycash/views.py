@@ -414,12 +414,11 @@ def cam53upload(request):
                                 "description": tx["description"],
                                 "user": tx["user"],
                                 "amount": tx["amount"],
-                                "change_reason": "TXREF=%s,%s %s by %s"
+                                "change_reason": "TXREF=%s, %s IBAN=%s"
                                 % (
                                     tx["ref"],
                                     tx["name_str"],
                                     tx["iban_str"],
-                                    request.user,
                                 ),
                             }
                         )
