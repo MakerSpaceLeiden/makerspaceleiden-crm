@@ -714,8 +714,6 @@ def userdetails(request):
     if request.method == "POST":
         try:
             user = UserForm(request.POST, request.FILES, instance=request.user)
-            logger.error("DEBUG: {}".format(user))
-
             save_user = user.save(commit=False)
             if user.is_valid():
                 new_email = "{}".format(user.cleaned_data["email"])
