@@ -13,6 +13,7 @@ from .models import (
     PettycashSku,
     PettycashTerminal,
     PettycashStation,
+    PettycashReimbursementRequest
 )
 import logging
 
@@ -63,9 +64,12 @@ class PettycashBalanceCacheAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     list_display = ("owner", "balance", "last")
     pass
 
+class PettycashReimbursementRequestAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
+    pass
 
 admin.site.register(PettycashSku, PettycashSkuAdmin)
 admin.site.register(PettycashTerminal, PettycashTerminalAdmin)
 admin.site.register(PettycashStation, PettycashStationAdmin)
 admin.site.register(PettycashTransaction, PettycashTransactionAdmin)
 admin.site.register(PettycashBalanceCache, PettycashBalanceCacheAdmin)
+admin.site.register(PettycashReimbursementRequest, PettycashReimbursementRequestAdmin)

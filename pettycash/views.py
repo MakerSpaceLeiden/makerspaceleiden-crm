@@ -254,7 +254,7 @@ def transact(
 
 @login_required
 def index(request, days=30):
-    lst = PettycashBalanceCache.objects.all()
+    lst = PettycashBalanceCache.objects.all().order_by('-last')
     prices = PettycashSku.objects.all()
     context = {
         "title": "Balances",
@@ -885,6 +885,7 @@ def reimburseque(request):
                 attachments.append(image2mime(item.scan))
 
             if approved:
+                context['reason'] = "Approved by %s (%d)" % (request.user, item.pk)
                 if item.viaTheBank:
                     emailPlain(
                         "email_imbursement_bank_approved.txt",
@@ -899,16 +900,19 @@ def reimburseque(request):
                         dst=item.dst,
                         description=item.description,
                         amount=item.amount,
-                        reason="Reimbursement approved by %s" % request.user,
+                        reason=context['reason'],
                         user=request.user,
                     )
             else:
+                context['reason'] = "Rejected by %s (%d)" % (request.user,item.pk)
                 emailPlain(
                     "email_imbursement_rejected.txt",
                     toinform=[pettycash_treasurer_emails(), request.user.email],
                     context=context,
                     attachments=attachments,
                 )
+
+            item._change_reason = context['reason']
             item.delete()
 
             return redirect(reverse("reimburse_queue"))
