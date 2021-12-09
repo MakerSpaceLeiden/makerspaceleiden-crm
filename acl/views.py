@@ -7,7 +7,7 @@ from django.contrib.auth import authenticate
 from django.conf import settings
 from django.shortcuts import redirect
 from django.views.generic import ListView, CreateView, UpdateView
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy,reverse
 from django import forms
 from django.forms import ModelForm
 from django.core.exceptions import ObjectDoesNotExist
@@ -361,8 +361,9 @@ def tag_edit(request, tag_id=None):
 
     form = TagForm(instance=tag, canedittag=request.user.is_privileged)
     context["form"] = form
+    context["back"] = "overview"
 
-    return render(request, "acl/crud.html", context)
+    return render(request, "crud.html", context)
 
 
 @login_required
@@ -391,8 +392,9 @@ def tag_delete(request, tag_id=None):
 
     form = TagForm(instance=tag, isdelete=True)
     context["form"] = form
+    context["back"] = "overview"
 
-    return render(request, "acl/crud.html", context)
+    return render(request, "crud.html", context)
 
 
 def userdetails(owner):

@@ -164,6 +164,7 @@ def create(request):
         "owner": request.user,
         "form": form,
         "has_permission": request.user.is_authenticated,
+        "back": "storage",
     }
     return render(request, "storage/crud.html", context)
 
@@ -223,6 +224,7 @@ def modify(request, pk):
         "form": form,
         "storage": storage,
         "has_permission": request.user.is_authenticated,
+        "back": "storage",
     }
 
     return render(request, "storage/crud.html", context)
@@ -248,6 +250,7 @@ def delete(request, pk):
             "storage": storage,
             "delete": True,
             "has_permission": request.user.is_authenticated,
+            "back": "storage",
         }
         return render(request, "storage/crud.html", context)
 
@@ -308,6 +311,7 @@ def showhistory(request, pk, rev=None):
             "storage": historic,
             "history": True,
             "has_permission": request.user.is_authenticated,
+            "back": "storage",
         }
         return render(request, "storage/crud.html", context)
         # return historyAdmin.history_form_view(request,str(pk),str(rev), context)

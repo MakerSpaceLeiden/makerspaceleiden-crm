@@ -97,8 +97,9 @@ def create(request):
         "owner": request.user,
         "form": form,
         "has_permission": request.user.is_authenticated,
+        "back": "boxes",
     }
-    return render(request, "memberbox/crud.html", context)
+    return render(request, "crud.html", context)
 
 
 @login_required
@@ -138,11 +139,12 @@ def modify(request, pk):
         "user": request.user,
         "owner": box.owner,
         "form": form,
-        "box": box,
+        "item": box,
         "has_permission": request.user.is_authenticated,
+        "back": "boxes",
     }
 
-    return render(request, "memberbox/crud.html", context)
+    return render(request, "crud.html", context)
 
 
 @login_required

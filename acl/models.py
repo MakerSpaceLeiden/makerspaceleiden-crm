@@ -49,7 +49,7 @@ class PermitType(models.Model):
         return self.name
 
     def hasThisPermit(self, user):
-        e = Entitlement.objects.all().filter(holder=user, permit=self).first
+        e = Entitlement.objects.all().filter(holder=user, permit=self).first()
         if e and e.active == True:
             return True
         return False
@@ -128,7 +128,7 @@ class Machine(models.Model):
             return True
         if not self.requires_permit.permit:
             return True
-        return self.requires_permit.permit(user)
+        return self.requires_permit.permit.hasThisPermit(user)
 
 
 # Special sort of create/get - where we ignore the issuer when looking for it.

@@ -108,4 +108,6 @@ ML_ADMINURL = "https://mailman.makerspaceleiden.nl/mailman"
 with open("/etc/crm_ml_secret.txt") as f:
     ML_PASSWORD = f.read().strip()
 
+PETTYCASH_IBAN="NL30TRIO0197694519"
+
 POT_ID = 63
