@@ -15,14 +15,11 @@ from django.core.mail import EmailMessage
 from django.template.loader import render_to_string, get_template
 
 import logging
+import json
 
 logger = logging.getLogger(__name__)
 
-
-@login_required
-def index(request):
-    current_user_id = request.user.id
-
+def getall(current_user_id = None):
     aggregator_adapter = get_aggregator_adapter()
     if not aggregator_adapter:
         return HttpResponse(
@@ -67,11 +64,26 @@ def index(request):
                 )
             event_groups[-1]["events"].append(event)
 
+    return event_groups
+
+def index_api(request):
+    payload = { 
+            'title': 'Chores of this week',
+            'version': '1.00',
+            'chores': getall(),
+    }
+    return HttpResponse(
+        json.dumps(payload).encode("utf8"), content_type="application/json"
+    )
+
+@login_required
+def index(request):
+    event_groups = getall(request.user.id)
+
     context = {
         "title": "Chores",
         "event_groups": event_groups,
     }
-
     return render(request, "chores.html", context)
 
 
