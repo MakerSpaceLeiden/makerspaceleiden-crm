@@ -19,7 +19,7 @@ import json
 
 logger = logging.getLogger(__name__)
 
-def getall(current_user_id = None):
+def getall(current_user_id = None, subset = None):
     aggregator_adapter = get_aggregator_adapter()
     if not aggregator_adapter:
         return HttpResponse(
@@ -48,6 +48,8 @@ def getall(current_user_id = None):
             num_missing_volunteers = event["chore"]["min_required_people"] - len(
                 event["volunteers"]
             )
+            if subset != None and not event["chore"]["name"] == subset:
+                continue
             this_user_volunteered = current_user_id in [
                 user.id for user in event["volunteers"]
             ]
@@ -66,11 +68,11 @@ def getall(current_user_id = None):
 
     return event_groups
 
-def index_api(request):
+def index_api(request, name=None):
     payload = { 
             'title': 'Chores of this week',
             'version': '1.00',
-            'chores': getall(),
+            'chores': getall(None,name),
     }
     return HttpResponse(
         json.dumps(payload).encode("utf8"), content_type="application/json"
@@ -78,7 +80,7 @@ def index_api(request):
 
 @login_required
 def index(request):
-    event_groups = getall(request.user.id)
+    event_groups = getall(request.user.id,None)
 
     context = {
         "title": "Chores",
