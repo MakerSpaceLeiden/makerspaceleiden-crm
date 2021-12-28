@@ -7,7 +7,7 @@ from django.contrib.auth import authenticate
 from django.conf import settings
 from django.shortcuts import redirect
 from django.views.generic import ListView, CreateView, UpdateView
-from django.urls import reverse_lazy,reverse
+from django.urls import reverse_lazy, reverse
 from django import forms
 from django.forms import ModelForm
 from django.core.exceptions import ObjectDoesNotExist

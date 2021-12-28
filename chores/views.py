@@ -19,7 +19,8 @@ import json
 
 logger = logging.getLogger(__name__)
 
-def getall(current_user_id = None, subset = None):
+
+def getall(current_user_id=None, subset=None):
     aggregator_adapter = get_aggregator_adapter()
     if not aggregator_adapter:
         return HttpResponse(
@@ -62,27 +63,33 @@ def getall(current_user_id = None, subset = None):
             if event_ts_str != ts:
                 ts = event_ts_str
                 event_groups.append(
-                        {"ts_str": event_ts.strftime("%A %d/%m/%Y"), "timestamp": timestamp, "events": []}
+                    {
+                        "ts_str": event_ts.strftime("%A %d/%m/%Y"),
+                        "timestamp": timestamp,
+                        "events": [],
+                    }
                 )
             event_groups[-1]["events"].append(event)
 
-    return sorted(event_groups, key = lambda e: e['timestamp'] )
+    return sorted(event_groups, key=lambda e: e["timestamp"])
+
 
 def index_api(request, name=None):
-    payload = { 
-            'title': 'Chores of this week',
-            'version': '1.00',
-            'chores': getall(None,name),
+    payload = {
+        "title": "Chores of this week",
+        "version": "1.00",
+        "chores": getall(None, name),
     }
     if name:
-        payload['title'] = name;
+        payload["title"] = name
     return HttpResponse(
         json.dumps(payload).encode("utf8"), content_type="application/json"
     )
 
+
 @login_required
 def index(request):
-    event_groups = getall(request.user.id,None)
+    event_groups = getall(request.user.id, None)
 
     context = {
         "title": "Chores",
