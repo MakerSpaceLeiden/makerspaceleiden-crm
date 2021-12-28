@@ -50,7 +50,11 @@ class PettycashReimbursementRequestForm(ModelForm):
 
 class PettycashReimburseHandleForm(forms.Form):
     pk = forms.IntegerField(widget=forms.HiddenInput())
-    approved = forms.BooleanField(initial=True, required=False, label="Approve")
+    reason = forms.CharField(
+        max_length=300,
+        required=False,
+        help_text="Reason for rejecting this reimbursement request",
+    )
 
 
 class CamtUploadForm(forms.Form):

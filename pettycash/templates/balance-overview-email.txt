@@ -1,5 +1,6 @@
-Subject: [makerbot] Account balances for this month
-L.S.,
+Subject: [makerbot] Everyones account balances for this month
+
+Folks,
 
 It is that time of the month again. Your spacebot has been doing the
 sums; and below are everyones balances.

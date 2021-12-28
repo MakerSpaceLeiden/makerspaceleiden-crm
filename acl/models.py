@@ -4,6 +4,8 @@ from django.utils import timezone
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from simple_history.models import HistoricalRecords
+from simple_history.utils import update_change_reason
+
 from django.urls import reverse
 from django.core.mail import EmailMessage
 from django.conf import settings
@@ -15,6 +17,7 @@ from django.contrib.sites.models import Site
 
 import datetime
 import logging
+import inspect
 
 logger = logging.getLogger(__name__)
 
@@ -192,8 +195,10 @@ class Entitlement(models.Model):
     )
     issuer = models.ForeignKey(
         User,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         related_name="isIssuedBy",
+        blank=True,
+        null=True,
     )
     history = HistoricalRecords()
     objects = EntitlementManager()
@@ -210,6 +215,26 @@ class Entitlement(models.Model):
             + yn(self.holder.form_on_file)
             + ")"
         )
+
+    # Bit of a temporary hack - we do not want to delete
+    # the entitlements issued when a user is deleted; and we
+    # also want to leave some  sort of audit of that persons
+    # their name name; even if the main # user record is gone.
+    #
+    # However - while we can do things like 'on_delete=SET(function)'
+    # -- we cannot pass any arguments; to that. So a bulk delete will
+    # not trigger the save() where the issuer is set to None of
+    # the Entitlement. And pre_save/delete here does not help
+    # us either. So we do this as a special for now. Also bypassing
+    # the normal save as it would block us (a non issuer is not allowed).
+    #
+    def delete_issuer_leaving_breadcrum(issuer):
+        for e in Entitlement.objects.all().filter(issuer=issuer):
+            reason = "Issuer %s no longer in the system" % (issuer)
+            e.issuer = None
+            e._change_reason = reason
+            # Bypass below permit checks.
+            super(Entitlement, e).save()
 
     def save(self, *args, **kwargs):
         current_site = Site.objects.get(pk=settings.SITE_ID)
@@ -248,6 +273,7 @@ class Entitlement(models.Model):
             logger.critical(
                 f"Entitlement.save(): STAFFF bypass of rule 'holder {self.issuer} cannot issue {self.permit} to {self.holder} as the holder lacks {issuer_permit}'"
             )
+
         if self.active == None:
             # See if we can fetch an older approval for same that may already have
             # been activated. And grandfather it in.

@@ -414,12 +414,11 @@ def cam53upload(request):
                                 "description": tx["description"],
                                 "user": tx["user"],
                                 "amount": tx["amount"],
-                                "change_reason": "TXREF=%s,%s %s by %s"
+                                "change_reason": "TXREF=%s, %s IBAN=%s"
                                 % (
                                     tx["ref"],
                                     tx["name_str"],
                                     tx["iban_str"],
-                                    request.user,
                                 ),
                             }
                         )
@@ -874,11 +873,18 @@ def reimburseque(request):
     form = PettycashReimburseHandleForm(request.POST or None)
     if form.is_valid():
         pk = form.cleaned_data["pk"]
-        approved = form.cleaned_data["approved"]
+        reason = form.cleaned_data["reason"].rstrip()
+        if reason:
+            reason = reason + "\n"
+
+        approved = False
+        if "approved" in (request.POST["submit"]):
+            approved = True
         try:
             item = PettycashReimbursementRequest.objects.get(id=pk)
             context["item"] = item
             context["approved"] = approved
+            context["reason"] = reason
 
             attachments = []
             if item.scan:
