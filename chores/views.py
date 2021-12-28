@@ -62,11 +62,11 @@ def getall(current_user_id = None, subset = None):
             if event_ts_str != ts:
                 ts = event_ts_str
                 event_groups.append(
-                    {"ts_str": event_ts.strftime("%A %d/%m/%Y"), "events": []}
+                        {"ts_str": event_ts.strftime("%A %d/%m/%Y"), "timestamp": timestamp, "events": []}
                 )
             event_groups[-1]["events"].append(event)
 
-    return event_groups
+    return sorted(event_groups, key = lambda e: e['timestamp'] )
 
 def index_api(request, name=None):
     payload = { 
@@ -74,6 +74,8 @@ def index_api(request, name=None):
             'version': '1.00',
             'chores': getall(None,name),
     }
+    if name:
+        payload['title'] = name;
     return HttpResponse(
         json.dumps(payload).encode("utf8"), content_type="application/json"
     )
