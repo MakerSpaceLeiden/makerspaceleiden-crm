@@ -69,10 +69,13 @@ def getall(current_user_id = None, subset = None):
     return sorted(event_groups, key = lambda e: e['timestamp'] )
 
 def index_api(request, name=None):
+    chores = getall(None,name)
+    if not chores:
+        return HttpResponse("No chores found", status=404, content_type="text/plain")
     payload = { 
             'title': 'Chores of this week',
             'version': '1.00',
-            'chores': getall(None,name),
+            'chores': chores,
     }
     if name:
         payload['title'] = name;
