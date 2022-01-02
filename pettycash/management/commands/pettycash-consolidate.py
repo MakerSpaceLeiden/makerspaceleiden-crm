@@ -61,7 +61,7 @@ class Command(BaseCommand):
                 )
                 if not options["dryrun"]:
                     rollup._change_reason = "Created during manual rollup"
-                    rollup.save()
+                    rollup.save(bypass=True)
                     print("  -  saved: %s" % rollup)
 
                 print()

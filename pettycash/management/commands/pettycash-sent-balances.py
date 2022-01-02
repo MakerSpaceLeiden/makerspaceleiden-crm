@@ -15,7 +15,7 @@ from django.utils import timezone
 from moneyed import Money, EUR
 
 
-def sendEmail(balances, toinform, template="balance-overview-email.txt"):
+def sendEmail(balances, toinform, template="balance-overview-email.txt", forreal=True):
     for e in [toinform] if isinstance(toinform, str) else toinform:
         emailPlain(
             template,
@@ -25,6 +25,7 @@ def sendEmail(balances, toinform, template="balance-overview-email.txt"):
                 "date": datetime.now(tz=timezone.utc),
                 "base": settings.BASE,
             },
+            forreal=forreal,
         )
 
 
@@ -70,6 +71,13 @@ class Command(BaseCommand):
             help="Save the message as rfc822 blobs rather than sending. Useful as we sort out dkim on the server. Pass the output directory as an argument",
         )
 
+        parser.add_argument(
+            "--dry-run",
+            dest="dryrun",
+            action="store_true",
+            help="Do a dry run; do not actually sent",
+        )
+
     def handle(self, *args, **options):
         verbosity = int(options["verbosity"])
         cutoff_date = datetime.now(tz=timezone.utc) - timedelta(days=options["days"])
@@ -81,9 +89,13 @@ class Command(BaseCommand):
 
         balances = PettycashBalanceCache.objects.order_by("balance")
         if not options["all"]:
-            balances = balances.filter(
-                Q(balance__gt=Money(0, EUR)) | Q(balance__lt=Money(0, EUR))
-            ).filter(Q(last__date__gt=cutoff_date))
+            balances = (
+                balances.filter(
+                    Q(balance__gt=Money(0, EUR)) | Q(balance__lt=Money(0, EUR))
+                )
+                .filter(Q(last__date__gt=cutoff_date))
+                .filter(~Q(id=settings.POT_ID))
+            )
 
         dest = settings.MAILINGLIST
         if options["to"]:
@@ -93,7 +105,7 @@ class Command(BaseCommand):
             dest = balances.values_list("owner__email", flat=True)
 
         if balances.count():
-            sendEmail(balances, dest)
+            sendEmail(balances, dest, forreal=(not options["dryrun"]))
         else:
             print("No balances sent - none done since %s" % cutoff_date)
 

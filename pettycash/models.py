@@ -301,7 +301,7 @@ class PettycashTransaction(models.Model):
             self.date = timezone.now()
 
         if self.amount < Money(0, EUR):
-            if not bypas:
+            if not bypass:
                 raise ValidationError("Blocked negative transaction.")
             logger.info("Bypass for negative transaction used on save of %s" % self)
 

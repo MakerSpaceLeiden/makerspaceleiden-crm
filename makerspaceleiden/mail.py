@@ -11,6 +11,7 @@ from email.mime.multipart import MIMEMultipart
 from email.charset import Charset, QP
 import email.mime, email.mime.nonmultipart, email.charset
 
+from textwrap import wrap
 import datetime
 import logging
 import re
@@ -31,7 +32,9 @@ def flatten(t):
     return out
 
 
-def emailPlain(template, subject=None, toinform=[], context={}, attachments=[]):
+def emailPlain(
+    template, subject=None, toinform=[], context={}, attachments=[], forreal=True
+):
     # try to stick to rfc822 (django default is base64) religiously; also
     # as it helps with spam filters.
     cs = Charset("utf-8")
@@ -73,4 +76,7 @@ def emailPlain(template, subject=None, toinform=[], context={}, attachments=[]):
     msg.attach(part2)
 
     email.attach(msg)
-    email.send()
+    if forreal:
+        email.send()
+    else:
+        print("To:\t%s\nSubject: %s\n%s\n\n" % (to, subject, body))
