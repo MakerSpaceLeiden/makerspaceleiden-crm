@@ -99,6 +99,7 @@ from .models import (
     PettycashTerminal,
     PettycashStation,
     PettycashReimbursementRequest,
+    PettycashImportRecord,
 )
 from .admin import PettycashBalanceCacheAdmin, PettycashTransactionAdmin
 from .forms import (
@@ -263,6 +264,7 @@ def index(request, days=30):
         "pricelist": prices,
         "has_permission": request.user.is_authenticated,
         "user": request.user,
+        "last_import": PettycashImportRecord.objects.all().last(),
     }
     return render(request, "pettycash/index.html", context)
 
@@ -507,6 +509,12 @@ def cam53process(request):
                     e,
                 )
             )
+    if ok:
+        try:
+            record = PettycashImportRecord.objects.create(by=request.user)
+            record.save()
+        except Exception as e:
+            logger.error("Had issues recording transaction import")
 
     context = {
         "title": "Import Results",
@@ -641,7 +649,7 @@ def show_mine(request):
         lst = (
             PettycashTransaction.objects.all()
             .filter(Q(src=user) | Q(dst=user))
-            .order_by("id")
+            .order_by("date")
         )
     except ObjectDoesNotExist as e:
         pass
@@ -656,6 +664,7 @@ def show_mine(request):
         "admins": User.objects.all()
         .filter(groups__name=settings.PETTYCASH_ADMIN_GROUP)
         .order_by("last_name"),
+        "last_import": PettycashImportRecord.objects.all().last(),
     }
 
     return render(request, "pettycash/view_mine.html", context)
@@ -710,7 +719,7 @@ def show(request, pk):
         lst = (
             PettycashTransaction.objects.all()
             .filter(Q(src=user) | Q(dst=user))
-            .order_by("id")
+            .order_by("date")
         )
         for tx in lst:
             if tx.dst == user:

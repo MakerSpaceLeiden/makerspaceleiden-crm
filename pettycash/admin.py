@@ -14,6 +14,7 @@ from .models import (
     PettycashTerminal,
     PettycashStation,
     PettycashReimbursementRequest,
+    PettycashImportRecord,
 )
 import logging
 
@@ -69,9 +70,15 @@ class PettycashReimbursementRequestAdmin(ImportExportModelAdmin, SimpleHistoryAd
     pass
 
 
+class PettycashImportRecordAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
+    list_display = ("date", "by")
+    pass
+
+
 admin.site.register(PettycashSku, PettycashSkuAdmin)
 admin.site.register(PettycashTerminal, PettycashTerminalAdmin)
 admin.site.register(PettycashStation, PettycashStationAdmin)
 admin.site.register(PettycashTransaction, PettycashTransactionAdmin)
 admin.site.register(PettycashBalanceCache, PettycashBalanceCacheAdmin)
 admin.site.register(PettycashReimbursementRequest, PettycashReimbursementRequestAdmin)
+admin.site.register(PettycashImportRecord, PettycashImportRecordAdmin)

@@ -362,3 +362,14 @@ class PettycashReimbursementRequest(models.Model):
         help_text="Scan, photo or similar of the receipt",
     )
     history = HistoricalRecords()
+
+
+class PettycashImportRecord(models.Model):
+    date = models.DateField(help_text="Date of last import", default=timezone.now)
+    by = models.ForeignKey(
+        User,
+        help_text="Person that did this import",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+    )

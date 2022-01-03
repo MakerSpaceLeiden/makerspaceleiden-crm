@@ -16,7 +16,8 @@ Or consult your personal page at:
 
 	{{ base }}{% url 'mytransactions' %} 
 
-for just your own transactions.
+for just your own transactions. With regard to the deposits into the
+bank acount; last import as {{ last_import.date}} by {{ last_import.by }}
 
 Yours,
 

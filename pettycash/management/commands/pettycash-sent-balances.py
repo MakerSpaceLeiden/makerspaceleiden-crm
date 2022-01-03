@@ -5,7 +5,11 @@ from django.conf import settings
 from django.core.mail import EmailMessage
 from django.db.models import Q
 
-from pettycash.models import PettycashTransaction, PettycashBalanceCache
+from pettycash.models import (
+    PettycashTransaction,
+    PettycashBalanceCache,
+    PettycashImportRecord,
+)
 from makerspaceleiden.mail import emailPlain
 
 import sys, os, pwd
@@ -24,6 +28,7 @@ def sendEmail(balances, toinform, template="balance-overview-email.txt", forreal
                 "balances": balances,
                 "date": datetime.now(tz=timezone.utc),
                 "base": settings.BASE,
+                "last_import": PettycashImportRecord.objects.all().last(),
             },
             forreal=forreal,
         )
@@ -94,7 +99,7 @@ class Command(BaseCommand):
                     Q(balance__gt=Money(0, EUR)) | Q(balance__lt=Money(0, EUR))
                 )
                 .filter(Q(last__date__gt=cutoff_date))
-                .filter(~Q(id=settings.POT_ID))
+                .filter(~Q(owner=settings.POT_ID))
             )
 
         dest = settings.MAILINGLIST

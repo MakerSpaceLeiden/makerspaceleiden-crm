@@ -16,10 +16,13 @@ Your balance
 So there little, if any, left in your acount. 
 Thererfore you may want to make a <a href="{% url 'manual_deposit' %}">deposit</a> 
 before this runs out. As it takes a few days (or more) before the monies wired will show up in your account.
-<p>
 {%else%}
 	<b>Negative, so you owe the space money; and should make a <a href="{% url 'manual_deposit' %}">deposit</a> as soon as possible.</b>
 {% endif %}
+{% endif %}
+{% if last_import %}
+The last import/synchronisation with the bank account was done by {{ last_import.by }} on {{ last_import.date }}.
+<p>
 {% endif %}
 <h1>Information about payments</i>
 <ul>
