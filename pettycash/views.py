@@ -763,7 +763,7 @@ def pay(request):
 
     return transact(
         request,
-        "%s pays %s to the Makerspace for %s"
+        "%s wants to pay %s to the Makerspace for %s"
         % (request.user, mtostr(amount), description),
         src=request.user,
         dst=settings.POT_ID,
