@@ -94,12 +94,10 @@ class Command(BaseCommand):
 
         balances = PettycashBalanceCache.objects.order_by("balance")
         if not options["all"]:
-            balances = (
-                balances.filter(
-                    (Q(balance__gt=Money(0, EUR)) & Q(last__date__gt=cutoff_date)) | Q(balance__lt=Money(0, EUR))
-                )
-                .filter(~Q(owner=settings.POT_ID))
-            )
+            balances = balances.filter(
+                (Q(balance__gt=Money(0, EUR)) & Q(last__date__gt=cutoff_date))
+                | Q(balance__lt=Money(0, EUR))
+            ).filter(~Q(owner=settings.POT_ID))
 
         dest = settings.MAILINGLIST
         if options["to"]:
