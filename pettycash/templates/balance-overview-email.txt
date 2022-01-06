@@ -4,8 +4,8 @@ Folks,
 
 It is that time of the month again. Your spacebot has been doing the
 sums; and below the balances of everyone that did a transaction in the
-last month and everyone that owes money to the space and really should
-do a deposit as soon as possible.
+last month together with everyone that owes money to the space and really 
+should do a deposit as soon as possible.
 
 As always - you can see the complete list at
 
@@ -23,7 +23,11 @@ Or consult your personal page at:
 	{{ base }}{% url 'mytransactions' %} 
 
 for just your own transactions. With regard to the deposits into the
-bank acount; last import as {{ last_import.date}} by {{ last_import.by }}
+bank acount; last import was {{ last_import.date}} by {{ last_import.by }}
+
+As a general rule (and depending on your coffee, nuts, welding gas and 
+bolts appetite) consider doing a deposit of 5 or 10 euro when you are 
+getting below 5 euro or so.
 
 Yours,
 
