@@ -3,7 +3,9 @@ Subject: [makerbot] Everyones account balances for this month
 Folks,
 
 It is that time of the month again. Your spacebot has been doing the
-sums; and below are everyones balances.
+sums; and below the balances of everyone that did a transaction in the
+last month and everyone that owes money to the space and really should
+do a deposit as soon as possible.
 
 As always - you can see the complete list at
 
@@ -11,6 +13,10 @@ As always - you can see the complete list at
 
 where you can also browse to the specific transactions.  And here you 
 can also fix any mistakes.
+
+If you are not on this list - then you propably did not do any 
+transaction (this month, or ever) -and- do do not owe the space
+any money at this point in time.
 
 Or consult your personal page at:
 
