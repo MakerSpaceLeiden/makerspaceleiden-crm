@@ -1,1 +1,0 @@
-Membersbox {{location}} of {{ name }} put up for re-use; any contents left in it will soon be junked/recycled.

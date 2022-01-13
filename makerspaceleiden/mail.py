@@ -31,6 +31,12 @@ def flatten(t):
     return out
 
 
+def emails_for_group(group):
+    return list(
+        User.objects.all().filter(groups__name=group).values_list("email", flat=True)
+    )
+
+
 def emailPlain(template, subject=None, toinform=[], context={}, attachments=[]):
     # try to stick to rfc822 (django default is base64) religiously; also
     # as it helps with spam filters.
