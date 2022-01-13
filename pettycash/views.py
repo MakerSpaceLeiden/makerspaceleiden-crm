@@ -875,11 +875,11 @@ def reimburseque(request):
         pk = form.cleaned_data["pk"]
         reason = form.cleaned_data["reason"].rstrip()
         if reason:
-           reason = reason + "\n"
+            reason = reason + "\n"
 
         approved = False
-        if 'approved' in (request.POST['submit']):
-             approved = True
+        if "approved" in (request.POST["submit"]):
+            approved = True
         try:
             item = PettycashReimbursementRequest.objects.get(id=pk)
             context["item"] = item
