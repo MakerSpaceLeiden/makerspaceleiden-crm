@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     "mainssensor.apps.MainssensorConfig",
     "kwh.apps.KwhConfig",
     "pettycash.apps.PettycashConfig",
+    "ultimaker.apps.UltimakerConfig",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",

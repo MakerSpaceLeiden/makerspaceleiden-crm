@@ -41,3 +41,7 @@ jsonfield2
 
 # Petty cash
 django-money
+
+# Reverse proxy for the 3D printers
+requests
+
