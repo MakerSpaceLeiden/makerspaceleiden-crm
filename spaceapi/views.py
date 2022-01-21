@@ -28,10 +28,10 @@ def index(request):
         )
 
     state = aggregator_adapter.fetch_state_space()
-    context = {"open": 'false'}
+    context = {"open": "false"}
 
     if bool(state["users_in_space"]):
-        context = {"open": 'true'} # must be lowercase
+        context = {"open": "true"}  # must be lowercase
         lst = datetime.datetime(1970, 1, 1)
         for user in state["users_in_space"]:
             ulst = parser.parse(user["ts_checkin"])
