@@ -1,0 +1,29 @@
+{
+  "issue_report_channels": [
+    "email"
+  ],
+  "state": {
+    "message": "Limited access due to Covid-19 measures; see website.",
+    "open": {{ open }},
+    "lastchange": {{ lastSinceEpoch }}
+  },
+  "space": "Makerspace Leiden",
+  "location": {
+    "lon": 4.493948742846493,
+    "lat": 52.16270661099023, 
+    "address": "Volmolengracht 13, 2312 PG Leiden"
+  },
+  "api": "0.13",
+  "open": {{ open }},
+  "lastchange": {{ lastSinceEpoch }},
+  "url": "https://makerspaceleiden.nl/",
+  "contact": {
+    "email": "bestuur@makerspaceleiden.nl"
+  },
+  "logo": "https://makerspaceleiden.nl/wp-content/uploads/2019/10/MSL-logo-1.svg",
+  "spacefed": {
+    "spacenet": false,
+    "spacesaml": false,
+    "spacephone": false
+  }
+}

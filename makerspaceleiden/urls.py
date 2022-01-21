@@ -44,6 +44,7 @@ urlpatterns = [
     path("kwh/", include("kwh.urls")),
     path("ultimaker/", include("ultimaker.urls")),
     path("pettycash/", include("pettycash.urls")),
+    path("spaceapi/", include("spaceapi.urls")),
 ]
 
 urlpatterns += static(r"/favicon.ico", document_root="static/favicon.ico")
