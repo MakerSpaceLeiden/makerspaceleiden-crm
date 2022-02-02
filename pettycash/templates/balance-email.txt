@@ -21,7 +21,7 @@ the makerspace bot, on behalf of the trustees (bestuur@makerspaceleiden.nl).
 
 
 {% for tx in transactions %}
-{% if tx.src == who and tx.dst == who %}
+{% if tx.src == user and tx.dst == user %}
 Balance previous billing cycle      {{ tx.amount}}
 {% else %}{% if tx.src == user %}{{tx.date}} {{ tx.description }}
                                  af {{ tx.amount }}
