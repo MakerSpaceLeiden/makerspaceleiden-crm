@@ -23,7 +23,8 @@ Or consult your personal page at:
 	{{ base }}{% url 'mytransactions' %} 
 
 for just your own transactions. With regard to the deposits into the
-bank acount; last import was {{ last_import.date}} by {{ last_import.by }}
+bank acount; last import of the bank-statements with your deposits was
+done on {{ last_import.date}} by {{ last_import.by }}.
 
 As a general rule (and depending on your coffee, nuts, welding gas and 
 bolts appetite) consider doing a deposit of 5 or 10 euro when you are 
