@@ -29,6 +29,7 @@ class Command(BaseCommand):
         rc = 0
         verbosity = int(options["verbosity"])
 
+        total = Money(0, EUR)
         for user in User.objects.all():
             balance = PettycashBalanceCache(owner=user, balance=Money(0, EUR))
             old_balance = Money(0, EUR)
@@ -50,8 +51,10 @@ class Command(BaseCommand):
                 for tx in trns:
                     if tx.dst == user:
                         balance.balance += tx.amount
+                        total += tx.amount
                     else:
                         balance.balance -= tx.amount
+                        total -= tx.amount
             except ObjectDoesNotExist as e:
                 pass
 
@@ -65,4 +68,6 @@ class Command(BaseCommand):
             if (err != "" and act != "initial creation") or verbosity > 1:
                 print("%s: %s%s" % (user, balance.balance, err))
 
+        if total !=  Money(0, EUR) or verbosity > 1:
+            print("Total %s" % (total))
         sys.exit(rc)

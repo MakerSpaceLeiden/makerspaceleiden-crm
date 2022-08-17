@@ -27,6 +27,8 @@ class MailmanAccessNoSuchSubscriber(Exception):
 class MailmanAccessDeniedException(Exception):
     pass
 
+class MailmanAccessLoginFail(Exception):
+    pass
 
 class MailmanException(Exception):
     pass
@@ -58,7 +60,7 @@ class MailmanService:
 
         postdata = urllib.parse.urlencode({"adminpw": self.password}).encode("ascii")
 
-        logger.debug(f"LOGIN {url1}")
+        logger.info(f"LOGIN {url1}")
         with self.opener.open(urllib.request.Request(url1, postdata)) as response:
             body = response.read()
             tree = html.fromstring(body)
@@ -79,7 +81,7 @@ class MailmanService:
 
                 formparams["csrf_token"] = self.csrf_token
                 postdata = urllib.parse.urlencode(formparams).encode("ascii")
-                logger.debug(f"POST {url2}")
+                logger.info(f"POST {url2}")
                 with self.opener.open(
                     urllib.request.Request(url2, postdata)
                 ) as response:
@@ -87,7 +89,10 @@ class MailmanService:
                     tree = html.fromstring(body)
 
                 if "first log in by giving your" in str(body):
-                    raise MailmanAccessNoSuchSubscriber
+                   if not retry:
+                       raise MailmanAccessLoginFail
+                   logger.info("Re-logign in")
+                   self.login(mailinglist)
 
                 if "The form lifetime has expire." not in str(
                     body
@@ -224,9 +229,9 @@ class MailmanAccount:
                 onoff = "1"
             else:
                 onoff = "0"
-            logger.debug(f"Setting {email}@{self.mailinglist} {field} = {onoff}")
+            logger.info(f"Setting {email}@{self.mailinglist} {field} = {onoff}")
         else:
-            logger.debug(f"Reading {email} {field}")
+            logger.info(f"Reading {email} {field}")
 
         params[field] = onoff
 
@@ -248,19 +253,23 @@ class MailmanAccount:
                 else:
                     formparams[k] = v
 
+            logger.info(f"Posting with {formparams}")
             body = self.service.post(self.mailinglist, url2, formparams)
             tree = html.fromstring(body)
 
             # bit of a hack - should be a chat/expect per form type. But these
             # are unique enough for the few functons that we have.
             if "Already a member" in str(body):
+                logger.info("Return ok on already a member")
                 return True
                 raise MailmanAlreadySubscribed("already a member")
 
             if "Successfully subscribed:" in str(body):
+                logger.info("Return ok on sub-sub")
                 return True
 
             if "Successfully Unsubscribed:" in str(body):
+                logger.info("Return ok on sub-unsub")
                 return True
 
             if "Cannot unsubscribe non-members:" in str(body):
@@ -287,7 +296,7 @@ class MailmanAccount:
                     results[k] = str(val)
 
             del formparams["csrf_token"]
-            logger.debug(f"{url2} {formparams} {results}")
+            logger.info(f"{url2} {formparams} {results}")
             return results
 
         except urllib.error.HTTPError as e:

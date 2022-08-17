@@ -13,6 +13,7 @@ urlpatterns = [
     path("pricelist", views.pricelist, name="pricelist"),
     path("qrcode", views.qrcode, name="qrcode"),
     path("manual_deposit", views.manual_deposit, name="manual_deposit"),
+    path("showall", views.showall, name="all_transactiondetail"),
     path("showtx/<int:pk>", views.showtx, name="transactiondetail"),
     path("invoice/<int:src>", views.invoice, name="invoice"),
     path(

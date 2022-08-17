@@ -39,4 +39,6 @@ Balances as of {{ date }}
 {% for b in balances %}
 {{ b.owner|rjust:30 }} {{ b.balance }}{% endfor %}
 
-
+General spend
+{% for e in per_sku %}
+{{ e.name|rjust:30 }} {{ e.count|rjust:10 }} @ {{ e.price }} =  {{ e.amount|rjust:10 }}{% endfor %}

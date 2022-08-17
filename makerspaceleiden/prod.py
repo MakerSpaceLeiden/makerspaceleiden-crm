@@ -86,6 +86,11 @@ LOGGING = {
             "level": "DEBUG",
             "propagate": True,
         },
+        "mailinglists": {
+            "handlers": ["file"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
         "": {
             "handlers": ["file"],
             "propagate": True,

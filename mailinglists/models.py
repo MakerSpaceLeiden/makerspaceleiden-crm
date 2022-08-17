@@ -81,20 +81,24 @@ class Subscription(models.Model):
         while retry > 0:
             retry -= 1
             try:
-                self.account.digest(email, self.digest)
+                logger.info(f"Try to set active={self.active} on {email} @ {self.mailinglist}")
                 self.account.delivery(email, self.active)
+                logger.info(f"Try to set digest={self.digest} on {email} @ {self.mailinglist}")
+                self.account.digest(email, self.digest)
                 logger.info(
-                    f"Updated {email} @ {self.mailinglist} to delivery {self.active} and digest {self.digest}"
+                        f"OK: Updated {email} @ {self.mailinglist} to delivery {self.active} and digest {self.digest}"
                 )
+                retry = 0
             except MailmanAccessNoSuchSubscriber as e:
                 logger.info(
-                    f"Missing subscription - duyring sync; attempting fix by creating {email} @ {self.mailinglist}"
+                        f"FAIL: Missing subscription - duyring sync; attempting fix by creating {email} @ {self.mailinglist}"
                 )
                 self.subscribe()
                 retry -= 1
 
         # if active != self.active or digest != self.digest:
         #    raise Exception("out of sync with server.")
+        logger.info(f"Sync activate complete")
 
     def subscribe(self):
         if not self.account:
