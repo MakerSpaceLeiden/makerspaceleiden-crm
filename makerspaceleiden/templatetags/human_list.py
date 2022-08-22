@@ -11,7 +11,7 @@ def human_list_with_commas(obj_list):
     # also force to string.
     l = len(obj_list)
     if l == 1:
-        return u"%s" % obj_list[0]
+        return "%s" % obj_list[0]
 
     # Oxford comman or not ?!
     return (
