@@ -1,5 +1,6 @@
 {
   "api": "0.13",
+  "api_compatibility": ["14"],
   "space": "Makerspace Leiden",
   "open": {{ open }},
   "lastchange": {{ lastSinceEpoch }},
@@ -25,5 +26,20 @@
   },
   "issue_report_channels": [
     "email"
-  ]
+  ],
+   "projects": [
+    "https://wiki.makerspaceleiden.nl/mediawiki/index.php/Makerspace_Leiden", 
+    "https://github.com/MakerSpaceLeiden/"
+  ],
+  "feeds": {
+    "blog":
+	  {
+		 "type": "rss",
+		 "url": "https://makerspaceleiden.nl/feed/"
+	  },
+    "wiki": {
+		 "type": "wiki",
+		 "url": "https://wiki.makerspaceleiden.nl/mediawiki/index.php/Makerspace_Leiden"
+	  }
+   }
 }

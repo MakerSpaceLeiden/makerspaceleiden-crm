@@ -40,12 +40,13 @@ def index(request):
 
     if bool(state["users_in_space"]):
         context = {"open": "true"}  # must be lowercase
-        lst = datetime.datetime(1970, 1, 1)
-        for user in state["users_in_space"]:
-            ulst = parser.parse(user["ts_checkin"])
-            if ulst > lst:
-                lst = ulst
-        context["lastSinceEpoch"] = lst.strftime("%s")
+
+    lst = datetime.datetime(1970, 1, 1)
+    for user in state["users_in_space"]:
+        ulst = parser.parse(user["ts_checkin"])
+        if ulst > lst:
+            lst = ulst
+    context["lastSinceEpoch"] = lst.strftime("%s")
 
     resp = render(request, "spaceapi.json", context)
 
