@@ -13,6 +13,7 @@ import datetime
 
 from moneyed import Money, EUR
 
+
 class Command(BaseCommand):
     help = "Show all balances"
 
@@ -22,7 +23,7 @@ class Command(BaseCommand):
         total = Money(0, EUR)
         for balance in PettycashBalanceCache.objects.all():
             if balance.last:
-               total += balance.last.amount
+                total += balance.last.amount
 
         print("Balance across all accounts: %s" % (total))
 

@@ -27,8 +27,10 @@ class MailmanAccessNoSuchSubscriber(Exception):
 class MailmanAccessDeniedException(Exception):
     pass
 
+
 class MailmanAccessLoginFail(Exception):
     pass
+
 
 class MailmanException(Exception):
     pass
@@ -89,10 +91,10 @@ class MailmanService:
                     tree = html.fromstring(body)
 
                 if "first log in by giving your" in str(body):
-                   if not retry:
-                       raise MailmanAccessLoginFail
-                   logger.info("Re-logign in")
-                   self.login(mailinglist)
+                    if not retry:
+                        raise MailmanAccessLoginFail
+                    logger.info("Re-logign in")
+                    self.login(mailinglist)
 
                 if "The form lifetime has expire." not in str(
                     body
