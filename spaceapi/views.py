@@ -47,4 +47,13 @@ def index(request):
                 lst = ulst
         context["lastSinceEpoch"] = lst.strftime("%s")
 
-    return render(request, "spaceapi.json", context)
+    resp = render(request, "spaceapi.json", context)
+
+    # Add headers to make validator happyL
+    #   https://validator.spaceapi.io/ui/?url=https://makerspaceleiden.nl/crm/spaceapi/0.13
+    #
+    resp["Access-Control-Allow-Origin"] = "*"
+    resp["Access-Control-Allow-Headers"] = "*"
+    resp["content-type"] = "application/json"
+
+    return resp

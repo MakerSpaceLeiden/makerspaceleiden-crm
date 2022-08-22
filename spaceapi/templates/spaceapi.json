@@ -14,7 +14,7 @@
     "email": "bestuur@makerspaceleiden.nl"
   },
   "state": {
-    "message": "Limited access due to Covid-19 measures; see website.",
+    "message": "Use the top bell wiht 'MSL'. Also open every tuesday evening from about 20:00 for those curious. Or contact bestuur@makerspaceleiden.nl ahead of time.",
     "open": {{ open }},
     "lastchange": {{ lastSinceEpoch }}
   },
