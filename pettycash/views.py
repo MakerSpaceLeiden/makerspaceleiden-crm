@@ -650,7 +650,6 @@ def showtx(request, pk):
     return render(request, "pettycash/details.html", context)
 
 
-
 @login_required
 def show_mine(request):
     user = request.user
@@ -716,15 +715,13 @@ def manual_deposit(request):
 
     return render(request, "pettycash/manual_deposit.html", context)
 
+
 @login_required
 def showall(request):
     balance = 0
     lst = []
     try:
-        lst = (
-            PettycashTransaction.objects.all()
-            .order_by("date")
-        )
+        lst = PettycashTransaction.objects.all().order_by("date")
     except ObjectDoesNotExist as e:
         pass
 
@@ -739,6 +736,7 @@ def showall(request):
     }
 
     return render(request, "pettycash/alldetails.html", context)
+
 
 @login_required
 def show(request, pk):

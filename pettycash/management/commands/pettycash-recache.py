@@ -68,6 +68,6 @@ class Command(BaseCommand):
             if (err != "" and act != "initial creation") or verbosity > 1:
                 print("%s: %s%s" % (user, balance.balance, err))
 
-        if total !=  Money(0, EUR) or verbosity > 1:
+        if total != Money(0, EUR) or verbosity > 1:
             print("Total %s" % (total))
         sys.exit(rc)

@@ -20,7 +20,14 @@ from django.utils import timezone
 from moneyed import Money, EUR
 
 
-def sendEmail(balances, skus, per_sku, toinform, template="balance-overview-email.txt", forreal=True):
+def sendEmail(
+    balances,
+    skus,
+    per_sku,
+    toinform,
+    template="balance-overview-email.txt",
+    forreal=True,
+):
     for e in [toinform] if isinstance(toinform, str) else toinform:
         emailPlain(
             template,
@@ -105,8 +112,17 @@ class Command(BaseCommand):
         skus = PettycashSku.objects.order_by("name")
         per_sku = []
         for sku in skus:
-            e = { "name": sku.name, "sku": sku,  "description": sku.description, "amount": Money(0, EUR), "count": 0, "price": sku.amount }
-            for tx in PettycashTransaction.objects.all().filter( description__startswith = sku.description ):
+            e = {
+                "name": sku.name,
+                "sku": sku,
+                "description": sku.description,
+                "amount": Money(0, EUR),
+                "count": 0,
+                "price": sku.amount,
+            }
+            for tx in PettycashTransaction.objects.all().filter(
+                description__startswith=sku.description
+            ):
                 e["amount"] += tx.amount
                 e["count"] += 1
             per_sku.append(e)
