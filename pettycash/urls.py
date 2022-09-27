@@ -28,6 +28,7 @@ urlpatterns = [
     path("cam53process", views.cam53process, name="cam53process"),
     path("unpaired", views.unpaired, name="unpaired"),
     path("pair/<int:pk>", views.pair, name="pair"),
+    path("forget/<int:pk>", views.forget, name="forget"),
     # Reimbursement related
     path("reimburse_request", views.reimburseform, name="reimburseform"),
     path("reimburse_queue", views.reimburseque, name="reimburse_queue"),

@@ -380,7 +380,7 @@ def transfer(request, src, dst):
 
 @login_required
 def unpaired(request):
-    lst = PettycashTerminal.objects.all().filter(Q(accepted=True) & Q(station=None))
+    lst = PettycashTerminal.objects.all().filter(Q(accepted=True) & Q(station=None)).order_by('-date')
     unlst = PettycashTerminal.objects.all().filter(Q(accepted=False))
     paired = PettycashStation.objects.all().filter(~Q(terminal=None))
     unpaired = PettycashStation.objects.all().filter(Q(terminal=None))
@@ -526,6 +526,18 @@ def cam53process(request):
     }
     return render(request, "pettycash/importlog-results.html", context)
 
+
+@superuser
+def forget(request, pk):
+    try:
+        tx = PettycashTerminal.objects.get(id=pk)
+        tx.delete()
+    except ObjectDoesNotExist as e:
+        return HttpResponse("Not found", status=404, content_type="text/plain")
+    except Exception as e:
+            logger.error("Delete failed")
+
+    return redirect("unpaired")
 
 @superuser
 def pair(request, pk):
