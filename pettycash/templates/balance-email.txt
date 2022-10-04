@@ -10,7 +10,11 @@ Do this by wiring your balance plus a little extra, {{ topup }} euro,
 to the {{ settings.PETTYCASH_IBAN }} its bank account.
 
 You can find the account details and a QR code (if your bank supports
-this) on {{ base }}{% url 'manual_deposit' %}.
+this) on {{ base }}{% url 'manual_deposit' %}. 
+
+With regard to the deposits into the bank acount; last import of the 
+bank-statements with your deposits was done on {{ last_import.date}} 
+by {{ last_import.by }}.
 {% endif %}
 
 See {{ base }}{% url 'mytransactions' %} for the full details.
