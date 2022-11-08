@@ -13,7 +13,7 @@ from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string, get_template
-from django.core.serializers import serialize 
+from django.core.serializers import serialize
 
 import logging
 import json
@@ -61,7 +61,7 @@ def getall(current_user_id=None, subset=None):
                         event["volunteers"].append("offer_volunteering")
                     else:
                         event["volunteers"].append(None)
-            event["volunteers"] = [ str(n) for n in event["volunteers"] ]
+            event["volunteers"] = [str(n) for n in event["volunteers"]]
 
             if event_ts_str != ts:
                 ts = event_ts_str
@@ -90,9 +90,8 @@ def index_api(request, name=None):
     if name:
         payload["title"] = name
 
-    js = json.dumps(payload).encode("utf8") 
-    return HttpResponse( js, content_type="application/json" 
-    )
+    js = json.dumps(payload).encode("utf8")
+    return HttpResponse(js, content_type="application/json")
 
 
 @login_required
