@@ -12,14 +12,19 @@ Your balance
 {% if balance.balance.amount > 5 %}
 	<i>(Positive balance, so you have money left to spend)</i>.
 {% else %}
-{% if balance.balance.amount > 0 %}
-So there just a few euro's left in your acount. <p>
+{% if balance.balance.amount >= 0 %}
+So there little, if any, left in your acount. 
 Thererfore you may want to make a <a href="{% url 'manual_deposit' %}">deposit</a> 
 before this runs out. As it takes a few days (or more) before the monies wired will show up in your account.
 {%else%}
 	<b>Negative, so you owe the space money; and should make a <a href="{% url 'manual_deposit' %}">deposit</a> as soon as possible.</b>
 {% endif %}
 {% endif %}
+{% if last_import %}
+The last import/synchronisation with the bank account was done by {{ last_import.by }} on {{ last_import.date }}.
+<p>
+{% endif %}
+<h1>Information about payments</i>
 <ul>
 	<li> <a href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/SpaceTegoed">What is SpaceTegoed</a>
 <br>
@@ -27,10 +32,15 @@ before this runs out. As it takes a few days (or more) before the monies wired w
 <br>
 <li> <a href="{% url 'balances' %}">View everyone else</a> their transactions
 <br>
+</ul>
+<h1>Pay</i>
+<ul>
 <li> <a href="{% url 'invoice' src=who.id %}">Pay for a product</a> to the space.
 <br>
 <li> <a href="{% url 'transfer_to_member' src=who.id %}">Transfer SpaceTegoed to other member</a>
-<br>
+</ul>
+<h1>Get Paid</i>
+<ul>
 <li> <a href="{% url 'reimburseform' %}">Get reimbursed by the space for something</a> that you paid for.
 <br>
 <li> <a href="{% url 'manual_deposit' %}">Deposit money</a> into your space account.
@@ -39,6 +49,9 @@ before this runs out. As it takes a few days (or more) before the monies wired w
 <li> <a href="{% url 'reimburseform' %}">Withdraw money</a>
 <br>
 {% endif %}
+</ul>
+<h1>Other</i>
+<ul>
 <li> <a href="{% url 'pricelist' %}">See the current pricelist</a>
 <br>
 {% if user|isPettycashAdmin %}
@@ -54,6 +67,11 @@ before this runs out. As it takes a few days (or more) before the monies wired w
 (<i>only visible for treasurers.</i>)
 <br>
 {% endif %}
+<li> People that can help with fixing (erroneous) payments and other issues: 
+	{% for user in admins %}
+	{% if forloop.first %}{% else %}{% if forloop.last %} and {% else %}, {% endif %}{% endif %}
+	<a href="mailto:{{user.email}}">{{ user }}</a>
+	{% endfor %}. For everything else - contact the trustees at <a href="mailto:{{ settings.TRUSTEES }}">{{ settings.TRUSTEES }}</a>.
 </ul>
 <p>
 <hr>

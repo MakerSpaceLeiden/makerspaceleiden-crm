@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load isingroup %}
+
+{% block content %}
+
+{% if lst %}
+<table>
+	<tr>
+		<th>id</th>
+		<th>Date</th>
+		<th>From</th>
+		<th>To</th>
+		<th>Description</th>
+		<th style="border-right: solid 1px;" align=right>Amount</th>
+	</tr>
+	{% for tx in lst %}
+			{% if tx.src == tx.dst  %}
+			<tr>
+				<td><a href="{% url 'transactiondetail' pk=tx.id %}"> {{ tx.id }}</a></td>
+				<td>{{ tx.date }}</td>
+				<td colspan=2 align=center>{{ tx.src }}</td>
+				<td ><i>balance previous billing cycle<i></td>
+				<td align=right>{{ tx.amount}} </td>
+			</tr>
+			{% else %}
+			<tr>
+				<td><a href="{% url 'transactiondetail' pk=tx.id %}"> {{ tx.id }}</a></td>
+				<td>{{ tx.date }}</td>
+				<td>{{ tx.src }}</td>
+				<td>{{ tx.dst }}</td>
+				<td><i>{{ tx.description }}</i></td>
+				<td align=right>{{ tx.amount }}</td>
+				<td></td>
+			</tr>
+			{% endif %}
+	{% endfor %}
+	        <tr>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td style=border-top: solid 2px" align=right><b>{{ balance }}</b></td>
+		</tr>
+</table>
+{% else %}
+<i>No transactions.</i>
+{% endif %}
+
+{% endblock %}

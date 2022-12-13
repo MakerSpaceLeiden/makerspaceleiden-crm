@@ -5,7 +5,12 @@ from django.conf import settings
 from django.core.mail import EmailMessage
 from django.db.models import Q
 
-from pettycash.models import PettycashTransaction, PettycashBalanceCache
+from pettycash.models import (
+    PettycashSku,
+    PettycashTransaction,
+    PettycashBalanceCache,
+    PettycashImportRecord,
+)
 from makerspaceleiden.mail import emailPlain
 
 import sys, os, pwd
@@ -15,16 +20,27 @@ from django.utils import timezone
 from moneyed import Money, EUR
 
 
-def sendEmail(balances, toinform, template="balance-overview-email.txt"):
+def sendEmail(
+    balances,
+    skus,
+    per_sku,
+    toinform,
+    template="balance-overview-email.txt",
+    forreal=True,
+):
     for e in [toinform] if isinstance(toinform, str) else toinform:
         emailPlain(
             template,
             toinform=[e],
             context={
                 "balances": balances,
+                "per_sku": per_sku,
+                "skus": skus,
                 "date": datetime.now(tz=timezone.utc),
                 "base": settings.BASE,
+                "last_import": PettycashImportRecord.objects.all().last(),
             },
+            forreal=forreal,
         )
 
 
@@ -70,6 +86,13 @@ class Command(BaseCommand):
             help="Save the message as rfc822 blobs rather than sending. Useful as we sort out dkim on the server. Pass the output directory as an argument",
         )
 
+        parser.add_argument(
+            "--dry-run",
+            dest="dryrun",
+            action="store_true",
+            help="Do a dry run; do not actually sent",
+        )
+
     def handle(self, *args, **options):
         verbosity = int(options["verbosity"])
         cutoff_date = datetime.now(tz=timezone.utc) - timedelta(days=options["days"])
@@ -82,8 +105,27 @@ class Command(BaseCommand):
         balances = PettycashBalanceCache.objects.order_by("balance")
         if not options["all"]:
             balances = balances.filter(
-                Q(balance__gt=Money(0, EUR)) | Q(balance__lt=Money(0, EUR))
-            ).filter(Q(last__date__gt=cutoff_date))
+                (Q(balance__gt=Money(0, EUR)) & Q(last__date__gt=cutoff_date))
+                | Q(balance__lt=Money(0, EUR))
+            ).filter(~Q(owner=settings.POT_ID))
+
+        skus = PettycashSku.objects.order_by("name")
+        per_sku = []
+        for sku in skus:
+            e = {
+                "name": sku.name,
+                "sku": sku,
+                "description": sku.description,
+                "amount": Money(0, EUR),
+                "count": 0,
+                "price": sku.amount,
+            }
+            for tx in PettycashTransaction.objects.all().filter(
+                description__startswith=sku.description
+            ):
+                e["amount"] += tx.amount
+                e["count"] += 1
+            per_sku.append(e)
 
         dest = settings.MAILINGLIST
         if options["to"]:
@@ -93,7 +135,7 @@ class Command(BaseCommand):
             dest = balances.values_list("owner__email", flat=True)
 
         if balances.count():
-            sendEmail(balances, dest)
+            sendEmail(balances, skus, per_sku, dest, forreal=(not options["dryrun"]))
         else:
             print("No balances sent - none done since %s" % cutoff_date)
 

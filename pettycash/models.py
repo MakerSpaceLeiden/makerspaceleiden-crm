@@ -307,7 +307,7 @@ class PettycashTransaction(models.Model):
             self.date = timezone.now()
 
         if self.amount < Money(0, EUR):
-            if not bypas:
+            if not bypass:
                 raise ValidationError("Blocked negative transaction.")
             logger.info("Bypass for negative transaction used on save of %s" % self)
 
@@ -368,3 +368,14 @@ class PettycashReimbursementRequest(models.Model):
         help_text="Scan, photo or similar of the receipt",
     )
     history = HistoricalRecords()
+
+
+class PettycashImportRecord(models.Model):
+    date = models.DateField(help_text="Date of last import", default=timezone.now)
+    by = models.ForeignKey(
+        User,
+        help_text="Person that did this import",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+    )

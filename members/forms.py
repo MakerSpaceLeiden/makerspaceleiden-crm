@@ -74,6 +74,7 @@ class NewUserForm(forms.Form):
     )
     activate_doors = forms.BooleanField(
         initial=True,
+        required=False,
         help_text="Also give this user door permits if they did not have it yet. Only applicable if above tag is specified.",
     )
     mailing_lists = forms.ModelMultipleChoiceField(

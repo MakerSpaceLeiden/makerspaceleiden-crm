@@ -91,6 +91,7 @@ from .models import (
     PettycashStation,
     PettycashReimbursementRequest,
     pettycash_admin_emails,
+    PettycashImportRecord,
 )
 from .admin import PettycashBalanceCacheAdmin, PettycashTransactionAdmin
 from .forms import (
@@ -161,6 +162,7 @@ def pettycash_redirect(pk=None):
 def transact_raw(
     request, src=None, dst=None, description=None, amount=None, reason=None, user=None
 ):
+
     if None in [src, dst, description, amount, reason, user]:
         logger.error("Transact raw called with missing arguments. bug.")
         return 0
@@ -169,8 +171,8 @@ def transact_raw(
         tx = PettycashTransaction(
             src=src, dst=dst, description=description, amount=amount
         )
-        logger.error("payment: %s" % reason)
-        tx._change_reason = reason
+        logger.info("payment: %s" % reason)
+        tx._change_reason = reason[:100]
         tx.save()
         alertOwnersToChange(tx, user, [])
 
@@ -245,7 +247,7 @@ def transact(
 
 @login_required
 def index(request, days=30):
-    lst = PettycashBalanceCache.objects.all()
+    lst = PettycashBalanceCache.objects.all().order_by("-last")
     prices = PettycashSku.objects.all()
     context = {
         "title": "Balances",
@@ -254,6 +256,7 @@ def index(request, days=30):
         "pricelist": prices,
         "has_permission": request.user.is_authenticated,
         "user": request.user,
+        "last_import": PettycashImportRecord.objects.all().last(),
     }
     return render(request, "pettycash/index.html", context)
 
@@ -321,9 +324,11 @@ def transfer_to_member(request, src):
     if form.is_valid():
         reason = "Transfer"
         item = form.save(commit=False)
+        if not item.dst:
+            item.dst = User.objects.get(id=settings.POT_ID)
         if transact_raw(
             request,
-            src=item.src,
+            src=request.user,
             dst=item.dst,
             description=item.description,
             amount=item.amount,
@@ -367,7 +372,11 @@ def transfer(request, src, dst):
 
 @login_required
 def unpaired(request):
-    lst = PettycashTerminal.objects.all().filter(Q(accepted=True) & Q(station=None))
+    lst = (
+        PettycashTerminal.objects.all()
+        .filter(Q(accepted=True) & Q(station=None))
+        .order_by("-date")
+    )
     unlst = PettycashTerminal.objects.all().filter(Q(accepted=False))
     paired = PettycashStation.objects.all().filter(~Q(terminal=None))
     unpaired = PettycashStation.objects.all().filter(Q(terminal=None))
@@ -403,12 +412,11 @@ def cam53upload(request):
                                 "description": tx["description"],
                                 "user": tx["user"],
                                 "amount": tx["amount"],
-                                "change_reason": "TXREF=%s HOLDER=%s IBAN=%s import, ran by %s"
+                                "change_reason": "TXREF=%s, %s IBAN=%s"
                                 % (
                                     tx["ref"],
                                     tx["name_str"],
                                     tx["iban_str"],
-                                    request.user,
                                 ),
                             }
                         )
@@ -468,7 +476,7 @@ def cam53process(request):
                     src=User.objects.get(id=settings.POT_ID), dst=user, amount=amount
                 )
                 tx.description = vals["description_%d" % i]
-                tx._change_reason = vals["change_reason_%d" % i]
+                tx._change_reason = vals["change_reason_%d" % i][:100]
                 tx.save()
                 alertOwnersToChange(
                     tx,
@@ -497,6 +505,12 @@ def cam53process(request):
                     e,
                 )
             )
+    if ok:
+        try:
+            record = PettycashImportRecord.objects.create(by=request.user)
+            record.save()
+        except Exception as e:
+            logger.error("Had issues recording transaction import")
 
     context = {
         "title": "Import Results",
@@ -507,6 +521,19 @@ def cam53process(request):
         "has_permission": request.user.is_authenticated,
     }
     return render(request, "pettycash/importlog-results.html", context)
+
+
+@superuser
+def forget(request, pk):
+    try:
+        tx = PettycashTerminal.objects.get(id=pk)
+        tx.delete()
+    except ObjectDoesNotExist as e:
+        return HttpResponse("Not found", status=404, content_type="text/plain")
+    except Exception as e:
+        logger.error("Delete failed")
+
+    return redirect("unpaired")
 
 
 @superuser
@@ -525,11 +552,11 @@ def pair(request, pk):
         )
 
         tx.accepted = True
-        tx._change_reason = reason
+        tx._change_reason = reason[:100]
         tx.save()
 
         station.terminal = tx
-        station._change_reason = reason
+        station._change_reason = reason[:100]
         station.save()
 
         return redirect("unpaired")
@@ -631,7 +658,7 @@ def show_mine(request):
         lst = (
             PettycashTransaction.objects.all()
             .filter(Q(src=user) | Q(dst=user))
-            .order_by("id")
+            .order_by("date")
         )
     except ObjectDoesNotExist as e:
         pass
@@ -643,6 +670,10 @@ def show_mine(request):
         "lst": lst,
         "queue": PettycashReimbursementRequest.objects.all().count(),
         "has_permission": request.user.is_authenticated,
+        "admins": User.objects.all()
+        .filter(groups__name=settings.PETTYCASH_ADMIN_GROUP)
+        .order_by("last_name"),
+        "last_import": PettycashImportRecord.objects.all().last(),
     }
 
     return render(request, "pettycash/view_mine.html", context)
@@ -683,6 +714,28 @@ def manual_deposit(request):
 
 
 @login_required
+def showall(request):
+    balance = 0
+    lst = []
+    try:
+        lst = PettycashTransaction.objects.all().order_by("date")
+    except ObjectDoesNotExist as e:
+        pass
+
+    for tx in lst:
+        balance += tx.amount
+
+    context = {
+        "title": "All transactions",
+        "has_permission": request.user.is_authenticated,
+        "lst": lst,
+        "balance": balance,
+    }
+
+    return render(request, "pettycash/alldetails.html", context)
+
+
+@login_required
 def show(request, pk):
     try:
         user = User.objects.get(id=pk)
@@ -697,7 +750,7 @@ def show(request, pk):
         lst = (
             PettycashTransaction.objects.all()
             .filter(Q(src=user) | Q(dst=user))
-            .order_by("id")
+            .order_by("date")
         )
         for tx in lst:
             if tx.dst == user:
@@ -741,7 +794,7 @@ def pay(request):
 
     return transact(
         request,
-        "%s pays %s to the Makerspace for %s"
+        "%s wants to pay %s to the Makerspace for %s"
         % (request.user, mtostr(amount), description),
         src=request.user,
         dst=settings.POT_ID,
@@ -772,7 +825,7 @@ def delete(request, pk):
     form = PettycashDeleteForm(request.POST or None)
     if form.is_valid():
         reason = "%s (by %s)" % (form.cleaned_data["reason"], request.user)
-        tx._change_reason = reason
+        tx._change_reason = reason[:100]
         # tx.delete();
         tx.refund_booking()
         alertOwnersToChange(
@@ -860,17 +913,25 @@ def reimburseque(request):
     form = PettycashReimburseHandleForm(request.POST or None)
     if form.is_valid():
         pk = form.cleaned_data["pk"]
-        approved = form.cleaned_data["approved"]
+        reason = form.cleaned_data["reason"].rstrip()
+        if reason:
+            reason = reason + "\n"
+
+        approved = False
+        if "approved" in (request.POST["submit"]):
+            approved = True
         try:
             item = PettycashReimbursementRequest.objects.get(id=pk)
             context["item"] = item
             context["approved"] = approved
+            context["reason"] = reason
 
             attachments = []
             if item.scan:
                 attachments.append(image2mime(item.scan))
 
             if approved:
+                context["reason"] = "Approved by %s (%d)" % (request.user, item.pk)
                 if item.viaTheBank:
                     emailPlain(
                         "email_imbursement_bank_approved.txt",
@@ -885,16 +946,19 @@ def reimburseque(request):
                         dst=item.dst,
                         description=item.description,
                         amount=item.amount,
-                        reason="Reimbursement approved by %s" % request.user,
+                        reason=context["reason"],
                         user=request.user,
                     )
             else:
+                context["reason"] = "Rejected by %s (%d)" % (request.user, item.pk)
                 emailPlain(
                     "email_imbursement_rejected.txt",
                     toinform=[pettycash_treasurer_emails(), request.user.email],
                     context=context,
                     attachments=attachments,
                 )
+
+            item._change_reason = context["reason"]
             item.delete()
 
             return redirect(reverse("reimburse_queue"))
@@ -1011,7 +1075,8 @@ def api2_register(request):
         terminal = PettycashTerminal(fingerprint=client_sha, name=name, accepted=False)
         terminal.nonce = secrets.token_hex(32)
         terminal.accepted = False
-        terminal._change_reason = "Added on first contact; from IP address %s" % (ip)
+        reason = "Added on first contact; from IP address %s" % (ip)
+        terminal._change_reason = reason[:100]
         terminal.save()
 
         logger.info("Issuing first time nonce to %s at %s" % (client_sha, ip))
@@ -1060,12 +1125,13 @@ def api2_register(request):
 
             if sha.lower() == response.lower():
                 terminal.accepted = True
-                terminal._change_reason = "%s, IP=%s tag-=%d %s" % (
+                reason = "%s, IP=%s tag-=%d %s" % (
                     terminal.name,
                     ip,
                     tag.id,
                     tag.owner,
                 )
+                terminal._change_reason = reason[:100]
                 terminal.save()
                 logger.error(
                     "Terminal %s accepted, tag swipe by %s matched."
@@ -1220,7 +1286,8 @@ def api2_pay(request):
         tag = Tag.objects.get(tag=tagstr)
     except ObjectDoesNotExist as e:
         logger.error(
-            "Tag %s not found, terminal %s@%s" % (terminal.name, station.description)
+            "Tag %s not found, terminal %s@%s"
+            % (tagstr, terminal.name, station.description)
         )
         return HttpResponse("Tag not found", status=404, content_type="text/plain")
 

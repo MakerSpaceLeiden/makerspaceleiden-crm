@@ -2,7 +2,9 @@
 
 {% block content %}
 
+<h3>Terminals that have not been paired yet</h3>
 {% if lst %}
+
 Assign a <b>Terminal</b> to a <b>Station</b>:
 <p>
 <table>
@@ -12,7 +14,10 @@ Assign a <b>Terminal</b> to a <b>Station</b>:
 			<td>{{ b.name }}</td>
 			<td><code>{{ b.fingerprint}}</code></td>
 			<td>{{ b.date }}</td>
-			<td><a href="{% url 'pair' pk=b.id %}">[ pair ]</a></td>
+			<td>
+				<a href="{% url 'pair' pk=b.id %}">[ pair ]</a>
+				<a href="{% url 'forget' pk=b.id %}">[ forget ]</a>
+			</td>
 		</tr>
 	{% endfor %}
 </table>
@@ -31,12 +36,13 @@ There are currently <b>no</b> unassigned terminals (be sure to start them; and c
 The following terminal(s) have not yet been accepted (e.g. with a tag-swipe by an admin).
 <p>
 <table>
-	<tr><th>Self/firmware identifier</th><th>Fingerprint</th><th>Last attempt</th></tr>
+	<tr><th>Self/firmware identifier</th><th>Fingerprint</th><th>Last attempt</th><th>Action</th></tr>
 	{% for b in unlst %}
 		<tr>
 			<td>{{ b.name }}</td>
 			<td><code>{{ b.fingerprint}}</code></td>
 			<td>{{ b.date }}</td>
+			<td><a href="{% url 'forget' pk=b.id %}">[ forget ]</a></td>
 		</tr>
 	{% endfor %}
 </table>
@@ -45,9 +51,41 @@ The following terminal(s) have not yet been accepted (e.g. with a tag-swipe by a
 There are currently no terminals waiting for acceptance.
 {%endif %}
 
+<h3>Stations without a terminal</h3>
+{% if unpaired %}
+<table>
+	<tr><th>Station Description</th><th>Station Location</th></tr>
+	{% for b in unpaired %}
+		<tr>
+			<td>{{ b.description }}</td>
+			<td>{{ b.location }}</td>
+		</tr>
+		<tr><td></td><td colspan=2</td>
+{%if b.available_skus.all %}
+	Pricelist:	<i>
+	{% for i in b.available_skus.all %}
+		{% if i == b.default_sku %}
+			<b>{{ i }}</b>
+		{% else %}
+			{{ i }}
+		{% endif %}
+	{% endfor %}
+{%else%}
+anything / you can enter a amount.
+{%endif%}
+<a href="{% url 'admin:pettycash_pettycashstation_change' b.id %}">[edit]</a>
+		</td></tr>
+	{% endfor %}
+</table>
+{% else %}
+No stations that lack a terminal.
+{% endif %}
 <p>
 <h3>Stations with terminals assigned</h3>
 {% if paired %}
+These terminals are all up and running - no actions required.
+<p>
+
 <table>
 	<tr><th>Terminal identifier</th><th>Station Description</th><th>Station Location</th></tr>
 	{% for b in paired %}
@@ -79,36 +117,6 @@ anything / you can enter a amount.
 </table>
 {% else %}
 No stations.
-{% endif %}
-
-<h3>Stations without a terminal</h3>
-{% if unpaired %}
-<table>
-	<tr><th>Station Description</th><th>Station Location</th></tr>
-	{% for b in unpaired %}
-		<tr>
-			<td>{{ b.description }}</td>
-			<td>{{ b.location }}</td>
-		</tr>
-		<tr><td></td><td colspan=2</td>
-{%if b.available_skus.all %}
-	Pricelist:	<i>
-	{% for i in b.available_skus.all %}
-		{% if i == b.default_sku %}
-			<b>{{ i }}</b>
-		{% else %}
-			{{ i }}
-		{% endif %}
-	{% endfor %}
-{%else%}
-anything / you can enter a amount.
-{%endif%}
-<a href="{% url 'admin:pettycash_pettycashstation_change' b.id %}">[edit]</a>
-		</td></tr>
-	{% endfor %}
-</table>
-{% else %}
-No stations that lack a terminal.
 {% endif %}
 {% endblock %}
 

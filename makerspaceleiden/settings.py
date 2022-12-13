@@ -9,6 +9,8 @@ import os
 import locale
 from moneyed import Money, EUR
 
+os.umask(2)
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -53,6 +55,8 @@ INSTALLED_APPS = [
     "mainssensor.apps.MainssensorConfig",
     "kwh.apps.KwhConfig",
     "pettycash.apps.PettycashConfig",
+    "ultimaker.apps.UltimakerConfig",
+    "spaceapi.apps.SpaceapiConfig",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",

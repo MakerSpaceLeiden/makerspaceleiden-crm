@@ -14,6 +14,30 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+def is_superuser_or_bearer(request):
+    if not request.user.is_anonymous and request.user.is_privileged:
+        return True
+
+    if hasattr(settings, "UT_BEARER_SECRET"):
+        secret = None
+        # Pendantic header
+        if request.META.get(HEADER):
+            secret = request.META.get(HEADER)
+
+        # Also accept a modern RFC 6750 style header.
+        elif request.META.get(MODERN_HEADER):
+            match = re.search(
+                r"\bbearer\s+(\S+)", request.META.get(MODERN_HEADER), re.IGNORECASE
+            )
+            if match:
+                secret = match.group(1)
+
+        for bs in settings.UT_BEARER_SECRET.split():
+            if secret == bs:
+                return True
+    return False
+
+
 def superuser(function):
     @wraps(function)
     def wrap(request, *args, **kwargs):
@@ -32,26 +56,8 @@ def superuser(function):
 def superuser_or_bearer_required(function):
     @wraps(function)
     def wrap(request, *args, **kwargs):
-        if not request.user.is_anonymous and request.user.is_privileged:
+        if is_superuser_or_bearer(request):
             return function(request, *args, **kwargs)
-
-        if hasattr(settings, "UT_BEARER_SECRET"):
-            secret = None
-            # Pendantic header
-            if request.META.get(HEADER):
-                secret = request.META.get(HEADER)
-
-            # Also accept a modern RFC 6750 style header.
-            elif request.META.get(MODERN_HEADER):
-                match = re.search(
-                    r"\bbearer\s+(\S+)", request.META.get(MODERN_HEADER), re.IGNORECASE
-                )
-                if match:
-                    secret = match.group(1)
-
-            for bs in settings.UT_BEARER_SECRET.split():
-                if secret == bs:
-                    return function(request, *args, **kwargs)
 
         # Quell some odd 'code 400, message Bad request syntax ('tag=1-2-3-4')'
         request.POST

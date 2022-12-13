@@ -15,7 +15,7 @@ from moneyed import Money, EUR
 import sys, os
 import datetime
 
-def camt53_process(file, triggerwords = ["space", "tegoed", "zwarte pot", "zwartepot", "storting"], uidmapping = (), nouidcheck=False):
+def camt53_process(file, triggerwords = ["space", "tegoed", "zwarte pot", "zwartepot", "storting", "spacepot"], uidmapping = (), nouidcheck=False):
     print(file)
     xmlparser = etree.XMLParser(
         ns_clean=True, remove_blank_text=True, remove_comments=True, no_network=True

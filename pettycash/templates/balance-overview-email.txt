@@ -1,8 +1,11 @@
-Subject: [makerbot] Account balances for this month
-L.S.,
+Subject: [makerbot] Everyones account balances for this month
+
+Folks,
 
 It is that time of the month again. Your spacebot has been doing the
-sums; and below are everyones balances.
+sums; and below the balances of everyone that did a transaction in the
+last month together with everyone that owes money to the space and really 
+should do a deposit as soon as possible.
 
 As always - you can see the complete list at
 
@@ -11,11 +14,21 @@ As always - you can see the complete list at
 where you can also browse to the specific transactions.  And here you 
 can also fix any mistakes.
 
+If you are not on this list - then you propably did not do any 
+transaction (this month, or ever) -and- do do not owe the space
+any money at this point in time.
+
 Or consult your personal page at:
 
 	{{ base }}{% url 'mytransactions' %} 
 
-for just your own transactions.
+for just your own transactions. With regard to the deposits into the
+bank acount; last import of the bank-statements with your deposits was
+done on {{ last_import.date}} by {{ last_import.by }}.
+
+As a general rule (and depending on your coffee, nuts, welding gas and 
+bolts appetite) consider doing a deposit of 5 or 10 euro when you are 
+getting below 5 euro or so.
 
 Yours,
 
@@ -26,4 +39,6 @@ Balances as of {{ date }}
 {% for b in balances %}
 {{ b.owner|rjust:30 }} {{ b.balance }}{% endfor %}
 
-
+General spend
+{% for e in per_sku %}
+{{ e.name|rjust:30 }} {{ e.count|rjust:10 }} @ {{ e.price }} =  {{ e.amount|rjust:10 }}{% endfor %}

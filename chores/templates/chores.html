@@ -8,6 +8,10 @@
 <p>
     Please sign up for the activities you can help with. If a chore is getting close and nobody has signed up yet, the system will send out reminders.
 </p>
+<p>
+    For the engineers - this data is also accessible as a JSON from <code><a href="{% url "chores_api"%}">{% url "chores_api"%}</a></code>.
+</p>
+
 
 {% for event_group in event_groups %}
     <div style="margin-top: 50px;">

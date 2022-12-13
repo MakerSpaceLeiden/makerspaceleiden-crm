@@ -13,6 +13,7 @@ urlpatterns = [
     path("pricelist", views.pricelist, name="pricelist"),
     path("qrcode", views.qrcode, name="qrcode"),
     path("manual_deposit", views.manual_deposit, name="manual_deposit"),
+    path("showall", views.showall, name="all_transactiondetail"),
     path("showtx/<int:pk>", views.showtx, name="transactiondetail"),
     path("invoice/<int:src>", views.invoice, name="invoice"),
     path(
@@ -27,6 +28,7 @@ urlpatterns = [
     path("cam53process", views.cam53process, name="cam53process"),
     path("unpaired", views.unpaired, name="unpaired"),
     path("pair/<int:pk>", views.pair, name="pair"),
+    path("forget/<int:pk>", views.forget, name="forget"),
     # Reimbursement related
     path("reimburse_request", views.reimburseform, name="reimburseform"),
     path("reimburse_queue", views.reimburseque, name="reimburse_queue"),

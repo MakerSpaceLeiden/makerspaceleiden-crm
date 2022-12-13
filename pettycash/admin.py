@@ -1,5 +1,6 @@
 from import_export.admin import ImportExportModelAdmin
 from simple_history.admin import SimpleHistoryAdmin
+from django.core.exceptions import ObjectDoesNotExist
 
 from django.contrib import admin
 from django.db import models
@@ -12,6 +13,8 @@ from .models import (
     PettycashSku,
     PettycashTerminal,
     PettycashStation,
+    PettycashReimbursementRequest,
+    PettycashImportRecord,
 )
 import logging
 
@@ -24,9 +27,19 @@ class PettycashSkuAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
 
 
 class PettycashTerminalAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
-    list_display = ("accepted", "date", "fingerprint", "name")
+    list_display = ("accepted", "date", "get_station", "name", "fingerprint")
     readonly_fields = ["fingerprint", "nonce"]
-    pass
+
+    def get_station(self, terminal):
+        try:
+            station = PettycashStation.objects.get(terminal=terminal)
+            return station.description
+        except ObjectDoesNotExist as e:
+            pass
+        return "-"
+
+    get_station.short_description = "Station"
+    get_station.admin_order_field = "station__name"
 
 
 class PettycashStationAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
@@ -53,8 +66,19 @@ class PettycashBalanceCacheAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     pass
 
 
+class PettycashReimbursementRequestAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
+    pass
+
+
+class PettycashImportRecordAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
+    list_display = ("date", "by")
+    pass
+
+
 admin.site.register(PettycashSku, PettycashSkuAdmin)
 admin.site.register(PettycashTerminal, PettycashTerminalAdmin)
 admin.site.register(PettycashStation, PettycashStationAdmin)
 admin.site.register(PettycashTransaction, PettycashTransactionAdmin)
 admin.site.register(PettycashBalanceCache, PettycashBalanceCacheAdmin)
+admin.site.register(PettycashReimbursementRequest, PettycashReimbursementRequestAdmin)
+admin.site.register(PettycashImportRecord, PettycashImportRecordAdmin)

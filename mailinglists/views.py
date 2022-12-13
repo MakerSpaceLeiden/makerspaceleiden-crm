@@ -78,6 +78,7 @@ def mailinglists_edit(request, user_id=None):
                 nw = form.save(commit=False)
                 nw.member = user
                 nw.mailinglist = id2list[form.prefix]
+                logger.error(f"Saving {nw}: a={nw.active} d={nw.digest}")
                 nw.save()
             return redirect("mailinglists_edit", user_id=user.id)
 

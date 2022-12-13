@@ -20,6 +20,8 @@ Or consult your personal page at:
 
         {{ base }}{% url 'mytransactions' %} 
 
+Which is where you can also deposit extra money into your account.
+
 Your friendly makerbot.
 -- 
 Makerspace Leiden, internal payment notifcations.

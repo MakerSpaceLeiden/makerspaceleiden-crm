@@ -116,8 +116,9 @@ def create(request):
         "form": form,
         "action": "Add",
         "has_permission": request.user.is_authenticated,
+        "back": "ufo",
     }
-    return render(request, "ufo/crud.html", context)
+    return render(request, "crud.html", context)
 
 
 def show(request, pk):
@@ -174,8 +175,9 @@ def modify(request, pk):
 
     form = UfoForm(instance=oitem)
     context["form"] = form
+    context["back"] = "ufo"
 
-    return render(request, "ufo/crud.html", context)
+    return render(request, "crud.html", context)
 
 
 @login_required
@@ -217,8 +219,9 @@ def delete(request, pk):
             "form": form,
             "item": item,
             "delete": True,
+            "back": "ufo",
         }
-        return render(request, "ufo/crud.html", context)
+        return render(request, "crud.html", context)
 
     if not form.is_valid():
         return HttpResponse("Eh - confused ?!", status=403, content_type="text/plain")

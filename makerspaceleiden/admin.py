@@ -4,6 +4,7 @@ from django.http import Http404
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.shortcuts import redirect
+from django.http import HttpResponseRedirect, HttpResponse
 
 from acl.models import EntitlementViolation
 
@@ -21,7 +22,7 @@ def admin_view(view, cacheable=False):
             return view(request, *args, **kwargs)
         except EntitlementViolation:
             return HttpResponse(
-                "Not permitted to do that", pk, status=404, content_type="text/plain"
+                "Not permitted to do that", status=404, content_type="text/plain"
             )
 
     context = {

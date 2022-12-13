@@ -1,0 +1,45 @@
+{
+  "api": "0.13",
+  "api_compatibility": ["14"],
+  "space": "Makerspace Leiden",
+  "open": {{ open }},
+  "lastchange": {{ lastSinceEpoch }},
+  "url": "https://makerspaceleiden.nl/",
+  "logo": "https://makerspaceleiden.nl/wp-content/uploads/2019/10/MSL-logo-1.svg",
+  "location": {
+    "lon": 4.493948742846493,
+    "lat": 52.16270661099023, 
+    "address": "Volmolengracht 13, 2312 PG Leiden"
+  },
+  "contact": {
+    "email": "bestuur@makerspaceleiden.nl"
+  },
+  "state": {
+    "message": "Use the top bell wiht 'MSL'. Also open every tuesday evening from about 20:00 for those curious. Or contact bestuur@makerspaceleiden.nl ahead of time.",
+    "open": {{ open }},
+    "lastchange": {{ lastSinceEpoch }}
+  },
+  "spacefed": {
+    "spacenet": false,
+    "spacesaml": false,
+    "spacephone": false
+  },
+  "issue_report_channels": [
+    "email"
+  ],
+   "projects": [
+    "https://wiki.makerspaceleiden.nl/mediawiki/index.php/Makerspace_Leiden", 
+    "https://github.com/MakerSpaceLeiden/"
+  ],
+  "feeds": {
+    "blog":
+	  {
+		 "type": "rss",
+		 "url": "https://makerspaceleiden.nl/feed/"
+	  },
+    "wiki": {
+		 "type": "wiki",
+		 "url": "https://wiki.makerspaceleiden.nl/mediawiki/index.php/Makerspace_Leiden"
+	  }
+   }
+}

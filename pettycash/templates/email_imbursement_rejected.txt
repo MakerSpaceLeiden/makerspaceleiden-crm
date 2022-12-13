@@ -1,10 +1,11 @@
 Subject: Reimbursement rejected ({{ item.dst }} {{ item.amount }}, {{ item.description }})
 
-L.S.
+L.S.,
 
-Could you be so kind to contact the {{ settings.TRUSTEES }} ? As your
-reimbursement for below was rejected.
+Could you be so kind to contact the {{ settings.TRUSTEES }} ? 
 
+As your reimbursement for {{ item.amount }} was rejected by the trustees.
+{{ reason }}
 Your spacebot (on behalf of {{ user }}.
 
 Details:

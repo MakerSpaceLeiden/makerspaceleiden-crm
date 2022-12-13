@@ -15,7 +15,10 @@ from django.core.mail import EmailMessage
 from django.urls import reverse
 from django.forms import widgets
 
-from makerspaceleiden.decorators import superuser_or_bearer_required
+from makerspaceleiden.decorators import (
+    superuser_or_bearer_required,
+    is_superuser_or_bearer,
+)
 
 from .forms import TabledCheckboxSelectMultiple
 
@@ -620,8 +623,8 @@ def space_state(request):
     return render(request, "space_state.html", context)
 
 
-@superuser_or_bearer_required
 def space_state_api(request):
+
     aggregator_adapter = get_aggregator_adapter()
     if not aggregator_adapter:
         return HttpResponse(
@@ -630,9 +633,16 @@ def space_state_api(request):
     context = aggregator_adapter.fetch_state_space()
 
     payload = {}
-    for e in ["space_open", "machines", "users_in_space", "lights_on"]:
+    l = 0
+    for e in ["space_open", "lights_on", "machines", "users_in_space"]:
         if e in context:
             payload[e] = context[e]
+            if e == "users_in_space":
+                l = len(context[e])
+    if not is_superuser_or_bearer(request):
+        payload = {}
+
+    payload["num_users_in_space"] = l
 
     return HttpResponse(
         json.dumps(payload).encode("utf8"), content_type="application/json"
@@ -714,8 +724,6 @@ def userdetails(request):
     if request.method == "POST":
         try:
             user = UserForm(request.POST, request.FILES, instance=request.user)
-            logger.error("DEBUG: {}".format(user))
-
             save_user = user.save(commit=False)
             if user.is_valid():
                 new_email = "{}".format(user.cleaned_data["email"])
