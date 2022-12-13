@@ -103,7 +103,7 @@ class Command(BaseCommand):
         print("\nRecognized payments\n");
         for out in paid:
              if skipcheck:
-                  print("{}\t{}".format(out['uid'], out['name_str']))
+                  print("{}\t{}\t{}".format(out['uid'], out['date'], out['name_str']))
              else:
-                  print("{}\t{}\n\t{}".format(out['user'].id, out['user'], out))
+                  print("{}\t{}\t{}\n\t{}".format(out['user'].id, out['date'], out['user'], out))
         sys.exit(rc)

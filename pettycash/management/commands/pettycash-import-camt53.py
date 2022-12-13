@@ -20,7 +20,7 @@ import pwd
 
 
 class Command(BaseCommand):
-    help = "Recache all balances"
+    help = "Import CAM53 file"
 
     def add_arguments(self, parser):
         parser.add_argument(

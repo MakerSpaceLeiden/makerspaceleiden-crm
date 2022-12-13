@@ -35,10 +35,14 @@ def camt53_process(file, triggerwords = ["space", "tegoed", "zwarte pot", "zwart
 
 
 def process(e, namespaces, triggerwords, uidmapping, nouidcheck):
-    ref = e.xpath("camt:NtryRef/text()", namespaces=namespaces)[0]
     out = {}
+
+    ref = e.xpath("camt:NtryRef/text()", namespaces=namespaces)[0]
     out["ref"] = ref
     out["success"] = False
+
+    dte = e.xpath("camt:BookgDt/camt:Dt/text()", namespaces=namespaces)[0]
+    out['date'] = dte    
 
     tpe = e.xpath("camt:CdtDbtInd/text()", namespaces=namespaces)[0]
     if tpe == "CRDT":
