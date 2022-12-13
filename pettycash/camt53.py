@@ -15,7 +15,13 @@ from moneyed import Money, EUR
 import sys, os
 import datetime
 
-def camt53_process(file, triggerwords = ["space", "tegoed", "zwarte pot", "zwartepot", "storting", "spacepot"], uidmapping = (), nouidcheck=False):
+
+def camt53_process(
+    file,
+    triggerwords=["space", "tegoed", "zwarte pot", "zwartepot", "storting", "spacepot"],
+    uidmapping=(),
+    nouidcheck=False,
+):
     print(file)
     xmlparser = etree.XMLParser(
         ns_clean=True, remove_blank_text=True, remove_comments=True, no_network=True
@@ -131,29 +137,25 @@ def process(e, namespaces, triggerwords, uidmapping, nouidcheck):
         out["error"] = True
         return out
 
-    matches = [
-        w
-        for w in triggerwords
-        if w in details.lower()
-    ]
+    matches = [w for w in triggerwords if w in details.lower()]
     if len(matches) < 1:
         out["msg"] = "Skipping - not enough trigger words "
         return out
 
     m = re.search(r"\b(\d+)\b", details)
     if m:
-       try:
-          uid = int(m.group(0))
-       except:
-        out["msg"] = "ERROR - Skipping - uid could not be parsed"
-        out["error"] = True
-        return out
+        try:
+            uid = int(m.group(0))
+        except:
+            out["msg"] = "ERROR - Skipping - uid could not be parsed"
+            out["error"] = True
+            return out
     else:
         if not iban_str in uidmapping:
             out["msg"] = "ERROR Skipping - no uid"
             out["error"] = True
             return out
-        uid = int(uidmapping[ iban_str ])
+        uid = int(uidmapping[iban_str])
 
     MAX_UID = 10000
     if uid <= 0 or uid > MAX_UID:
@@ -162,33 +164,35 @@ def process(e, namespaces, triggerwords, uidmapping, nouidcheck):
         return out
 
     if nouidcheck:
-       out["uid"] = uid
-       user,created = User.objects.get_or_create(email = uid)
-       user.last_name = name_str
+        out["uid"] = uid
+        user, created = User.objects.get_or_create(email=uid)
+        user.last_name = name_str
     else:
-       try:
-           user = User.objects.get(pk=uid)
-           out["user"] = user
-       except:
-           out["msg"] = "ERROR - Skipping, no user with uid=%d" % uid
-           out["error"] = True
-           return out
+        try:
+            user = User.objects.get(pk=uid)
+            out["user"] = user
+        except:
+            out["msg"] = "ERROR - Skipping, no user with uid=%d" % uid
+            out["error"] = True
+            return out
 
-       try:
-           h = PettycashTransaction.history.filter(Q(history_change_reason__contains=ref))
-           if h.count() > 0:
-               out["msg"] = (
-                   "ERROR - Skipping, already %d transction(s) in the history with identifier=%s: first:%s"
-                   % (h.count(), ref, h.first())
-               )
-               out["error"] = True
-               return out
-       except ObjectDoesNotExist as e:
-           pass
-       except Exception as e:
-           out["msg"] = "ERROR - Skipping, error looking up '%s': %s" % (ref, e)
-           out["error"] = True
-           return out
+        try:
+            h = PettycashTransaction.history.filter(
+                Q(history_change_reason__contains=ref)
+            )
+            if h.count() > 0:
+                out["msg"] = (
+                    "ERROR - Skipping, already %d transction(s) in the history with identifier=%s: first:%s"
+                    % (h.count(), ref, h.first())
+                )
+                out["error"] = True
+                return out
+        except ObjectDoesNotExist as e:
+            pass
+        except Exception as e:
+            out["msg"] = "ERROR - Skipping, error looking up '%s': %s" % (ref, e)
+            out["error"] = True
+            return out
 
     out["success"] = True
     out["description"] = "Deposit by %s, %s" % (name_str, iban_str)
