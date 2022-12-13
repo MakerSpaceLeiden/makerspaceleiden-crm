@@ -79,6 +79,7 @@ def pettycash_admin_emails():
         .values_list("email", flat=True)
     )
 
+
 import logging
 
 logger = logging.getLogger(__name__)
