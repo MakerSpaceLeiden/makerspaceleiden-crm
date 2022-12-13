@@ -79,15 +79,6 @@ def pettycash_admin_emails():
         .values_list("email", flat=True)
     )
 
-
-def pettycash_treasurer_emails():
-    return list(
-        User.objects.all()
-        .filter(groups__name=settings.PETTYCASH_TREASURER_GROUP)
-        .values_list("email", flat=True)
-    )
-
-
 import logging
 
 logger = logging.getLogger(__name__)
@@ -99,6 +90,7 @@ from .models import (
     PettycashTerminal,
     PettycashStation,
     PettycashReimbursementRequest,
+    pettycash_admin_emails,
 )
 from .admin import PettycashBalanceCacheAdmin, PettycashTransactionAdmin
 from .forms import (

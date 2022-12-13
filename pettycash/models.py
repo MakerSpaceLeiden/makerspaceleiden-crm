@@ -52,6 +52,12 @@ def hexsha2pin(sha256_hex_a, sha256_hex_b):
     fp = hashlib.sha256(a + b).hexdigest()
     return fp[:6].upper()
 
+def pettycash_admin_emails():
+    return list(
+        User.objects.all()
+        .filter(groups__name=settings.PETTYCASH_ADMIN_GROUP)
+        .values_list("email", flat=True)
+    )
 
 class PettycashSku(models.Model):
     name = models.CharField(max_length=300, blank=True, null=True)
