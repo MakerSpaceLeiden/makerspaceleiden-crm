@@ -10,8 +10,10 @@ from stdimage.models import StdImageField
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import RegexValidator
 from django import forms
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 import logging
+import secrets
 
 logger = logging.getLogger(__name__)
 
@@ -213,6 +215,50 @@ class Tag(models.Model):
     def __str__(self):
         return self.tag + " (" + str(self.owner) + ")"
 
+class IBANSaltedHash(models.Model):
+    user = models.ForeignKey(User, help_text="Person likely assocated with this account",  on_delete=models.CASCADE)
+    valdigits = models.IntegerField(validators=[ MaxValueValidator(99), MinValueValidator(0) ])
+    salt = models.BinaryField(max_length=32)
+    hash = models.BinaryField(max_length=32)
+
+    def get(self,valdigits, keyed_hash):
+        for e in IBANSaltedHash.objects.all().filter(valdigits=valdigits):
+              salted_hash = hashlib.sha256()
+              salted_hash.update(e.salt)
+              salted_hash.update(keyed_hash)
+              hash = salted_hash.digest()
+              if e.hash == hash:
+                    return e
+        return None
+
+    def get_user(self,valdigits, keyed_hash):
+        e = self.get(valdigits, keyed_hash)
+        if e is not None:
+            return e.user
+        return e
+
+    def set(self, user, valdigits, keyed_hash):
+        e = self.get(valdigits, keyed_hash)
+
+        salt = secrets.token_bytes(32)
+
+        salted_hash = hashlib.sha256()
+        salted_hash.update(salt)
+        salted_hash.update(keyed_hash)
+        hash = salted_hash.digest()
+
+        ee = self.create(user=user, salt=salt, hash=hash, valdigits=valdigits)
+        ee.save()
+
+        if ee is None or e is None:
+            return ee
+
+        if e.user != user:
+            logger.warn("IBAN with valdigits {} moved from {} to {}".format(valdigits,e.user,user))
+        else:
+            logger.warn("IBAN with valdigits {} updated for {}".format(valdigits,user))
+
+        e.delete()
 
 def clean_tag_string(tag):
     try:

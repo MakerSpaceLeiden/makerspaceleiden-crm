@@ -381,3 +381,4 @@ class PettycashImportRecord(models.Model):
         blank=True,
         null=True,
     )
+

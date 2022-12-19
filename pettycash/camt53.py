@@ -1,5 +1,9 @@
 from lxml import etree
 import re
+import hmac
+import hashlib
+import base64
+
 from django.core.management.base import BaseCommand, CommandError
 
 from django.conf import settings
@@ -40,7 +44,7 @@ def camt53_process(
     return results
 
 
-def process(e, namespaces, triggerwords, uidmapping, nouidcheck):
+def process(e, namespaces, triggerwords, uidmapping, nouidcheck=False, maskiban=True):
     out = {}
 
     ref = e.xpath("camt:NtryRef/text()", namespaces=namespaces)[0]
@@ -100,7 +104,26 @@ def process(e, namespaces, triggerwords, uidmapping, nouidcheck):
         ]
         if item is not None and item != ""
     )[0]
-    iban_str = "%s*****%s" % (iban_str[0:8], iban_str[-3:])
+
+    # Rather than hash just the IBAN; we mix in our (production) secret key to make it
+    # a bit more resistant against, say, a dictionary search based on a list of all 
+    # Dutch bank accounts (these things are floating around on the internet).
+    #
+    iban_keyed_hash = base64.b64encode(hmac.new(
+           settings.SECRET_KEY.encode('utf-8'),
+           iban_str.encode('ASCII'), 
+           hashlib.sha256).digest())
+
+    valdigits = 0
+    try:
+        valdigits = int(iban_str[2:4])
+    except Exception as e:
+        # out["msg"] = "Skipping - could not convert/parse IBAN for check digits."
+        # return out
+        valdigits = 0
+
+    if maskiban:
+       iban_str = "%s*****%s" % (iban_str[0:8], iban_str[-3:])
 
     details = e.xpath(
         "camt:NtryDtls/camt:TxDtls/camt:AddtlTxInf/text()", namespaces=namespaces
@@ -111,6 +134,8 @@ def process(e, namespaces, triggerwords, uidmapping, nouidcheck):
         details = ""
 
     out["iban_str"] = iban_str
+    out["iban_keyed_has"] = iban_keyed_hash
+    out["iban_valdigits"] = valdigits
     out["name_str"] = name_str
     out["details"] = details
 
@@ -152,14 +177,14 @@ def process(e, namespaces, triggerwords, uidmapping, nouidcheck):
             return out
     else:
         if not iban_str in uidmapping:
-            out["msg"] = "ERROR Skipping - no uid"
+            out["msg"] = "ERROR Skipping - no ibanstr to map to uid"
             out["error"] = True
             return out
         uid = int(uidmapping[iban_str])
 
     MAX_UID = 10000
     if uid <= 0 or uid > MAX_UID:
-        out["msg"] = "ERROR - Skipping no usabable user id"
+        out["msg"] = "ERROR - Skipping -- no usabable user id"
         out["error"] = True
         return out
 
