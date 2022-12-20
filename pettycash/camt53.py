@@ -106,13 +106,16 @@ def process(e, namespaces, triggerwords, uidmapping, nouidcheck=False, maskiban=
     )[0]
 
     # Rather than hash just the IBAN; we mix in our (production) secret key to make it
-    # a bit more resistant against, say, a dictionary search based on a list of all 
+    # a bit more resistant against, say, a dictionary search based on a list of all
     # Dutch bank accounts (these things are floating around on the internet).
     #
-    iban_keyed_hash = base64.b64encode(hmac.new(
-           settings.SECRET_KEY.encode('utf-8'),
-           iban_str.encode('ASCII'), 
-           hashlib.sha256).digest())
+    iban_keyed_hash = base64.b64encode(
+        hmac.new(
+            settings.SECRET_KEY.encode("utf-8"),
+            iban_str.encode("ASCII"),
+            hashlib.sha256,
+        ).digest()
+    )
 
     valdigits = 0
     try:
@@ -123,7 +126,7 @@ def process(e, namespaces, triggerwords, uidmapping, nouidcheck=False, maskiban=
         valdigits = 0
 
     if maskiban:
-       iban_str = "%s*****%s" % (iban_str[0:8], iban_str[-3:])
+        iban_str = "%s*****%s" % (iban_str[0:8], iban_str[-3:])
 
     details = e.xpath(
         "camt:NtryDtls/camt:TxDtls/camt:AddtlTxInf/text()", namespaces=namespaces

@@ -215,23 +215,30 @@ class Tag(models.Model):
     def __str__(self):
         return self.tag + " (" + str(self.owner) + ")"
 
+
 class IBANSaltedHash(models.Model):
-    user = models.ForeignKey(User, help_text="Person likely assocated with this account",  on_delete=models.CASCADE)
-    valdigits = models.IntegerField(validators=[ MaxValueValidator(99), MinValueValidator(0) ])
+    user = models.ForeignKey(
+        User,
+        help_text="Person likely assocated with this account",
+        on_delete=models.CASCADE,
+    )
+    valdigits = models.IntegerField(
+        validators=[MaxValueValidator(99), MinValueValidator(0)]
+    )
     salt = models.BinaryField(max_length=32)
     hash = models.BinaryField(max_length=32)
 
-    def get(self,valdigits, keyed_hash):
+    def get(self, valdigits, keyed_hash):
         for e in IBANSaltedHash.objects.all().filter(valdigits=valdigits):
-              salted_hash = hashlib.sha256()
-              salted_hash.update(e.salt)
-              salted_hash.update(keyed_hash)
-              hash = salted_hash.digest()
-              if e.hash == hash:
-                    return e
+            salted_hash = hashlib.sha256()
+            salted_hash.update(e.salt)
+            salted_hash.update(keyed_hash)
+            hash = salted_hash.digest()
+            if e.hash == hash:
+                return e
         return None
 
-    def get_user(self,valdigits, keyed_hash):
+    def get_user(self, valdigits, keyed_hash):
         e = self.get(valdigits, keyed_hash)
         if e is not None:
             return e.user
@@ -254,11 +261,16 @@ class IBANSaltedHash(models.Model):
             return ee
 
         if e.user != user:
-            logger.warn("IBAN with valdigits {} moved from {} to {}".format(valdigits,e.user,user))
+            logger.warn(
+                "IBAN with valdigits {} moved from {} to {}".format(
+                    valdigits, e.user, user
+                )
+            )
         else:
-            logger.warn("IBAN with valdigits {} updated for {}".format(valdigits,user))
+            logger.warn("IBAN with valdigits {} updated for {}".format(valdigits, user))
 
         e.delete()
+
 
 def clean_tag_string(tag):
     try:
