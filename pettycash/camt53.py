@@ -52,7 +52,7 @@ def process(e, namespaces, triggerwords, uidmapping, nouidcheck=False, maskiban=
     out["success"] = False
 
     dte = e.xpath("camt:BookgDt/camt:Dt/text()", namespaces=namespaces)[0]
-    out['date'] = dte    
+    out["date"] = dte
 
     tpe = e.xpath("camt:CdtDbtInd/text()", namespaces=namespaces)[0]
     if tpe == "CRDT":
