@@ -1,4 +1,4 @@
-Django
+Django<4.0.0
 pytz
 wheel
 django-import-export
@@ -44,4 +44,4 @@ django-money
 
 # Reverse proxy for the 3D printers
 requests
-dateutils
+python-dateutil
