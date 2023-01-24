@@ -37,6 +37,8 @@ logger = logging.getLogger(__name__)
 import base64
 import hashlib
 
+none_user = User.objects.get(id=settings.NONE_ID)
+
 
 def pemToSHA256Fingerprint(pem):
     pem = pem[27:-25]
@@ -200,6 +202,12 @@ class PettycashBalanceCache(models.Model):
     def path(self):
         return reverse("balances", kwargs={"pk": self.id})
 
+    def save(self):
+        if not self.owner:
+            self.owner = none_user
+
+        return super(PettycashBalanceCache, self).save()
+
 
 def adjust_balance_cache(last, dst, amount):
     try:
@@ -308,6 +316,11 @@ class PettycashTransaction(models.Model):
         if not self.date:
             self.date = timezone.now()
 
+        if not self.src:
+            self.src = none_user
+        if not self.dst:
+            self.dst = none_user
+
         if self.amount < Money(0, EUR):
             if not bypass:
                 raise ValidationError("Blocked negative transaction.")
@@ -354,6 +367,7 @@ class PettycashReimbursementRequest(models.Model):
         default=False,
         help_text="Check this box if you want to be paid via a IBAN/SEPA transfer; otherwise the amount will be credited to your Makerspace petty cash acount",
     )
+    isPayout = models.BooleanField(default=False, help_text="Internal hidden field")
 
     description = models.CharField(
         max_length=300,

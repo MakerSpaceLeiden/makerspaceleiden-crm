@@ -15,11 +15,18 @@
           {% if user|isPettycashAdmin or b.owner.id != settings.POT_ID %}
 		<tr>
 			<td>
+			{% if b.owner.id and user.id %}
 			<a href="{% url 'transactions' pk=b.owner.id %}">
+			{% endif %}
           		{% if b.owner.id == settings.POT_ID %}
 				{{ settings.POT_LABEL }}
 			{% else %}
-				{{b.owner }}
+			{% if b.owner.id %}
+					{{b.owner }}
+				{% else %}
+				<i>participant that has left</i>
+				{% endif %}
+
 			{% endif %}
 			</a></td>
 			<td>
@@ -30,6 +37,7 @@
 			{% endif %}
 			</td>
 			<td>{{ b.balance }}</td>
+			{% if b.owner.id and user.id %}
                         {% if user.id == b.owner.id %}
 				<td><a href="{% url 'invoice' src=b.owner.id %}">[pay to {{ settings.POT_LABEL }}]</a></td>
                         {% else %}
@@ -39,6 +47,9 @@
 			{% endif %}
 			{% if user.is_privileged and b.owner.id != settings.POT_ID %}
 				<td><a href="{% url 'deposit' dst=b.owner.id %}">[deposit]</a></td>
+			{% endif %}
+			{% else %}
+				deleted participant
 			{% endif %}
 		</tr>
             {% endif %}

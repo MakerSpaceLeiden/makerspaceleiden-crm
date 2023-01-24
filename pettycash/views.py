@@ -102,6 +102,7 @@ from .forms import (
     CamtUploadForm,
     ImportProcessForm,
     PettycashReimbursementRequestForm,
+    PettycashPayoutRequestForm,
     PettycashReimburseHandleForm,
 )
 from .models import pemToSHA256Fingerprint, hexsha2pin
@@ -848,6 +849,46 @@ def delete(request, pk):
 
 
 @login_required
+def payoutform(request):
+    form = PettycashPayoutRequestForm(
+        request.POST or None,
+        request.FILES or None,
+        initial={
+            "dst": request.user,
+            "date": date.today(),
+        },
+    )
+    context = {
+        "settings": settings,
+        "form": form,
+        "label": "Payout",
+        "action": "request",
+        "user": request.user,
+        "has_permission": request.user.is_authenticated,
+    }
+
+    if form.is_valid():
+        item = form.save(commit=False)
+        item.viaTheBank = True
+        item.isPayout = True
+        if not item.date:
+            item.date = datetime.now()
+        if not item.submitted:
+            item.submitted = datetime.now()
+
+        item.save()
+        context["item"] = item
+
+        emailPlain(
+            "email_payout_notify.txt",
+            toinform=[pettycash_treasurer_emails(), request.user.email],
+            context=context,
+        )
+        return render(request, "pettycash/reimburse_ok.html", context=context)
+    return render(request, "pettycash/reimburse_form.html", context=context)
+
+
+@login_required
 def reimburseform(request):
     form = PettycashReimbursementRequestForm(
         request.POST or None,
@@ -940,7 +981,7 @@ def reimburseque(request):
                         context=context,
                         attachments=attachments,
                     )
-                else:
+                if item.isPayout or not item.viaTheBank:
                     transact_raw(
                         request,
                         src=User.objects.get(id=settings.POT_ID),

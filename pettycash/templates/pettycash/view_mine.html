@@ -46,7 +46,7 @@ The last import/synchronisation with the bank account was done by {{ last_import
 <li> <a href="{% url 'manual_deposit' %}">Deposit money</a> into your space account.
 <br>
 {% if balance.balance.amount > 25 %}
-<li> <a href="{% url 'reimburseform' %}">Withdraw money</a>
+<li> <a href="{% url 'payoutform' %}">Withdraw money</a>
 <br>
 {% endif %}
 </ul>

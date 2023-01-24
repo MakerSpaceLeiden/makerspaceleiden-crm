@@ -103,7 +103,9 @@ class MailmanService:
 
             except urllib.error.HTTPError as e:
                 if e.code != 401:
-                    raise e
+                    raise MailmanException(
+                        "Unknown error with post: {} {}: {}".format(url2, formparams, e)
+                    )
 
             # propably a wrong cookie or CSRF issue; reset these. And try again.
             #

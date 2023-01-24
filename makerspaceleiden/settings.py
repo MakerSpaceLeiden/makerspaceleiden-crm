@@ -108,6 +108,8 @@ SETTINGS_EXPORT = [
     "STORAGE",
     "POT_ID",
     "POT_LABEL",
+    "NONE_ID",
+    "NONE_LABEL",
     "TRUSTEES",
 ]
 
@@ -276,6 +278,8 @@ PETTYCASH_TOPUP = 15
 PETTYCASH_TNS = "Stichting Makerspace Leiden"
 PETTYCASH_IBAN = "NL18RABO0123459876"
 POT_ID = 1
+NONE_ID = 217
+NONE_LABEL = "Former participant"
 POT_LABEL = "Makerspace (de zwarte Pot)"
 CURRENCIES = ["EUR"]
 

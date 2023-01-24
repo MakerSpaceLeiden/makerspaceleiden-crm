@@ -42,6 +42,12 @@ class PettycashDeleteForm(forms.Form):
     )
 
 
+class PettycashPayoutRequestForm(ModelForm):
+    class Meta:
+        model = PettycashReimbursementRequest
+        fields = ["dst", "description", "amount", "date"]
+
+
 class PettycashReimbursementRequestForm(ModelForm):
     class Meta:
         model = PettycashReimbursementRequest
