@@ -71,6 +71,8 @@ def image2mime(img):
     attachment.add_header("Content-Disposition", 'inline; filename="' + name + '"')
     return attachment
 
+def pettycash_treasurer_emails():
+    return pettycash_admin_emails()
 
 def pettycash_admin_emails():
     return list(
