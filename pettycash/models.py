@@ -37,10 +37,9 @@ logger = logging.getLogger(__name__)
 import base64
 import hashlib
 
-try:
-    none_user = User.objects.get(id=settings.NONE_ID)
-except:
-    none_user = None
+
+def none_user():
+    return User.objects.get(id=settings.NONE_ID)
 
 
 def pemToSHA256Fingerprint(pem):
@@ -207,7 +206,7 @@ class PettycashBalanceCache(models.Model):
 
     def save(self):
         if not self.owner:
-            self.owner = none_user
+            self.owner = none_user()
 
         return super(PettycashBalanceCache, self).save()
 
@@ -320,9 +319,9 @@ class PettycashTransaction(models.Model):
             self.date = timezone.now()
 
         if not self.src:
-            self.src = none_user
+            self.src = none_user()
         if not self.dst:
-            self.dst = none_user
+            self.dst = none_user()
 
         if self.amount < Money(0, EUR):
             if not bypass:
