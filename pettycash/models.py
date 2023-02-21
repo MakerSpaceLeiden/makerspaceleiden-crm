@@ -37,8 +37,10 @@ logger = logging.getLogger(__name__)
 import base64
 import hashlib
 
-none_user = User.objects.get(id=settings.NONE_ID)
-
+try:
+   none_user = User.objects.get(id=settings.NONE_ID)
+except:
+   none_user = None
 
 def pemToSHA256Fingerprint(pem):
     pem = pem[27:-25]
