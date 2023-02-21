@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 from simple_history.models import HistoricalRecords
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import AbstractUser, BaseUserManager
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.urls import reverse_lazy, reverse
 from stdimage.models import StdImageField
 from django.core.exceptions import ObjectDoesNotExist
