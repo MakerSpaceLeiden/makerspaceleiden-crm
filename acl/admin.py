@@ -5,7 +5,7 @@ from simple_history.admin import SimpleHistoryAdmin
 from import_export import resources
 from django.conf import settings
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from members.models import User
 from .models import PermitType

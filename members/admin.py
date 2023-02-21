@@ -8,7 +8,7 @@ from import_export.admin import ImportExportModelAdmin
 from import_export import resources
 from import_export import resources
 from simple_history.admin import SimpleHistoryAdmin
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from .models import Tag, User, AuditRecord
 
