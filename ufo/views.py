@@ -44,6 +44,7 @@ from .admin import UfoAdmin
 from .forms import UfoForm, NewUfoForm, UfoZipUploadForm
 from members.models import User
 
+
 # Note - we do this here; rather than in the model its save() - as this
 # lets admins change things through the database interface silently.
 # Which can help when sheparding the community.

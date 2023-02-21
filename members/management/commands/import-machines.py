@@ -26,7 +26,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         for file in options["inputfile"]:
             for line in file:
-
                 lineData = {
                     "Name": None,
                     "instructionsRequired": None,

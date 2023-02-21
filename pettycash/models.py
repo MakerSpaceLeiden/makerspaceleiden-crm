@@ -38,9 +38,10 @@ import base64
 import hashlib
 
 try:
-   none_user = User.objects.get(id=settings.NONE_ID)
+    none_user = User.objects.get(id=settings.NONE_ID)
 except:
-   none_user = None
+    none_user = None
+
 
 def pemToSHA256Fingerprint(pem):
     pem = pem[27:-25]

@@ -624,7 +624,6 @@ def space_state(request):
 
 
 def space_state_api(request):
-
     aggregator_adapter = get_aggregator_adapter()
     if not aggregator_adapter:
         return HttpResponse(

@@ -17,7 +17,6 @@ class Command(BaseCommand):
     help = "Compare mailinglist(s) in mailman with database"
 
     def add_arguments(self, parser):
-
         parser.add_argument(
             "--all",
             dest="all",

@@ -19,6 +19,7 @@ import requests
 
 logger = logging.getLogger(__name__)
 
+
 # No access restrictions
 def index(request):
     aggregator_adapter = get_aggregator_adapter()

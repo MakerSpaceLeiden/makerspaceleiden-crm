@@ -18,7 +18,6 @@ class Command(BaseCommand):
     help = "Sync roster from remote service; and create/sync it with the local one."
 
     def add_arguments(self, parser):
-
         parser.add_argument(
             "--all",
             dest="all",
