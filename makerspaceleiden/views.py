@@ -2,7 +2,6 @@ from django.http import HttpResponseRedirect, HttpResponse
 
 
 class MySimpleHistoryAdmin(SimpleHistoryAdmin):
-
     object_history_template = "object_history.html"
 
     # Bit risky - routes in to bypass for naughtyness in below showhistory.

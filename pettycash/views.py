@@ -114,6 +114,7 @@ from .camt53 import camt53_process
 
 from members.models import User, Tag
 
+
 # Note - we do this here; rather than in the model its save() - as this
 # lets admins change things through the database interface silently.
 # Which can help when sheparding the community.
@@ -168,7 +169,6 @@ def pettycash_redirect(pk=None):
 def transact_raw(
     request, src=None, dst=None, description=None, amount=None, reason=None, user=None
 ):
-
     if None in [src, dst, description, amount, reason, user]:
         logger.error("Transact raw called with missing arguments. bug.")
         return 0
@@ -318,7 +318,6 @@ def invoice(request, src):
 @login_required
 @login_or_priveleged
 def transfer_to_member(request, src):
-
     src = request.user
     description = "Transfer"
     amount = Money(0)

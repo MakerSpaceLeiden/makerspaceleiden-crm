@@ -113,14 +113,12 @@ def api_index_legacy2(request):
 
     out = ""
     for member in User.objects.filter(is_active=True):
-
         machines = []
         for machine in (
             Machine.objects.all()
             .exclude(requires_permit=None)
             .exclude(node_machine_name=None)
         ):
-
             if machine.requires_form and not member.form_on_file:
                 continue
 

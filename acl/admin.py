@@ -14,6 +14,7 @@ from .models import Location
 from .models import Entitlement
 from .models import RecentUse
 
+
 # class MachineAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 class MachineAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     list_display = (
@@ -29,6 +30,7 @@ class MachineAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
 
 
 admin.site.register(Machine, MachineAdmin)
+
 
 # class LocationAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 class LocationAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):

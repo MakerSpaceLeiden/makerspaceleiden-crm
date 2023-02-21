@@ -36,7 +36,6 @@ class Command(BaseCommand):
         torollup = PettycashTransaction.objects.all().filter(date__lt=cutoff_date)
 
         for user in User.objects.all():
-
             records = torollup.filter(Q(dst=user) | Q(src=user))
 
             rollup = PettycashTransaction(

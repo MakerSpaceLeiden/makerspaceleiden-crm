@@ -33,7 +33,6 @@ from selfservice.aggregator_adapter import get_aggregator_adapter
 
 @user_or_kiosk_required
 def kiosk(request):
-
     aggregator_adapter = get_aggregator_adapter()
     if not aggregator_adapter:
         return HttpResponse(

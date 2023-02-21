@@ -16,7 +16,6 @@ def tohexstr(value):
 
 
 class HexFormField(forms.CharField):
-
     default_error_messages = {
         "invalid_hex": 'Enter a valid hex number: e.g. "DE12", the 0x prefix is optional; case is ignored.',
     }
