@@ -55,18 +55,20 @@ def generate_waiverform_fd(user_id, user_name, confirmation_url):
     )
 
     # Read template page from PDF
-    reader = PyPDF2.PdfFileReader(template_filepath, strict=False)
-    template_page = reader.getPage(0)
+    reader = PyPDF2.PdfReader(template_filepath, strict=False)
+    template_page = reader.pages[0]
 
-    # Generate overlay text with reportlab
     fd = _generate_overlay(form_data, confirmation_url)
-    overlay_page = PyPDF2.PdfFileReader(fd, strict=False).getPage(0)
+    overlay_page = PyPDF2.PdfReader(fd, strict=False).pages[0]
 
     # Merge the pages
-    writer = PyPDF2.PdfFileWriter()
-    new_page = writer.addBlankPage(*DOCUMENT_SIZE)
-    new_page.mergePage(template_page)
-    new_page.mergePage(overlay_page)
+    writer = PyPDF2.PdfWriter()
+
+    mediabox = template_page.mediabox
+    template_page.merge_page(overlay_page)
+    template_page.mediabox = mediabox
+
+    writer.add_page(template_page)
 
     # Write the result to an in-memory file
     fd = io.BytesIO()
