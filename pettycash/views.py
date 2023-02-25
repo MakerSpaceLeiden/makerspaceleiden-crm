@@ -320,7 +320,7 @@ def invoice(request, src):
 def transfer_to_member(request, src):
     src = request.user
     description = "Transfer"
-    amount = Money(0)
+    amount = Money(0, EUR)
     form = PettycashTransactionForm(
         request.POST or None,
         initial={"src": src, "description": description, "amount": amount},
