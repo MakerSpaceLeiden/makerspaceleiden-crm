@@ -30,7 +30,8 @@ class Mailinglist(models.Model):
         help_text="How long these archives are visible for normal members, or blank/0 if `forever'",
     )
     hidden = models.BooleanField(
-        default=False, help_text="Show this in the normal (non admin) view",
+        default=False,
+        help_text="Show this in the normal (non admin) view",
     )
 
     history = HistoricalRecords()
