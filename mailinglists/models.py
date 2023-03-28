@@ -25,10 +25,12 @@ class Mailinglist(models.Model):
     mandatory = models.BooleanField(
         default=False, help_text="Requires super admin to change"
     )
-
     visible_months = models.IntegerField(
         default=0,
         help_text="How long these archives are visible for normal members, or blank/0 if `forever'",
+    )
+    hidden = models.BooleanField(
+        default=False, help_text="Show this in the normal (non admin) view",
     )
 
     history = HistoricalRecords()

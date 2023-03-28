@@ -87,6 +87,8 @@ def mailinglists_edit(request, user_id=None):
         # As per above 'not perfect' note -- See if we already have this subscription or not; and then use that
         # to populate our values; otherwise pick up a brand new one.
         #
+        if l.hidden and not request.user.is_privileged:
+            continue
         s = [s for s in subs if s.mailinglist == l]
         if s:
             s = s[0]
