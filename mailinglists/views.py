@@ -74,6 +74,13 @@ def mailinglists_edit(request, user_id=None):
             for l in lists
         ]
         if all([form.is_valid() for form in forms]):
+            if not request.user.is_privileged:
+                for form in forms:
+                    if id2list[form.prefixd2l].hidden:
+                        return HttpResponse(
+                            "XS denied", status=403, content_type="text/plain"
+                        )
+
             for form in forms:
                 nw = form.save(commit=False)
                 nw.member = user
@@ -173,6 +180,8 @@ def mailinglists_archive(
         mlist = mid.name
     except Mailinglist.DoesNotExist:
         return HttpResponse("List not found", status=404, content_type="text/plain")
+
+    # TODO - implement security for hidden lists ??
 
     # Real URL
     #     https://mailman.makerspaceleiden.nl/mailman/private/<mlist>
