@@ -280,6 +280,40 @@ def pricelist(request, days=30):
 
 
 @login_required
+def spends(request):
+    skus = PettycashSku.objects.order_by("name")
+    per_sku = []
+    frst = timezone.now()
+    for sku in skus:
+        e = {
+            "name": sku.name,
+            "sku": sku,
+            "description": sku.description,
+            "amount": Money(0, EUR),
+            "count": 0,
+            "price": sku.amount,
+        }
+        for tx in PettycashTransaction.objects.all().filter(
+            description__startswith=sku.description
+        ):
+            e["amount"] += tx.amount
+            e["count"] += 1
+            if frst > tx.date:
+                frst = tx.date
+        per_sku.append(e)
+
+    context = {
+        "title": "Spend",
+        "settings": settings,
+        "has_permission": request.user.is_authenticated,
+        "per_sku": per_sku,
+        "skus": skus,
+        "first": frst,
+    }
+    return render(request, "pettycash/spend.html", context)
+
+
+@login_required
 def qrcode(request):
     description = request.GET.get("description", None)
     amount_str = request.GET.get("amount", 0)

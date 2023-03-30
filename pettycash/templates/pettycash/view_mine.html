@@ -52,7 +52,7 @@ The last import/synchronisation with the bank account was done by {{ last_import
 </ul>
 <h1>Other</i>
 <ul>
-<li> <a href="{% url 'pricelist' %}">See the current pricelist</a>
+<li> <a href="{% url 'pricelist' %}">See the current pricelist</a> and <a href='{% url "spends" %}'>our spending this month</a>.
 <br>
 {% if user|isPettycashAdmin %}
 <li> List of <a href='{% url "unpaired" %}'>stations</a> and pairing. (<i>only visible to pettycash admins</i>.)

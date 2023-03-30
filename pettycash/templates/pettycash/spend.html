@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load isingroup %}
+
+{% block content %}
+
+Recent spend (if any) from {{ first }} onwards:
+
+<table>
+	<tr>
+		<th>SKU</th><th>Count</th><th>Unit price</th><th>total</th>
+	</tr>
+{% for e in per_sku %}
+	<tr>
+		<td>{{ e.name }}</td>
+		<td>{{ e.count }}</td>
+		<td>{{ e.price }}</td>
+		<td>{{ e.amount }}</td>
+	</tr>
+{% endfor %}
+</table>
+
+<p>
+Return to the <a href="{% url 'mytransactions' %}">[balance]</a>.
+
+
+{% endblock %}
