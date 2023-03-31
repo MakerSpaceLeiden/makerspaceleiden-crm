@@ -71,6 +71,11 @@ class Subscription(models.Model):
     # Sync active bit and REST setings admin tool.
     #
     def sync_activate(self):
+        if self.mailinglist.hidden:
+            logger.info(f"Skipping sync activate; {self.mailinglist} is managed via Sympa")
+            # but we're not returning yet during this legacy situation of maintaining both
+            # return
+
         # Force subscribe if needed ?
         #
         # if not self.account.is_subscribed:
@@ -108,12 +113,21 @@ class Subscription(models.Model):
         logger.info(f"Sync activate complete")
 
     def subscribe(self):
+        if self.mailinglist.hidden:
+            logger.info(f"Skipping subscribe; {self.mailinglist} is managed via Sympa")
+            # but we're not returning yet during this legacy situation of maintaining both
+            # return
+
         if not self.account:
             self.account = MailmanAccount(service, self.mailinglist)
 
         r = self.account.subscribe(self.member.email, self.member.name())
 
     def unsubscribe(self):
+        if self.mailinglist.hidden:
+            logger.info(f"Skipping unsubscribe; {self.mailinglist} is managed via Sympa")
+            # but we're not returning yet during this legacy situation of maintaining both
+            # return
         if not self.account:
             self.account = MailmanAccount(service, self.mailinglist)
         self.account.unsubscribe(self.member.email)
