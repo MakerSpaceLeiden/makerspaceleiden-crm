@@ -301,7 +301,6 @@ def spends(request):
             if frst > tx.date:
                 frst = tx.date
         per_sku.append(e)
-
     context = {
         "title": "Spend",
         "settings": settings,
@@ -309,6 +308,7 @@ def spends(request):
         "per_sku": per_sku,
         "skus": skus,
         "first": frst,
+        "delta": timezone.now() - frst,
     }
     return render(request, "pettycash/spend.html", context)
 

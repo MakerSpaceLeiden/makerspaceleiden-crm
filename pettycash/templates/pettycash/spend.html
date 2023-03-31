@@ -3,8 +3,9 @@
 
 {% block content %}
 
-Recent spend (if any) from {{ first }} onwards:
-
+{% if per_sku %}
+Spend in the last {{ delta.days }} days on normal things that are on the pricelist (i.e. excluding any specials):
+<p>
 <table>
 	<tr>
 		<th>SKU</th><th>Count</th><th>Unit price</th><th>total</th>
@@ -18,9 +19,12 @@ Recent spend (if any) from {{ first }} onwards:
 	</tr>
 {% endfor %}
 </table>
+{% else %}
+No recent spend.
+
+{% endif %}
 
 <p>
 Return to the <a href="{% url 'mytransactions' %}">[balance]</a>.
-
 
 {% endblock %}
