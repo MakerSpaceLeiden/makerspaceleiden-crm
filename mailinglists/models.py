@@ -72,7 +72,9 @@ class Subscription(models.Model):
     #
     def sync_activate(self):
         if self.mailinglist.hidden:
-            logger.info(f"Skipping sync activate; {self.mailinglist} is managed via Sympa")
+            logger.info(
+                f"Skipping sync activate; {self.mailinglist} is managed via Sympa"
+            )
             # but we're not returning yet during this legacy situation of maintaining both
             # return
 
@@ -125,7 +127,9 @@ class Subscription(models.Model):
 
     def unsubscribe(self):
         if self.mailinglist.hidden:
-            logger.info(f"Skipping unsubscribe; {self.mailinglist} is managed via Sympa")
+            logger.info(
+                f"Skipping unsubscribe; {self.mailinglist} is managed via Sympa"
+            )
             # but we're not returning yet during this legacy situation of maintaining both
             # return
         if not self.account:

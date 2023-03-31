@@ -49,7 +49,11 @@ def index(request):
 @login_required
 def newmember(request):
     if not request.user.is_privileged:
-        logger.error("{} tried to create a new member without the right priveleges. XS denied.".format(request.user));
+        logger.error(
+            "{} tried to create a new member without the right priveleges. XS denied.".format(
+                request.user
+            )
+        )
         return HttpResponse("XS denied", status=403, content_type="text/plain")
 
     if request.POST:
