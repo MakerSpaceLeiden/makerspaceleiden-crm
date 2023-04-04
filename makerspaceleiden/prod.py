@@ -97,7 +97,7 @@ LOGGING = {
         },
     },
 }
-ALSO_INFORM_EMAIL_ADDRESSES = ["deelnemers@mailman.makerspaceleiden.nl"]
+ALSO_INFORM_EMAIL_ADDRESSES = ["deelnemers@lists.makerspaceleiden.nl"]
 
 # v1 legacy
 DOORS = 3
