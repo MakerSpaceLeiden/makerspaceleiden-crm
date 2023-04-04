@@ -22,8 +22,6 @@ from django.views.decorators.csrf import csrf_exempt
 from makerspaceleiden.decorators import superuser_or_bearer_required, superuser
 
 from .forms import SubscriptionForm
-from .mailman import MailmanService, MailmanAccount
-
 import json, os, re
 
 from members.models import User
@@ -171,96 +169,4 @@ def mailinglists_subs(request):
 def mailinglists_archive(
     request, mlist, yearmonth=None, order=None, zip=None, attachment=None
 ):
-    # XXX - cache this 'per list' or make the loging 'admin level' cross lists.
-    #
-    service = MailmanService(settings.ML_PASSWORD, settings.ML_ADMINURL)
-
-    try:
-        mid = Mailinglist.objects.get(name=mlist)
-        mlist = mid.name
-    except Mailinglist.DoesNotExist:
-        return HttpResponse("List not found", status=404, content_type="text/plain")
-
-    # TODO - implement security for hidden lists ??
-
-    # Real URL
-    #     https://mailman.makerspaceleiden.nl/mailman/private/<mlist>
-    #
-    path = f"private/{ mlist }/"
-    if yearmonth:
-        try:
-            m = strptime(yearmonth, "%Y-%B")
-            fdom = datetime.datetime.strptime(yearmonth + "-01", "%Y-%B-%d")
-            year = m.tm_year
-            month = m.tm_mon
-        except Exception as e:
-            logger.error(f"Path element { yearmonth } not understood")
-            return HttpResponse(
-                "Path not understood", status=500, content_type="text/plain"
-            )
-
-        if mid.visible_months:
-            f = datetime.date.today() - datetime.timedelta(
-                days=mid.visible_months * 30
-            )  # Bit in-exact; but not very critical as we round down to months.
-            if (
-                year < f.year
-                or (year == f.year and month < f.month)
-                and not request.user.is_privileged
-            ):
-                return HttpResponse(
-                    "No access to archives this old; contact the trustees",
-                    status=404,
-                    content_type="text/plain",
-                )
-
-        if zip:
-            path = path + yearmonth + ".txt.gz"
-        else:
-            path = path + yearmonth + "/"
-
-    if attachment:
-        path = f"private/{mlist}/attachments/{attachment}"
-    elif order:
-        path = path + order + ".html"
-
-    response = service.get(mlist, path)
-    mimetype = response.info().get_content_type().lower()
-
-    if not mimetype:
-        mimetype = "text/plain"
-
-    body = response.read()
-    if mimetype == "text/html" and not attachment:
-        try:
-            body = body.decode("utf-8")
-        except UnicodeDecodeError:
-            try:
-                body = body.decode("latin1")
-            except UnicodeDecodeError:
-                body = body.decode(errors="ignore")
-
-        if yearmonth == None:
-            p = reverse("mailinglists_archives")
-            body = re.sub(r"You can get", "", body)
-            body = re.sub(
-                r'<a href="\S+listinfo\S+"[^<]*</a>',
-                f'<a href="{p}">Overview of all list archives</a>.',
-                body,
-            )
-        else:
-            p = reverse("mailinglists_archive", kwargs={"mlist": mlist})
-            body = re.sub(
-                r'<a href="\S+listinfo\S+"[^<]*</a>',
-                f'<a href="{p}">Overview for the archive of this list</a>.',
-                body,
-            )
-
-        if order:
-            pattern = f"{service.adminurl}/private/{mlist}/(attachments/\d+/[a-fA-F0-9]+/attachment[\-\d+.\w]+)"
-            r = re.compile(pattern)
-            body = re.sub(r, "\g<1>", body)
-
-        body = re.sub(re.compile("<!--x-search-form-->.*</form>", re.DOTALL), "", body)
-
-    return HttpResponse(body, content_type=mimetype)
+    return HttpResponse("Not available; list being migrated")
