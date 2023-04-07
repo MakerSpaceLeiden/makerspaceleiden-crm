@@ -58,4 +58,4 @@ class Subscription(models.Model):
     history = HistoricalRecords()
 
     def __str__(self):
-        return f"{self.member.email} @ {self.mailinglist}"
+        return f"{self.member.email}@{self.mailinglist}"

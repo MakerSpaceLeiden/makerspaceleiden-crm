@@ -72,19 +72,14 @@ def mailinglists_edit(request, user_id=None):
             for l in lists
         ]
         if all([form.is_valid() for form in forms]):
-            if not request.user.is_privileged:
-                for form in forms:
-                    if id2list[form.prefixd2l].hidden:
-                        return HttpResponse(
-                            "XS denied", status=403, content_type="text/plain"
-                        )
-
             for form in forms:
+                if id2list[form.prefix].hidden and not request.user.is_privileged:
+                    continue
                 nw = form.save(commit=False)
                 nw.member = user
                 nw.mailinglist = id2list[form.prefix]
-                logger.error(f"Saving {nw}: a={nw.active} d={nw.digest}")
                 nw.save()
+                logger.error(f"Saved {nw}: a={nw.active} d={nw.digest}")
             return redirect("mailinglists_edit", user_id=user.id)
 
     forms = []

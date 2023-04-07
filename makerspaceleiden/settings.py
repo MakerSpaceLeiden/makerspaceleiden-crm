@@ -104,7 +104,6 @@ TEMPLATES = [
 
 SETTINGS_EXPORT = [
     "GRAND_AMNESTY",
-    "ML_ADMINURL",
     "STORAGE",
     "POT_ID",
     "POT_LABEL",

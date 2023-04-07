@@ -283,6 +283,11 @@ class Entitlement(models.Model):
             except EntitlementNotFound:
                 pass
 
+        logger.error(
+            f"Entitlement: saving {self} -- with active:{self.active} and permit:{self.permit} ({self.permit.permit})"
+        )
+        # Current rule for pending is:
+        #      Entitlement.objects.all().filter(active=False).filter(holder__is_active=True)
         if not self.active and self.permit.permit:
             try:
                 context = {
@@ -303,6 +308,9 @@ class Entitlement(models.Model):
                     to=[self.issuer.email, settings.TRUSTEES, "dirkx@webweaving.org"],
                     from_email=settings.DEFAULT_FROM_EMAIL,
                 ).send()
+                logger.error(
+                    f"Entitlement: mail sent to {self.issuer} and the trustees"
+                )
             except Exception as e:
                 logger.critical("Failed to sent an email: {}".format(str(e)))
 

@@ -255,7 +255,9 @@ def recordinstructions(request):
                     record.active = not pt.require_ok_trustee
                     try:
                         record.save(request=request)
+                        logger.error("Creation of {0} completed".format(record))
                         context["holder"].append(p)
+
                     except Exception as e:
                         logger.error("Updating of instructions failed: {0}".format(e))
                         return HttpResponse(
