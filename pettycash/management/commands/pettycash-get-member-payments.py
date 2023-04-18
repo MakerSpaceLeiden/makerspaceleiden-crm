@@ -82,6 +82,10 @@ class Command(BaseCommand):
             "contribution",
             "lidmaatschap",
             "deelname",
+            "membership",
+            "participation",
+            "participant",
+            "member",
         ]
         results = camt53_process(file, triggerwords, mapping, skipcheck)
         paid = []
