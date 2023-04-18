@@ -12,6 +12,7 @@ from django.utils.translation import gettext_lazy as _
 
 from .models import Tag, User, AuditRecord
 
+
 class UserResource(resources.ModelResource):
     class Meta:
         model = User
