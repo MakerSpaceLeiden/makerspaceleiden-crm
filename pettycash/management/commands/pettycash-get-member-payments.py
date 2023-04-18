@@ -52,14 +52,23 @@ class Command(BaseCommand):
             l = 0
             for line in rd:
                 l = l + 1
-                if len(line) < 1 or int(line[1]) < 1 or int(line[1]) > 5000:
+                i = -1
+                try:
+                    i = int(line[0])
+                    if len(line) < 1 or int(line[0]) < 1 or int(line[0]) > 5000:
+                        print(
+                            "Error in mapping file {} - line {}:{}".format(
+                                mappingfile, l, line
+                            )
+                        )
+                        sys.exit(1)
+                    mapping[" ".join(line[1:])] = line[0]
+                except:
                     print(
-                        "Error in mapping file {} - line {}:{}".format(
+                        "Warning - error in mapping file {} - line {}:{}".format(
                             mappingfile, l, line
                         )
                     )
-                    sys.exit(1)
-                mapping[line[0]] = line[1]
 
         if verbosity > 2:
             print("Processing %s", file)

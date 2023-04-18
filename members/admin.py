@@ -6,17 +6,24 @@ from search_admin_autocomplete.admin import SearchAutoCompleteAdmin
 
 from import_export.admin import ImportExportModelAdmin
 from import_export import resources
-from import_export import resources
+from import_export import fields
 from simple_history.admin import SimpleHistoryAdmin
 from django.utils.translation import gettext_lazy as _
 
 from .models import Tag, User, AuditRecord
 
+
 class UserResource(resources.ModelResource):
+    full_name = fields.Field(column_name="Full Name")
+
+    def dehydrate_full_name(self, obj):
+        return "%s %s" % (obj.first_name, obj.last_name)
+
     class Meta:
         model = User
         fields = (
             "id",
+            "full_name",
             "first_name",
             "last_name",
             "email",

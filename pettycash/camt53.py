@@ -125,6 +125,7 @@ def process(e, namespaces, triggerwords, uidmapping, nouidcheck=False, maskiban=
         # return out
         valdigits = 0
 
+    iban_raw = iban_str
     if maskiban:
         iban_str = "%s*****%s" % (iban_str[0:8], iban_str[-3:])
 
@@ -170,20 +171,30 @@ def process(e, namespaces, triggerwords, uidmapping, nouidcheck=False, maskiban=
         out["msg"] = "Skipping - not enough trigger words "
         return out
 
-    m = re.search(r"\b(\d+)\b", details)
-    if m:
-        try:
-            uid = int(m.group(0))
-        except:
-            out["msg"] = "ERROR - Skipping - uid could not be parsed"
-            out["error"] = True
-            return out
-    else:
-        if not iban_str in uidmapping:
+    uid = 0
+    if uidmapping:
+        hits = [line for line in uidmapping.keys() if iban_raw in line]
+        if len(hits) == 0:
             out["msg"] = "ERROR Skipping - no ibanstr to map to uid"
             out["error"] = True
             return out
-        uid = int(uidmapping[iban_str])
+        if len(hits) > 1:
+            out["msg"] = "ERROR Skipping - {} appears for multiple UIDs".format(
+                iban_str
+            )
+            out["error"] = True
+            return out
+        uid = int(uidmapping[hits[0]])
+
+    if uid == 0:
+        m = re.search(r"\b(\d+)\b", details)
+        if m:
+            try:
+                uid = int(m.group(0))
+            except:
+                out["msg"] = "ERROR - Skipping - uid could not be parsed"
+                out["error"] = True
+                return out
 
     MAX_UID = 10000
     if uid <= 0 or uid > MAX_UID:
