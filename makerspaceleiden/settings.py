@@ -114,8 +114,8 @@ SETTINGS_EXPORT = [
 
 WSGI_APPLICATION = "makerspaceleiden.wsgi.application"
 
-MAILINGLIST = "deelnemers@makerspaceleiden.nl"
-TRUSTEES = "hetbestuur@makerspaceleiden.nl"
+MAILINGLIST = "deelnemers@lists.makerspaceleiden.nl"
+TRUSTEES = "hetbestuur@lists.makerspaceleiden.nl"
 
 DEFAULT_FROM_EMAIL = "noc@makerspaceleiden.nl"
 # Leave it to FORCE_SCRPT do do the psotfix right
