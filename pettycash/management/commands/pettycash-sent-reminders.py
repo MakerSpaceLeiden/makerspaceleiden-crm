@@ -70,6 +70,9 @@ class Command(BaseCommand):
             if user.id == settings.POT_ID:
                 continue
 
+            if user.id == settings.NONE_ID:
+                continue
+
             if balance.balance == 0:
                 continue
 

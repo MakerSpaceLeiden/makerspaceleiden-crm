@@ -107,7 +107,7 @@ class Command(BaseCommand):
             balances = balances.filter(
                 (Q(balance__gt=Money(0, EUR)) & Q(last__date__gt=cutoff_date))
                 | Q(balance__lt=Money(0, EUR))
-            ).filter(~Q(owner=settings.POT_ID))
+            ).filter(~Q(owner=settings.POT_ID) & ~Q(owner=settings.NONE_ID))
 
         skus = PettycashSku.objects.order_by("name")
         per_sku = []
