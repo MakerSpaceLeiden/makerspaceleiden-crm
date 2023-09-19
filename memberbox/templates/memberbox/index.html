@@ -144,6 +144,20 @@ In a few <i>exceptional</i> cases - there is permission for a member to store th
 </table>
 {% endif %}
 
+{% if morethanone|length %}
+<h2>People having more than one storage box or item</h2>
+
+<table>
+  <tr><th>person</th><th>number of items</th><th></th></tr>
+  {% for person,count in morethanone.items %}
+  <tr>
+	  <td><a href="{{ person.path  }}">{{ person }}</a></td>
+	  <td>{{ count }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endif %}
+
 <div class="dontprint">
 <pre>
 

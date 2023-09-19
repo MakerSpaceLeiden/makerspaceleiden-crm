@@ -40,8 +40,15 @@ def index(request):
         for storage_key, storage_data in STORAGES.items()
     )
 
-    # Fill up data structures
+    # Fill up data structures; and do a count/owner on the side
+    count = {}
+    morethanone = {}
     for box in Memberbox.objects.order_by("location"):
+        if box.owner.id in count:
+           count[box.owner.id] = count[box.owner.id] + 1
+           morethanone[box.owner] = count[box.owner.id]
+        else:
+           count[box.owner.id] = 1
         box_location = parse_box_location(box.location)
         if box_location:
             num_rows = STORAGES[box_location.storage]["num_rows"]
@@ -59,6 +66,7 @@ def index(request):
         "floating": floating,
         "yours": yours,
         "has_permission": request.user.is_authenticated,
+        "morethanone": morethanone,
     }
 
     return render(request, "memberbox/index.html", context)
