@@ -45,10 +45,10 @@ def index(request):
     morethanone = {}
     for box in Memberbox.objects.order_by("location"):
         if box.owner.id in count:
-           count[box.owner.id] = count[box.owner.id] + 1
-           morethanone[box.owner] = count[box.owner.id]
+            count[box.owner.id] = count[box.owner.id] + 1
+            morethanone[box.owner] = count[box.owner.id]
         else:
-           count[box.owner.id] = 1
+            count[box.owner.id] = 1
         box_location = parse_box_location(box.location)
         if box_location:
             num_rows = STORAGES[box_location.storage]["num_rows"]
