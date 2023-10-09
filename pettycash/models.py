@@ -66,8 +66,8 @@ def pettycash_admin_emails():
 
 
 class PettycashSku(models.Model):
-    name = models.CharField(max_length=300, blank=True, null=True)
-    description = models.CharField(max_length=300, blank=True, null=True)
+    name = models.CharField(max_length=300, blank=False, null=True)
+    description = models.CharField(max_length=300, blank=False, null=True)
     amount = MoneyField(
         max_digits=8, decimal_places=2, null=True, default_currency="EUR"
     )
