@@ -13,11 +13,9 @@ import sys, os, pwd
 from datetime import datetime, timedelta
 from django.utils import timezone
 
+
 def sendEmail(
-    toinform,
-    template="monthly-participants-email.txt",
-    forreal=True,
-    context={}
+    toinform, template="monthly-participants-email.txt", forreal=True, context={}
 ):
     context["date"] = datetime.now(tz=timezone.utc).date()
     context["base"] = settings.BASE
@@ -89,11 +87,13 @@ class Command(BaseCommand):
         if options["to"]:
             dest = options["to"]
 
-        sendEmail(dest, 
-            forreal=(not options["dryrun"]), 
-            context = {
-                "participants": users ,
+        sendEmail(
+            dest,
+            forreal=(not options["dryrun"]),
+            context={
+                "participants": users,
                 "num": users.count,
-	    })
+            },
+        )
 
         sys.exit(rc)
