@@ -1,0 +1,16 @@
+Subject:  "[makerbot] Makerspace Leiden, {{num}} participants storng today ({{date}})
+
+Hello All,
+
+We have currently {{num}} makers united at the makerspace in Leiden; as
+listed below. 
+
+Or consult {{ base }}{% url 'members-index'%} for mugshots.
+
+mbot
+-- 
+the makerspace bot, on behalf of the trustees (bestuur@makerspaceleiden.nl).
+
+{% for p in participants %}
+	{{p}} <{{p.email}}>
+{% endfor %}

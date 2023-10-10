@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     "pettycash.apps.PettycashConfig",
     "ultimaker.apps.UltimakerConfig",
     "spaceapi.apps.SpaceapiConfig",
+    "memberlist",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
