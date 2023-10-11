@@ -15,6 +15,7 @@ from textwrap import wrap
 import datetime
 import logging
 import re
+import html
 
 logger = logging.getLogger(__name__)
 
@@ -55,7 +56,7 @@ def emailPlain(
 
     body_html = (
         "<html><head><title>%s</title></head><body><pre>%s</pre></body><html>"
-        % (subject, body)
+        % (subject, html.escape(body))
     )
 
     msg = MIMEMultipart("alternative")

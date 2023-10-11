@@ -1,4 +1,4 @@
-Subject:  "[makerbot] Makerspace Leiden, {{num}} participants storng today ({{date}})
+Subject: [makerbot] Makerspace Leiden, {{num}} participants storng today ({{date}})
 
 Hello All,
 
@@ -12,5 +12,4 @@ mbot
 the makerspace bot, on behalf of the trustees (bestuur@makerspaceleiden.nl).
 
 {% for p in participants %}
-	{{p}} <{{p.email}}>
-{% endfor %}
+	{{p}} <{{p.email}}>{% endfor %}
