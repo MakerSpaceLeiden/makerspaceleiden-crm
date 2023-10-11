@@ -54,10 +54,12 @@ def emailPlain(
         subject = re.sub("^Subject:\s+", string=subject, repl="", flags=re.IGNORECASE)
         body = "\n".join(body[1:])
 
-    body_html = (
-        "<html><head><title>%s</title></head><body><pre>%s</pre></body><html>"
-        % (subject, html.escape(body))
-    )
+    body_html = body
+    if not re.search('^\s*<html>', body_html, re.IGNORECASE):
+        body_html = (
+            "<html><head><title>%s</title></head><body><pre>%s</pre></body><html>"
+            % (subject, html.escape(body))
+        )
 
     msg = MIMEMultipart("alternative")
 

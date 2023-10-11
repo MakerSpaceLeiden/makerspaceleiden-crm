@@ -1,4 +1,4 @@
-Subject: [makerbot] Makerspace Leiden, {{num}} participants storng today ({{date}})
+Subject: [makerbot] Makerspace Leiden, {{num}} participants strong today ({{date}})
 
 Hello All,
 
