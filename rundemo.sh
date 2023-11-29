@@ -7,6 +7,8 @@ POETRY=${POETRY:-false}
 
 export LC_ALL=en_US.UTF-8
 
+unset POETRY_RUN
+
 # python${VERSION}  -mvenv venv
 # . venv/bin/activate
 
@@ -22,7 +24,7 @@ if $POETRY; then
         exit 1
     else
         poetry install
-        poetry shell
+        export POETRY_RUN="poetry run "
     fi
 else
     echo "Using pip"
@@ -35,6 +37,6 @@ else
     fi
 fi
 
-python${VERSION} manage.py makemigrations
-python${VERSION} manage.py migrate
-python${VERSION} manage.py runserver
+${POETRY_RUN}python${VERSION} manage.py makemigrations
+${POETRY_RUN}python${VERSION} manage.py migrate
+${POETRY_RUN}python${VERSION} manage.py runserver

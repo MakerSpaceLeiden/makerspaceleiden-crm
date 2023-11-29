@@ -7,6 +7,8 @@ source /etc/os-release
 PYTHON_VERSION=${PYTHON_VERSION:-3}
 POETRY=${POETRY:=false}
 
+unset POETRY_RUN
+
 if $POETRY ; then
 	echo "Using poetry"
 	if ! test -f pyproject.toml; then
@@ -19,7 +21,7 @@ if $POETRY ; then
 		exit 1
 	else
 		poetry install
-		poetry shell
+		export POETRY_RUN="poetry run "
 	fi
 else
 	echo "Using pip"
@@ -41,8 +43,8 @@ fi
 
 test -f db.sqlite3 && rm -f db.sqlite3
 
-python${PYTHON_VERSION} manage.py makemigrations
-python${PYTHON_VERSION} manage.py migrate
+${POETRY_RUN}python${PYTHON_VERSION} manage.py makemigrations
+${POETRY_RUN}python${PYTHON_VERSION} manage.py migrate
 export LC_ALL=en_US.UTF-8
 
 echo
@@ -50,16 +52,16 @@ echo Importing data
 echo
 
 if test -f demo/example.json; then
-	python${PYTHON_VERSION} manage.py loaddata demo/example.json
+	${POETRY_RUN}python${PYTHON_VERSION} manage.py loaddata demo/example.json
 else
-	python${PYTHON_VERSION} manage.py import-wifi demo/wifi.csv
-	python${PYTHON_VERSION} manage.py import-machines demo/mac.csv
-	python${PYTHON_VERSION} manage.py import-consolidated demo/consolidated.txt
-	python${PYTHON_VERSION} manage.py pettycash-recache
-    python${PYTHON_VERSION} manage.py pettycash-activate-all-users
+	${POETRY_RUN}python${PYTHON_VERSION} manage.py import-wifi demo/wifi.csv
+	${POETRY_RUN}python${PYTHON_VERSION} manage.py import-machines demo/mac.csv
+	${POETRY_RUN}python${PYTHON_VERSION} manage.py import-consolidated demo/consolidated.txt
+	${POETRY_RUN}python${PYTHON_VERSION} manage.py pettycash-recache
+    ${POETRY_RUN}python${PYTHON_VERSION} manage.py pettycash-activate-all-users
     echo
 	echo No invites with password-set requests sent. Passwords are all hardcoded to 1234 for:
 	grep @  demo/consolidated.txt
 fi
 
-python${PYTHON_VERSION} manage.py runserver
+${POETRY_RUN}python${PYTHON_VERSION} manage.py runserver

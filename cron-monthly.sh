@@ -1,4 +1,5 @@
 #!/bin/bash
+
 set -e
 
 source .env
@@ -8,13 +9,15 @@ cd $DIR || exit 1
 
 POETRY=${POETRY:=false}
 
+unset POETRY_RUN
+
 if $POETRY ; then
-    poetry shell
+    export POETRY_RUN="poetry run "
 else
     . ./venv/bin/activate
 fi
 
-python manage.py pettycash-recache $*
-python manage.py pettycash-sent-reminders $*
-python manage.py pettycash-sent-balances $*
-python manage.py pettycash-consolidate $* 30
+${POETRY_RUN}python manage.py pettycash-recache $*
+${POETRY_RUN}python manage.py pettycash-sent-reminders $*
+${POETRY_RUN}python manage.py pettycash-sent-balances $*
+${POETRY_RUN}python manage.py pettycash-consolidate $* 30

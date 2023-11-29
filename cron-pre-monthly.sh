@@ -9,10 +9,12 @@ cd $DIR || exit 1
 
 POETRY=${POETRY:=false}
 
+unset POETRY_RUN
+
 if $POETRY ; then
-    poetry shell
+    export POETRY_RUN="poetry run "
 else
     . ./venv/bin/activate
 fi
 
-python manage.py  memberlist-sent-list
+${POETRY_RUN}python manage.py  memberlist-sent-list

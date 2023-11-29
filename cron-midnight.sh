@@ -9,13 +9,15 @@ cd $DIR || exit 1
 
 POETRY=${POETRY:=false}
 
+unset POETRY_RUN
+
 if $POETRY ; then
-    poetry shell
+    export POETRY_RUN="poetry run "
 else
     . ./venv/bin/activate
 fi
 
-python manage.py pettycash-recache
-python manage.py clean_duplicate_history --auto > /dev/null
-python manage.py clean_old_history --days 1000 --auto > /dev/null
-python manage.py sent-ufo-reminders
+${POETRY_RUN}python manage.py pettycash-recache
+${POETRY_RUN}python manage.py clean_duplicate_history --auto > /dev/null
+${POETRY_RUN}python manage.py clean_old_history --days 1000 --auto > /dev/null
+${POETRY_RUN}python manage.py sent-ufo-reminders
