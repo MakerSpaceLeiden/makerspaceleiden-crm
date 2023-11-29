@@ -580,7 +580,6 @@ def api_none(request):
     return HttpResponse("OK\n", status=200, content_type="text/plain")
 
 
-
 @superuser
 def deposit(request, dst):
     try:
@@ -991,6 +990,7 @@ def reimburseque(request):
 
     context["items"] = items
     return render(request, "pettycash/reimburse_queue.html", context=context)
+
 
 @csrf_exempt
 @superuser_or_bearer_required
