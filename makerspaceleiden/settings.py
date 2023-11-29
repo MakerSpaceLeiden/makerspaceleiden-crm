@@ -6,8 +6,9 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
-import locale
-from moneyed import Money, EUR
+
+from moneyed import EUR, Money
+from stdimage.validators import MaxSizeValidator, MinSizeValidator
 
 os.umask(2)
 
@@ -37,7 +38,7 @@ STORAGE = False
 INSTALLED_APPS = [
     "import_export",
     "simple_history",
-    "search_admin_autocomplete",
+    "search_admin_autocomplete.apps.SearchAdminAutocompleteConfig",
     "qr_code",
     "djmoney",
     "makerspaceleiden",
@@ -208,8 +209,6 @@ MIN_IMAGE_SIZE = 2 * 1024
 MAX_IMAGE_SIZE = 8 * 1024 * 1024
 MAX_IMAGE_WIDTH = 1280
 
-from stdimage.validators import MinSizeValidator, MaxSizeValidator
-
 IMG_VALIDATORS = [MinSizeValidator(100, 100), MaxSizeValidator(8000, 8000)]
 
 # Note: the labels are effectively 'hardcoded' in the templates
@@ -296,7 +295,7 @@ PETTYCASH_TERMS_MIN_UNKNOWN = 1
 PETTYCASH_TERMS_MINS_CUTOFF = 10
 
 try:
-    from .local import *
+    from .local import *  # noqa: F403
 except ImportError:
     print(
         "WARNING -- no local configs. You propably want to copy makerspaceleiden/debug.py to local.py & tweak it !!"

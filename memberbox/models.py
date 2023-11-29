@@ -1,18 +1,15 @@
-from django.db import models
+import logging
+
 from django.conf import settings
-from django.contrib.auth import get_user_model
+from django.core.mail import EmailMessage
+from django.db import models
+from django.template.loader import render_to_string
 from simple_history.models import HistoricalRecords
-from members.models import User
 from stdimage.models import StdImageField
-from django.db.models.signals import pre_delete, pre_save
 
 # from stdimage.utils import pre_delete_delete_callback, pre_save_delete_callback
 from makerspaceleiden.utils import upload_to_pattern
-from django.urls import reverse
-from django.core.mail import EmailMessage
-from django.template.loader import render_to_string, get_template
-
-import logging
+from members.models import User
 
 logger = logging.getLogger(__name__)
 
@@ -44,8 +41,10 @@ class Memberbox(models.Model):
     def url(self):
         return settings.BASE + self.path()
 
-    def url(self):
-        return reverse("overview", kwargs={"member_id": self.id})
+    # TODO: Removed redefinition of function
+    # Check if this was the wrong definition or not
+    # def url(self):
+    #     return reverse("overview", kwargs={"member_id": self.id})
 
     def __str__(self):
         if self.owner:

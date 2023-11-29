@@ -1,8 +1,20 @@
-#!/bin/sh
+#!/bin/bash
+
 set -e
+
+source .env
+
 DIR=${DIR:-/usr/local/makerspaceleiden-crm}
 cd $DIR || exit 1
 
-. ./venv/bin/activate
+POETRY=${POETRY:=false}
 
-python manage.py  memberlist-sent-list 
+unset POETRY_RUN
+
+if $POETRY ; then
+    export POETRY_RUN="poetry run "
+else
+    . ./venv/bin/activate
+fi
+
+${POETRY_RUN}python manage.py  memberlist-sent-list

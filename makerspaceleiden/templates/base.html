@@ -25,7 +25,7 @@
     {% if not is_popup %}
     <!-- Header -->
     <div id="header">
-        <div id="branding"> 
+        <div id="branding">
         {% block branding %}Makerspace Leiden{% endblock %}
         </div>
         {% block usertools %}
@@ -36,7 +36,7 @@
                 <strong>{% firstof user.get_short_name user.get_username %}</strong>.
 {% if user.is_privileged %}<b>(admin)</b>
    {% if not user.is_superuser %}
-	/ <a href="{% url 'drop' %}">[drop]</a> / 
+	/ <a href="{% url 'drop' %}">[drop]</a> /
    {% endif %}
 {% else %}
    {% if user.can_escalate_to_priveleged %}

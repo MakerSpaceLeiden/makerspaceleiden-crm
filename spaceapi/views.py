@@ -1,21 +1,11 @@
-from django.shortcuts import render, redirect
-from django.urls import path
+import datetime
+import logging
+
+from dateutil import parser
 from django.http import HttpResponse
-from django.conf import settings
-from django.db.models import Q
-
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.csrf import csrf_exempt
-
-from django.utils import timezone
+from django.shortcuts import render
 
 from selfservice.aggregator_adapter import get_aggregator_adapter
-
-import logging
-import datetime
-from dateutil import parser
-import re
-import requests
 
 logger = logging.getLogger(__name__)
 

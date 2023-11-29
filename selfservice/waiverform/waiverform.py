@@ -1,12 +1,12 @@
+import datetime
 import io
 import os
-import datetime
 from collections import namedtuple
-from reportlab.pdfgen import canvas
-from reportlab.lib.units import mm, inch
+
 import PyPDF2
 import qrcode
-
+from reportlab.lib.units import inch, mm
+from reportlab.pdfgen import canvas
 
 MM_2_UNITS = mm / inch * 72
 pt = inch / 27
@@ -31,7 +31,7 @@ Leiden, {data.date}
 
 Ref: waiver: waiver-2019-01-v1.01/{data.user_id}
 
-{data.user_name} verklaart op {data.date} bekend te zijn met het risico van het gebruik van 
+{data.user_name} verklaart op {data.date} bekend te zijn met het risico van het gebruik van
 apparatuur die ernstig blijvend letsel kan veroorzaken met eventueel de dood tot gevolg.
 
 {data.user_name} verklaart zich te houden aan de veiligheidsinstructies en richtlijnen.

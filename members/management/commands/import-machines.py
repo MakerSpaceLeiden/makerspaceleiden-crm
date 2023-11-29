@@ -1,23 +1,18 @@
-from django.core.management.base import BaseCommand, CommandError
-
-from simple_history.models import HistoricalRecords
-from members.models import User
-from members.models import Tag, User
-from acl.models import Machine, Location, PermitType, Entitlement
-from memberbox.models import Memberbox
-from storage.models import Storage
-
 import argparse
 
-""" 
-Imports tool/machine information according to the following table format:
+from django.core.management.base import BaseCommand
 
-| Name       | instruction-req | permit-req | permit-type | description | location  |
-| 3D printer | 1               | 0          |             | 3D-Printer  | Frontroom |
-"""
+from acl.models import Location, Machine, PermitType
 
 
 class Command(BaseCommand):
+    """
+    Imports tool/machine information according to the following table format:
+
+    | Name       | instruction-req | permit-req | permit-type | description | location  |
+    | 3D printer | 1               | 0          |             | 3D-Printer  | Frontroom |
+    """
+
     help = "Imports tool/machine data from file in csv format"
 
     def add_arguments(self, parser):

@@ -22,7 +22,7 @@ Once you've done that - press pay.
       <td>{{item.amount}}</td>
       <td>
         <a href="{% url 'pay' %}?description={{item.description}}&amount={{item.amount.amount}}">Pay</a>
-	for this or use this 
+	for this or use this
         <a href="{% url 'qrcode' %}?description={{item.description}}&amount={{item.amount.amount}}">QR-code</a>
       </td>
     </tr>

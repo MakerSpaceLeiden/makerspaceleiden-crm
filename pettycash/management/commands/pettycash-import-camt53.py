@@ -1,22 +1,13 @@
-from lxml import etree
-import re
-from django.core.management.base import BaseCommand, CommandError
+import os
+import pwd
+import sys
 
 from django.conf import settings
-from django.core.mail import EmailMessage
-from django.db.models import Q
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.management.base import BaseCommand
 
-from pettycash.models import PettycashBalanceCache, PettycashTransaction
 from members.models import User
-
 from pettycash.camt53 import camt53_process
-
-from moneyed import Money, EUR
-
-import sys, os
-import datetime
-import pwd
+from pettycash.models import PettycashTransaction
 
 
 class Command(BaseCommand):

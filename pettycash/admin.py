@@ -1,22 +1,21 @@
-from import_export.admin import ImportExportModelAdmin
-from simple_history.admin import SimpleHistoryAdmin
-from django.core.exceptions import ObjectDoesNotExist
+import logging
 
 from django.contrib import admin
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
-
 from django.forms import CheckboxSelectMultiple
+from import_export.admin import ImportExportModelAdmin
+from simple_history.admin import SimpleHistoryAdmin
 
 from .models import (
-    PettycashTransaction,
     PettycashBalanceCache,
-    PettycashSku,
-    PettycashTerminal,
-    PettycashStation,
-    PettycashReimbursementRequest,
     PettycashImportRecord,
+    PettycashReimbursementRequest,
+    PettycashSku,
+    PettycashStation,
+    PettycashTerminal,
+    PettycashTransaction,
 )
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +33,7 @@ class PettycashTerminalAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
         try:
             station = PettycashStation.objects.get(terminal=terminal)
             return station.description
-        except ObjectDoesNotExist as e:
+        except ObjectDoesNotExist:
             pass
         return "-"
 

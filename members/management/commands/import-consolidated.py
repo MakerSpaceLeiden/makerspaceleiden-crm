@@ -1,14 +1,13 @@
-from django.core.management.base import BaseCommand, CommandError
-from django.contrib.auth.models import User
-
-from simple_history.models import HistoricalRecords
-from members.models import User
-from members.models import Tag
-from acl.models import Machine, Location, PermitType, Entitlement
-from memberbox.models import Memberbox
-from storage.models import Storage
-
 import argparse
+import logging
+
+from django.core.management.base import BaseCommand
+
+from acl.models import Entitlement, Machine, PermitType
+from memberbox.models import Memberbox
+from members.models import Tag, User
+
+logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
@@ -26,7 +25,8 @@ class Command(BaseCommand):
 
         try:
             admin = User.objects.get(email="admin@admin.nl")
-        except:
+        except Exception:
+            logger.warning("Admin user not found, creating")
             admin = User.objects.create_superuser("admin@admin.nl", "1234")
             admin.first_name = ("Ad",)
             admin.last_name = "Min"
@@ -65,7 +65,7 @@ class Command(BaseCommand):
                     member.last_name = ""
                 if len(what.split(" ")) > 1:
                     member.form_on_file = True
-                if trustee == None:
+                if trustee is None:
                     member.is_staff = True
                     trustee = member
                 member.save()

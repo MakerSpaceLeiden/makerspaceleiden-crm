@@ -1,15 +1,12 @@
-from django.http import HttpResponseRedirect, HttpResponse
-
-from django.core.exceptions import PermissionDenied
-from django.conf import settings
-
-from functools import wraps
+import logging
 import re
+from functools import wraps
+
+from django.conf import settings
+from django.http import HttpResponse
 
 HEADER = "HTTP_X_BEARER"
 MODERN_HEADER = "HTTP_AUTHORIZATION"
-
-import logging
 
 logger = logging.getLogger(__name__)
 

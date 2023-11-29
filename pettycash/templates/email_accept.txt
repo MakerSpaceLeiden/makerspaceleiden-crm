@@ -11,5 +11,5 @@ has been accepted/added as via a swipe by tag #{{ tag.id }} which
 is owned by {{ tag.owner }}.
 
 Your friendly makerbot.
--- 
+--
 Makerspace Leiden, internal payment notifcations.

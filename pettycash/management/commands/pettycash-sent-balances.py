@@ -1,23 +1,19 @@
-from django.core.management.base import BaseCommand, CommandError
+import sys
+from datetime import datetime, timedelta
 
-from django.template.loader import render_to_string, get_template
 from django.conf import settings
-from django.core.mail import EmailMessage
+from django.core.management.base import BaseCommand
 from django.db.models import Q
+from django.utils import timezone
+from moneyed import EUR, Money
 
+from makerspaceleiden.mail import emailPlain
 from pettycash.models import (
-    PettycashSku,
-    PettycashTransaction,
     PettycashBalanceCache,
     PettycashImportRecord,
+    PettycashSku,
+    PettycashTransaction,
 )
-from makerspaceleiden.mail import emailPlain
-
-import sys, os, pwd
-
-from datetime import datetime, timedelta
-from django.utils import timezone
-from moneyed import Money, EUR
 
 
 def sendEmail(
@@ -94,7 +90,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        verbosity = int(options["verbosity"])
+        _ = int(options["verbosity"])
         cutoff_date = datetime.now(tz=timezone.utc) - timedelta(days=options["days"])
         rc = 0
 

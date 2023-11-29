@@ -1,17 +1,12 @@
-from django.core.management.base import BaseCommand, CommandError
+import sys
 
-from django.conf import settings
-from django.core.mail import EmailMessage
-from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.management.base import BaseCommand
+from django.db.models import Q
+from moneyed import EUR, Money
 
-from pettycash.models import PettycashBalanceCache, PettycashTransaction
 from members.models import User
-
-from moneyed import Money, EUR
-
-import sys, os
-import datetime
+from pettycash.models import PettycashBalanceCache, PettycashTransaction
 
 
 class Command(BaseCommand):
@@ -37,7 +32,7 @@ class Command(BaseCommand):
             try:
                 balance = PettycashBalanceCache.objects.get(owner=user)
                 old_balance = balance.balance
-            except ObjectDoesNotExist as e:
+            except ObjectDoesNotExist:
                 act = "initial creation"
                 pass
 
@@ -55,7 +50,7 @@ class Command(BaseCommand):
                     else:
                         balance.balance -= tx.amount
                         total -= tx.amount
-            except ObjectDoesNotExist as e:
+            except ObjectDoesNotExist:
                 pass
 
             old_balance = old_balance - balance.balance

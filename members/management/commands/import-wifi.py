@@ -1,22 +1,19 @@
-from django.core.management.base import BaseCommand, CommandError
-
-from simple_history.models import HistoricalRecords
-from members.models import User
-from members.models import Tag, User
-from selfservice.models import WiFiNetwork
-
 # import sys,os
 import argparse
 
-""" 
-Imports SSID-password pairs for the network according to the following table format:
+from django.core.management.base import BaseCommand
 
-| SSID            | PSK          |
-| MakerSpace-5GHz | SomePassword |
-"""
+from selfservice.models import WiFiNetwork
 
 
 class Command(BaseCommand):
+    """
+    Imports SSID-password pairs for the network according to the following table format:
+
+    | SSID            | PSK          |
+    | MakerSpace-5GHz | SomePassword |
+    """
+
     help = "Import CSV file with SSID/Password pairs for the wifi"
 
     def add_arguments(self, parser):

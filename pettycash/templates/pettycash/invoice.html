@@ -19,7 +19,7 @@ Enter any description and amount in the form (up to a 100 euro) and press pay to
 
 {% if products %}
   <h2>Products</h2>
-Select one of the products below to pre-populate the form with the right data. 
+Select one of the products below to pre-populate the form with the right data.
 <p>
 
   <table>
@@ -36,7 +36,7 @@ Select one of the products below to pre-populate the form with the right data.
       <td>{{item.amount}}</td>
       <td>
         <a href="{% url 'pay' %}?description={{item.description}}&amount={{item.amount.amount}}">Pay</a>
-	for this or use this 
+	for this or use this
         <a href="{% url 'qrcode' %}?description={{item.description}}&amount={{item.amount.amount}}">QR-code</a>
       </td>
     </tr>

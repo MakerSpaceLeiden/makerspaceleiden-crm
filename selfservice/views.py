@@ -1,44 +1,41 @@
+import json
+import logging
 import re
+import sys
 
-from django.contrib.sites.shortcuts import get_current_site
-from django.utils.encoding import force_bytes, force_text
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.template.loader import render_to_string
-from django.http import HttpResponse
-from django.contrib.auth.decorators import login_required
+import six
 from django import forms
-from django.shortcuts import render, redirect
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.db.models import Q
+from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import EmailMessage
-from django.urls import reverse
+from django.db.models import Q
 from django.forms import widgets
+from django.http import HttpResponse
+from django.shortcuts import redirect, render
+from django.template.loader import render_to_string
+from django.urls import reverse
+from django.utils.encoding import force_bytes, force_str
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 
+from acl.models import Entitlement, Machine, PermitType
 from makerspaceleiden.decorators import (
-    superuser_or_bearer_required,
     is_superuser_or_bearer,
+    superuser_or_bearer_required,
 )
-
-from .forms import TabledCheckboxSelectMultiple
-
-from django.conf import settings
-
-import logging
-import json
-import sys
-import six
-
 from members.models import User
-from acl.models import Machine, Entitlement, PermitType
 from selfservice.forms import (
-    UserForm,
-    SignalNotificationSettingsForm,
     EmailNotificationSettingsForm,
+    SignalNotificationSettingsForm,
+    UserForm,
 )
+
+from .aggregator_adapter import get_aggregator_adapter
+from .forms import TabledCheckboxSelectMultiple
 from .models import WiFiNetwork
 from .waiverform.waiverform import generate_waiverform_fd
-from .aggregator_adapter import get_aggregator_adapter
 
 
 def send_email_verification(
@@ -212,13 +209,13 @@ def recordinstructions(request):
                 if request.user.is_privileged and form.cleaned_data["issuer"]:
                     i = User.objects.get(pk=form.cleaned_data["issuer"])
                 else:
-                    i = user = request.user
+                    i = request.user
 
                 pt = None
                 if m.requires_permit:
                     pt = PermitType.objects.get(pk=m.requires_permit.id)
 
-                if pt == None:
+                if pt is None:
                     logger.error(f"{m} skipped - no permit - bug ?")
                     continue
 
@@ -296,7 +293,7 @@ def recordinstructions(request):
 @login_required
 def confirmemail(request, uidb64, token, newemail):
     try:
-        uid = force_text(urlsafe_base64_decode(uidb64))
+        uid = force_str(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=uid)
         if request.user != user:
             return HttpResponse(
@@ -340,7 +337,7 @@ def waiverformredir(request):
 def waiverform(request, user_id=None):
     try:
         member = User.objects.get(pk=user_id)
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         return HttpResponse("User not found", status=404, content_type="text/plain")
     confirmation_url = request.build_absolute_uri(
         reverse("waiver_confirmation", kwargs=dict(user_id=user_id))
@@ -371,7 +368,7 @@ def confirm_waiver(request, user_id=None):
 
     try:
         member = User.objects.get(pk=user_id)
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         return HttpResponse("User not found", status=404, content_type="text/plain")
 
     if not operator_user.is_staff:
@@ -400,7 +397,7 @@ def telegram_connect(request):
 
     try:
         User.objects.get(pk=user.id)
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         return HttpResponse("User not found", status=404, content_type="text/plain")
 
     aggregator_adapter = get_aggregator_adapter()
@@ -426,7 +423,7 @@ def telegram_disconnect(request):
 
     try:
         User.objects.get(pk=user.id)
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         return HttpResponse("User not found", status=404, content_type="text/plain")
 
     aggregator_adapter = get_aggregator_adapter()
@@ -458,7 +455,7 @@ def signal_disconnect(request):
 
     try:
         User.objects.get(pk=user.id)
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         return HttpResponse("User not found", status=404, content_type="text/plain")
 
     user.uses_signal = False
@@ -486,7 +483,7 @@ def notification_settings(request):
 
     try:
         User.objects.get(pk=user.id)
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         return HttpResponse("User not found", status=404, content_type="text/plain")
 
     aggregator_adapter = get_aggregator_adapter()
@@ -526,7 +523,7 @@ def save_signal_notification_settings(request):
 
     try:
         User.objects.get(pk=user.id)
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         return HttpResponse("User not found", status=404, content_type="text/plain")
 
     aggregator_adapter = get_aggregator_adapter()
@@ -560,7 +557,7 @@ def save_email_notification_settings(request):
 
     try:
         User.objects.get(pk=user.id)
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         return HttpResponse("User not found", status=404, content_type="text/plain")
 
     aggregator_adapter = get_aggregator_adapter()
@@ -591,7 +588,7 @@ def notification_test(request):
 
     try:
         User.objects.get(pk=user.id)
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         return HttpResponse("User not found", status=404, content_type="text/plain")
 
     aggregator_adapter = get_aggregator_adapter()

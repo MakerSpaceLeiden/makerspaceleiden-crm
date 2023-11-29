@@ -2,10 +2,10 @@
 Folks,
 {%if postDeadline %}
 The following items are nearing their deadline and have not been claimed. So make
-sure you claim your property back; as otherwise these will be free for others to 
+sure you claim your property back; as otherwise these will be free for others to
 claim, and if not claimed quick enough, be disposed.
 
-{%for item in postDeadline %}-  {{ item.description }} 
+{%for item in postDeadline %}-  {{ item.description }}
      Deadline {{ item.deadline }}
      Will be disposed {{ item.dispose_by_date }}
      <{{item.url }}>
@@ -14,11 +14,11 @@ By the way - if something is yours - and you do not want it anymore; then do fee
 mark it as 'can be disposed'. {%endif%}
 {%if postDisposeline %}
 Know that the items listed below are now past their 'dispose by' deadline - or have
-already been marked 'to be disposed'. So if you have some time; be so kind to dump 
-them in the container or drop them off at the Kringloop next door. And then mark 
+already been marked 'to be disposed'. So if you have some time; be so kind to dump
+them in the container or drop them off at the Kringloop next door. And then mark
 them 'gone' in the CRM.
 
-{%for item in postDisposeline %}-  {{ item.description }} 
+{%for item in postDisposeline %}-  {{ item.description }}
      Will be disposed {{ item.dispose_by_date }}
      <{{item.url }}>
 {% endfor %}
@@ -26,7 +26,7 @@ them 'gone' in the CRM.
 Your friendly makerbot.
 
 
--- 
+--
 "I love deadlines. I love the whooshing noise they make as they go by."
 - Douglas Adams, The Salmon of Doubt
 

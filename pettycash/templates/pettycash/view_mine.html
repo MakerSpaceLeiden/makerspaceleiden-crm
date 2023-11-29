@@ -3,7 +3,7 @@
 
 {% block content %}
 
-Your balance 
+Your balance
 {% if balance == 0 %}
 	&euro; 0,-
 {% else %}
@@ -13,8 +13,8 @@ Your balance
 	<i>(Positive balance, so you have money left to spend)</i>.
 {% else %}
 {% if balance.balance.amount >= 0 %}
-So there little, if any, left in your acount. 
-Thererfore you may want to make a <a href="{% url 'manual_deposit' %}">deposit</a> 
+So there little, if any, left in your acount.
+Thererfore you may want to make a <a href="{% url 'manual_deposit' %}">deposit</a>
 before this runs out. As it takes a few days (or more) before the monies wired will show up in your account.
 {%else%}
 	<b>Negative, so you owe the space money; and should make a <a href="{% url 'manual_deposit' %}">deposit</a> as soon as possible.</b>
@@ -67,7 +67,7 @@ The last import/synchronisation with the bank account was done by {{ last_import
 (<i>only visible for treasurers.</i>)
 <br>
 {% endif %}
-<li> People that can help with fixing (erroneous) payments and other issues: 
+<li> People that can help with fixing (erroneous) payments and other issues:
 	{% for user in admins %}
 	{% if forloop.first %}{% else %}{% if forloop.last %} and {% else %}, {% endif %}{% endif %}
 	<a href="mailto:{{user.email}}">{{ user }}</a>

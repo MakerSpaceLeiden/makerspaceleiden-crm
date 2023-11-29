@@ -1,21 +1,13 @@
-from django.shortcuts import render, redirect
-from django.template.loader import render_to_string, get_template
-from django.core.mail import EmailMessage
-from django.core.mail import EmailMultiAlternatives
-
-from django.conf import settings
-
-from email.mime.text import MIMEText
-from email.mime.image import MIMEImage
-from email.mime.multipart import MIMEMultipart
-from email.charset import Charset, QP
-import email.mime, email.mime.nonmultipart, email.charset
-
-from textwrap import wrap
-import datetime
+import html
 import logging
 import re
-import html
+from email.charset import QP, Charset
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
+from django.conf import settings
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
 
 logger = logging.getLogger(__name__)
 

@@ -1,68 +1,19 @@
-from django.shortcuts import render
-from django.template import loader
-from django.http import HttpResponse
-from django.http import Http404
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth import authenticate
-from django.conf import settings
-from django.shortcuts import redirect
-from django.views.generic import ListView, CreateView, UpdateView
-from django.urls import reverse_lazy, reverse
-from django import forms
-from django.forms import ModelForm
-from django.core.exceptions import ObjectDoesNotExist
-from django.shortcuts import render
-from django.contrib.sites.shortcuts import get_current_site
-from django.contrib.admin.sites import AdminSite
-from django.template import loader
-from django.http import HttpResponse
-from django.conf import settings
-from django.shortcuts import redirect
-from django.views.generic import ListView, CreateView, UpdateView
-from django.contrib.auth.decorators import login_required
-from django import forms
-from django.contrib.auth import login, authenticate
-from django.shortcuts import render, redirect
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.db.models import Q
-from simple_history.admin import SimpleHistoryAdmin
-from django.template.loader import render_to_string, get_template
-from django.core.mail import EmailMessage
-from django.conf import settings
-from django.contrib.admin.sites import AdminSite
-from django.core.exceptions import ObjectDoesNotExist
-from django.core.mail import EmailMultiAlternatives
-
-from email.mime.text import MIMEText
+import logging
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
-import datetime
-import uuid
-import zipfile
-import os
-import re
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
+from django.core.mail import EmailMessage
+from django.http import HttpResponse
+from django.shortcuts import redirect, render
+from django.template.loader import render_to_string
 
-import logging
-
-logger = logging.getLogger(__name__)
-
-from members.models import User
-
-from django.views.decorators.csrf import csrf_exempt
-from makerspaceleiden.decorators import superuser_or_bearer_required
-
-import json
-from django.http import JsonResponse
-from ipware import get_client_ip
-
-from members.models import User
 from acl.models import Machine
-
-from servicelog.models import Servicelog
 from servicelog.forms import ServicelogForm
-
-import logging
+from servicelog.models import Servicelog
 
 logger = logging.getLogger(__name__)
 
@@ -107,7 +58,7 @@ def servicelog_overview(request, machine_id=None):
         entries = Servicelog.objects.all()
         if machine_id:
             machine = Machine.objects.get(id=machine_id)
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         return HttpResponse("Machine not found", status=404, content_type="text/plain")
 
     if machine_id:
@@ -141,14 +92,14 @@ def servicelog_crud(request, machine_id=None, servicelog_id=None):
             .order_by("-reported")
             .first()
         )
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         return HttpResponse("Machine not found", status=404, content_type="text/plain")
 
     servicelog = None
     if servicelog_id:
         try:
             servicelog = Servicelog.objects.get(id=servicelog_id)
-        except ObjectDoesNotExist as e:
+        except ObjectDoesNotExist:
             return HttpResponse(
                 "Servicelog not found", status=404, content_type="text/plain"
             )
@@ -184,9 +135,9 @@ def servicelog_crud(request, machine_id=None, servicelog_id=None):
                 old_state = machine.out_of_order
                 new_state = form.cleaned_data.get("out_of_order")
                 if old_state != new_state and (
-                    most_recent == None
+                    most_recent is None
                     or item.id == most_recent.id
-                    or servicelog_id == None
+                    or servicelog_id is None
                 ):
                     machine.out_of_order = new_state
                     machine.changeReason = (
@@ -196,7 +147,7 @@ def servicelog_crud(request, machine_id=None, servicelog_id=None):
                     )
                     machine.save()
 
-                if servicelog_id == None or old_state != new_state:
+                if servicelog_id is None or old_state != new_state:
                     emailNotification(
                         item,
                         "email_notification",
@@ -212,7 +163,7 @@ def servicelog_crud(request, machine_id=None, servicelog_id=None):
     form = ServicelogForm(
         instance=servicelog, canreturntoservice=machine.canInstruct(request.user)
     )
-    if servicelog != None and most_recent != None and servicelog != most_recent:
+    if servicelog is not None and most_recent is not None and servicelog != most_recent:
         form.fields["out_of_order"].disabled = True
         form.fields[
             "out_of_order"

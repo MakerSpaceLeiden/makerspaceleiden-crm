@@ -110,6 +110,7 @@ share
 .sqlite3
 venv
 static
+!search_admin_autocomplete/static
 
 initial_populate
 */migrations/0*.py

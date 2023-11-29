@@ -1,10 +1,11 @@
+from datetime import datetime, timedelta
+
 from django import template
 from django.conf import settings
-from pettycash.models import PettycashBalanceCache
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
 
-from datetime import datetime, timedelta
+from pettycash.models import PettycashBalanceCache
 
 register = template.Library()
 
@@ -43,7 +44,7 @@ def isPettycashUser(user):
         if b.last and b.last.date > cutoff:
             return True
 
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         pass
 
     return False

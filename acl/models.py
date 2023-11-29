@@ -1,23 +1,17 @@
-from django.db import models
-from django.utils import timezone
-
-from django.conf import settings
-from django.contrib.auth import get_user_model
-from simple_history.models import HistoricalRecords
-from simple_history.utils import update_change_reason
-
-from django.urls import reverse
-from django.core.mail import EmailMessage
-from django.conf import settings
-from django.template.loader import render_to_string, get_template
-from django.contrib.sites.shortcuts import get_current_site
-
-from members.models import User
-from django.contrib.sites.models import Site
-
 import datetime
 import logging
-import inspect
+
+from django.conf import settings
+from django.contrib.sites.models import Site
+from django.contrib.sites.shortcuts import get_current_site
+from django.core.mail import EmailMessage
+from django.db import models
+from django.template.loader import render_to_string
+from django.urls import reverse
+from django.utils import timezone
+from simple_history.models import HistoricalRecords
+
+from members.models import User
 
 logger = logging.getLogger(__name__)
 
@@ -53,7 +47,7 @@ class PermitType(models.Model):
 
     def hasThisPermit(self, user):
         e = Entitlement.objects.all().filter(holder=user, permit=self).first()
-        if e and e.active == True:
+        if e and e.active is True:
             return True
         return False
 
@@ -110,7 +104,7 @@ class Machine(models.Model):
         return reverse("machine_overview", kwargs={"machine_id": self.id})
 
     def url(self):
-        return settings.BASE + url()
+        return settings.BASE + self.path()
 
     def __str__(self):
         return self.name
@@ -274,14 +268,16 @@ class Entitlement(models.Model):
                 f"Entitlement.save(): STAFFF bypass of rule 'holder {self.issuer} cannot issue {self.permit} to {self.holder} as the holder lacks {issuer_permit}'"
             )
 
-        if self.active == None:
+        if self.active is None:
             # See if we can fetch an older approval for same that may already have
             # been activated. And grandfather it in.
             try:
                 e = Entitlement.objects.get(permit=self.permit, holder=self.holder)
                 self.active = e.active
-            except EntitlementNotFound:
-                pass
+            except Exception as e:
+                logger.warning(
+                    "Failed to fetch an older entitlement: {}".format(str(e))
+                )
 
         logger.error(
             f"Entitlement: saving {self} -- with active:{self.active} and permit:{self.permit} ({self.permit.permit})"
@@ -349,7 +345,7 @@ class RecentUse(models.Model):
 
 
 def yn(v):
-    if v == None:
+    if v is None:
         return "?"
     if v:
         return "yes"

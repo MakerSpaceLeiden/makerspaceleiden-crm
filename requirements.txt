@@ -1,24 +1,7 @@
-Django<4.0.0
-pytz
-wheel
-django-import-export
-# django-autocomplete-light
-django-search-admin-autocomplete
-django-simple-history
-qrcode
-django-settings-export
-django-stdimage
+Django
 django-dynamic-filenames
-django-six
-six
 django-import-export
-# django-proxy
-django-revproxy
-
-# We're also including Pillow  as otherwise QR will fall back
-# to SVG - which is not as supported.
-Pillow
-django-qr-code
+django-import-export
 
 # When using Postgress as the backing DB
 # psycopg2-binary
@@ -26,22 +9,38 @@ django-qr-code
 # Determine client IP address
 django-ipware
 
-# PDF generation
-reportlab
-PyPDF2
-
-# Mailman scraping API
-lxml
-
-# JSON fields in the DB model
-jsonfield2
-
 # For production
 # mysqlclient
 
 # Petty cash
 django-money
+django-qr-code
+# django-proxy
+django-revproxy
+# django-autocomplete-light
+django-settings-export
+django-simple-history
+django-six
+django-stdimage
+
+# JSON fields in the DB model
+jsonfield2
+
+# Mailman scraping API
+lxml
+
+# We're also including Pillow  as otherwise QR will fall back
+# to SVG - which is not as supported.
+Pillow
+PyPDF2
+python-dateutil
+pytz
+qrcode
+
+# PDF generation
+reportlab
 
 # Reverse proxy for the 3D printers
 requests
-python-dateutil
+six
+wheel

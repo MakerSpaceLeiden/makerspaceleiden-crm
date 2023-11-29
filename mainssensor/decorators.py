@@ -1,10 +1,7 @@
-from django.http import HttpResponseRedirect, HttpResponse
-
-from django.core.exceptions import PermissionDenied
-from django.conf import settings
-
 from functools import wraps
-import re
+
+from django.conf import settings
+from django.http import HttpResponse
 
 
 def superuser_or_mainsadmin_required(function):

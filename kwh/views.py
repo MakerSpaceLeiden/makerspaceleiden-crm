@@ -1,14 +1,9 @@
-from django.shortcuts import render, redirect
-from django.template import loader
-from django.http import HttpResponse
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth import authenticate
-from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist
-from django.http import FileResponse
-
-import os, re
 import logging
+import os
+import re
+
+from django.contrib.auth.decorators import login_required
+from django.http import FileResponse, HttpResponse
 
 logger = logging.getLogger(__name__)
 

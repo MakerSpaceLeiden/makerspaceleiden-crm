@@ -1,12 +1,10 @@
-from django.db import models
-from members.models import User
-from django.db.models.signals import post_delete, post_save, pre_delete, pre_save
-from django.conf import settings
-from simple_history.models import HistoricalRecords
-from django.urls import reverse_lazy, reverse
-
-
 import logging
+
+from django.db import models
+from django.urls import reverse
+from simple_history.models import HistoricalRecords
+
+from members.models import User
 
 logger = logging.getLogger(__name__)
 

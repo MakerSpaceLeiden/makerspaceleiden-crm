@@ -11,7 +11,7 @@ Location: {{ rq.location }}
           {{ rq.extra_info }}
 {% if rq.state == 'R' %}
 This request requires the approval from the members of this mailing list. Until then
-it will stay in the 'requested' state; while {{ owner }} will need to wait 
+it will stay in the 'requested' state; while {{ owner }} will need to wait
 before storing {{ what }} at the space.
 {% elif rq.state == 'AG' %}
 As this is (the first) request for short term storage of this item; it has been
@@ -36,7 +36,7 @@ and any past history at:
 
 	<{{ rq.history_url }}>
 
-{% if count  %}And a full overview of all {{ count }} items in special storage by {{ rq.owner.first_name }} can 
+{% if count  %}And a full overview of all {{ count }} items in special storage by {{ rq.owner.first_name }} can
 be seen at:
 
 	<{{ rq.owner_url }}>{% endif %}

@@ -1,17 +1,12 @@
-from django.core.management.base import BaseCommand, CommandError
+import sys
+from datetime import datetime
 
-from django.template.loader import render_to_string, get_template
 from django.conf import settings
-from django.core.mail import EmailMessage
-from django.db.models import Q
+from django.core.management.base import BaseCommand
+from django.utils import timezone
 
 from makerspaceleiden.mail import emailPlain
 from members.models import User
-
-import sys, os, pwd
-
-from datetime import datetime, timedelta
-from django.utils import timezone
 
 
 def sendEmail(
@@ -70,7 +65,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        verbosity = int(options["verbosity"])
+        _ = int(options["verbosity"])
         rc = 0
 
         if options["save"]:

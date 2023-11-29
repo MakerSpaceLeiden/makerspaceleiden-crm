@@ -1,22 +1,20 @@
+import json
+import logging
 import time
 from collections import defaultdict
 from datetime import datetime
-from django.shortcuts import render
-from selfservice.aggregator_adapter import get_aggregator_adapter
-from django.http import HttpResponse
-from django.shortcuts import redirect
-from django.core.exceptions import ObjectDoesNotExist
-from .admin import ChoreAdmin
-from .models import ChoreVolunteer, Chore
-from django.contrib.auth.decorators import login_required
 
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import EmailMessage
-from django.template.loader import render_to_string, get_template
-from django.core.serializers import serialize
+from django.http import HttpResponse
+from django.shortcuts import redirect, render
+from django.template.loader import render_to_string
 
-import logging
-import json
+from selfservice.aggregator_adapter import get_aggregator_adapter
+
+from .models import Chore, ChoreVolunteer
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +37,7 @@ def getall(current_user_id=None, subset=None):
 
     event_groups = []
     ts = None
-    if data != None:
+    if data is not None:
         for event in data["events"]:
             event_ts = datetime.fromtimestamp(event["when"]["timestamp"])
             event_ts_str = event_ts.strftime("%d%m%Y")
@@ -50,7 +48,7 @@ def getall(current_user_id=None, subset=None):
             num_missing_volunteers = event["chore"]["min_required_people"] - len(
                 event["volunteers"]
             )
-            if subset != None and not event["chore"]["name"] == subset:
+            if subset is not None and not event["chore"]["name"] == subset:
                 continue
             this_user_volunteered = current_user_id in [
                 user.id for user in event["volunteers"]
@@ -109,7 +107,7 @@ def index(request):
 def signup(request, chore_id, ts):
     try:
         chore = Chore.objects.get(pk=chore_id)
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         return HttpResponse("Chore not found", status=404, content_type="text/plain")
 
     try:
@@ -138,7 +136,7 @@ def signup(request, chore_id, ts):
 def remove_signup(request, chore_id, ts):
     try:
         chore = Chore.objects.get(pk=chore_id)
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         return HttpResponse("Chore not found", status=404, content_type="text/plain")
 
     try:

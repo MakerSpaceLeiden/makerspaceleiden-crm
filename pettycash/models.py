@@ -1,41 +1,27 @@
-from django.conf import settings
-from simple_history.models import HistoricalRecords
-from djmoney.models.fields import MoneyField
-from django.conf import settings
-from django.urls import reverse
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from django.forms.models import ModelChoiceField
-from django.db.models import Q
-from djmoney.models.validators import MaxMoneyValidator, MinMoneyValidator
-from stdimage.models import StdImageField
-from stdimage.validators import MinSizeValidator, MaxSizeValidator
+import base64
+import binascii
+import hashlib
+import logging
+from datetime import timedelta
 
-from django.db.models.signals import pre_delete, pre_save
+from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.db import models
+from django.db.models import Q
+from django.urls import reverse
+from django.utils import timezone
+from djmoney.models.fields import MoneyField
+from djmoney.models.validators import MaxMoneyValidator, MinMoneyValidator
+from moneyed import EUR, Money
+from simple_history.models import HistoricalRecords
+from stdimage.models import StdImageField
 
 from acl.models import Location
-
-from django.db import models
-from members.models import User
-from datetime import timedelta
 from makerspaceleiden.mail import emailPlain
 from makerspaceleiden.utils import upload_to_pattern
-
-from django.utils import timezone
-import uuid
-import os
-import re
-import base64
-import hashlib
-import binascii
-
-from moneyed import Money, EUR
-
-import logging
+from members.models import User
 
 logger = logging.getLogger(__name__)
-
-import base64
-import hashlib
 
 
 def none_user():
@@ -214,7 +200,7 @@ class PettycashBalanceCache(models.Model):
 def adjust_balance_cache(last, dst, amount):
     try:
         balance = PettycashBalanceCache.objects.get(owner=dst)
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         logger.info("Warning - creating for dst=%s" % (dst))
 
         balance = PettycashBalanceCache(owner=dst, balance=Money(0, EUR))

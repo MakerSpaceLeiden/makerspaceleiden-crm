@@ -1,29 +1,22 @@
-from django.db import models
-from django.conf import settings
-from django.contrib.auth import get_user_model
-from simple_history.models import HistoricalRecords
-from django.contrib.auth.models import AbstractUser
-from django.contrib.auth.models import AbstractUser, BaseUserManager
-from django.utils.translation import gettext_lazy as _
-from django.urls import reverse_lazy, reverse
-from stdimage.models import StdImageField
-from django.core.exceptions import ObjectDoesNotExist
-from django.core.validators import RegexValidator
-from django import forms
-from django.core.validators import MaxValueValidator, MinValueValidator
-
+import datetime
+import hashlib
 import logging
+import re
 import secrets
 
-logger = logging.getLogger(__name__)
-
-from django.db.models.signals import pre_delete, pre_save
-
-# from stdimage.utils import pre_delete_delete_callback, pre_save_delete_callback
+from django.conf import settings
+from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.core.exceptions import ObjectDoesNotExist
+from django.core.validators import MaxValueValidator, MinValueValidator, RegexValidator
+from django.db import models
+from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
+from simple_history.models import HistoricalRecords
+from stdimage.models import StdImageField
 
 from makerspaceleiden.utils import upload_to_pattern
 
-import re, datetime
+logger = logging.getLogger(__name__)
 
 GDPR_ESCALATED_TIMESPAN_SECONDS = 60 * 10
 
@@ -161,7 +154,7 @@ class User(AbstractUser):
 
         last = AuditRecord.last(self)
 
-        if last == None:
+        if last is None:
             logger.debug("Rejected is_priv, no recent audit for {}".format(self.name))
             return False
 
@@ -181,7 +174,7 @@ class User(AbstractUser):
         return self.is_staff or self.is_superuser
 
     def escalate_to_priveleged(self, request, action):
-        ar = AuditRecord(user=self, action=action)
+        _ = AuditRecord(user=self, action=action)
 
     # Bit of a temporary hack - we do not want to delete
     # the entitlements issued by this user; and leave some
@@ -283,7 +276,7 @@ def clean_tag_string(tag):
             return None
         return "-".join(bts)
 
-    except ValueError as e:
+    except ValueError:
         pass
 
     return None

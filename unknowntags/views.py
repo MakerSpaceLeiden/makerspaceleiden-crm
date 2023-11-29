@@ -1,24 +1,20 @@
-from django.shortcuts import render, redirect
-from django.urls import path
-from django.http import HttpResponse
-from django.conf import settings
-from django.db.models import Q
+import datetime
+import logging
 
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
+from django.http import HttpResponse
+from django.shortcuts import redirect, render
+from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 
-from .models import Unknowntag
-from members.models import Tag, User, clean_tag_string
 from acl.models import Entitlement, PermitType
-
-from .forms import SelectUserForm, SelectTagForm
-
 from makerspaceleiden.decorators import superuser_or_bearer_required
+from members.models import Tag, User, clean_tag_string
 
-import logging
-import datetime
-import re
-from django.utils import timezone
+from .forms import SelectTagForm, SelectUserForm
+from .models import Unknowntag
 
 logger = logging.getLogger(__name__)
 
@@ -93,7 +89,7 @@ def addmembertounknowntag(request, user_id=None):
             try:
                 user = User.objects.get(pk=user_id)
                 tag = form.cleaned_data.get("tag")
-            except:
+            except Exception:
                 return HttpResponse(
                     "Unknown tag or user gone awol. Drat.",
                     status=404,
@@ -122,16 +118,16 @@ def addunknowntagtomember(request, tag_id=None):
         return HttpResponse("XS denied", status=403, content_type="text/plain")
     try:
         tag = Unknowntag.objects.get(pk=tag_id)
-    except:
+    except Exception:
         return HttpResponse(
             "Unknown tag gone awol. Drat.", status=500, content_type="text/plain"
         )
 
     try:
-        existing_tag = Tag.objects.get(tag=tag["tag"])
+        _ = Tag.objects.get(tag=tag["tag"])
         return HttpResponse("Tag already in use", status=500, content_type="text/plain")
-    except:
-        pass
+    except Exception as e:
+        logger.warning("Tag not in use: {}".format(str(e)))
 
     if request.POST:
         form = SelectUserForm(request.POST)
