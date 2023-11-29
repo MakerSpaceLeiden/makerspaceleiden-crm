@@ -28,7 +28,7 @@ else
 		echo "pip${PYTHON_VERSION} could not be found. Please install pip${PYTHON_VERSION}"
 		exit 1
 	else
-		python${PYTHON_VERSION}  -mvenv venv
+		python${PYTHON_VERSION}  -m venv venv
 		. venv/bin/activate
 		if [ $VERSION_ID == "23.04" -o  $VERSION_ID == "23.10" ]; then
 			sudo apt install --upgrade python3-pip -y
