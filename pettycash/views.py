@@ -580,34 +580,6 @@ def api_none(request):
     return HttpResponse("OK\n", status=200, content_type="text/plain")
 
 
-# TODO: check if redefinition is indeed the incorrect one
-# @csrf_exempt
-# @superuser_or_bearer_required
-# def api_pay(request):
-#     try:
-#         node = request.GET.get("node", None)
-#         tagstr = request.GET.get("src", None)
-#         amount_str = request.GET.get("amount", None)
-#         description = request.GET.get("description", None)
-#         amount = Money(amount_str, EUR)
-#     except Exception:
-#         logger.error("Tag %s payment has param issues." % (tagstr))
-#         return HttpResponse("Params problems", status=400, content_type="text/plain")
-
-#     if None in [tagstr, amount_str, description, amount, node]:
-#         logger.error("Missing param, Payment Tag %s denied" % (tagstr))
-#         return HttpResponse(
-#             "Mandatory params missing", status=400, content_type="text/plain"
-#         )
-
-#     if amount < Money(0, EUR):
-#         logger.error("Invalid param. Payment Tag %s denied" % (tagstr))
-#         return HttpResponse("Invalid param", status=400, content_type="text/plain")
-
-#     if amount > settings.MAX_PAY_API:
-#         logger.error("Payment too high, rejected, Tag %s denied" % (tagstr))
-#     pass
-
 
 @superuser
 def deposit(request, dst):
@@ -1020,7 +992,6 @@ def reimburseque(request):
     context["items"] = items
     return render(request, "pettycash/reimburse_queue.html", context=context)
 
-
 @csrf_exempt
 @superuser_or_bearer_required
 def api_pay(request):
@@ -1031,17 +1002,17 @@ def api_pay(request):
         description = request.GET.get("description", None)
         amount = Money(amount_str, EUR)
     except Exception:
-        logger.error("Tag %s payment has param issues." % (tagstr))
+        logger.error("Tag payment has param issues.")
         return HttpResponse("Params problems", status=400, content_type="text/plain")
 
     if None in [tagstr, amount_str, description, amount, node]:
-        logger.error("Missing param, Payment Tag %s denied" % (tagstr))
+        logger.error("Missing param, Payment at %s denied" % (node))
         return HttpResponse(
             "Mandatory params missing", status=400, content_type="text/plain"
         )
 
     if amount < Money(0, EUR):
-        logger.error("Invalid param. Payment Tag %s denied" % (tagstr))
+        logger.error("Invalid param. Payment at %s denied" % (node))
         return HttpResponse("Invalid param", status=400, content_type="text/plain")
 
     if amount > settings.MAX_PAY_API:
