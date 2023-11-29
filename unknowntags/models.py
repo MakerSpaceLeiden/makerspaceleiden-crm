@@ -1,12 +1,12 @@
+import datetime
+
 from django.conf import settings
 from django.db import models
 from django.db.models import Q
 from django.utils import timezone
 
-from members.models import Tag, clean_tag_string
 from acl.models import Entitlement, PermitType
-
-import datetime
+from members.models import Tag
 
 
 class Unknowntag(models.Model):

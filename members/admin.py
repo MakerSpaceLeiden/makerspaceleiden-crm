@@ -1,16 +1,13 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from django.contrib.auth.forms import UserChangeForm
+from django.utils.translation import gettext_lazy as _
+from import_export import fields, resources
+from import_export.admin import ImportExportModelAdmin
+from simple_history.admin import SimpleHistoryAdmin
 
 from search_admin_autocomplete.admin import SearchAutoCompleteAdmin
 
-from import_export.admin import ImportExportModelAdmin
-from import_export import resources
-from import_export import fields
-from simple_history.admin import SimpleHistoryAdmin
-from django.utils.translation import gettext_lazy as _
-
-from .models import Tag, User, AuditRecord
+from .models import AuditRecord, Tag, User
 
 
 class UserResource(resources.ModelResource):

@@ -1,15 +1,11 @@
-from django.core.management.base import BaseCommand, CommandError
+import sys
 
 from django.conf import settings
-from django.core.mail import EmailMessage
+from django.core.management.base import BaseCommand
 from django.db.models import Q
-from django.core.exceptions import ObjectDoesNotExist
 
-from pettycash.models import PettycashBalanceCache, PettycashTransaction
 from members.models import User
-
-import sys, os
-import datetime
+from pettycash.models import PettycashBalanceCache, PettycashTransaction
 
 
 class Command(BaseCommand):
@@ -28,9 +24,9 @@ class Command(BaseCommand):
             print(
                 "%s,%s,%s,%s,%s" % (tx.src, tx.dst, tx.date, tx.description, tx.amount)
             )
-            if tx.src == None:
+            if tx.src is None:
                 tx.src = none
-            if tx.dst == None:
+            if tx.dst is None:
                 tx.dst = none
             tx.message = "Replaced None by the 'Former Participant' catchall"
             tx.save(bypass=True)

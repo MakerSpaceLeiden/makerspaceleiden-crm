@@ -8,13 +8,10 @@ A list is below.
 
 Your spacebot,
 
--- 
+--
 
 List:
 
 {% for e in stale %}
 - {{ e }}
 {% endfor %}
-
-
-

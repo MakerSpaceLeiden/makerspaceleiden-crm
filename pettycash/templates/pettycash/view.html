@@ -33,7 +33,7 @@
 				{% if tx.dst.id == settings.POT_ID %}
 					{{ settings.POT_LABEL }}
 				{% else %}
-					{{ tx.dst }} 
+					{{ tx.dst }}
 				{% endif %}
 					<i>(paid)</i></td>
 				<td>{{ tx.description }}</td>
@@ -50,7 +50,7 @@
 				{% if tx.src.id == settings.POT_ID %}
 					{{ settings.POT_LABEL }}
 				{% else %}
-					{{ tx.src }} 
+					{{ tx.src }}
 				{% endif %}
 				<i>(received)</i></td>
 				<td>{{ tx.description }}</td>

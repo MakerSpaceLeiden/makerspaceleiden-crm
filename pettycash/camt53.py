@@ -1,23 +1,16 @@
-from lxml import etree
-import re
-import hmac
-import hashlib
 import base64
-
-from django.core.management.base import BaseCommand, CommandError
+import hashlib
+import hmac
+import re
 
 from django.conf import settings
-from django.core.mail import EmailMessage
-from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q
+from lxml import etree
+from moneyed import EUR, Money
 
-from pettycash.models import PettycashBalanceCache, PettycashTransaction
 from members.models import User
-
-from moneyed import Money, EUR
-
-import sys, os
-import datetime
+from pettycash.models import PettycashTransaction
 
 
 def camt53_process(
@@ -191,7 +184,7 @@ def process(e, namespaces, triggerwords, uidmapping, nouidcheck=False, maskiban=
         if m:
             try:
                 uid = int(m.group(0))
-            except:
+            except Exception:
                 out["msg"] = "ERROR - Skipping - uid could not be parsed"
                 out["error"] = True
                 return out
@@ -210,7 +203,7 @@ def process(e, namespaces, triggerwords, uidmapping, nouidcheck=False, maskiban=
         try:
             user = User.objects.get(pk=uid)
             out["user"] = user
-        except:
+        except Exception:
             out["msg"] = "ERROR - Skipping, no user with uid=%d" % uid
             out["error"] = True
             return out
@@ -226,7 +219,7 @@ def process(e, namespaces, triggerwords, uidmapping, nouidcheck=False, maskiban=
                 )
                 out["error"] = True
                 return out
-        except ObjectDoesNotExist as e:
+        except ObjectDoesNotExist:
             pass
         except Exception as e:
             out["msg"] = "ERROR - Skipping, error looking up '%s': %s" % (ref, e)

@@ -9,4 +9,3 @@ A copy of this message has been sent to {{ user.name }}'s old email address as w
 Your friendly spacebot.
 
 {% endautoescape %}
-

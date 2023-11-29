@@ -1,7 +1,7 @@
-from django.urls import path, re_path, include
-from . import views
-
 from django.conf import settings
+from django.urls import path, re_path
+
+from . import views
 
 if not settings.STORAGE:
     urlpatterns = [re_path(r".*", views.nope)]

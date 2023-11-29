@@ -1,20 +1,9 @@
-from django.shortcuts import render, redirect
-from django.urls import path
-from django.http import HttpResponse
-from django.conf import settings
-from django.db.models import Q
-
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.csrf import csrf_exempt
-
-from django.utils import timezone
-
-from makerspaceleiden.decorators import superuser_or_bearer_required
-
 import logging
-import datetime
-import re
+
 import requests
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
+from django.shortcuts import render
 
 logger = logging.getLogger(__name__)
 

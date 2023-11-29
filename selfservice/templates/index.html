@@ -30,7 +30,7 @@ function showPw(fld) {
         {% if e.adminsonly %}
 		type="password"/><input style="padding:5px" type=button value=show onClick="showPw('{{ e.network }}');"
 	{%endif%}
-	/> 
+	/>
 	</td>
   </tr>
 {% endif %}
@@ -56,7 +56,7 @@ There are no passwords for members at the moment.
 	<li><a href="{% url 'overview' %}">All members </a>
 <p/>
 	<li><a href="{% url 'personal_page' %}">Your data</a>
-	<li><a href="{% url 'mytransactions' %}">Your cash balance</a>,  see all 
+	<li><a href="{% url 'mytransactions' %}">Your cash balance</a>,  see all
 	<a href="{% url 'balances' %}">balances</a>, the <a href="{% url 'pricelist' %}">pricelist</a> and so on.
 	<li><a href="{% url 'mailinglists_edit' %}">Mailing lists subscriptions</a> and digest settings.
 	<li><a href="{% url 'mailinglists_archives' %}">Historic archives</a> of the mailing lists.

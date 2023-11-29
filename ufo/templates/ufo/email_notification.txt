@@ -12,4 +12,3 @@ Owner/resp.:	{{ item.owner }}
 		{{ item.get_state_display }}
 
 {% endautoescape %}
-

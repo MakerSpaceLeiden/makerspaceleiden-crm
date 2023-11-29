@@ -1,26 +1,13 @@
+from django.conf import settings
 from django.db import models
-
-from django import forms
-from django.contrib.auth.forms import UserCreationForm
-from django.forms import ModelForm
+from django.urls import reverse
+from stdimage.models import StdImageField
 
 from acl.models import Machine
+from makerspaceleiden.utils import upload_to_pattern
 from members.models import User
 
-from django.conf import settings
-
-from stdimage.models import StdImageField
-from stdimage.validators import MinSizeValidator, MaxSizeValidator
-from django.urls import reverse
-
-from makerspaceleiden.utils import upload_to_pattern
-
-
-from django.db.models.signals import pre_delete, pre_save
-
 # from stdimage.utils import pre_delete_delete_callback, pre_save_delete_callback
-
-import re
 
 
 class Servicelog(models.Model):

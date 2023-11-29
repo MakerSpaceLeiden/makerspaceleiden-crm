@@ -1,15 +1,12 @@
-from django.core.management.base import BaseCommand, CommandError
+import datetime
+import sys
 
 from django.conf import settings
-from django.core.mail import EmailMessage
+from django.core.management.base import BaseCommand
 from django.db.models import Q
 
 from ufo.models import Ufo
-
 from ufo.utils import emailUfoInfo
-
-import sys, os
-import datetime
 
 
 class Command(BaseCommand):

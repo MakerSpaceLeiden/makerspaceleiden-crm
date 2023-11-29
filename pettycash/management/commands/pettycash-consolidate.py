@@ -1,18 +1,13 @@
-from django.core.management.base import BaseCommand, CommandError
-
-from django.conf import settings
-from django.core.mail import EmailMessage
-from django.db.models import Q
-from django.core.exceptions import ObjectDoesNotExist
-from django.utils import timezone
-
-from pettycash.models import PettycashBalanceCache, PettycashTransaction
-from members.models import User
-
-import sys, os
+import sys
 from datetime import datetime, timedelta
 
-from moneyed import Money, EUR
+from django.core.management.base import BaseCommand
+from django.db.models import Q
+from django.utils import timezone
+from moneyed import EUR, Money
+
+from members.models import User
+from pettycash.models import PettycashTransaction
 
 
 class Command(BaseCommand):

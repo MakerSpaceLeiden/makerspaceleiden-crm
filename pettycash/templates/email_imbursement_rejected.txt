@@ -2,7 +2,7 @@ Subject: Reimbursement rejected ({{ item.dst }} {{ item.amount }}, {{ item.descr
 
 L.S.,
 
-Could you be so kind to contact the {{ settings.TRUSTEES }} ? 
+Could you be so kind to contact the {{ settings.TRUSTEES }} ?
 
 As your reimbursement for {{ item.amount }} was rejected by the trustees.
 {{ reason }}
@@ -17,4 +17,3 @@ Deascription:{{ item.description }}
 Submitted:   {{ item.submitted }}
 
 Requested to be paid into {% if item.viaTheBank %}the bank account{% else %}the {{ settings.POT_LABEL }}{%endif %}.
-

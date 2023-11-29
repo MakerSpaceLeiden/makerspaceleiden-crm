@@ -2,6 +2,9 @@
 
 -	Make sure you have a somewhat recent python version
 
+-   [OPTIONAL] If you want to use `poetry` instead, install [poetry](https://python-poetry.org/docs/#installation)
+    - Add environment variable `POETRY` with the value true. Can be done by running: `cp example.env .env`
+
 -	sh loaddemo.sh
 
 Then go to
@@ -45,7 +48,7 @@ and login using the accounts created & shown to you during the loaddemo.sh scrip
 
 ## Self service (bonus)
 
--	report accident 
+-	report accident
 
 - 	report outages
 	activate lockout
@@ -79,7 +82,7 @@ and login using the accounts created & shown to you during the loaddemo.sh scrip
 
 - Normal Django users; Members adds a field to that (form on file). May
 	add more in the future (e.g. emergency contact).
-	
+
 - Machines
 	Machines or things that you can interact with (like doors).
 	May require instructions
@@ -98,4 +101,3 @@ and login using the accounts created & shown to you during the loaddemo.sh scrip
 	i.e. the instruction permit, if so specified (one deep)
 
 ## issues with the current design
-	

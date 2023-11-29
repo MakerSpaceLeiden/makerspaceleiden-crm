@@ -23,12 +23,12 @@
              <table>
               {{ item.form.as_table }}
               <tr><td></td><td>
-                 <button name="submit" value="rejected" type="submit">reject</button> or 
+                 <button name="submit" value="rejected" type="submit">reject</button> or
                  <button name="submit" value="approved" type="submit">{% if item.tx.viaTheBank %}Approve to wire to the bank{% else %}Approve and deposit into the space account {% endif %}</button><br>
 {% if item.tx.viaTheBank %}<i>You need to do this manaully!</i><br>{% endif %}
               </td></tr>
              </table>
-            </form>  
+            </form>
 	    <!-- end form -->
 	</td>
 </tr>

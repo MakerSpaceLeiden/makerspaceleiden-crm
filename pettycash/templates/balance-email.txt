@@ -2,7 +2,7 @@ Subject:  "[makerbot] Account balance {{ user}} {{ balance.balance }}
 
 Dear {{ user }},
 
-Your current account balanace is {{ balance.balance }}; which means that 
+Your current account balanace is {{ balance.balance }}; which means that
 you {% if goodstanding  %}do not have to do anything.
 {% else %}should do a payment as soon as possible.
 
@@ -10,10 +10,10 @@ Do this by wiring your balance plus a little extra, {{ topup }} euro,
 to the {{ settings.PETTYCASH_IBAN }} its bank account.
 
 You can find the account details and a QR code (if your bank supports
-this) on {{ base }}{% url 'manual_deposit' %}. 
+this) on {{ base }}{% url 'manual_deposit' %}.
 
-With regard to the deposits into the bank acount; last import of the 
-bank-statements with your deposits was done on {{ last_import.date}} 
+With regard to the deposits into the bank acount; last import of the
+bank-statements with your deposits was done on {{ last_import.date}}
 by {{ last_import.by }}.
 {% endif %}
 
@@ -36,4 +36,3 @@ Balance previous billing cycle      {{ tx.amount}}
                           Balance   {{ balance.balance }}
 
 See more at {{ base }}{% url 'transactions' pk=user.id%}
-

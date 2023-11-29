@@ -12,6 +12,6 @@ as we do really need some kind person to do this. To help
 keep the Space a happy and happening place.
 
 Sb.
--- 
+--
 Your friendly SpaceBot.
 {% endautoescape  %}

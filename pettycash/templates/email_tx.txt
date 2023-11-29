@@ -12,16 +12,16 @@ Just to let you know; we had the following transaction made:
 
          {{ tx.description}}
 
-Should this be wrong; let one of the trustee's know at {{ settings.TRUSTEES }}. The 
+Should this be wrong; let one of the trustee's know at {{ settings.TRUSTEES }}. The
 full details of this transaction can be seen at {{ base }}{% url 'transactiondetail' pk=tx.pk  %}.
 This is also the place where you can delete a transaction.
 
-Or consult your personal page at: 
+Or consult your personal page at:
 
-        {{ base }}{% url 'mytransactions' %} 
+        {{ base }}{% url 'mytransactions' %}
 
 Which is where you can also deposit extra money into your account.
 
 Your friendly makerbot.
--- 
+--
 Makerspace Leiden, internal payment notifcations.

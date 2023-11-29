@@ -10,7 +10,7 @@
 <h2>Temporary Storage for {{ owner }}</h2>
 {% if limit %}
 <p>
-	Below only shows the storage for {{ owner }} -- 
+	Below only shows the storage for {{ owner }} --
 	see <a href="{% url 'storage' %}">[here]</a> for an overview of everyone.
 </p>
 {% endif %}
@@ -22,7 +22,7 @@
 {% if storage %}
 <h2>{{ label }}</h2>
 <table>
-  <tr>	
+  <tr>
 	<th>id</th>
 	<th class="sem">status</th>
 	<th>location and owner</th>
@@ -56,9 +56,9 @@ no img
           {{ item.requested }} + {{ item.duration }} days = {{ item.enddate }} <br/>
           <p>
             {% if item.editable %}
-		<a href="{% url 'changestorage' pk=item.id %}">[change]</a> 
+		<a href="{% url 'changestorage' pk=item.id %}">[change]</a>
             {% elif item.location_updatable %}
-		<a href="{% url 'changestorage' pk=item.id %}">[relocate]</a> 
+		<a href="{% url 'changestorage' pk=item.id %}">[relocate]</a>
             {% endif %}
             {% if item.deletable %}
 		<a href="{% url 'deletestorage' pk=item.id  %}">[remove]</a>

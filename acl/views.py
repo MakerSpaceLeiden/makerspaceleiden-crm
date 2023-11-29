@@ -1,36 +1,21 @@
-from django.shortcuts import render
-from django.template import loader
-from django.http import HttpResponse
-from django.http import Http404
+import logging
+
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import authenticate
-from django.conf import settings
-from django.shortcuts import redirect
-from django.views.generic import ListView, CreateView, UpdateView
-from django.urls import reverse_lazy, reverse
-from django import forms
-from django.forms import ModelForm
 from django.core.exceptions import ObjectDoesNotExist
+from django.http import Http404, HttpResponse, JsonResponse
+from django.shortcuts import redirect, render
 from django.utils import timezone
-
 from django.views.decorators.csrf import csrf_exempt
-from makerspaceleiden.decorators import superuser_or_bearer_required
-
-import json
-from django.http import JsonResponse
 from ipware import get_client_ip
 
-from members.models import Tag, User, clean_tag_string
-from members.forms import TagForm
-
-from mailinglists.models import Mailinglist, Subscription
-
-from .models import Machine, Entitlement, PermitType, RecentUse
-
-from storage.models import Storage
+from mailinglists.models import Subscription
+from makerspaceleiden.decorators import superuser_or_bearer_required
 from memberbox.models import Memberbox
+from members.forms import TagForm
+from members.models import Tag, User, clean_tag_string
+from storage.models import Storage
 
-import logging
+from .models import Entitlement, Machine, PermitType, RecentUse
 
 logger = logging.getLogger(__name__)
 
@@ -59,7 +44,7 @@ def matrix_mm(machine, member):
 
         for e in ents:
             out["has_permit"] = True
-            if e.active == False:
+            if e.active is False:
                 xs = False
 
     for tag in Tag.objects.filter(owner=member):
@@ -87,7 +72,7 @@ def api_index(request):
     ffa = []
     for m in lst:
         if m.requires_permit:
-            if not m.requires_permit.name in perms:
+            if m.requires_permit.name not in perms:
                 perms[m.requires_permit.name] = []
             perms[m.requires_permit.name].append(m)
         else:
@@ -168,7 +153,7 @@ def machine_overview(request, machine_id=None):
     if machine_id:
         try:
             machines = machines.filter(pk=machine_id)
-        except ObjectDoesNotExist as e:
+        except ObjectDoesNotExist:
             return HttpResponse(
                 "Machine not found", status=404, content_type="text/plain"
             )
@@ -221,11 +206,11 @@ def members(request):
 
 @login_required
 def member_overview(request, member_id=None):
-    if member_id == None:
+    if member_id is None:
         member_id = request.user.id
     try:
         member = User.objects.get(pk=member_id)
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         return HttpResponse("User not found", status=404, content_type="text/plain")
 
     if not member.is_active and not request.user.is_privileged:
@@ -244,7 +229,7 @@ def member_overview(request, member_id=None):
 
     specials = []
     for e in Entitlement.objects.all().filter(holder=member):
-        if not e.permit in normal_permits:
+        if e.permit not in normal_permits:
             specials.append(e)
 
     lst = {}
@@ -284,8 +269,8 @@ def member_overview(request, member_id=None):
 def api_details(request, machine_id):
     try:
         machine = Machine.objects.get(pk=machine_id)
-    except:
-        raise Http404("Machine not found")
+    except Exception as e:
+        raise Http404("Machine not found. {}".format(str(e)))
 
     context = {"machine": machine.name, "lst": matrix_m(machine)}
     return render(request, "acl/details.txt", context, content_type="text/plain")
@@ -329,7 +314,7 @@ def filed_forms(request):
 def tag_edit(request, tag_id=None):
     try:
         tag = Tag.objects.get(pk=tag_id)
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         return HttpResponse("Tag not found", status=404, content_type="text/plain")
 
     context = {
@@ -368,7 +353,7 @@ def tag_edit(request, tag_id=None):
 def tag_delete(request, tag_id=None):
     try:
         tag = Tag.objects.get(pk=tag_id)
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         return HttpResponse("Tag not found", status=404, content_type="text/plain")
 
     context = {
@@ -418,7 +403,7 @@ def api_gettaginfo(request):
         try:
             tag = Tag.objects.get(tag=tagstr)
             owner = tag.owner
-        except ObjectDoesNotExist as e:
+        except ObjectDoesNotExist:
             return HttpResponse(
                 "Tag/Owner not found", status=404, content_type="text/plain"
             )
@@ -438,7 +423,7 @@ def api_getok(request, machine=None):
     if request.POST:
         try:
             tagstr = clean_tag_string(request.POST.get("tag"))
-        except Exception as e:
+        except Exception:
             logger.error("No or invalid tag passed to getok, denied.")
             return HttpResponse(
                 "No or invalid tag", status=400, content_type="text/plain"
@@ -450,14 +435,14 @@ def api_getok(request, machine=None):
 
         try:
             machine = Machine.objects.get(node_machine_name=machine)
-        except ObjectDoesNotExist as e:
+        except ObjectDoesNotExist:
             logger.error("Machine not found to getok, denied.")
             return HttpResponse(
                 "Machine not found", status=404, content_type="text/plain"
             )
         try:
             tag = Tag.objects.get(tag=tagstr)
-        except ObjectDoesNotExist as e:
+        except ObjectDoesNotExist:
             logger.error(
                 "Tag {} on machine {} not found, denied.".format(tagstr, machine)
             )

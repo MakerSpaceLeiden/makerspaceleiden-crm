@@ -1,20 +1,18 @@
+import datetime
+
+from django.conf import settings
 from django.db import models
-from django.conf import settings
-from django.contrib.auth import get_user_model
+from django.urls import reverse
 from simple_history.models import HistoricalRecords
-from django.template.loader import render_to_string, get_template
-from django.core.mail import EmailMessage
-from django.conf import settings
 from stdimage.models import StdImageField
-from django.db.models.signals import pre_delete, pre_save
 
 # from stdimage.utils import pre_delete_delete_callback, pre_save_delete_callback
 from makerspaceleiden.utils import upload_to_pattern
-from django.urls import reverse
-
 from members.models import User
 
-import datetime
+
+class AgainstTheRules(Exception):
+    pass
 
 
 class Storage(models.Model):
@@ -78,9 +76,6 @@ class Storage(models.Model):
 
     def __str__(self):
         return self.what + "@" + self.location
-
-    class AgainstTheRules(Exception):
-        pass
 
     def path(self):
         return reverse("showstorage", kwargs={"pk": self.id})

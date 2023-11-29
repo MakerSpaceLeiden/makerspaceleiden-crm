@@ -1,56 +1,55 @@
-from django.shortcuts import render
-from django.contrib.sites.shortcuts import get_current_site
-from django.contrib.admin.sites import AdminSite
-from django.template import loader
-from django.http import HttpResponse
+import hashlib
+import logging
+import secrets
+from datetime import date, datetime, timedelta
+from email.mime.image import MIMEImage
+
 from django.conf import settings
-from django.shortcuts import redirect
-from django.views.generic import ListView, CreateView, UpdateView
 from django.contrib.auth.decorators import login_required
-from makerspaceleiden.decorators import login_or_priveleged, superuser
-from django import forms
-from django.contrib.auth import login, authenticate
-from django.shortcuts import render, redirect
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.shortcuts import render
-from django.views.decorators.csrf import csrf_protect
-from django.db.models import Q
-from simple_history.admin import SimpleHistoryAdmin
-from django.template.loader import render_to_string, get_template
-from django.core.mail import EmailMessage
-from django.conf import settings
-from django.contrib.admin.sites import AdminSite
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.mail import EmailMultiAlternatives
-from django.urls import reverse
+from django.db.models import Q
 from django.forms import widgets
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.middleware.csrf import CsrfViewMiddleware
-
-
+from django.shortcuts import redirect, render
+from django.urls import reverse
+from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
+from moneyed import EUR, Money
+from moneyed.l10n import format_money
+
 from makerspaceleiden.decorators import (
+    login_or_priveleged,
+    superuser,
     superuser_or_bearer_required,
-    login_and_treasurer,
+)
+from makerspaceleiden.mail import emailPlain
+from members.models import Tag, User
+
+from .camt53 import camt53_process
+from .forms import (
+    CamtUploadForm,
+    ImportProcessForm,
+    PettycashDeleteForm,
+    PettycashPairForm,
+    PettycashPayoutRequestForm,
+    PettycashReimburseHandleForm,
+    PettycashReimbursementRequestForm,
+    PettycashTransactionForm,
+)
+from .models import (
+    PettycashBalanceCache,
+    PettycashImportRecord,
+    PettycashReimbursementRequest,
+    PettycashSku,
+    PettycashStation,
+    PettycashTerminal,
+    PettycashTransaction,
+    pemToSHA256Fingerprint,
+    pettycash_admin_emails,
 )
 
-from email.mime.text import MIMEText
-from email.mime.image import MIMEImage
-from email.mime.multipart import MIMEMultipart
-
-import datetime
-import uuid
-import zipfile
-import os
-import re
-import secrets
-import hashlib
-from django.utils import timezone
-from makerspaceleiden.mail import emailPlain
-from datetime import datetime, timedelta, date
-
-from moneyed import Money, EUR
-from moneyed.l10n import format_money
+logger = logging.getLogger(__name__)
 
 
 def mtostr(m):
@@ -74,45 +73,6 @@ def image2mime(img):
 
 def pettycash_treasurer_emails():
     return pettycash_admin_emails()
-
-
-def pettycash_admin_emails():
-    return list(
-        User.objects.all()
-        .filter(groups__name=settings.PETTYCASH_ADMIN_GROUP)
-        .values_list("email", flat=True)
-    )
-
-
-import logging
-
-logger = logging.getLogger(__name__)
-
-from .models import (
-    PettycashTransaction,
-    PettycashBalanceCache,
-    PettycashSku,
-    PettycashTerminal,
-    PettycashStation,
-    PettycashReimbursementRequest,
-    pettycash_admin_emails,
-    PettycashImportRecord,
-)
-from .admin import PettycashBalanceCacheAdmin, PettycashTransactionAdmin
-from .forms import (
-    PettycashTransactionForm,
-    PettycashDeleteForm,
-    PettycashPairForm,
-    CamtUploadForm,
-    ImportProcessForm,
-    PettycashReimbursementRequestForm,
-    PettycashPayoutRequestForm,
-    PettycashReimburseHandleForm,
-)
-from .models import pemToSHA256Fingerprint, hexsha2pin
-from .camt53 import camt53_process
-
-from members.models import User, Tag
 
 
 # Note - we do this here; rather than in the model its save() - as this
@@ -337,7 +297,7 @@ def qrcode(request):
 def invoice(request, src):
     try:
         src = User.objects.get(id=src)
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         return HttpResponse("Not found", status=404, content_type="text/plain")
 
     return transact(
@@ -393,7 +353,7 @@ def transfer(request, src, dst):
     try:
         src = User.objects.get(id=src)
         dst = User.objects.get(id=dst)
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         return HttpResponse("Not found", status=404, content_type="text/plain")
 
     dst_label = dst
@@ -548,7 +508,7 @@ def cam53process(request):
         try:
             record = PettycashImportRecord.objects.create(by=request.user)
             record.save()
-        except Exception as e:
+        except Exception:
             logger.error("Had issues recording transaction import")
 
     context = {
@@ -567,9 +527,9 @@ def forget(request, pk):
     try:
         tx = PettycashTerminal.objects.get(id=pk)
         tx.delete()
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         return HttpResponse("Not found", status=404, content_type="text/plain")
-    except Exception as e:
+    except Exception:
         logger.error("Delete failed")
 
     return redirect("unpaired")
@@ -579,7 +539,7 @@ def forget(request, pk):
 def pair(request, pk):
     try:
         tx = PettycashTerminal.objects.get(id=pk)
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         return HttpResponse("Not found", status=404, content_type="text/plain")
 
     form = PettycashPairForm(request.POST or None)
@@ -620,39 +580,40 @@ def api_none(request):
     return HttpResponse("OK\n", status=200, content_type="text/plain")
 
 
-@csrf_exempt
-@superuser_or_bearer_required
-def api_pay(request):
-    try:
-        node = request.GET.get("node", None)
-        tagstr = request.GET.get("src", None)
-        amount_str = request.GET.get("amount", None)
-        description = request.GET.get("description", None)
-        amount = Money(amount_str, EUR)
-    except Exception as e:
-        logger.error("Tag %s payment has param issues." % (tagstr))
-        return HttpResponse("Params problems", status=400, content_type="text/plain")
+# TODO: check if redefinition is indeed the incorrect one
+# @csrf_exempt
+# @superuser_or_bearer_required
+# def api_pay(request):
+#     try:
+#         node = request.GET.get("node", None)
+#         tagstr = request.GET.get("src", None)
+#         amount_str = request.GET.get("amount", None)
+#         description = request.GET.get("description", None)
+#         amount = Money(amount_str, EUR)
+#     except Exception:
+#         logger.error("Tag %s payment has param issues." % (tagstr))
+#         return HttpResponse("Params problems", status=400, content_type="text/plain")
 
-    if None in [tagstr, amount_str, description, amount, node]:
-        logger.error("Missing param, Payment Tag %s denied" % (tagstr))
-        return HttpResponse(
-            "Mandatory params missing", status=400, content_type="text/plain"
-        )
+#     if None in [tagstr, amount_str, description, amount, node]:
+#         logger.error("Missing param, Payment Tag %s denied" % (tagstr))
+#         return HttpResponse(
+#             "Mandatory params missing", status=400, content_type="text/plain"
+#         )
 
-    if amount < Money(0, EUR):
-        logger.error("Invalid param. Payment Tag %s denied" % (tagstr))
-        return HttpResponse("Invalid param", status=400, content_type="text/plain")
+#     if amount < Money(0, EUR):
+#         logger.error("Invalid param. Payment Tag %s denied" % (tagstr))
+#         return HttpResponse("Invalid param", status=400, content_type="text/plain")
 
-    if amount > settings.MAX_PAY_API:
-        logger.error("Payment too high, rejected, Tag %s denied" % (tagstr))
-    pass
+#     if amount > settings.MAX_PAY_API:
+#         logger.error("Payment too high, rejected, Tag %s denied" % (tagstr))
+#     pass
 
 
 @superuser
 def deposit(request, dst):
     try:
         dst = User.objects.get(id=dst)
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         return HttpResponse("Not found", status=404, content_type="text/plain")
 
     dst_label = dst
@@ -673,7 +634,7 @@ def deposit(request, dst):
 def showtx(request, pk):
     try:
         tx = PettycashTransaction.objects.get(id=pk)
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         return HttpResponse("Not found", status=404, content_type="text/plain")
 
     context = {
@@ -699,7 +660,7 @@ def show_mine(request):
             .filter(Q(src=user) | Q(dst=user))
             .order_by("date")
         )
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         pass
 
     context = {
@@ -727,7 +688,7 @@ def manual_deposit(request):
             int((-float(balance.balance.amount) + settings.PETTYCASH_TOPUP) / 5 + 0.5)
             * 5
         )
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         pass
 
     context = {
@@ -758,7 +719,7 @@ def showall(request):
     lst = []
     try:
         lst = PettycashTransaction.objects.all().order_by("date")
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         pass
 
     for tx in lst:
@@ -778,7 +739,7 @@ def showall(request):
 def show(request, pk):
     try:
         user = User.objects.get(id=pk)
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         return HttpResponse("Not found", status=404, content_type="text/plain")
     balance = None
     lst = []
@@ -796,7 +757,7 @@ def show(request, pk):
                 moneys_in += tx.amount
             else:
                 moneys_out += tx.amount
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         pass
 
     label = user
@@ -847,7 +808,7 @@ def pay(request):
 def delete(request, pk):
     try:
         tx = PettycashTransaction.objects.get(id=pk)
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         return HttpResponse("Not found", status=404, content_type="text/plain")
 
     if (
@@ -1042,7 +1003,7 @@ def reimburseque(request):
 
             return redirect(reverse("reimburse_queue"))
 
-        except ObjectDoesNotExist as e:
+        except ObjectDoesNotExist:
             logger.error("Reimbursment %d not found" % (pk))
             return HttpResponse(
                 "Reimbursement not found", status=404, content_type="text/plain"
@@ -1069,7 +1030,7 @@ def api_pay(request):
         amount_str = request.GET.get("amount", None)
         description = request.GET.get("description", None)
         amount = Money(amount_str, EUR)
-    except Exception as e:
+    except Exception:
         logger.error("Tag %s payment has param issues." % (tagstr))
         return HttpResponse("Params problems", status=400, content_type="text/plain")
 
@@ -1091,7 +1052,7 @@ def api_pay(request):
 
     try:
         tag = Tag.objects.get(tag=tagstr)
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         logger.error("Tag %s not found, denied" % (tagstr))
         return HttpResponse("Tag not found", status=404, content_type="text/plain")
 
@@ -1121,7 +1082,7 @@ def api2_register(request):
     # 1. We're always offered an x509 client cert.
     #
     cert = request.META.get("SSL_CLIENT_CERT", None)
-    if cert == None:
+    if cert is None:
         logger.error("Bad request, missing cert")
         return HttpResponse(
             "No client identifier, rejecting", status=400, content_type="text/plain"
@@ -1136,7 +1097,7 @@ def api2_register(request):
     try:
         terminal = PettycashTerminal.objects.get(fingerprint=client_sha)
 
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         logger.info(
             "Fingerprint %s not found, adding to the list of unknowns" % client_sha
         )
@@ -1248,7 +1209,7 @@ def api2_register(request):
     #
     try:
         station = PettycashStation.objects.get(terminal=terminal)
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         return JsonResponse({})
 
     avail = []
@@ -1299,7 +1260,7 @@ def api_get_sku(request, sku):
                 "price": float(item.amount.amount),
             }
         )
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         logger.error("SKU %d not found, denied" % (sku))
         return HttpResponse("SKU not found", status=404, content_type="text/plain")
 
@@ -1311,7 +1272,7 @@ def api2_pay(request):
     # 1. We're always offered an x509 client cert.
     #
     cert = request.META.get("SSL_CLIENT_CERT", None)
-    if cert == None:
+    if cert is None:
         logger.error("Bad request, missing cert")
         return HttpResponse(
             "No client identifier, rejecting", status=400, content_type="text/plain"
@@ -1323,7 +1284,7 @@ def api2_pay(request):
     #
     try:
         terminal = PettycashTerminal.objects.get(fingerprint=client_sha)
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         logger.error("Unknwon terminal; fingerprint=%s" % client_sha)
         return HttpResponse(
             "No client identifier, rejecting", status=400, content_type="text/plain"
@@ -1336,7 +1297,7 @@ def api2_pay(request):
         )
     try:
         station = PettycashStation.objects.get(terminal=terminal)
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         logger.error("No station for terminal; fingerprint=%s" % client_sha)
         return HttpResponse(
             "Terminal not paired, rejecting", status=400, content_type="text/plain"
@@ -1347,7 +1308,7 @@ def api2_pay(request):
         amount_str = request.GET.get("amount", None)
         description = request.GET.get("description", None)
         amount = Money(amount_str, EUR)
-    except Exception as e:
+    except Exception:
         logger.error(
             "Param issue for terminal %s@%s" % (terminal.name, station.description)
         )
@@ -1363,7 +1324,7 @@ def api2_pay(request):
 
     try:
         tag = Tag.objects.get(tag=tagstr)
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         logger.error(
             "Tag %s not found, terminal %s@%s"
             % (tagstr, terminal.name, station.description)

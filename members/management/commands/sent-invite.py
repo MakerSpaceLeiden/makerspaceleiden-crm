@@ -1,19 +1,10 @@
-from django.core.management.base import BaseCommand, CommandError
+import sys
 
-from simple_history.models import HistoricalRecords
-from members.models import User
-from members.models import User
-from django.contrib.auth.forms import PasswordResetForm
 from django.conf import settings
-from django.core.mail import EmailMessage
+from django.contrib.auth.forms import PasswordResetForm
+from django.core.management.base import BaseCommand
 
-import sys, os
-from datetime import datetime
-
-""" 
-Sent invites; to just one user, or all users
-in the system,
-"""
+from members.models import User
 
 
 def reset_password(
@@ -25,7 +16,7 @@ def reset_password(
 ):
     try:
         user = User.objects.get(email=email)
-    except Exception as e:
+    except Exception:
         print("No user with email address <{}> found.".format(email), file=sys.stderr)
         return False
 
@@ -56,6 +47,11 @@ def reset_password(
 
 
 class Command(BaseCommand):
+    """
+    Sent invites; to just one user, or all users
+    in the system,
+    """
+
     help = "Sent invite to email adddress(es) provided - or read them from stdin."
 
     def add_arguments(self, parser):

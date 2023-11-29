@@ -1,13 +1,13 @@
 Subject: [makerbot] Deleted transaction for {{ tx.amount }} -- {{ label }}
 L.S.
 
-Just to let you know; we had the transaction below was DELETED 
+Just to let you know; we had the transaction below was DELETED
 by {{ user }}:
 
   from   {{ src_label }}
     to   {{ dst_label }}
 
- status  DELETED 
+ status  DELETED
 
   when   {{ tx.date }}
 
@@ -15,12 +15,12 @@ by {{ user }}:
 
          {{ tx.description}}
 
-Should this be wrong; let one of the trustee's know at {{ settings.TRUSTEES }}. 
+Should this be wrong; let one of the trustee's know at {{ settings.TRUSTEES }}.
 
-Or consult your personal page at: 
+Or consult your personal page at:
 
-        {{ base }}{% url 'mytransactions' %} 
+        {{ base }}{% url 'mytransactions' %}
 
 Your friendly makerbot.
--- 
+--
 Makerspace Leiden, internal payment notifcations.

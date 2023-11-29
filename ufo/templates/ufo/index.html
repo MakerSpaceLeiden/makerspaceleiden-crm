@@ -18,7 +18,7 @@
   </tr><tr>
 	<td colspan=3>
 		<b><a href="{% url 'mine' pk=item.id %}">[Claim this]</a><b>
-		-- 
+		--
 		<a href="{% url 'showufo' pk=item.id %}">[view]</a>
 		<a href="{% url 'changeufo' pk=item.id %}">[modify]</a>
 		<a href="{% url 'deleteufo' pk=item.id %}">[delete]</a>
@@ -30,9 +30,9 @@
 <b>Note: Only showing the last {{ days }} day(s) for items that are already claimed.</b> (And all unclaimed items).
 {% endif %}
 <p/>
-Show only data relevant for 
+Show only data relevant for
 <a href="7">last week</a>,
-<a href="30">last month</a> or 
+<a href="30">last month</a> or
 <a href="0">all times</a>
 <p/>
 {% else %}

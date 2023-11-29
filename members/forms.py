@@ -1,13 +1,11 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
-from .models import Tag, clean_tag_string, AuditRecord
 from django.forms import ModelForm
 
+from mailinglists.models import Mailinglist
 from members.models import User
-from mailinglists.models import Mailinglist, Subscription
 from unknowntags.models import Unknowntag
 
-import re
+from .models import AuditRecord, Tag, clean_tag_string
 
 
 class NewTagForm(ModelForm):

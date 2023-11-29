@@ -1,3 +1,5 @@
+import sys
+
 FORCE_SCRIPT_NAME = "/crm"
 LOGIN_URL = "/crm/login/"
 LOGIN_REDIRECT_URL = "/crm/"
@@ -28,7 +30,6 @@ DATABASES = {
 
 EMAIL_BACKEND = "django_sendmail_backend.backends.EmailBackend"
 
-import sys
 
 LOGGING = {
     "version": 1,

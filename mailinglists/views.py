@@ -1,39 +1,14 @@
-from django.shortcuts import render, redirect
-from django.template import loader
-from django.http import HttpResponse
-from django.http import Http404
+import logging
+
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import authenticate
-from django.conf import settings
-from django.shortcuts import redirect
-from django.views.generic import ListView, CreateView, UpdateView
-from django.urls import reverse_lazy, reverse
-from django import forms
-from django.forms import ModelForm
-from django.core.exceptions import ObjectDoesNotExist
-from django.http import JsonResponse
-from django.db.models import Q
+from django.http import HttpResponse
+from django.shortcuts import redirect, render
 
-from time import strptime
-import datetime
-
-
-from django.views.decorators.csrf import csrf_exempt
-from makerspaceleiden.decorators import superuser_or_bearer_required, superuser
-
-from .forms import SubscriptionForm
-import json, os, re
-
+from makerspaceleiden.decorators import superuser
 from members.models import User
 
-from acl.models import Machine, Entitlement, PermitType
-
+from .forms import SubscriptionForm
 from .models import Mailinglist, Subscription
-
-from storage.models import Storage
-from memberbox.models import Memberbox
-
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +22,7 @@ def mailinglists_edit(request, user_id=None):
         except User.DoesNotExist:
             return HttpResponse("User not found", status=404, content_type="text/plain")
 
-    if user != request.user and request.user.is_privileged != True:
+    if user != request.user and request.user.is_privileged is not True:
         return HttpResponse("XS denied", status=403, content_type="text/plain")
 
     lists = Mailinglist.objects.all()

@@ -1,10 +1,9 @@
 from functools import update_wrapper
 
-from django.http import Http404
+from django.http import Http404, HttpResponse
+from django.shortcuts import redirect
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
-from django.shortcuts import redirect
-from django.http import HttpResponseRedirect, HttpResponse
 
 from acl.models import EntitlementViolation
 
@@ -25,7 +24,7 @@ def admin_view(view, cacheable=False):
                 "Not permitted to do that", status=404, content_type="text/plain"
             )
 
-    context = {
+    _ = {
         "title": "View history",
     }
 

@@ -1,23 +1,9 @@
-from lxml import etree
-import re
-from django.core.management.base import BaseCommand, CommandError
 import csv
+import sys
 
-from django.conf import settings
-from django.core.mail import EmailMessage
-from django.db.models import Q
-from django.core.exceptions import ObjectDoesNotExist
-
-from pettycash.models import PettycashBalanceCache, PettycashTransaction
-from members.models import User
+from django.core.management.base import BaseCommand
 
 from pettycash.camt53 import camt53_process
-
-from moneyed import Money, EUR
-
-import sys, os
-import datetime
-import pwd
 
 
 class Command(BaseCommand):
@@ -43,7 +29,7 @@ class Command(BaseCommand):
         mappingfile = options["iban2member-tsv"][0]
         file = options["camt53-xml-file"][0]
         verbosity = int(options["verbosity"])
-        dryrun = options["dryrun"]
+        _ = options["dryrun"]
         skipcheck = options["skipcheck"]
         rc = 0
         mapping = {}
@@ -52,9 +38,7 @@ class Command(BaseCommand):
             l = 0
             for line in rd:
                 l = l + 1
-                i = -1
                 try:
-                    i = int(line[0])
                     if len(line) < 1 or int(line[0]) < 1 or int(line[0]) > 5000:
                         print(
                             "Error in mapping file {} - line {}:{}".format(
@@ -63,10 +47,10 @@ class Command(BaseCommand):
                         )
                         sys.exit(1)
                     mapping[" ".join(line[1:])] = line[0]
-                except:
+                except Exception as e:
                     print(
-                        "Warning - error in mapping file {} - line {}:{}".format(
-                            mappingfile, l, line
+                        "Warning - error in mapping file {} - line {}:{} - exc: {}".format(
+                            mappingfile, l, line, str(e)
                         )
                     )
 

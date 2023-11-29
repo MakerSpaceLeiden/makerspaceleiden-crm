@@ -1,10 +1,11 @@
-from django.db import models
-from django.core import exceptions
-
-from simple_history.models import HistoricalRecords
-from members.models import User
-import jsonfield
 import json
+
+import jsonfield
+from django.core import exceptions
+from django.db import models
+from simple_history.models import HistoricalRecords
+
+from members.models import User
 
 
 def validate_json(payload):

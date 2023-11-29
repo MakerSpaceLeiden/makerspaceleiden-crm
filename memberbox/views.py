@@ -1,13 +1,14 @@
-from django.http import HttpResponse
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
-from django.core.exceptions import ObjectDoesNotExist
-
-from .models import Memberbox
-from .forms import MemberboxForm, NewMemberboxForm
-from storage.definitions import parse_box_location, STORAGES
-
 import logging
+
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
+from django.http import HttpResponse
+from django.shortcuts import redirect, render
+
+from storage.definitions import STORAGES, parse_box_location
+
+from .forms import MemberboxForm, NewMemberboxForm
+from .models import Memberbox
 
 logger = logging.getLogger(__name__)
 
@@ -65,7 +66,6 @@ def index(request):
         "storages": list(storages.values()),
         "floating": floating,
         "yours": yours,
-        "has_permission": request.user.is_authenticated,
         "morethanone": morethanone,
     }
 

@@ -8,7 +8,7 @@ I.e. they want to withdraw cash from the system via a bank transfer.
 
 The details are below. You can approve or reject this at
 
-     {{ base }}{% url 'reimburse_queue' %} 
+     {{ base }}{% url 'reimburse_queue' %}
 
 And you will get a reminder of this every other week.
 
@@ -27,4 +27,3 @@ Requested to be paid into {% if item.viaTheBank %}the bank account{% else %}the 
 {% if user != item.dst %}
 NOTE:that this request was not made by {{ item.dst }} but by {{ user }}.
 {% endif %}
-

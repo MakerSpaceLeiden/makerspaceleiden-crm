@@ -1,8 +1,8 @@
-from django.urls import path
 from django.urls import path, register_converter
 
-from . import views
 from makerspaceleiden import converters
+
+from . import views
 
 register_converter(converters.FloatUrlParameterConverter, "float")
 

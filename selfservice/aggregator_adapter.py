@@ -1,7 +1,7 @@
-import urllib.request
 import base64
 import json
 import logging
+import urllib.request
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +24,7 @@ class AggregatorAdapter(object):
             "Authorization", "Basic %s" % self.encoded_credentials.decode("ascii")
         )
         logger.debug("Fetching {} {}".format(req, url))
+        print("Fetching {} {}".format(req, url))
         return json.loads(urllib.request.urlopen(req).read())
 
     def _request_with_user_id(self, url, user_id=None):
@@ -67,7 +68,7 @@ class AggregatorAdapter(object):
         if payload:
             try:
                 return json.loads(payload)
-            except Exception as e:
+            except Exception:
                 logger.error("Failed to parse the json chore: '{}'.".format(payload))
         return None
 

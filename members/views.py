@@ -1,27 +1,20 @@
-from django.shortcuts import render, redirect
+import logging
+import sys
 
-from django.contrib.auth.forms import PasswordResetForm
-from django.core.mail import EmailMessage
-
-from django.template import loader
-from django.http import HttpResponse
-from django.contrib.auth.decorators import login_required
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordResetForm
 from django.db.utils import IntegrityError
+from django.http import HttpResponse
+from django.shortcuts import redirect, render
+from django.template.loader import render_to_string
 from django.urls import reverse
 
-from django.template.loader import render_to_string, get_template
-
-from .forms import NewUserForm, NewAuditRecordForm
-
-from acl.models import Entitlement, PermitType
-from members.models import Tag, User, clean_tag_string, AuditRecord
+from acl.models import Entitlement
 from mailinglists.models import Mailinglist, Subscription
+from members.models import AuditRecord, User
 
-import logging
-import datetime
-import sys
-import re
+from .forms import NewAuditRecordForm, NewUserForm
 
 logger = logging.getLogger(__name__)
 
@@ -31,9 +24,9 @@ def index(request):
     lst = Entitlement.objects.order_by("holder__id")
     agg = {}
     perms = {}
-    output = ""
+    _ = ""
     for e in lst:
-        if not e.holder in agg:
+        if e.holder not in agg:
             agg[e.holder] = {}
         perms[e.permit.name] = 1
         agg[e.holder][e.permit.name] = 1

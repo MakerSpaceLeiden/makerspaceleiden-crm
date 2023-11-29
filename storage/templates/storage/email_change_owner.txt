@@ -1,6 +1,6 @@
 Dear {{ rq.owner }},
 
-{{ user }} has {% if created %}requested{% else %}updated the information for{% endif %} storage 
+{{ user }} has {% if created %}requested{% else %}updated the information for{% endif %} storage
 that you, as the owner, are now responsible for:
 
 	  {{ rq.what }}
@@ -12,7 +12,7 @@ Location: {{ rq.location }}
           {{ rq.extra_info }}
 
 {% if rq.state == 'R' %}
-This request requires the approval from the members of this mailing list. 
+This request requires the approval from the members of this mailing list.
 
 Until then you will need to wait. If've you've already stored it at the space; then
 you should really remove it again; and beware that others may recycle or bin it if

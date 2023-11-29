@@ -1,32 +1,20 @@
-from django.contrib.sites.shortcuts import get_current_site
-from django.contrib.admin.sites import AdminSite
-from django.template import loader
-from django.http import HttpResponse
-from django.conf import settings
-from django.shortcuts import redirect
-from django.views.generic import ListView, CreateView, UpdateView
-from django.contrib.auth.decorators import login_required
-from django import forms
-from django.contrib.auth import login, authenticate
-from django.shortcuts import render, redirect
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.shortcuts import render
-from django.views.decorators.csrf import csrf_protect
-from django.db.models import Q
-from simple_history.admin import SimpleHistoryAdmin
-from django.template.loader import render_to_string, get_template
-from django.core.mail import EmailMessage
-from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist
-
-import datetime
-
-from .models import Storage
-from members.models import User
-from .admin import StorageAdmin
-from .forms import StorageForm, ConfirmForm
-
 import logging
+
+from django.conf import settings
+from django.contrib.admin.sites import AdminSite
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
+from django.core.mail import EmailMessage
+from django.db.models import Q
+from django.http import HttpResponse
+from django.shortcuts import redirect, render
+from django.template.loader import render_to_string
+from simple_history.admin import SimpleHistoryAdmin
+
+from members.models import User
+
+from .forms import ConfirmForm, StorageForm
+from .models import Storage
 
 logger = logging.getLogger(__name__)
 
@@ -85,10 +73,10 @@ def index(request, user_pk):
 
     canedit = {}
     for i in storage:
-        if i.owner == request.user and i.editable() == True:
+        if i.owner == request.user and i.editable() is True:
             canedit[i] = True
     for i in pending:
-        if i.owner == request.user and i.editable() == True:
+        if i.owner == request.user and i.editable() is True:
             canedit[i] = True
 
     context = {

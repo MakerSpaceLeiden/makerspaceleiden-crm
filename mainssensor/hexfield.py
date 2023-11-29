@@ -1,7 +1,7 @@
-from django.db import models
-from django import forms
-
 import re
+
+from django import forms
+from django.db import models
 
 
 def tohexstr(value):
@@ -44,7 +44,7 @@ class HexField(models.Field):
         return "integer UNSIGNED"
 
     def get_prep_value(self, value):
-        if value == None:
+        if value is None:
             return 0
         return int(value, 16)
 
