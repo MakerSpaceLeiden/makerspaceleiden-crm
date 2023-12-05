@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-source .env
-source /etc/os-release
+test -f .env && source .env
+test -f /etc/os-release && source /etc/os-release
 
 PYTHON_VERSION=${PYTHON_VERSION:-3}
 POETRY=${POETRY:=false}
@@ -32,7 +32,7 @@ else
 	else
 		python${PYTHON_VERSION}  -m venv venv
 		. venv/bin/activate
-		if [ $VERSION_ID == "23.04" -o  $VERSION_ID == "23.10" ]; then
+		if [ x$VERSION_ID == "x23.04" -o  x$VERSION_ID == "23.10" ]; then
 			sudo apt install --upgrade python3-pip -y
 		else
 			pip${PYTHON_VERSION} install --upgrade pip

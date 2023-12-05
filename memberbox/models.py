@@ -4,6 +4,7 @@ from django.conf import settings
 from django.core.mail import EmailMessage
 from django.db import models
 from django.template.loader import render_to_string
+from django.urls import reverse
 from simple_history.models import HistoricalRecords
 from stdimage.models import StdImageField
 
@@ -37,8 +38,11 @@ class Memberbox(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     history = HistoricalRecords()
 
+    # Return the relative path of this member (we do not
+    # yet have a page for the box(es) of a member.
+    #
     def url(self):
-        return settings.BASE + self.path()
+        return reverse("overview", kwargs={"member_id": self.id})
 
     def __str__(self):
         if self.owner:
