@@ -9,9 +9,6 @@ django-import-export
 # Determine client IP address
 django-ipware
 
-# For production
-# mysqlclient
-
 # Petty cash
 django-money
 django-qr-code
@@ -29,6 +26,9 @@ jsonfield2
 
 # Mailman scraping API
 lxml
+
+# For production
+mysqlclient
 
 # We're also including Pillow  as otherwise QR will fall back
 # to SVG - which is not as supported.
