@@ -22,6 +22,7 @@ django-settings-export
 django-simple-history
 django-six
 django-stdimage
+django-versatileimagefield
 
 # JSON fields in the DB model
 jsonfield2

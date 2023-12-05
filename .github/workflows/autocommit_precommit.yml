@@ -16,7 +16,7 @@ jobs:
         git config --global user.email '${GITHUB_ACTOR}@users.noreply.github.com'
         # git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
         git commit -am "chore: commit changes after running pre-commit hooks"
-        git pull
+        git pull HEAD:${{ github.head_ref }}
     - name: Push changes
       if: failure()
       uses: ad-m/github-push-action@master

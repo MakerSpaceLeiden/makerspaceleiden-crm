@@ -384,6 +384,22 @@ progressbar = ["progressbar2 (>=3.0.0)"]
 test = ["pytest", "pytest-cov", "pytest-django"]
 
 [[package]]
+name = "django-versatileimagefield"
+version = "3.0"
+description = "A drop-in replacement for django's ImageField that provides a flexible, intuitive and easily-extensible interface for creating new images from the one assigned to the field."
+optional = false
+python-versions = "*"
+files = [
+    {file = "django-versatileimagefield-3.0.tar.gz", hash = "sha256:1651db2ed36d843cfb1788f2601472a293d9ba86729369b6f6e5591112357ac7"},
+    {file = "django_versatileimagefield-3.0-py2.py3-none-any.whl", hash = "sha256:19c09c2a887a1fe14eb8c72397c52aa348b315d5fdcc43bf1a1e683283750fd7"},
+]
+
+[package.dependencies]
+Django = ">=3.0"
+Pillow = ">=2.4.0"
+python-magic = ">=0.4.22,<1.0.0"
+
+[[package]]
 name = "et-xmlfile"
 version = "1.1.0"
 description = "An implementation of lxml.xmlfile for the standard library"
@@ -920,6 +936,17 @@ files = [
 dev = ["coverage[toml]", "coveralls (>=3.3,<4.0)", "ruff", "twine"]
 
 [[package]]
+name = "python-magic"
+version = "0.4.27"
+description = "File type identification using libmagic"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
+files = [
+    {file = "python-magic-0.4.27.tar.gz", hash = "sha256:c1ba14b08e4a5f5c31a302b7721239695b2f0f058d125bd5ce1ee36b9d9d3c3b"},
+    {file = "python_magic-0.4.27-py2.py3-none-any.whl", hash = "sha256:c212960ad306f700aa0d01e5d7a325d20548ff97eb9920dcd29513174f0294d3"},
+]
+
+[[package]]
 name = "pytz"
 version = "2023.3.post1"
 description = "World timezone definitions, modern and historical"
@@ -1263,4 +1290,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "3859340f20662ae76d3343581564b578428608f2aa752aba32e8b0a87fa9c868"
+content-hash = "dcc614be80d736d1b7e2b6dff8f76a2f8c3a12090ac2f32de275864104e5f378"
