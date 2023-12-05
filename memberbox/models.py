@@ -7,7 +7,6 @@ from django.template.loader import render_to_string
 from simple_history.models import HistoricalRecords
 from stdimage.models import StdImageField
 
-# from stdimage.utils import pre_delete_delete_callback, pre_save_delete_callback
 from makerspaceleiden.utils import upload_to_pattern
 from members.models import User
 
@@ -40,11 +39,6 @@ class Memberbox(models.Model):
 
     def url(self):
         return settings.BASE + self.path()
-
-    # TODO: Removed redefinition of function
-    # Check if this was the wrong definition or not
-    # def url(self):
-    #     return reverse("overview", kwargs={"member_id": self.id})
 
     def __str__(self):
         if self.owner:
