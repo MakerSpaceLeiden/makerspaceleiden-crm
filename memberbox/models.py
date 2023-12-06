@@ -4,11 +4,10 @@ from django.conf import settings
 from django.core.mail import EmailMessage
 from django.db import models
 from django.template.loader import render_to_string
+from django.urls import reverse
 from simple_history.models import HistoricalRecords
 from stdimage.models import StdImageField
-from django.urls import reverse
 
-# from stdimage.utils import pre_delete_delete_callback, pre_save_delete_callback
 from makerspaceleiden.utils import upload_to_pattern
 from members.models import User
 
@@ -38,9 +37,6 @@ class Memberbox(models.Model):
 
     owner = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     history = HistoricalRecords()
-
-    # def url(self):
-    #    return settings.BASE + self.path()
 
     # Return the relative path of this member (we do not
     # yet have a page for the box(es) of a member.

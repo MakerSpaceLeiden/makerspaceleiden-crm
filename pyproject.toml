@@ -29,6 +29,8 @@ jsonfield2 = "^4.0.0.post0"
 django-money = "^3.4.0"
 requests = "^2.31.0"
 python-dateutil = "^2.8.2"
+django-versatileimagefield = "^3.0"
+mysqlclient = "^2.2.0"
 
 
 [tool.poetry.group.dev.dependencies]
