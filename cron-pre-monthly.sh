@@ -2,7 +2,7 @@
 
 set -e
 
-source .env
+test -f .env && source .env
 
 DIR=${DIR:-/usr/local/makerspaceleiden-crm}
 cd $DIR || exit 1
