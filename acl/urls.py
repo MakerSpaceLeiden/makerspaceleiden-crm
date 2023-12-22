@@ -21,6 +21,7 @@ urlpatterns = [
     path("acl/", views.api_index, name="acl-index"),
     # API oriented
     path("acl/api/v1/getok/<str:machine>", views.api_getok, name="acl-v1-getok"),
+    path("acl/api/v1/getok4node/<str:node>", views.api_getok_by_node, name="acl-v1-getok4-node"),
     path("acl/api/v1/gettaginfo", views.api_gettaginfo, name="acl-v1-gettaginfo"),
     path("acl/<int:machine_id>", views.api_details, name="details"),
 ]
