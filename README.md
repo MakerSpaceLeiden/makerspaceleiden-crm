@@ -13,6 +13,13 @@ Then go to
 
 and login using the accounts created & shown to you during the loaddemo.sh script.
 
+Or use URLs such as
+
+	curl -H "X-Bearer: Foo" -F tag=1-2-4 http://127.0.0.1:8000/acl/api/v1/getok4node/foonode
+ 
+to check  the API (this assumes local.py to contain the Foo password; see debug.py) and some machine
+given a node name. 
+
 # Requirements
 
 ## Trustees
