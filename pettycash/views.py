@@ -458,9 +458,9 @@ def cam53process(request):
     if request.method != "POST":
         return HttpResponse("Unknown FAIL", status=400, content_type="text/plain")
 
-    reason = CsrfViewMiddleware().process_view(request, None, (), {})
-    if reason:
-        return HttpResponse("CSRF FAIL", status=400, content_type="text/plain")
+#    reason = CsrfViewMiddleware().process_view(request, None, (), {})
+#    if reason:
+##        return HttpResponse("CSRF FAIL", status=400, content_type="text/plain")
 
     ok = []
     failed = []
