@@ -452,7 +452,6 @@ def checktag(function):
             )
 
         kwargs['tag'] = tag
-        logger.error("KWarging {}".format(tag))
         return function(request, *args, **kwargs)
 
     return wrap
@@ -493,7 +492,7 @@ def api_getok(request, machine=None,tag=None):
                 "Machine not found", status=404, content_type="text/plain"
         )
    try:
-        r = RecentUse(user=owner, machine=machine)
+        r = RecentUse(user=tag.owner, machine=machine)
         r.save()
    except Exception as e:
         logger.error(
