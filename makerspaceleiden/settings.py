@@ -294,6 +294,9 @@ PETTYCASH_TERMS_MAX_UNKNOWN = 4
 PETTYCASH_TERMS_MIN_UNKNOWN = 1
 PETTYCASH_TERMS_MINS_CUTOFF = 10
 
+# Message of the day - how many dates to show by default.
+MOTD_DEFAULT_SHOW_DAYS=100
+
 try:
     from .local import *  # noqa: F403
 except ImportError:

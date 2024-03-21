@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% for msg in motds %}
+	<hr/>
+	<h1>{{ msg.title }}</h1>
+	<p>{{ msg.message}}</p>
+	<i>Show until {{ msg.show_until }}</i>
+	<hr/>
+{% endfor %}
+
+{% endblock %}
