@@ -1,0 +1,10 @@
+[
+{% for msg in msgs %}
+	{ 	
+		"title": "{{ msg.title }}",
+		"msg": "{{ msg.message}}",
+		"from": "{{ msg.date }}",
+		"till ": "{{ msg.show_until}}"
+	}{% if not forloop.last %},{% endif %}
+{% endfor %}
+]

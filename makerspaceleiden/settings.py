@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "qr_code",
     "djmoney",
     "makerspaceleiden",
+    "motd.apps.MotdConfig",
     "storage.apps.StorageConfig",
     "memberbox.apps.MemberboxConfig",
     "members.apps.UserConfig",

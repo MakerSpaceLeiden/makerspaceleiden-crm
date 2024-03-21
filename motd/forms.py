@@ -4,6 +4,6 @@ from django.forms import ModelForm
 
 import models
 
-class MotDForm(ModelForm):
+class MotdForm(ModelForm):
     class Meta:
-        model = MotD
+        model = Motd
