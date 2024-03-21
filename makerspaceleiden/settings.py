@@ -295,7 +295,7 @@ PETTYCASH_TERMS_MAX_UNKNOWN = 4
 PETTYCASH_TERMS_MIN_UNKNOWN = 1
 PETTYCASH_TERMS_MINS_CUTOFF = 10
 
-NODERED_URL = "localhost:1880"
+NODERED_URL = "http://localhost:1880"
 
 try:
     from .local import *  # noqa: F403
