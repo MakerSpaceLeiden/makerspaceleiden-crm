@@ -20,6 +20,7 @@ django-simple-history
 django-six
 django-stdimage
 django-versatileimagefield
+djproxy
 
 # JSON fields in the DB model
 jsonfield2

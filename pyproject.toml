@@ -31,6 +31,7 @@ requests = "^2.31.0"
 python-dateutil = "^2.8.2"
 django-versatileimagefield = "^3.0"
 mysqlclient = "^2.2.0"
+djproxy = "^2.3.6"
 
 
 [tool.poetry.group.dev.dependencies]
