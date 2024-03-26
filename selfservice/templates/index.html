@@ -92,6 +92,10 @@ There are no passwords for members at the moment.
 	<li>List of <a href='{% url "unpaired" %}'>payment stations</a> and pairing.
 {% endif %}
 
+{% if user|isDeveloper %}
+	<li><a href='{% url "nodered_proxy" "" %}'>Nodered</a>
+{% endif %}
+
 {%if user.is_privileged %}
 	<li><a href="{% url 'newmember' %}">Add a NEW member</a>
 	<p/>

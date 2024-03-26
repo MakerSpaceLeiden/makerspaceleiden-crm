@@ -274,6 +274,7 @@ PETTYCASH_TREASURER_GROUP = "pettycash admin group"
 PETTYCASH_TOPUP = 15
 PETTYCASH_TNS = "Stichting Makerspace Leiden"
 PETTYCASH_IBAN = "NL18RABO0123459876"
+DEVELOPERS_ADMIN_GROUP = "developers"
 POT_ID = 1
 NONE_ID = 217
 NONE_LABEL = "Former participant"
