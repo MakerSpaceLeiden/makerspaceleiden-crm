@@ -1,4 +1,5 @@
 import logging
+from functools import wraps
 
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
@@ -6,8 +7,6 @@ from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
-from functools import wraps
-
 from ipware import get_client_ip
 
 from mailinglists.models import Subscription
@@ -21,6 +20,7 @@ from .models import Entitlement, Machine, PermitType, RecentUse
 
 logger = logging.getLogger(__name__)
 
+
 def matrix_mm(machine, member):
     out = {"xs": False, "instructions_needed": False, "tags": []}
     out["mid"] = machine.id
@@ -31,12 +31,13 @@ def matrix_mm(machine, member):
     out["out_of_order"] = machine.out_of_order
     out["can_instruct"] = machine.canInstruct(member)
     out["xs"] = machine.canOperate(member)
-    out["activated"] =  out["xs"]
+    out["activated"] = out["xs"]
 
     for tag in Tag.objects.filter(owner=member):
         out["tags"].append(tag.tag)
 
     return out
+
 
 def matrix_m(machine):
     lst = {}
@@ -45,23 +46,25 @@ def matrix_m(machine):
 
     return lst
 
-def get_perms(tag,machine):
+
+def get_perms(tag, machine):
     owner = tag.owner
     canOperate = machine.canOperate(owner)
     canInstruct = machine.canInstruct(owner)
 
     out = userdetails(owner)
     if tag.description:
-            out["tag"] = tag.description
+        out["tag"] = tag.description
 
     out["requires_instruction"] = machine.requires_instruction
     out["requires_permit"] = str(machine.requires_permit)
     out["requires_form"] = machine.requires_form
     out["machine"] = str(machine)
-    out["access"] = canOperate;
+    out["access"] = canOperate
     out["can_instruct"] = canInstruct
 
     return out
+
 
 @login_required
 def api_index(request):
@@ -420,7 +423,7 @@ def checktag(function):
     @wraps(function)
     def wrap(request, *args, **kwargs):
         if not request.POST:
-             return HttpResponse("XS denied", status=403, content_type="text/plain")
+            return HttpResponse("XS denied", status=403, content_type="text/plain")
 
         try:
             tagstr = clean_tag_string(request.POST.get("tag"))
@@ -437,9 +440,7 @@ def checktag(function):
         try:
             tag = Tag.objects.get(tag=tagstr)
         except Exception:
-            logger.error(
-                "Tag {} not found, denied.".format(tagstr)
-            )
+            logger.error("Tag {} not found, denied.".format(tagstr))
             return HttpResponse(
                 "Tag/Owner not found", status=404, content_type="text/plain"
             )
@@ -451,52 +452,54 @@ def checktag(function):
                 "Unexpected error when recording tag use on {}: {}".format(tag, e)
             )
 
-        kwargs['tag'] = tag
+        kwargs["tag"] = tag
         logger.error("KWarging {}".format(tag))
         return function(request, *args, **kwargs)
 
     return wrap
 
-@csrf_exempt
-@superuser_or_bearer_required
-@checktag
-def api_getok_by_node(request,node=None,tag=None):
-   try:
-        machines = Machine.objects.filter(node_name=node)
-   except ObjectDoesNotExist:
-        logger.error("Node not found, denied.")
-        return HttpResponse(
-                "Node not found", status=404, content_type="text/plain"
-        )
-   if not machines:
-        return HttpResponse(
-                "Node does not have any machines connecte to it", status=404, content_type="text/plain"
-        )
-   owner = tag.owner
-   out = {}
-   for machine in machines:
-        r = get_perms(tag,machine)
-        if r:
-             out[machine.node_machine_name] = r
-   
-   return JsonResponse(out)
 
 @csrf_exempt
 @superuser_or_bearer_required
 @checktag
-def api_getok(request, machine=None,tag=None):
-   try:
-        machine = Machine.objects.get(node_machine_name=machine)
-   except ObjectDoesNotExist:
-        logger.error("Machine '{}' not found, denied.".format(machine))
+def api_getok_by_node(request, node=None, tag=None):
+    try:
+        machines = Machine.objects.filter(node_name=node)
+    except ObjectDoesNotExist:
+        logger.error("Node not found, denied.")
+        return HttpResponse("Node not found", status=404, content_type="text/plain")
+    if not machines:
         return HttpResponse(
-                "Machine not found", status=404, content_type="text/plain"
+            "Node does not have any machines connecte to it",
+            status=404,
+            content_type="text/plain",
         )
-   try:
+    out = {}
+    for machine in machines:
+        r = get_perms(tag, machine)
+        if r:
+            out[machine.node_machine_name] = r
+
+    return JsonResponse(out)
+
+
+@csrf_exempt
+@superuser_or_bearer_required
+@checktag
+def api_getok(request, machine=None, tag=None):
+    try:
+        machine = Machine.objects.get(node_machine_name=machine)
+    except ObjectDoesNotExist:
+        logger.error("Machine '{}' not found, denied.".format(machine))
+        return HttpResponse("Machine not found", status=404, content_type="text/plain")
+    try:
+        owner = tag.owner
         r = RecentUse(user=owner, machine=machine)
         r.save()
-   except Exception as e:
+    except Exception as e:
         logger.error(
-             "Unexpected error when recording machine use of {} by {}: {}".format(machine, owner, e)
+            "Unexpected error when recording machine use of {} by {}: {}".format(
+                machine, owner, e
+            )
         )
-   return JsonResponse(get_perms(tag,machine))
+    return JsonResponse(get_perms(tag, machine))
