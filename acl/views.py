@@ -1,4 +1,5 @@
 import logging
+from functools import wraps
 
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
@@ -6,8 +7,6 @@ from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
-from functools import wraps
-
 from ipware import get_client_ip
 
 from mailinglists.models import Subscription
@@ -15,11 +14,13 @@ from makerspaceleiden.decorators import superuser_or_bearer_required
 from memberbox.models import Memberbox
 from members.forms import TagForm
 from members.models import Tag, User, clean_tag_string
+from pettycash.models import PettycashBalanceCache
 from storage.models import Storage
 
 from .models import Entitlement, Machine, PermitType, RecentUse
 
 logger = logging.getLogger(__name__)
+
 
 def matrix_mm(machine, member):
     out = {"xs": False, "instructions_needed": False, "tags": []}
@@ -31,12 +32,13 @@ def matrix_mm(machine, member):
     out["out_of_order"] = machine.out_of_order
     out["can_instruct"] = machine.canInstruct(member)
     out["xs"] = machine.canOperate(member)
-    out["activated"] =  out["xs"]
+    out["activated"] = out["xs"]
 
     for tag in Tag.objects.filter(owner=member):
         out["tags"].append(tag.tag)
 
     return out
+
 
 def matrix_m(machine):
     lst = {}
@@ -45,23 +47,25 @@ def matrix_m(machine):
 
     return lst
 
-def get_perms(tag,machine):
+
+def get_perms(tag, machine):
     owner = tag.owner
     canOperate = machine.canOperate(owner)
     canInstruct = machine.canInstruct(owner)
 
     out = userdetails(owner)
     if tag.description:
-            out["tag"] = tag.description
+        out["tag"] = tag.description
 
     out["requires_instruction"] = machine.requires_instruction
     out["requires_permit"] = str(machine.requires_permit)
     out["requires_form"] = machine.requires_form
     out["machine"] = str(machine)
-    out["access"] = canOperate;
+    out["access"] = canOperate
     out["can_instruct"] = canInstruct
 
     return out
+
 
 @login_required
 def api_index(request):
@@ -140,6 +144,7 @@ def machine_list(request):
         "members": members,
         "machines": machines,
         "has_permission": request.user.is_authenticated,
+        "title": "Machines",
     }
     return render(request, "acl/machines.html", context)
 
@@ -236,6 +241,14 @@ def member_overview(request, member_id=None):
         lst[mchn.name] = matrix_mm(mchn, member)
         lst[mchn.name]["path"] = mchn.path()
 
+    user = request.user
+    balance = 0
+    try:
+        balance = PettycashBalanceCache.objects.get(owner=user)
+
+    except ObjectDoesNotExist:
+        pass
+
     context = {
         "title": member.first_name + " " + member.last_name,
         "member": member,
@@ -247,6 +260,7 @@ def member_overview(request, member_id=None):
         "subscriptions": subscriptions,
         "user": request.user,
         "has_permission": request.user.is_authenticated,
+        "balance": balance,
     }
 
     if member == request.user or request.user.is_privileged:
@@ -289,8 +303,8 @@ def missing(tof):
 @login_required
 def missing_forms(request):
     context = {
-        "title": "Missing forms",
-        "desc": "Missing forms (of people who had instruction on a machine that needs it).",
+        "title": "Missing waivers",
+        "desc": "Missing waiver forms (of people who had instruction on a machine that needs it).",
         "amiss": missing(False),
         "has_permission": request.user.is_authenticated,
     }
@@ -301,8 +315,8 @@ def missing_forms(request):
 def filed_forms(request):
     # people_with_forms = User.objects.all().filter(form_on_file = True)
     context = {
-        "title": "Filed forms",
-        "desc": "Forms on file for people that also had instruction on something",
+        "title": "Filed waivers",
+        "desc": "Waiver forms on file for people that also had instruction on something",
         "amiss": missing(True),
         "has_permission": request.user.is_authenticated,
     }
@@ -343,7 +357,7 @@ def tag_edit(request, tag_id=None):
 
     form = TagForm(instance=tag, canedittag=request.user.is_privileged)
     context["form"] = form
-    context["back"] = "overview"
+    context["back"] = "personal_page"
 
     return render(request, "crud.html", context)
 
@@ -374,7 +388,7 @@ def tag_delete(request, tag_id=None):
 
     form = TagForm(instance=tag, isdelete=True)
     context["form"] = form
-    context["back"] = "overview"
+    context["back"] = "personal_page"
 
     return render(request, "crud.html", context)
 
@@ -420,7 +434,7 @@ def checktag(function):
     @wraps(function)
     def wrap(request, *args, **kwargs):
         if not request.POST:
-             return HttpResponse("XS denied", status=403, content_type="text/plain")
+            return HttpResponse("XS denied", status=403, content_type="text/plain")
 
         try:
             tagstr = clean_tag_string(request.POST.get("tag"))
@@ -437,9 +451,7 @@ def checktag(function):
         try:
             tag = Tag.objects.get(tag=tagstr)
         except Exception:
-            logger.error(
-                "Tag {} not found, denied.".format(tagstr)
-            )
+            logger.error("Tag {} not found, denied.".format(tagstr))
             return HttpResponse(
                 "Tag/Owner not found", status=404, content_type="text/plain"
             )
@@ -451,51 +463,52 @@ def checktag(function):
                 "Unexpected error when recording tag use on {}: {}".format(tag, e)
             )
 
-        kwargs['tag'] = tag
+        kwargs["tag"] = tag
         return function(request, *args, **kwargs)
 
     return wrap
 
-@csrf_exempt
-@superuser_or_bearer_required
-@checktag
-def api_getok_by_node(request,node=None,tag=None):
-   try:
-        machines = Machine.objects.filter(node_name=node)
-   except ObjectDoesNotExist:
-        logger.error("Node not found, denied.")
-        return HttpResponse(
-                "Node not found", status=404, content_type="text/plain"
-        )
-   if not machines:
-        return HttpResponse(
-                "Node does not have any machines connecte to it", status=404, content_type="text/plain"
-        )
-   owner = tag.owner
-   out = {}
-   for machine in machines:
-        r = get_perms(tag,machine)
-        if r:
-             out[machine.node_machine_name] = r
-   
-   return JsonResponse(out)
 
 @csrf_exempt
 @superuser_or_bearer_required
 @checktag
-def api_getok(request, machine=None,tag=None):
-   try:
-        machine = Machine.objects.get(node_machine_name=machine)
-   except ObjectDoesNotExist:
-        logger.error("Machine '{}' not found, denied.".format(machine))
+def api_getok_by_node(request, node=None, tag=None):
+    try:
+        machines = Machine.objects.filter(node_name=node)
+    except ObjectDoesNotExist:
+        logger.error("Node not found, denied.")
+        return HttpResponse("Node not found", status=404, content_type="text/plain")
+    if not machines:
         return HttpResponse(
-                "Machine not found", status=404, content_type="text/plain"
+            "Node does not have any machines connecte to it",
+            status=404,
+            content_type="text/plain",
         )
-   try:
+    out = {}
+    for machine in machines:
+        r = get_perms(tag, machine)
+        if r:
+            out[machine.node_machine_name] = r
+
+    return JsonResponse(out)
+
+
+@csrf_exempt
+@superuser_or_bearer_required
+@checktag
+def api_getok(request, machine=None, tag=None):
+    try:
+        machine = Machine.objects.get(node_machine_name=machine)
+    except ObjectDoesNotExist:
+        logger.error("Machine '{}' not found, denied.".format(machine))
+        return HttpResponse("Machine not found", status=404, content_type="text/plain")
+    try:
         r = RecentUse(user=tag.owner, machine=machine)
         r.save()
-   except Exception as e:
+    except Exception as e:
         logger.error(
-             "Unexpected error when recording machine use of {} by {}: {}".format(machine, owner, e)
+            "Unexpected error when recording machine use of {} by {}: {}".format(
+                machine, tag.owner, e
+            )
         )
-   return JsonResponse(get_perms(tag,machine))
+    return JsonResponse(get_perms(tag, machine))
