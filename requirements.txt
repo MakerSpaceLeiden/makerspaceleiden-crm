@@ -45,3 +45,6 @@ reportlab
 requests
 six
 wheel
+
+# Bootstrap
+django_bootstrap5

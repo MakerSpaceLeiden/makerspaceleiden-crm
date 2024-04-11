@@ -68,6 +68,7 @@ INSTALLED_APPS = [
     #    'autocomplete_light',
     "django.contrib.sites",
     "revproxy",
+    "django_bootstrap5",
 ]
 
 SITE_ID = 1
