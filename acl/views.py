@@ -292,8 +292,8 @@ def missing(tof):
 @login_required
 def missing_forms(request):
     context = {
-        "title": "Missing forms",
-        "desc": "Missing forms (of people who had instruction on a machine that needs it).",
+        "title": "Missing waivers",
+        "desc": "Missing waiver forms (of people who had instruction on a machine that needs it).",
         "amiss": missing(False),
         "has_permission": request.user.is_authenticated,
     }
@@ -304,8 +304,8 @@ def missing_forms(request):
 def filed_forms(request):
     # people_with_forms = User.objects.all().filter(form_on_file = True)
     context = {
-        "title": "Filed forms",
-        "desc": "Forms on file for people that also had instruction on something",
+        "title": "Filed waivers",
+        "desc": "Waiver forms on file for people that also had instruction on something",
         "amiss": missing(True),
         "has_permission": request.user.is_authenticated,
     }
