@@ -10,7 +10,11 @@ logger = logging.getLogger(__name__)
 
 @login_required
 def index(request):
-    return render(request, "ultimaker/index.html", {})
+    context = {
+        "has_permission": request.user.is_authenticated,
+        "title": "Ultimaker 3+"
+    }
+    return render(request, "ultimaker/index.html", context)
 
 
 def snapshot(request):

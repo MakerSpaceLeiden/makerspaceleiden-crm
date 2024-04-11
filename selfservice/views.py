@@ -508,6 +508,7 @@ def notification_settings(request):
             "uses_email": (not user.uses_signal and not user.telegram_user_id)
             or user.always_uses_email,
             "user": user,
+            "has_permission": request.user.is_authenticated,
         },
     )
 
