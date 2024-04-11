@@ -1,11 +1,16 @@
-<style type="text/css" media="print">
-    .dontprint {
-	display: none;
-    }
-</style>
 {% extends 'base.html' %}
-
 {% block content %}
+
+<style type="text/css" media="print">
+  .dontprint {
+	    display: none;
+  }
+
+  /* hides the user-tools menu in base.html when printing */
+  #user-tools {       
+      display: none;
+  }
+</style>
 
 <style>
     .showhover { display: none; }
