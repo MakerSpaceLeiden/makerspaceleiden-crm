@@ -48,3 +48,4 @@ wheel
 
 # Bootstrap
 django_bootstrap5
+django-flatpickr
