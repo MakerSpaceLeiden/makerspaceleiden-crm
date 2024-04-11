@@ -52,7 +52,7 @@ def index(request, days=30):
         tooOld = datetime.date.today() - datetime.timedelta(days=days)
         lst = lst.filter(Q(lastChange__gte=tooOld) | Q(state="UNK"))
     context = {
-        "title": "Uknown Floating Objects",
+        "title": "Unclaimed Floating Objects",
         "lst": lst,
         "days": days,
         "has_permission": request.user.is_authenticated,
@@ -89,7 +89,7 @@ def create(request):
         )
 
     context = {
-        "title": "Add an Uknown Floating Objects",
+        "title": "Add an Unclaimed Floating Object",
         "form": form,
         "action": "Add",
         "has_permission": request.user.is_authenticated,
@@ -105,7 +105,7 @@ def show(request, pk):
         return HttpResponse("UFO not found", status=404, content_type="text/plain")
 
     context = {
-        "title": "Uknown Floating Objects",
+        "title": "Unclaimed Floating Objects",
         "item": item,
         "has_permission": request.user.is_authenticated,
     }
@@ -124,7 +124,7 @@ def modify(request, pk):
         toinform.append(oitem.owner.email)
 
     context = {
-        "title": "Update an Uknown Floating Objects",
+        "title": "Update an Unclaimed Floating Object",
         "action": "Update",
         "item": oitem,
         "has_permission": request.user.is_authenticated,
