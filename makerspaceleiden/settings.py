@@ -70,6 +70,7 @@ INSTALLED_APPS = [
     "revproxy",
     "django_bootstrap5",
     "django_flatpickr",
+    "rest_framework",
 ]
 
 SITE_ID = 1
