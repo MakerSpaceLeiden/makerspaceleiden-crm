@@ -202,7 +202,8 @@ def recordinstructions(request):
     if request.method == "POST" and form.is_valid():
         context["machines"] = []
         context["holder"] = []
-
+        holder = []
+        
         for mid in form.cleaned_data["machine"]:
             try:
                 m = Machine.objects.get(pk=mid)
@@ -253,7 +254,7 @@ def recordinstructions(request):
                     try:
                         record.save(request=request)
                         logger.error("Creation of {0} completed".format(record))
-                        context["holder"].append(p)
+                        holder.append(p)
 
                     except Exception as e:
                         logger.error("Updating of instructions failed: {0}".format(e))
@@ -266,6 +267,7 @@ def recordinstructions(request):
                 context["created"] = created
                 context["machines"].append(m)
                 context["issuer"] = i
+                context["holder"] = list(set(holder)) # Using set() to remove duplicates
 
                 saved = True
             # except Exception as e:
