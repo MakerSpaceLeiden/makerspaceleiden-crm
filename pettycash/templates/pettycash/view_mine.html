@@ -24,7 +24,7 @@ before this runs out. As it takes a few days (or more) before the monies wired w
 The last import/synchronisation with the bank account was done by {{ last_import.by }} on {{ last_import.date }}.
 <p>
 {% endif %}
-<h1>Information about payments</i>
+<h1>Information about payments</h1>
 <ul>
 	<li> <a href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/SpaceTegoed">What is SpaceTegoed</a>
 <br>
@@ -33,13 +33,13 @@ The last import/synchronisation with the bank account was done by {{ last_import
 <li> <a href="{% url 'balances' %}">View everyone else</a> their transactions
 <br>
 </ul>
-<h1>Pay</i>
+<h1>Pay</h1>
 <ul>
 <li> <a href="{% url 'invoice' src=who.id %}">Pay for a product</a> to the space.
 <br>
 <li> <a href="{% url 'transfer_to_member' src=who.id %}">Transfer SpaceTegoed to other member</a>
 </ul>
-<h1>Get Paid</i>
+<h1>Get Paid</h1>
 <ul>
 <li> <a href="{% url 'reimburseform' %}">Get reimbursed by the space for something</a> that you paid for.
 <br>
@@ -50,7 +50,7 @@ The last import/synchronisation with the bank account was done by {{ last_import
 <br>
 {% endif %}
 </ul>
-<h1>Other</i>
+<h1>Other</h1>
 <ul>
 <li> <a href="{% url 'pricelist' %}">See the current pricelist</a> and <a href='{% url "spends" %}'>our spending this month</a>.
 <br>

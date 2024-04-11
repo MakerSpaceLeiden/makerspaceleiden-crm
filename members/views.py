@@ -180,7 +180,7 @@ def sudo(request):
     form = NewAuditRecordForm(None, initial={"return_to": rurl})
     context = {
         "label": "GDPR (AVG)",
-        "title": "Become and admin",
+        "title": "Become an admin",
         "action": "go admin",
         "form": form,
         "back": "index",
