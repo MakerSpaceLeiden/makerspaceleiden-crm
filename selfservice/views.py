@@ -614,13 +614,18 @@ def space_state(request):
             content_type="text/plain",
         )
 
+    context = {}
     aggregator_adapter = get_aggregator_adapter()
-    if not aggregator_adapter:
-        return HttpResponse(
-            "No aggregator configuration found", status=500, content_type="text/plain"
-        )
-    context = aggregator_adapter.fetch_state_space()
+    
+    try:       
+       context = aggregator_adapter.fetch_state_space()
+    except:
+       context["no_data_available"] = True
+
     context["user"] = user
+    context["title"] = "State of the Space"
+    context["has_permission"] = request.user.is_authenticated
+    
     return render(request, "space_state.html", context)
 
 
