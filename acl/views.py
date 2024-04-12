@@ -500,7 +500,9 @@ def api_getok(request, machine=None, tag=None):
         machine = Machine.objects.get(node_machine_name=machine)
     except ObjectDoesNotExist:
         logger.error("Machine '{}' not found, denied.".format(machine))
-        return HttpResponse("Machine not found", status=404, content_type="text/plain")
+        return HttpResponse(
+                "Machine not found", status=404, content_type="text/plain"
+        )
     try:
         r = RecentUse(user=tag.owner, machine=machine)
         r.save()
