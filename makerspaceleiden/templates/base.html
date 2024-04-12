@@ -86,6 +86,11 @@
             </div>  
             {% if user.is_authenticated %}
                 <div class="dark-color-bar">
+                    <div class="navbar-block">
+                        {% block navbar %}
+                            {% include 'navigation/navbar.html' %}
+                        {% endblock %} 
+                    </div>
                 </div>
             {% endif %}
         {% endif %}
