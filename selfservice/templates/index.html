@@ -10,7 +10,7 @@ function showPw(fld) {
   var x = document.getElementById(fld);
   if (x.type === "password") {
     x.type = "text";
-    window.setTimeout(function() { showPw(fld); }, 3000);
+    window.setTimeout(function() { showPw(fld); }, 15000);
   } else {
     x.type = "password";
   }
@@ -96,8 +96,8 @@ There are no passwords for members at the moment.
 	<li><a href="{% url 'newmember' %}">Add a NEW member</a>
 	<p/>
 	<li><a href="{% url 'pending' %}">Instructions pending approval trustee</a>
-	<li><a href="{% url 'missing_forms' %}">Missing forms</a>
-	<li><a href="{% url 'filed_forms' %}">Filed forms</a>
+	<li><a href="{% url 'missing_forms' %}">Missing waivers</a>
+	<li><a href="{% url 'filed_forms' %}">Filed waivers</a>
 	<li><a href="{% url 'userdetails' %}">Update your personal details</a>
 	<p/>
 	<li><a href="{% url 'admin:index' %}">raw database access</a>

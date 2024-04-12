@@ -1,11 +1,8 @@
 {% extends 'base.html' %}
-
 {% load qr_code  %}
-{% block content %}
+{% load django_bootstrap5 %}
 
-{% if member.image %}
-	<a href="{{ member.image.url }}"><img alt="" src="{{ member.image.medium.url   }}"/></a>
-{% endif %}
+{% block content %}
 
 {% if not member.is_active %}
 <hr>
@@ -15,244 +12,441 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
 {% endif %}
 
 {% if lst %}
-<table>
-	<tr>
-		<td colspan=2><h3>Personal details</h3>
-		{% if member == user %}
-		<hr/>
-		<a href="{% url 'userdetails' %}">edit your own user details</a>
-		<p/>
-		{% endif %}
-		</td>
-		<td valign=top rowspan=5 align=center>{% qr_from_text member.url size="m" border=1 %}<br/><code><font size=-3>{{ member.url }}</font></center></td>
-	</tr>
-{% if member.image %}
-	<!-- image is outside the table - above it -->
-{% else %}
-   {% if member == user or user.member.is_privileged %}
-	<tr valign=top>
-		<td align=right>Profile image</td>
-		<td><a href="{% url 'userdetails' %}">[ Add profile image ]</a></td>
-	</tr>
-   {% endif %}
-{% endif %}
-	<tr valign=top>
-		<td align=right>First name</td><td>{{ member.first_name}}</td>
-	</tr>
-	<tr><td align=right>Last name</td><td>{{ member.last_name }}</td></tr>
-	<tr><td align=right>Email (username)</td><td>{{ member.email}}</td></tr>
-	{%if user.is_privileged or member == user %}
-        {% if member.phone_number %}
-	<tr><td align=right>Phone:</td><td>{{ member.phone_number }}<p/><i>Note: this field is only visible to the member and the admins</i></td></tr>
-        {%endif %}
-        {%endif %}
-	<tr><td align=right>Waiver on file</td><td>
-			{%if member.form_on_file %} yes {% else %} no
-	{%if member == user or  user.is_privileged %}
-  		<a href="{% url 'waiverform' user_id=member.id %}" target="_blank">[ Download form ]</a>, read, sign and then delivery or mail to the address on the form.
-	{% endif %}
-{% endif %}
-			</td></tr>
-	{%if member.is_superuser %}
-			<tr><td></td><td>Is a trustee</td><td>
-        {% else %}
-	{%if member.can_escalate_to_privileged %}
-			<tr><td></td><td>Can edit certain databases on behalf of the trustee)</td><td>
-	{% endif %}
-	{% endif %}
+<div class="row mt-3">
 
-    <tr><td colspan=2><h3>Subscriptions</h3></td></tr>
-{% for sub in subscriptions %}
-        <tr><td align=right>{{sub.mailinglist.name}}</td><td><i>{{sub.mailinglist.description}}</i>
-	<br/>Subscribed:
-	{%if sub.active %}
-		yes
-	{% else %}
-		no
-	{% endif %}
-	<br/>Digest
-	{%if sub.digest %}
-		yes
-	{% else %}
-		no, receive in real time
-	{% endif %}
-	<p/></td></tr>
-{% endfor %}
-{%if member == user %}
-	<tr><td></td><td><a href="{% url 'mailinglists_edit'  user_id=member.id %}">[edit]</a> your subscriptions</td></tr>
-{% else %}
-{%if  user.is_privileged %}
-	<tr><td></td><td><a href="{% url 'mailinglists_edit'  user_id=member.id %}">[edit]</a> the subscriptions of {{ member.name }}</td></tr>
-{% endif %}
-{% endif %}
+    <!-- Personal Details Section -->
+    <div class="col-xl-9 col-lg-12 col-sm-12">
+        <div class="card mb-4">
+            <div class="card-body pb-4">
+                <div>
+                   <h2 class="card-title">Personal Details</h2> 
+                </div>
+                <dl class="row mb-1" >
+                    <dt class="col-sm-3 ">First Name:</dt>
+                    <dd class="col-sm-9">{{ member.first_name }}</dd>
+                    
+                    <dt class="col-sm-3 ">Last Name:</dt>
+                    <dd class="col-sm-9">{{ member.last_name }}</dd>
+                    
+                    <dt class="col-sm-3 ">Email:</dt>
+                    <dd class="col-sm-9">{{ member.email }}</dd>
+                    
+                    {% if user.is_privileged or member == user %}
+                        {% if member.phone_number %}
+                            <dt class="col-sm-3 ">Phone:</dt>
+                            <dd class="col-sm-9">{{ member.phone_number }}</dd>
+                            
+                            <dt class="col-sm-3"></dt>
+                            <dd class="col-sm-9"><small>Note: The phone number is only visible to members and admins.</small></dd>
+                        {% endif %}
+                    {% endif %}
+                </dl>
+                <div>
+                {% if member == user %}
+                <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'userdetails' %}'">Edit</button>
+                {% endif %}                    
+                </div>
+            </div>
+        </div>
+    </div>
 
-    {%if member == user %}
-    <tr><td colspan=2><h3>Notifications</h3></td></tr>
-	<tr><td></td><td>
-        <p>
-            The system can occasionally send you reminders when you forget to check-out, leave machines turned on, or other useful warnings.
-        </p>
-        <p>
-            Currently using:
-            <ul>
-                <li>Email: {% if uses_email %} <b style="color: green;">ACTIVE</b> {% else %} inactive {% endif %}</li>
-                <li>Telegram: {% if uses_telegram %} <b style="color: green;">ACTIVE</b> {% else %} inactive {% endif %}</li>
-                <li>Signal: {% if uses_signal %} <b style="color: green;">ACTIVE</b> {% else %} inactive {% endif %}</li>
-            </ul>
-        </p>
-        <p>
-            <a href="{% url 'notification_settings' %}">[ Edit notification settings ]</a>
-        </p>
-	</td><td>
+    <!-- Password -->
+    <div class="col-xl-9 col-lg-12 col-sm-12">
+        <div class="card mb-4">
+            <div class="card-body pb-4">
+                <div>
+                    <h2 class="card-title">Password</h2> 
+                 </div>
+                <dl class="row mb-2" >
+                    <dt class="col-sm-3">Email:</dt>
+                    <dd class="col-sm-9">{{ member.email }}</dd>
+                    <dt class="col-sm-3">Pasword:</dt>
+                    <dd class="col-sm-9">***</dd>
+                </dl>
+                <div>
+                    {% if member == user %}   
+                    <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'password_change' %}'">Change password</button> 
+                    {% endif %}                
+                </div>
+            </div> 
+        </div>
+    </div>
+
+    <!-- Profile Image Section -->
+    <div class="col-xl-9 col-lg-12 col-sm-12">
+        <div class="card mb-4">
+            <div class="card-body pb-4">
+                <div>
+                    <h2 class="card-title">Profile Image</h2>
+                </div>
+                <div class="mt-3 mb-3">
+                    {% if member.image %}
+                    <a href="{{ member.image.url }}" ><img alt="" src="{{ member.image.medium.url }}"/></a>
+                    {% else %}
+                    <div style="width: 150px; height: 50px; border: 1px solid #ccc;text-align: center;padding-top:10px;">No image</div>
+                    {% comment %} <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">No image.</div> {% endcomment %}
+  
+                    {% endif %}
+                </div>
+                {% if member == user %}
+                <div>
+                <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'userdetails' %}'">Edit</button>                
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- SpaceTegoed -->
+    <div class="col-xl-9 col-lg-12 col-sm-12">
+        <div class="card mb-4">
+            <div class="card-body pb-4">
+                <div>
+                    <h2 class="card-title">SpaceTegoed</h2>
+                </div>
+                <dl class="row mb-2" >
+                    <dt class="col-sm-3">Balance:</dt>
+                    {% if balance == 0 %}
+                    <dd class="col-sm-9"> &euro; 0,-</dd>
+                    {% else %}
+                    <dd class="col-sm-9"> {{ balance.balance }} </dd>
+                    {% endif %}
+                </dl>
+                <div>
+                    {% if member == user %} 
+                    <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'mytransactions' %}'">Manage</button> 
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Waiver Section -->
+    <div class="col-xl-9 col-lg-12 col-sm-12">
+        <div class="card mb-4">
+            <div class="card-body pb-4">
+                <div>
+                    <h2 class="card-title">Waiver</h2>
+                </div>
+                <dl class="row mb-3" >
+                    <dt class="col-sm-3">Waiver on File:</dt>
+                    <dd class="col-sm-9">
+                        {% if member.form_on_file %}Yes
+                        {% else %}No.
+                            {%if member == user or  user.is_privileged %}
+                            Download the waiver form, read, sign and then delivery or mail to the address on the form.
+                            {% endif %}
+                        {% endif %}
+                    </dd>
+                </dl>
+                <div>
+                {%if member == user %}     
+                <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'waiverform' user_id=member.id %}'">Download</button> 
+                {% endif %}               
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mailing List Subscriptions Section -->
+    <div class="col-xl-9 col-lg-12 col-sm-12">
+        <div class="card mb-4">
+            <div class="card-body pb-4">
+                <div>
+                    <h2 class="card-title">Mailing List Subscriptions</h2>
+                </div>
+                {% for sub in subscriptions %}
+                <dl class="row mb-3">
+                    <dt class="col-sm-3">Subscription:</dt>
+                    <dd class="col-sm-9">{{ sub.mailinglist.name }}</dd>
+                    <dt class="col-sm-3">Description:</dt>
+                    <dd class="col-sm-9">{{ sub.mailinglist.description }}</dd>
+                    <dt class="col-sm-3">Subscribed:</dt>
+                    <dd class="col-sm-9">{% if sub.active %}yes{% else %}no{% endif %}</dd>
+                    <dt class="col-sm-3">Digest:</dt>
+                    <dd class="col-sm-9">{% if sub.digest %}yes{% else %}no, receive in real time{% endif %}</dd>
+                </dl>
+                {% endfor %}
+                <div>
+                {% if member == user %}
+                <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'mailinglists_edit' user_id=member.id %}'">Edit</button>
+                {% else %}
+                    {% if user.is_privileged %}
+                    <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'mailinglists_edit' user_id=member.id %}'">Edit the subscriptions for {{ member.name }}</button>
+                    {% endif %}
+                {% endif %}                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications Section -->
+    {% if member == user %}
+    <div class="col-xl-9 col-lg-12 col-sm-12">
+        <div class="card mb-4">
+            <div class="card-body pb-4">
+                <div>
+                    <h2 class="card-title">Notifications</h2>
+                </div>
+                <div class="mb-3">
+                    The system can occasionally send you reminders when you forget to check-out, leave machines turned on, or other useful warnings.
+                </div>
+                <div class="mb-3">
+                    Currently using:
+                </div>
+                <dl class="row mb-1" >
+                    <dt class="col-sm-3">Email:</dt>
+                    <dd class="col-sm-9">{% if uses_email %} <b style="color: green;">ACTIVE</b> {% else %} inactive {% endif %}</dd>
+                    <dt class="col-sm-3">Telegram:</dt>
+                    <dd class="col-sm-9">{% if uses_telegram %} <b style="color: green;">ACTIVE</b> {% else %} inactive {% endif %}</dd>
+                    <dt class="col-sm-3">Signal:</dt>
+                    <dd class="col-sm-9">{% if uses_signal %} <b style="color: green;">ACTIVE</b> {% else %} inactive {% endif %}</dd>
+                </dl>
+                <div>
+                    {% if member == user %} 
+                    <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'notification_settings' %}'">Edit</button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
     {% endif %}
 
-	{%if permits %}
-	<tr><td colspan=2><h3>Special Permits and Instructions</h3></tr>
-	{%for p in permits %}
-	<tr><td align=right>{{ p.permit.name }}</td><td>{{ p.permit.description }}
-			{% if not p.active %}
-			Not active at this time (awaiting Trustee approval).
-			{% endif %}
-		</td></tr>
-	{%endfor %}
-	{% endif %}
-{% if tags %}
-	{%if user.is_privileged or member == user %}
-	<tr><td colspan=2><h3>Tags</h3></tr>
-	{%if user.is_privileged %}
-		<tr><td></td><td><a href="{% url 'addmembertounknowntag' user_id=member.id %}">[ add unknown tags to this user ]</a></td></tr>
-	{%endif %}
-        {% for tag in tags %}
-		<tr><td></td><td>
-<a href="{% url 'tag_edit' tag_id=tag.id %}">{{ tag.tag }}</a>
-<a href="{% url 'tag_edit' tag_id=tag.id %}">[edit]</a>
-<a href="{% url 'tag_delete' tag_id=tag.id %}">[delete]</a>
-<br>
-                                  {%if tag.description %}<b>{{tag.description}}</b>{% endif %}<br><i>{% if tag.last_used %}Last seen: {{ tag.last_used }}{% else %}not used recently{% endif %}.</i></tr>
-	{% endfor %}
-	<tr><td></td><td width=400><i>Note: above is only visible to member and the admins. Keep confidential as tags are trivial to clone once you know this number.</i></tr>
-{% endif %}
-        {% endif %}
-	<tr><td colspan=2><h3><a href="{% url 'boxes' %}">Boxes</h3></tr>
-	{% if boxes %}
-        {% for box in boxes %}
-	<tr><td align=right>{{ box.location }} </td><td>
-			{% if box.extra_info %}
-				{{ box.extra_info }}
-			{% else %}
-				{{ box }}
-			{% endif %}
-			{% if box.image %}
-				<br><a href="{{ box.image.url }}"><img alt="" src="{{ box.image.thumbnail.url  }}"/></a>
-			{% endif %}
-			<br>
-			<a href="{% url 'changebox' pk=box.id %}">[update]</a>
-	{%if member == user %}
-			<a href="{% url 'deletebox' pk=box.id %}">[delete]</a>
-	{% endif %}
-		</td></tr>
-	{% endfor %}
-	{% else %}
-	<tr><td></td><td>
-		<i>no box assigned yet.</i>
-		<a href="{% url 'addbox' %}">[add]</a>
-		</td></tr>
-	{% endif %}
+    <!-- Special Permits and Instructions Section -->
+    {% if permits %}
+    <div class="col-xl-9 col-lg-12 col-sm-12">
+        <div class="card mb-4">
+            <div class="card-body pb-4"><div><h2 class="card-title">Special Permits and Instructions</h2></div> 
+                {% for p in permits %}
+                <dl class="row mb-3" >
+                    <dt class="col-sm-3">Name:</dt>
+                    <dd class="col-sm-9">{{ p.permit.name }}</dd> 
+                    <dt class="col-sm-3">Description:</dt>
+                    <dd class="col-sm-9">{{ p.permit.description }}</dd>
+                    {% if not p.active %}
+                    <dt class="col-sm-3">Note:</dt>
+                    <dd class="col-sm-9">Not active at this time (awaiting Trustee approval).</dd>       
+                    {% endif %}
+                </dl>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
 
-{%  if settings.STORAGE %}
-	<tr><td colspan=2><h3><a href="{% url 'storage' %}">Storage</a></h3></tr>
-	{% if storage %}
-        {% for box in storage %}
-	<tr><td align=right>
-			{{ box.location }}<br>
-		</td><td>
-			{{ box.duration }} days until {{ box.enddate }}<br>
-			<b>{{ box.get_state_display }}</b><br>
-			{{ box.extra_info }}<br>
-			{% if box.image %}
-                                 <a href="{{ box.owner_path }}"><img alt="" src="{{ box.image.thumbnail.url  }}"/></a><br/>
-			{% endif %}
-			<a href="{{ box.path }}">[view]</a>
-			<a href="{% url 'changestorage' pk=box.id %}">[update]</a>
-	{%if member == user %}
-			<a href="{% url 'deletestorage' pk=box.id %}">[delete]</a>
-	{% endif %}
-		</td></tr>
-	{% endfor %}
-	{% else %}
-	<tr><td></td><td>
-		<i>no items in special storage</i>
-		<p>
-		<a href="{% url 'addstorage' %}">[request extra storage]</a>
-		</td></tr>
-	{% endif %}
-{% endif %}
-	{%if user.is_privileged or member == user %}
-	<tr><td colspan=2><h3>Machine recently used</h3></tr>
-	<tr><td></td><td>
-          {% if used %}
-            {% for r in used %}
-	    <a href="{{ r.user.path }}">{{ r.machine }}</a> <i>({{ r.used }})</i><br/>
-	    {% endfor %}
-	    <p>
-            <p><i>Note: this list may be incomplete or contain tag-swipes that were not followed by actually powering the machine on. Or when the ADLS was done. It is also limited in time and number of entries. And will only show the most recent swipe in case of successive use.</i></p>
-	  {% else %}
-              <i>None recorded resently.</i>
-          {% endif %}
-        </td></tr>
-        {% endif %}
-	<tr><td colspan=2><h3>Entitlements</h3><div id="Entitlements"/></tr>
-	{% for machine,info in lst.items %}
-	<tr>
-		<td align=right><a href="{{ info.path }}">{{ machine }}</a></td>
-		<td>
-                {%if info.xs == True %}
-		<b>
-			yes
-		</b>
-	                {%if info.requires_permit %}
-	 			-- permit '{{ info.requires_permit }}'
-	                {% if info.requires_form and member.form_on_file == True  %}
-				and liability waiver form
-				{% endif %}
-			on file.
-			{% elif info.requires_instruction == False %}
-			    -- <i>(no instructions needed)</i>
-			{% endif %}
+    <!-- Tags Section -->
+    {% if tags %}
+    <div class="col-xl-9 col-lg-12 col-sm-12">
+        <div class="card mb-4">
+            <div class="card-body pb-4">
+                <div>
+                    <h2 class="card-title">Tags</h2>
+                </div>
+                {% for tag in tags %}
+                <dl class="row mb-3" >
+                    <dt class="col-sm-3">Tag:</dt>
+                    <dd class="col-sm-9">{{ tag.tag }}
+                        <a href="{% url 'tag_edit' tag_id=tag.id %}"> [edit]</a>
+                        <a href="{% url 'tag_delete' tag_id=tag.id %}"> [delete]</a>
+                    </dd>
+                    {% if tag.description %}
+                    <dt class="col-sm-3">Description:</dt>
+                    <dd class="col-sm-9">{{ tag.description }}</dd> 
+                    {% endif %}
+                    {% if tag.last_used %}
+                    <dt class="col-sm-3">Last seen:</dt>
+                    <dd class="col-sm-9">{{ tag.last_used }}</dd> 
+                    {% else %}
+                    <dt class="col-sm-3"></dt>
+                    <dd class="col-sm-9">Not used recently.</dd> 
+                    {% endif %}
+                </dl>
+                {% endfor %}
+                <div class="mb-3">
+                    <i>Note: above is only visible to member and the admins. Keep confidential as tags are trivial to clone once you know this number.</i>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Entitlements Section -->
+    <div class="col-xl-9 col-lg-12 col-sm-12">
+        <div class="card mb-4">
+            <div class="card-body pb-4">
+                <div>
+                    <h2 class="card-title">Entitlements</h2>
+                </div> 
+                <div id="Entitlements"></div>
+                <dl class="row mb-2">
+                {% for machine, info in lst.items %}
+                    <dt class="col-sm-3 mb-1 mt-1"><a href="{{ info.path }}">{{ machine }}:</a></dt>
+                    <dd class="col-sm-9">
+                        {% if info.xs == True %}
+                            <b>yes</b>
+                            {%if info.requires_permit %}
+                                -- permit '{{ info.requires_permit }}'
+                                {% if info.requires_form and member.form_on_file == True  %}
+                                    and liability waiver form
+                                {% endif %}
+                                on file.
+                            {% elif info.requires_instruction == False %}
+                                -- <i>(no instructions needed)</i>
+                            {% endif %}
+                        {% else %}
+                        <i>no.</i>
+                        {% if info.requires_permit %}
+                            {% if info.has_permit %}
+                            <i>Already has the required permit</i>
+                                {% if not info.activated %}
+                                <i>but it is not yet activated by a trustee</i>
+                                {% endif %}.
+                            {% else %}
+                            <i>Requires the permit '{{ info.requires_permit }}'.</i>
+                            {% endif %}
+                        {% else %}
+                            {%if info.requires_instruction == True %}
+                            <i>Instruction needed.</i>
+                            {% endif %}
+                        {% endif %}
+                        {%if info.requires_form == True %}
+                            <i>The required liability waiver</i>
+                            {%if member.form_on_file == False %}
+                                <i>is not yet filed.</i>
+                            {% else %}
+                                <i>is already on file.</i>
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
+                </dd>
+                {% endfor %}
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    <!-- Member Boxes Section -->
+    <div class="col-xl-9 col-lg-12 col-sm-12">
+        <div class="card mb-4">
+            <div class="card-body pb-4">
+                <div>
+                    <h2 class="card-title">Member Box</h2>
+                </div>
+                {% if boxes %}
+                {% for box in boxes %}
+                <dl class="row mb-3" >
+                    <dt class="col-sm-3">Location:</dt>
+                    <dd class="col-sm-9">{{ box.location }}</dd> 
+                    {% if box.extra_info %}
+                    <dt class="col-sm-3">Extra info:</dt>
+                    <dd class="col-sm-9">{{ box.extra_info }}</dd> 
+                    {% endif %}
+                    {% if box.image %}
+                    <dt class="col-sm-3">Image:</dt>
+                    <dd class="col-sm-9"></dd> 
+                    <dt class="col-sm-3"></dt>
+                    <dd class="col-sm-9"> 
+                        <div class="mt-3 mb-2">
+                            <a href="{{ box.image.url }}"><img alt="" src="{{ box.image.thumbnail.url  }}"/></a>   
+                        </div>
+
+                    </dd>
+                    {% endif %}
+                </dl>                       
+                {% endfor %}
                 {% else %}
-		<i>
-			no.
-	                {% if info.requires_permit %}
-			{% if info.has_permit %}
-	 		Already has the required permit
-	                {% if not info.activated %}
-			but it is not yet activated by a trustee
-			{% endif %}.
-			{% else %}
-			Requires the permit
-			'{{ info.requires_permit }}'.
-			{% endif %}
-			{% else %}
-	                {%if info.requires_instruction == True %}
-                        Instruction needed.
-			{% endif %}
-			{% endif %}
-	                {%if info.requires_form == True %}
-			The required liability waiver
-				{%if member.form_on_file == False %}
-				is not yet filed.
-				{% else %}
-				is already on file.
-			        {% endif %}
-			{% endif %}
-		<i/>
-                   {% endif %}
-               </td>
-    	{% endfor %}
-	</tr>
-	<tr><td></td><td><a href="{% url 'add_instruction' %}">[add]</a></td><td>
-</table>
-{% else %}
+                <dl class="row mb-3" >   
+                    <dt class="col-sm-3"></dt>
+                    <dd class="col-sm-9">No box assigned yet.</dd>
+                </dl>
+                {% endif %}
+                <div>
+                    {% if member == user %} 
+                        <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'boxes' %}'">Edit</button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Storage Section -->
+    {% if settings.STORAGE %}
+    <div class="col-xl-9 col-lg-12 col-sm-12">
+        <div class="card mb-4">
+            <div class="card-body pb-4">
+                <div>
+                    <h2 class="card-title">Storage</h2>
+                </div>
+                {% if storage %}
+                {% for box in storage %}
+                <dl class="row mb-3" >
+                    <dt class="col-sm-3">Location:</dt>
+                    <dd class="col-sm-9">{{ box.location }}</dd> 
+                    <dt class="col-sm-3">Duration:</dt>
+                    <dd class="col-sm-9">{{ box.duration }} days until {{ box.enddate }}</dd> 
+                    <dt class="col-sm-3">Extra info:</dt>
+                    <dd class="col-sm-9">{{ box.extra_info }}</dd> 
+                    {% if box.image %}
+                    <dt class="col-sm-3">Image:</dt>
+                    <dd class="col-sm-9"><a href="{{ box.owner_path }}"><img alt="" src="{{ box.image.thumbnail.url }}"/></a></dd> 
+                    {% endif %}
+                </dl>
+                    {% endfor %}
+                    {% else %}
+                <dl class="row mb-3" >    
+                    <dt class="col-sm-3"></dt>
+                    <dd class="col-sm-9">No items in special storage.</dd>    
+                </dl>
+                <div>
+                    {% if member == user %} 
+                    <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'storage' %}'">Edit</button>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Machines recently used Section -->
+    {% if user.is_privileged or member == user %}
+    <div class="col-xl-9 col-lg-12 col-sm-12">
+        <div class="card mb-4">
+            <div class="card-body pb-4"><div><h2 class="card-title">Machines Recently Used</h2></div>
+                {% if used %}
+                <dl class="row mb-0">
+                {% for r in used %}                
+                    <dt class="col-sm-3">{{ r.used }}</dt>
+                    <dd class="col-sm-9">{{ r.machine }}</dd> 
+                {% endfor %}
+                </dl>
+                <div class="mb-3">
+                    <i>Note: this list may be incomplete or contain tag-swipes that were not followed by actually powering the machine on. Or when the ADLS was done. It is also limited in time and number of entries. And will only show the most recent swipe in case of successive use.</i>
+                </div>
+                {% else %}
+                <div class="mb-3">
+                    <i>None recorded recently.</i>
+                {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Personal QR code Section -->
+    <div class="col-xl-9 col-lg-12 col-sm-12">
+        <div class="card mb-4">
+            <div class="card-body pb-4"><div><h2 class="card-title">Personal profile QR code</h2></div>
+                <div class="mb-1">
+                    {% qr_from_text member.url size="m" border=0 %}
+                    <br/>
+                    <font size=-2>{{ member.url }}</font>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% else %}
     <p>Nothing configured yet.</p>
 {% endif %}
 {% endblock %}

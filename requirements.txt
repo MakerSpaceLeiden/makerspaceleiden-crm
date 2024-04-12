@@ -45,3 +45,10 @@ reportlab
 requests
 six
 wheel
+
+# Bootstrap
+django_bootstrap5
+django-flatpickr
+
+# Django REST Framework
+djangorestframework

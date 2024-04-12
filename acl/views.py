@@ -7,19 +7,18 @@ from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
-from ipware import get_client_ip
 
+from ipware import get_client_ip
 from mailinglists.models import Subscription
 from makerspaceleiden.decorators import superuser_or_bearer_required
 from memberbox.models import Memberbox
 from members.forms import TagForm
 from members.models import Tag, User, clean_tag_string
 from storage.models import Storage
-
+from pettycash.models import PettycashBalanceCache
 from .models import Entitlement, Machine, PermitType, RecentUse
 
 logger = logging.getLogger(__name__)
-
 
 def matrix_mm(machine, member):
     out = {"xs": False, "instructions_needed": False, "tags": []}
@@ -239,6 +238,14 @@ def member_overview(request, member_id=None):
         lst[mchn.name] = matrix_mm(mchn, member)
         lst[mchn.name]["path"] = mchn.path()
 
+    user = request.user
+    balance = 0
+    try:
+        balance = PettycashBalanceCache.objects.get(owner=user)
+
+    except ObjectDoesNotExist:
+        pass
+
     context = {
         "title": member.first_name + " " + member.last_name,
         "member": member,
@@ -250,6 +257,7 @@ def member_overview(request, member_id=None):
         "subscriptions": subscriptions,
         "user": request.user,
         "has_permission": request.user.is_authenticated,
+        "balance": balance,
     }
 
     if member == request.user or request.user.is_privileged:
@@ -292,8 +300,8 @@ def missing(tof):
 @login_required
 def missing_forms(request):
     context = {
-        "title": "Missing forms",
-        "desc": "Missing forms (of people who had instruction on a machine that needs it).",
+        "title": "Missing waivers",
+        "desc": "Missing waiver forms (of people who had instruction on a machine that needs it).",
         "amiss": missing(False),
         "has_permission": request.user.is_authenticated,
     }
@@ -304,8 +312,8 @@ def missing_forms(request):
 def filed_forms(request):
     # people_with_forms = User.objects.all().filter(form_on_file = True)
     context = {
-        "title": "Filed forms",
-        "desc": "Forms on file for people that also had instruction on something",
+        "title": "Filed waivers",
+        "desc": "Waiver forms on file for people that also had instruction on something",
         "amiss": missing(True),
         "has_permission": request.user.is_authenticated,
     }

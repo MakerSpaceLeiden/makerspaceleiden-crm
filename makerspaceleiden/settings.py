@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     "ultimaker.apps.UltimakerConfig",
     "spaceapi.apps.SpaceapiConfig",
     "memberlist",
+    "navigation",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -68,6 +69,9 @@ INSTALLED_APPS = [
     #    'autocomplete_light',
     "django.contrib.sites",
     "revproxy",
+    "django_bootstrap5",
+    "django_flatpickr",
+    "rest_framework",
 ]
 
 SITE_ID = 1

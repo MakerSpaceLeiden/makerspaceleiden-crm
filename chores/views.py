@@ -99,6 +99,7 @@ def index(request):
     context = {
         "title": "Chores",
         "event_groups": event_groups,
+        "has_permission": request.user.is_authenticated,
     }
     return render(request, "chores.html", context)
 
