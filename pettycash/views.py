@@ -10,7 +10,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from django.forms import widgets
 from django.http import HttpResponse, JsonResponse
-from django.middleware.csrf import CsrfViewMiddleware
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils import timezone
@@ -458,9 +457,9 @@ def cam53process(request):
     if request.method != "POST":
         return HttpResponse("Unknown FAIL", status=400, content_type="text/plain")
 
-#    reason = CsrfViewMiddleware().process_view(request, None, (), {})
-#    if reason:
-##        return HttpResponse("CSRF FAIL", status=400, content_type="text/plain")
+    #    reason = CsrfViewMiddleware().process_view(request, None, (), {})
+    #    if reason:
+    ##        return HttpResponse("CSRF FAIL", status=400, content_type="text/plain")
 
     ok = []
     failed = []
