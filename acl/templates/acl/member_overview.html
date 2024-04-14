@@ -51,6 +51,7 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
     </div>
 
     <!-- Password -->
+    {% if member == user %}
     <div class="col-xl-9 col-lg-12 col-sm-12">
         <div class="card mb-4">
             <div class="card-body pb-4">
@@ -60,7 +61,7 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
                 <dl class="row mb-2" >
                     <dt class="col-sm-3">Email:</dt>
                     <dd class="col-sm-9">{{ member.email }}</dd>
-                    <dt class="col-sm-3">Pasword:</dt>
+                    <dt class="col-sm-3">Password:</dt>
                     <dd class="col-sm-9">***</dd>
                 </dl>
                 <div>
@@ -71,6 +72,7 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
             </div> 
         </div>
     </div>
+    {% endif %}
 
     <!-- Profile Image Section -->
     <div class="col-xl-9 col-lg-12 col-sm-12">
@@ -84,8 +86,6 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
                     <a href="{{ member.image.url }}" ><img alt="" src="{{ member.image.medium.url }}"/></a>
                     {% else %}
                     <div style="width: 150px; height: 50px; border: 1px solid #ccc;text-align: center;padding-top:10px;">No image</div>
-                    {% comment %} <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">No image.</div> {% endcomment %}
-  
                     {% endif %}
                 </div>
                 {% if member == user %}
@@ -98,6 +98,7 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
     </div>
 
     <!-- SpaceTegoed -->
+    {% if member == user %}
     <div class="col-xl-9 col-lg-12 col-sm-12">
         <div class="card mb-4">
             <div class="card-body pb-4">
@@ -120,6 +121,7 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
             </div>
         </div>
     </div>
+    {% endif %}
 
     <!-- Waiver Section -->
     <div class="col-xl-9 col-lg-12 col-sm-12">
