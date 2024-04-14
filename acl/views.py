@@ -142,6 +142,7 @@ def machine_list(request):
         "members": members,
         "machines": machines,
         "has_permission": request.user.is_authenticated,
+        "title":"Machines"
     }
     return render(request, "acl/machines.html", context)
 
