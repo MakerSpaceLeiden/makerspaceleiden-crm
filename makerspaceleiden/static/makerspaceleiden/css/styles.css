@@ -172,7 +172,7 @@ input, textarea, select, .form-row p, form .button {
 }
 
 .makerspace-name {
-    color: var(--header-color) !important;
+    color: #ffc !important;
     font-size: 1rem;
     text-decoration: none !important;
 }
@@ -201,9 +201,7 @@ ul.messagelist li {
 }
 
 .dark-color-bar {
-    background-color: var(--primary);
-    /* height:52px; */
-    /* overflow: auto; */
+    background-color: rgb(121, 174, 200);
 }
 
 

@@ -1,12 +1,7 @@
 
-:root {
-    --navbar-custom-fg:  var(--body-bg);
-    --navbar-custom-link-fg: var(--body-bg);
-} 
-
 .navbar-custom {
     border: none;
-    color: var(--navbar-custom-fg);
+    color: white;
     display: flex;
     justify-content: center; 
     --bs-navbar-padding-x: none;
@@ -14,13 +9,13 @@
 }
 
 .navbar-custom .navbar-nav .nav-link {
-    color: var(--navbar-custom-fg);
-    font-size:var(--bs-body-font-size);
+    color: white;
+    font-size: 1rem;
 }
 
 .navbar-custom .navbar-nav .nav-link:hover,
 .navbar-custom .navbar-nav .nav-link:focus {
-    color: var(--navbar-custom-link-fg);
+    color: white;
 }
 
 .navbar-collapse {
@@ -30,8 +25,8 @@
 }
 
 .navbar-custom .dropdown-menu .dropdown-item {
-    font-size:var(--bs-body-font-size);
-    color:  var(--link-fg);
+    font-size: 1rem;
+    color: rgb(65,120,147);
     text-decoration: none !important;
     padding-top: 0.0rem;
     padding-bottom: 0.2rem;
@@ -44,17 +39,17 @@
 }
 
 .navbar-custom .navbar-nav .nav-item.active .nav-link {
-    color: var(--navbar-custom-link-fg);
-    background-color: var(--navbar-custom-bg);
-    font-size:var(--bs-body-font-size);
+    color: white;
+    background-color: rgb(121, 174, 200);
+    font-size: 1rem;
 }
 
 .navbar-custom .navbar-toggler-icon {
-    background-color: var(--navbar-custom-fg);
+    background-color: white;
 }
 
 .navbar-custom .navbar-toggler {
-    border-color: var(--navbar-custom-fg);
+    border-color: white;
 }
 
 .navbar .collapse li {
@@ -121,7 +116,6 @@
 .navbar-status-button {
       padding-left: 8px !important;
       padding-right:  8px !important;
-      /* border-radius: 0; */
       border-bottom-left-radius: 0;
       border-bottom-right-radius: 0; 
       border-bottom: none;
