@@ -1,5 +1,6 @@
 {% load i18n static %}
 {% load django_bootstrap5 %}
+{% load motd_tag %}
 {% load isingroup %}
 
 <!DOCTYPE html>
@@ -93,8 +94,19 @@
                     </div>
                 </div>
             {% endif %}
+
+            {% if user.is_authenticated %}
+                <div class="motd-bar-block">
+                    {% block motd %}
+                        {% if include_motd %} 
+                            {% render_motd %}
+                        {% endif %} 
+                    {% endblock %}
+                </div>
+            {% endif %}
+
         {% endif %}
-                
+        
         {% block messages %}
             {% if messages %}
             <ul class="messagelist">
