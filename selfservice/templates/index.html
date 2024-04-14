@@ -3,49 +3,74 @@
 
 {% block content %}
 
-{% if is_logged_in %}
-{% if wifinetworks %}
-<script>
-function showPw(fld) {
-  var x = document.getElementById(fld);
-  if (x.type === "password") {
-    x.type = "text";
-    window.setTimeout(function() { showPw(fld); }, 15000);
-  } else {
-    x.type = "password";
-  }
-}
-</script>
-<p>Passwords for members only:</p>
-<blockquote>
-<table>
-<tr><th>network/use</th><th>password</th></tr>
-{% for e in wifinetworks %}
-{%if not e.adminsonly or user|isNetAdmin or user.is_privileged %}
-  <tr>
-	<td align=left><input size=32 style="border:none" type=text value="{{ e.network }}">
-		{%if e.adminsonly %}<font color="red">*</font>{% endif %}
-	</td>
-	<td align=left><input size=32 style="border:none; font-family: monospace;" value="{{ e.password }}" id="{{ e.network }}"
-        {% if e.adminsonly %}
-		type="password"/><input style="padding:5px" type=button value=show onClick="showPw('{{ e.network }}');"
-	{%endif%}
-	/>
-	</td>
-  </tr>
-{% endif %}
-{% endfor %}
-</table>
-</blockquote>
-{% if user|isNetAdmin %}
-<p/>
-<i><font color=red>*)</font><i> This password is only visible to network administrators. Of which you are one. Do not share outside this group - or consult with one of the trustees first.</i><p/>
-{% endif %}
-{% else %}
-There are no passwords for members at the moment.
-{% endif %}
+<div class="mb-4">
+	{% if is_logged_in %}
+		{% if wifinetworks %}
+
+			<div class="col-xl-9 col-lg-12 col-sm-12 mt-4">
+				<h2>Passwords</h2>
+				For members only:
+				<div class="card mt-2 mb-3">
+					<div class="card-header">
+						<div class="row">
+							<div class="col-lg-6 col-md-7 col-12">
+								Network/Use
+							</div>
+							<div class="col-lg-5 col-md-5 col-12">
+								Password
+							</div>
+						</div>
+					</div>
+					<ul class="list-group list-group-flush pt-0" >
+						{% for e in wifinetworks %}
+							{% if not e.adminsonly or user|isNetAdmin or user.is_privileged %}
+								<li class="list-group-item pt-2" style="{% if forloop.last %} border-bottom: none;{% endif %}">
+									<div class="row">
+										<div class="col-lg-6 col-md-7 col-12 mt-1 mb-1">
+											{{ e.network }}
+											{% if e.adminsonly %}<font color="red">*</font>{% endif %}
+										</div>
+										<div class="col-lg-5 col-md-5 col-12 mt-1 mb-1">
+											<div id="pw_wrapper_{{ e.network }}">
+												{% if e.adminsonly %}
+													<div id="pw_display_{{ e.network }}" onclick="showPassword('{{ e.network }}')" style="color:rgb(65,120,147);">Show password</div>
+													<div style="display: none;" id="pw_input_{{ e.network }}">{{ e.password }}</div>
+												{% else %}
+													<div>{{ e.password }}</div>
+												{% endif %}
+											</div>
+										</div>
+									</div>
+								</li>
+								<script>
+									{% if e.adminsonly %}
+										function showPassword(network) {
+											var display = document.getElementById("pw_display_" + network);
+											var input = document.getElementById("pw_input_" + network);
+											display.style.display = "none";
+											input.style.display = "inline";
+											setTimeout(function() {
+												input.style.display = "none";
+												display.style.display = "inline";
+											}, 10000); // Revert to 'Show password' after 10 seconds
+										}
+									{% endif %}
+								</script>
+							{% endif %}
+						{% endfor %}
+					</ul>
+				</div>
+				{% if user|isNetAdmin or user.is_privileged %}
+				<small><font color=red>* </font> This password is only visible to the administrators, of which you are one. Do not share outside this group, or consult with one of the trustees first.</small>
+				{% endif %}
+			</div>
+
+		{% else %}
+		There are no passwords for members at the moment.
+		{% endif %}
+	</div>
+
 <h2>Manage your data</h2>
-<p>
 <ul>
 	<li><a href="https://wiki.makerspaceleiden.nl">General documentation</a>
 	<li><a href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Categorie:Tool">List of all tools</a> and their documentation.
@@ -113,7 +138,6 @@ There are no passwords for members at the moment.
 	<li><a href="{% url 'cam53upload' %}">Upload Triodos transactions</a>
         </p>
 {% endif %}
-	<p/>
 	<li><a href="{% url 'logout' %}?next={% url 'index' %}">logout</a>
 	</ul>
 {% else %}
