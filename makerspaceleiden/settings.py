@@ -60,7 +60,7 @@ INSTALLED_APPS = [
     "spaceapi.apps.SpaceapiConfig",
     "memberlist",
     "navigation",
-    "motd", 
+    "motd",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",

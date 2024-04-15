@@ -12,7 +12,7 @@
     <div class="row row-cols-1 w-100">
       <div class="col-10 order-0 pe-0">
         <div class="row">
-          
+
         <!-- Navigation icon for mobile -->
           <div class="col-6 order-0 d-lg-none col-sm-6">
             <div class="navbar-icon-mobile-div">
@@ -30,7 +30,7 @@
               </a>
             </div>
           </div>
-          
+
           <!-- Home icon -->
           <div class="col-auto order-1 ml-sm-4">
             <div class="navbar-home-icon-div">
@@ -56,10 +56,10 @@
                       <li><a class="dropdown-item" href="{% url 'add_instruction' %}">Record instructions</a></li>
                       <li><a class="dropdown-item" href="{% url 'mytransactions' %}">Manage SpaceTegoed</a></li>
                       <li><a class="dropdown-item" href="{% url 'invoice' src=user.id %}">Pay for a product</a></li>
-                      <li><a class="dropdown-item" href="{% url 'boxes' %}">Members boxes</a></li>              
+                      <li><a class="dropdown-item" href="{% url 'boxes' %}">Members boxes</a></li>
                       <li><a class="dropdown-item" href="{% url 'mailinglists_archives' %}">Mailing lists archive</a></li>
                       {%  if settings.STORAGE %}
-                      <li><a class="dropdown-item" href="{% url 'storage' %}">Storage management</a></li>  
+                      <li><a class="dropdown-item" href="{% url 'storage' %}">Storage management</a></li>
                       {% endif %}
                       {% if settings.GRAND_AMNESTY %}
                       <li><a class="dropdown-item" href="{% url 'amnesty' %}">Grand amnesty</a></li>
@@ -76,7 +76,7 @@
                       <li><a class="dropdown-item" href="{% url 'motd_messages' %}">Message of the day </a></li>
                       <li><a class="dropdown-item" href="{% url 'ufo' %}">UFO lost and found </a></li>
                       <li><a class="dropdown-item" href="{% url 'camindex' %}">Live printer camera</a></li>
-                      <li><a class="dropdown-item" href="/crm/kwh">Power consumption of the space</a></li>                     
+                      <li><a class="dropdown-item" href="/crm/kwh">Power consumption of the space</a></li>
                     </ul>
                   </li>
                   <li class="nav-item dropdown">
@@ -90,7 +90,7 @@
                       <li><a class="dropdown-item" href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Makerspace_Leiden#Procedures_en_Principes">Procedures and principles</a></li>
                       <li><a class="dropdown-item" href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Nieuw_artikel_aanmaken">Create a new wiki</a></li>
                       <li><a class="dropdown-item" href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Nieuweblog">Create a new blog article</a></li>
-                      <li><a class="dropdown-item" href="https://makerspaceleiden.nl">Members projects</a></li>            
+                      <li><a class="dropdown-item" href="https://makerspaceleiden.nl">Members projects</a></li>
                       <li><a class="dropdown-item" href="https://makerspaceleiden.nl">About Us</a></li>
                     </ul>
                   </li>
@@ -110,11 +110,11 @@
                       <li><a class="dropdown-item" href="{% url 'acl-index' %}">Permit use</a></li>
                       <li><a class="dropdown-item" href="{% url 'cam53upload' %}">Upload member transactions</a></li>
                       <li><a class="dropdown-item" href="{% url 'mailinglists_subs' %}">Members mailing list subscriptions</a></li>
-                    {% endif %} 
-                    {% if user.is_privileged or user|isMainsAdmin %} 
+                    {% endif %}
+                    {% if user.is_privileged or user|isMainsAdmin %}
                       <li><a class="dropdown-item" href="{% url 'mainsindex' %}">Lucas MainsSensors</a></li>
                       <li><a class="dropdown-item" href="/api/v1/mainssensor/resolve">Sensor descriptions</a></li>
-                    {% endif %} 
+                    {% endif %}
 
                     {% if user|isPettycashAdmin or user|isTreasurer %}
                           <li><a class="dropdown-item" href="{% url 'unpaired' %}">Payment stations</a></li>
@@ -132,7 +132,7 @@
         <div class="d-flex justify-content-end align-items-end h-100">
           <!-- Temporary placeholder instead of space status button -->
           <div class="temporary-placeholder-for-space-status order-3 d-flex align-items-stretch" style="height: 52px;">
-          </div> 
+          </div>
         </div>
       </div>
     </div>
@@ -140,5 +140,4 @@
 </nav>
 
 
-<script src="{% static 'navigation/js/script.js' %}"></script> 
-
+<script src="{% static 'navigation/js/script.js' %}"></script>
