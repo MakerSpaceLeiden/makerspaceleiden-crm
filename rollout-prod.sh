@@ -4,8 +4,7 @@ UK=$$
 
 trap cleanup INT
 cleanup () {
-	echo Cleaning up
-	rm -f /tmp/backup.$$ /tmp/backup.$UK /tmp/backup-static.$UK
+	test -f /tmp/backup.$UK && echo Warning - you will need to clean up the backup files in /tmp/*.$UK
 }
 
 (
