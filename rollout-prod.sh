@@ -28,6 +28,3 @@ E=$?
 
 cleanup
 exit $E
-
-
-
