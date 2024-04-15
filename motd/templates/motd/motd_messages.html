@@ -10,7 +10,7 @@
     <div class="col-md-9 order-0 order-md-0 pt-2">
         <div class="card scrollable pt-0 pb-3" id="message-text">
             <div class="card-body " style="max-height: 600px; min-height:250px; overflow-y: auto;">
-                
+
                 {% if selected_message %}
                     <div>
                         <h1 class="card-title" >{{ selected_message.motd|urlize }}</h1>
@@ -21,7 +21,7 @@
                             <div class="creation-info">
                                 <small>This message was posted by {{ created_by }} at {{ creation_date }}</small>
                             </div>
-                            {% if is_updated %} 
+                            {% if is_updated %}
                                 <div class="update-info">
                                     <small>This message was updated by {{ updated_by }} at {{ update_date }}</small>
                                 </div>
@@ -43,8 +43,8 @@
         <div class="scrollable rounded" style="max-height: 600px;  overflow-y: auto;">
             <ul class="list-group">
             {% for motd_item in object_list %}
-                <a class="list-group-item list-group-item-action pt-1 pb-1" style="{% if selected_message.pk == motd_item.pk %} background-color: #f7f7f7;{% endif %}"  href="{% url 'motd_messages_detail' pk=motd_item.pk %}"> 
-                    <div>    
+                <a class="list-group-item list-group-item-action pt-1 pb-1" style="{% if selected_message.pk == motd_item.pk %} background-color: #f7f7f7;{% endif %}"  href="{% url 'motd_messages_detail' pk=motd_item.pk %}">
+                    <div>
                             {% if motd_item.motd|length > 30 %}{{ motd_item.motd|slice:":30" }}...
                             {% else %}
                                 {{ motd_item.motd }}
@@ -66,8 +66,8 @@
             <div class="col-auto pe-0">
                 <button type="button" onclick="window.location.href='{% url 'motd_update' selected_message.pk %}'" class="btn btn-primary">Edit</button>
             </div>
-            {% endif %}  
-            <div class="col-auto">          
+            {% endif %}
+            <div class="col-auto">
                 <button type="button" onclick="window.location.href='{% url 'motd_create' %}'" class="btn btn-primary">Create New</button>
             </div>
         </div>

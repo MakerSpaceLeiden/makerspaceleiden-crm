@@ -20,6 +20,14 @@ Or use URLs such as
 to check  the API (this assumes local.py to contain the Foo password; see debug.py) and some machine
 given a node name.
 
+# Committing
+
+Make sure `pre-commit` is installed when committing. This can be done by installing using poetry (pre-commit is a dev dependency) or manually installing pre-commit with the instructions found [here](https://pre-commit.com/#install).
+
+Once `pre-commit` is installed, you can run `pre-commit install` to install the necessary git hooks. After this you're set to commit!
+
+There are pipelines running pre-commit is as well to check whether pre-commit was run successfully. If any issues arise in the pipeline, first try to run pre-commit locally using `pre-commit run --all-files`.
+
 # Requirements
 
 ## Trustees

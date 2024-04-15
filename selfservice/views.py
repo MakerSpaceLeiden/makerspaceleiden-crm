@@ -203,7 +203,7 @@ def recordinstructions(request):
         context["machines"] = []
         context["holder"] = []
         holder = []
-        
+
         for mid in form.cleaned_data["machine"]:
             try:
                 m = Machine.objects.get(pk=mid)
@@ -267,7 +267,9 @@ def recordinstructions(request):
                 context["created"] = created
                 context["machines"].append(m)
                 context["issuer"] = i
-                context["holder"] = list(set(holder)) # Using set() to remove duplicates
+                context["holder"] = list(
+                    set(holder)
+                )  # Using set() to remove duplicates
 
                 saved = True
             # except Exception as e:
@@ -617,16 +619,17 @@ def space_state(request):
 
     context = {}
     aggregator_adapter = get_aggregator_adapter()
-    
-    try:       
-       context = aggregator_adapter.fetch_state_space()
-    except:
-       context["no_data_available"] = True
+
+    try:
+        context = aggregator_adapter.fetch_state_space()
+    except Exception as e:
+        logger.error("No data available, exception: {0}".format(str(e)))
+        context["no_data_available"] = True
 
     context["user"] = user
     context["title"] = "State of the Space"
     context["has_permission"] = request.user.is_authenticated
-    
+
     return render(request, "space_state.html", context)
 
 

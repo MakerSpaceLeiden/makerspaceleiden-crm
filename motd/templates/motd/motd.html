@@ -7,7 +7,7 @@
 
 {% if motd_items %}
 <div id="motd-bar" class="custom-motd-bar">
-    <div class="motd-text" id="motd-text">       
+    <div class="motd-text" id="motd-text">
     {% for motd_item in motd_items %}
     <a href="{% url 'motd_messages_detail'  pk=motd_item.pk %}">
             <span class="motd-message">{{ motd_item.motd }}</span>

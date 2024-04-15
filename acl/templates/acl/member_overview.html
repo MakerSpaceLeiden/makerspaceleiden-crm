@@ -19,23 +19,23 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
         <div class="card mb-4">
             <div class="card-body pb-4">
                 <div>
-                   <h2 class="card-title">Personal Details</h2> 
+                   <h2 class="card-title">Personal Details</h2>
                 </div>
                 <dl class="row mb-1" >
                     <dt class="col-sm-3 ">First Name:</dt>
                     <dd class="col-sm-9">{{ member.first_name }}</dd>
-                    
+
                     <dt class="col-sm-3 ">Last Name:</dt>
                     <dd class="col-sm-9">{{ member.last_name }}</dd>
-                    
+
                     <dt class="col-sm-3 ">Email:</dt>
                     <dd class="col-sm-9">{{ member.email }}</dd>
-                    
+
                     {% if user.is_privileged or member == user %}
                         {% if member.phone_number %}
                             <dt class="col-sm-3 ">Phone:</dt>
                             <dd class="col-sm-9">{{ member.phone_number }}</dd>
-                            
+
                             <dt class="col-sm-3"></dt>
                             <dd class="col-sm-9"><small>Note: The phone number is only visible to members and admins.</small></dd>
                         {% endif %}
@@ -44,7 +44,7 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
                 <div>
                 {% if member == user %}
                 <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'userdetails' %}'">Edit</button>
-                {% endif %}                    
+                {% endif %}
                 </div>
             </div>
         </div>
@@ -56,7 +56,7 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
         <div class="card mb-4">
             <div class="card-body pb-4">
                 <div>
-                    <h2 class="card-title">Password</h2> 
+                    <h2 class="card-title">Password</h2>
                  </div>
                 <dl class="row mb-2" >
                     <dt class="col-sm-3">Email:</dt>
@@ -65,11 +65,11 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
                     <dd class="col-sm-9">***</dd>
                 </dl>
                 <div>
-                    {% if member == user %}   
-                    <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'password_change' %}'">Change password</button> 
-                    {% endif %}                
+                    {% if member == user %}
+                    <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'password_change' %}'">Change password</button>
+                    {% endif %}
                 </div>
-            </div> 
+            </div>
         </div>
     </div>
     {% endif %}
@@ -90,7 +90,7 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
                 </div>
                 {% if member == user %}
                 <div>
-                <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'userdetails' %}'">Edit</button>                
+                <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'userdetails' %}'">Edit</button>
                 </div>
                 {% endif %}
             </div>
@@ -114,8 +114,8 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
                     {% endif %}
                 </dl>
                 <div>
-                    {% if member == user %} 
-                    <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'mytransactions' %}'">Manage</button> 
+                    {% if member == user %}
+                    <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'mytransactions' %}'">Manage</button>
                     {% endif %}
                 </div>
             </div>
@@ -142,9 +142,9 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
                     </dd>
                 </dl>
                 <div>
-                {%if member == user %}     
-                <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'waiverform' user_id=member.id %}'">Download</button> 
-                {% endif %}               
+                {%if member == user %}
+                <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'waiverform' user_id=member.id %}'">Download</button>
+                {% endif %}
                 </div>
             </div>
         </div>
@@ -176,7 +176,7 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
                     {% if user.is_privileged %}
                     <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'mailinglists_edit' user_id=member.id %}'">Edit the subscriptions for {{ member.name }}</button>
                     {% endif %}
-                {% endif %}                    
+                {% endif %}
                 </div>
             </div>
         </div>
@@ -205,7 +205,7 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
                     <dd class="col-sm-9">{% if uses_signal %} <b style="color: green;">ACTIVE</b> {% else %} inactive {% endif %}</dd>
                 </dl>
                 <div>
-                    {% if member == user %} 
+                    {% if member == user %}
                     <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'notification_settings' %}'">Edit</button>
                     {% endif %}
                 </div>
@@ -218,16 +218,16 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
     {% if permits %}
     <div class="col-xl-9 col-lg-12 col-sm-12">
         <div class="card mb-4">
-            <div class="card-body pb-4"><div><h2 class="card-title">Special Permits and Instructions</h2></div> 
+            <div class="card-body pb-4"><div><h2 class="card-title">Special Permits and Instructions</h2></div>
                 {% for p in permits %}
                 <dl class="row mb-3" >
                     <dt class="col-sm-3">Name:</dt>
-                    <dd class="col-sm-9">{{ p.permit.name }}</dd> 
+                    <dd class="col-sm-9">{{ p.permit.name }}</dd>
                     <dt class="col-sm-3">Description:</dt>
                     <dd class="col-sm-9">{{ p.permit.description }}</dd>
                     {% if not p.active %}
                     <dt class="col-sm-3">Note:</dt>
-                    <dd class="col-sm-9">Not active at this time (awaiting Trustee approval).</dd>       
+                    <dd class="col-sm-9">Not active at this time (awaiting Trustee approval).</dd>
                     {% endif %}
                 </dl>
                 {% endfor %}
@@ -253,14 +253,14 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
                     </dd>
                     {% if tag.description %}
                     <dt class="col-sm-3">Description:</dt>
-                    <dd class="col-sm-9">{{ tag.description }}</dd> 
+                    <dd class="col-sm-9">{{ tag.description }}</dd>
                     {% endif %}
                     {% if tag.last_used %}
                     <dt class="col-sm-3">Last seen:</dt>
-                    <dd class="col-sm-9">{{ tag.last_used }}</dd> 
+                    <dd class="col-sm-9">{{ tag.last_used }}</dd>
                     {% else %}
                     <dt class="col-sm-3"></dt>
-                    <dd class="col-sm-9">Not used recently.</dd> 
+                    <dd class="col-sm-9">Not used recently.</dd>
                     {% endif %}
                 </dl>
                 {% endfor %}
@@ -278,7 +278,7 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
             <div class="card-body pb-4">
                 <div>
                     <h2 class="card-title">Entitlements</h2>
-                </div> 
+                </div>
                 <div id="Entitlements"></div>
                 <dl class="row mb-2">
                 {% for machine, info in lst.items %}
@@ -338,32 +338,32 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
                 {% for box in boxes %}
                 <dl class="row mb-3" >
                     <dt class="col-sm-3">Location:</dt>
-                    <dd class="col-sm-9">{{ box.location }}</dd> 
+                    <dd class="col-sm-9">{{ box.location }}</dd>
                     {% if box.extra_info %}
                     <dt class="col-sm-3">Extra info:</dt>
-                    <dd class="col-sm-9">{{ box.extra_info }}</dd> 
+                    <dd class="col-sm-9">{{ box.extra_info }}</dd>
                     {% endif %}
                     {% if box.image %}
                     <dt class="col-sm-3">Image:</dt>
-                    <dd class="col-sm-9"></dd> 
+                    <dd class="col-sm-9"></dd>
                     <dt class="col-sm-3"></dt>
-                    <dd class="col-sm-9"> 
+                    <dd class="col-sm-9">
                         <div class="mt-3 mb-2">
-                            <a href="{{ box.image.url }}"><img alt="" src="{{ box.image.thumbnail.url  }}"/></a>   
+                            <a href="{{ box.image.url }}"><img alt="" src="{{ box.image.thumbnail.url  }}"/></a>
                         </div>
 
                     </dd>
                     {% endif %}
-                </dl>                       
+                </dl>
                 {% endfor %}
                 {% else %}
-                <dl class="row mb-3" >   
+                <dl class="row mb-3" >
                     <dt class="col-sm-3"></dt>
                     <dd class="col-sm-9">No box assigned yet.</dd>
                 </dl>
                 {% endif %}
                 <div>
-                    {% if member == user %} 
+                    {% if member == user %}
                         <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'boxes' %}'">Edit</button>
                     {% endif %}
                 </div>
@@ -383,24 +383,24 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
                 {% for box in storage %}
                 <dl class="row mb-3" >
                     <dt class="col-sm-3">Location:</dt>
-                    <dd class="col-sm-9">{{ box.location }}</dd> 
+                    <dd class="col-sm-9">{{ box.location }}</dd>
                     <dt class="col-sm-3">Duration:</dt>
-                    <dd class="col-sm-9">{{ box.duration }} days until {{ box.enddate }}</dd> 
+                    <dd class="col-sm-9">{{ box.duration }} days until {{ box.enddate }}</dd>
                     <dt class="col-sm-3">Extra info:</dt>
-                    <dd class="col-sm-9">{{ box.extra_info }}</dd> 
+                    <dd class="col-sm-9">{{ box.extra_info }}</dd>
                     {% if box.image %}
                     <dt class="col-sm-3">Image:</dt>
-                    <dd class="col-sm-9"><a href="{{ box.owner_path }}"><img alt="" src="{{ box.image.thumbnail.url }}"/></a></dd> 
+                    <dd class="col-sm-9"><a href="{{ box.owner_path }}"><img alt="" src="{{ box.image.thumbnail.url }}"/></a></dd>
                     {% endif %}
                 </dl>
                     {% endfor %}
                     {% else %}
-                <dl class="row mb-3" >    
+                <dl class="row mb-3" >
                     <dt class="col-sm-3"></dt>
-                    <dd class="col-sm-9">No items in special storage.</dd>    
+                    <dd class="col-sm-9">No items in special storage.</dd>
                 </dl>
                 <div>
-                    {% if member == user %} 
+                    {% if member == user %}
                     <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'storage' %}'">Edit</button>
                     {% endif %}
                 </div>
@@ -417,9 +417,9 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
             <div class="card-body pb-4"><div><h2 class="card-title">Machines Recently Used</h2></div>
                 {% if used %}
                 <dl class="row mb-0">
-                {% for r in used %}                
+                {% for r in used %}
                     <dt class="col-sm-3">{{ r.used }}</dt>
-                    <dd class="col-sm-9">{{ r.machine }}</dd> 
+                    <dd class="col-sm-9">{{ r.machine }}</dd>
                 {% endfor %}
                 </dl>
                 <div class="mb-3">
