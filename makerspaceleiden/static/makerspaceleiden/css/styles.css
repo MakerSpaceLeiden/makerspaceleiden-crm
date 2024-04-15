@@ -4,9 +4,9 @@ body {
 }
 
 h1 {
-    font-size: 1.5rem !important; 
+    font-size: 1.5rem !important;
     margin-top: 0.5rem !important;
-    margin-bottom: 0.5rem !important; 
+    margin-bottom: 0.5rem !important;
 }
 
 h2 {
@@ -17,8 +17,8 @@ h2 {
 }
 
 h3 {
-    font-size: 1.0rem !important; 
-    font-weight: 700 !important; 
+    font-size: 1.0rem !important;
+    font-weight: 700 !important;
     margin-top: 0.5rem !important;
     margin-bottom: 0.5rem !important;
 }
@@ -67,7 +67,7 @@ ul.errorlist li {
 }
 
 table tbody tr {
-    background-color: transparent !important; 
+    background-color: transparent !important;
     border-bottom: 0.05rem solid #eee;
 }
 
@@ -89,7 +89,7 @@ tfoot td {
 
 
 th label{
-    font-size: 1.0rem ; 
+    font-size: 1.0rem ;
     line-height: 1.25rem;
 }
 
@@ -147,18 +147,18 @@ input, textarea, select, .form-row p, form .button {
 }
 
 #user-profile-button {
-    padding-top: 2px; 
-    padding-bottom: 3px; 
-    padding-left:7px; 
-    padding-right:7px; 
+    padding-top: 2px;
+    padding-bottom: 3px;
+    padding-left:7px;
+    padding-right:7px;
     font-size: 0.85rem;
 }
 
 #log-out-button {
-    padding-top: 2px; 
-    padding-bottom: 3px; 
-    padding-left:6px; 
-    padding-right:6px; 
+    padding-top: 2px;
+    padding-bottom: 3px;
+    padding-left:6px;
+    padding-right:6px;
     font-size: 0.85rem;
 }
 
@@ -178,12 +178,12 @@ input, textarea, select, .form-row p, form .button {
 }
 
 .makerspace-name-div {
-    padding-top: 2px !important; 
+    padding-top: 2px !important;
     padding-bottom: 2px !important;
 }
 
 .date-input {
-    min-width: 120px !important; 
+    min-width: 120px !important;
     max-width: 120px !important;
     text-align: center;
 }
@@ -193,7 +193,7 @@ input, textarea, select, .form-row p, form .button {
 }
 
 ul.messagelist li {
-    background-position: 40px 4px; 
+    background-position: 40px 4px;
 }
 
 .login .navbar {
@@ -215,5 +215,3 @@ ul.messagelist li {
         padding-bottom: 8px !important;
     }
 }
-
-

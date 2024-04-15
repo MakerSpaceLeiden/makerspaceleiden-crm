@@ -7,8 +7,8 @@ from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
-
 from ipware import get_client_ip
+
 from mailinglists.models import Subscription
 from makerspaceleiden.decorators import superuser_or_bearer_required
 from memberbox.models import Memberbox
@@ -16,10 +16,11 @@ from members.forms import TagForm
 from members.models import Tag, User, clean_tag_string
 from pettycash.models import PettycashBalanceCache
 from storage.models import Storage
-from pettycash.models import PettycashBalanceCache
+
 from .models import Entitlement, Machine, PermitType, RecentUse
 
 logger = logging.getLogger(__name__)
+
 
 def matrix_mm(machine, member):
     out = {"xs": False, "instructions_needed": False, "tags": []}
@@ -500,9 +501,7 @@ def api_getok(request, machine=None, tag=None):
         machine = Machine.objects.get(node_machine_name=machine)
     except ObjectDoesNotExist:
         logger.error("Machine '{}' not found, denied.".format(machine))
-        return HttpResponse(
-                "Machine not found", status=404, content_type="text/plain"
-        )
+        return HttpResponse("Machine not found", status=404, content_type="text/plain")
     try:
         r = RecentUse(user=tag.owner, machine=machine)
         r.save()

@@ -61,7 +61,7 @@ INSTALLED_APPS = [
     "memberlist",
     "nodered.apps.NoderedConfig",
     "navigation",
-    "motd", 
+    "motd",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",

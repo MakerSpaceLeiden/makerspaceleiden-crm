@@ -3,7 +3,7 @@
     border: none;
     color: white;
     display: flex;
-    justify-content: center; 
+    justify-content: center;
     --bs-navbar-padding-x: none;
     --bs-navbar-brand-margin-end: none;
 }
@@ -19,7 +19,7 @@
 }
 
 .navbar-collapse {
-    margin-left: 0.0rem !important; 
+    margin-left: 0.0rem !important;
     padding-top: 0.3rem !important;
     padding-bottom: 0.4rem !important;
 }
@@ -53,12 +53,12 @@
 }
 
 .navbar .collapse li {
-    list-style-type: none; 
+    list-style-type: none;
 }
 
 .navbar-nav {
     display: flex;
-    justify-content: center; 
+    justify-content: center;
     padding-top: 0.0rem !important;
     padding-bottom: 0.0rem !important;
   }
@@ -74,13 +74,13 @@
 }
 
 .navbar-nav .nav-link.dropdown-toggle::after {
-    display: none; /* Hide the dropdown list indicators */ 
+    display: none; /* Hide the dropdown list indicators */
 }
 
 .navbar-icon-large {
     font-size: 1.0rem !important;
     text-decoration: none !important;
-} 
+}
 
 .navbar-icon-large-div {
     padding-right: 0.7rem !important;
@@ -89,7 +89,7 @@
 
 .navbar-icon-mobile {
     font-size: 0.6rem !important;
-} 
+}
 
 .navbar-icon-mobile-div {
     padding-top: 0.8rem !important;
@@ -97,27 +97,27 @@
 
 .navbar-home-icon {
     font-size: 0.9rem !important;
-} 
+}
 
 .navbar-home-icon-div {
     padding-left: 0.4rem !important;
     padding-right: 0.4rem !important;
     padding-top: 0.9rem !important;
 
-} 
+}
 
 .navbar-logout-icon {
     font-size: 1.0rem !important;
     padding-left: 0.5rem !important;
     padding-top: 0.3rem !important;
     padding-bottom: 0.4rem !important;
-} 
+}
 
 .navbar-status-button {
       padding-left: 8px !important;
       padding-right:  8px !important;
       border-bottom-left-radius: 0;
-      border-bottom-right-radius: 0; 
+      border-bottom-right-radius: 0;
       border-bottom: none;
       background-color: rgba(121, 174, 200);
       padding-top: 18px  !important;
@@ -126,9 +126,9 @@
 }
 
 .navbar-status-button:hover {
-    background-color: rgb(247, 247, 247); 
+    background-color: rgb(247, 247, 247);
 }
-    
+
 .navbar-status-button.collapse-show {
       background-color: rgb(247, 247, 247);
       color:black;
@@ -144,7 +144,7 @@
 }
 
 .status-info-bar .card-body {
-    background-color: rgb(247, 247, 247); 
+    background-color: rgb(247, 247, 247);
     border-radius: 0;
     border-width: 0 !important;
 }

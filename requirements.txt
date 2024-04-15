@@ -1,5 +1,6 @@
 Django
 django-dynamic-filenames
+django-flatpickr
 django-import-export
 django-import-export
 
@@ -21,6 +22,12 @@ django-six
 django-stdimage
 django-versatileimagefield
 djproxy
+
+# Bootstrap
+django_bootstrap5
+
+# Django REST Framework
+djangorestframework
 
 # JSON fields in the DB model
 jsonfield2
@@ -46,10 +53,3 @@ reportlab
 requests
 six
 wheel
-
-# Bootstrap
-django_bootstrap5
-django-flatpickr
-
-# Django REST Framework
-djangorestframework
