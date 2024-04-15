@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% load django_bootstrap5 %}
+{% load static %}
+
+{% block content %}
+
+<div class="row mt-1">
+
+    <!-- Message text -->
+    <div class="col-md-9 order-0 order-md-0 pt-2">
+        <div class="card scrollable pt-0 pb-3" id="message-text">
+            <div class="card-body " style="max-height: 600px; min-height:250px; overflow-y: auto;">
+                
+                {% if selected_message %}
+                    <div>
+                        <h1 class="card-title" >{{ selected_message.motd|urlize }}</h1>
+                    </div>
+                    {% if object_list %}
+                        <div class="card-text mt-4 mb-4" style="word-wrap: break-word; white-space: pre-wrap;">{{ selected_message.motd_details|urlize }}</div>
+                        <br>
+                            <div class="creation-info">
+                                <small>This message was posted by {{ created_by }} at {{ creation_date }}</small>
+                            </div>
+                            {% if is_updated %} 
+                                <div class="update-info">
+                                    <small>This message was updated by {{ updated_by }} at {{ update_date }}</small>
+                                </div>
+                            {% endif %}
+                    {% endif %}
+                {% else %}
+                    <small>There are no messages.</small>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- List of messages -->
+    {% if object_list %}
+    <div class="col-md-3 order-2 order-md-1 pt-0" id="list-of-messages">
+        <div class="mt-0">
+            <h2>All messages</h2>
+        </div>
+        <div class="scrollable rounded" style="max-height: 600px;  overflow-y: auto;">
+            <ul class="list-group">
+            {% for motd_item in object_list %}
+                <a class="list-group-item list-group-item-action pt-1 pb-1" style="{% if selected_message.pk == motd_item.pk %} background-color: #f7f7f7;{% endif %}"  href="{% url 'motd_messages_detail' pk=motd_item.pk %}"> 
+                    <div>    
+                            {% if motd_item.motd|length > 30 %}{{ motd_item.motd|slice:":30" }}...
+                            {% else %}
+                                {{ motd_item.motd }}
+                            {% endif %}
+                    </div>
+                </a>
+            {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="col-12 col-md-9 pt-3 pb-4 order-1 order-md-2" id="message-buttons">
+        <div class="row">
+            <div class="col-auto pe-0">
+                <button type="button" onclick="window.location.href='{% url 'index' %}'" class="btn btn-secondary">Back</button>
+            </div>
+            {% if selected_message %}
+            <div class="col-auto pe-0">
+                <button type="button" onclick="window.location.href='{% url 'motd_update' selected_message.pk %}'" class="btn btn-primary">Edit</button>
+            </div>
+            {% endif %}  
+            <div class="col-auto">          
+                <button type="button" onclick="window.location.href='{% url 'motd_create' %}'" class="btn btn-primary">Create New</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
