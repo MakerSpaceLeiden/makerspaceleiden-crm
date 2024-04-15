@@ -239,6 +239,20 @@ argon2 = ["argon2-cffi (>=19.1.0)"]
 bcrypt = ["bcrypt"]
 
 [[package]]
+name = "django-bootstrap5"
+version = "23.4"
+description = "Bootstrap 5 for Django"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "django-bootstrap5-23.4.tar.gz", hash = "sha256:fbf9942a17e1f48b4142e78df9e85afb65e4066a20e38ec7c497d36ae5ef7256"},
+    {file = "django_bootstrap5-23.4-py3-none-any.whl", hash = "sha256:5181bf1e97afae6211e963f28f48d4a90c937a3b036b3f752f52260f0029f3bc"},
+]
+
+[package.dependencies]
+Django = ">=3.2"
+
+[[package]]
 name = "django-dynamic-filenames"
 version = "1.3.2"
 description = "Write advanced filename patterns using the Format String Syntax."
@@ -251,6 +265,23 @@ files = [
 
 [package.dependencies]
 django = ">=3.2"
+
+[[package]]
+name = "django-flatpickr"
+version = "2.0.3"
+description = "Flatpickr based DatePickerInput, TimePickerInput and DateTimePickerInput with date-range-picker functionality for django >= 2.0"
+optional = false
+python-versions = ">=3.8,<4.0"
+files = [
+    {file = "django_flatpickr-2.0.3-py3-none-any.whl", hash = "sha256:c1c82d735c76a7d2381d9e5d5b29b1c1d21f139798542e38eeaa4d3a70678d99"},
+    {file = "django_flatpickr-2.0.3.tar.gz", hash = "sha256:48f8fac131e8a1a512492277bd0b548fab10696c0a52ed58cab53c59d86e8f20"},
+]
+
+[package.dependencies]
+Django = ">=2,<6"
+pydantic = ">=1,<3"
+pydantic-settings = "*"
+typing-extensions = "*"
 
 [[package]]
 name = "django-import-export"
@@ -409,6 +440,20 @@ files = [
 Django = ">=3.0"
 Pillow = ">=6.2.0"
 python-magic = ">=0.4.22,<1.0.0"
+
+[[package]]
+name = "djangorestframework"
+version = "3.15.1"
+description = "Web APIs for Django, made easy."
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "djangorestframework-3.15.1-py3-none-any.whl", hash = "sha256:3ccc0475bce968608cf30d07fb17d8e52d1d7fc8bfe779c905463200750cbca6"},
+    {file = "djangorestframework-3.15.1.tar.gz", hash = "sha256:f88fad74183dfc7144b2756d0d2ac716ea5b4c7c9840995ac3bfd8ec034333c1"},
+]
+
+[package.dependencies]
+django = ">=3.0"
 
 [[package]]
 name = "djproxy"
@@ -919,6 +964,25 @@ files = [
 typing-extensions = ">=4.6.0,<4.7.0 || >4.7.0"
 
 [[package]]
+name = "pydantic-settings"
+version = "2.2.1"
+description = "Settings management using Pydantic"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "pydantic_settings-2.2.1-py3-none-any.whl", hash = "sha256:0235391d26db4d2190cb9b31051c4b46882d28a51533f97440867f012d4da091"},
+    {file = "pydantic_settings-2.2.1.tar.gz", hash = "sha256:00b9f6a5e95553590434c0fa01ead0b216c3e10bc54ae02e37f359948643c5ed"},
+]
+
+[package.dependencies]
+pydantic = ">=2.3.0"
+python-dotenv = ">=0.21.0"
+
+[package.extras]
+toml = ["tomli (>=2.0.1)"]
+yaml = ["pyyaml (>=6.0.1)"]
+
+[[package]]
 name = "pypdf2"
 version = "3.0.1"
 description = "A pure-python PDF library capable of splitting, merging, cropping, and transforming PDF files"
@@ -960,6 +1024,20 @@ files = [
 
 [package.dependencies]
 six = ">=1.5"
+
+[[package]]
+name = "python-dotenv"
+version = "1.0.1"
+description = "Read key-value pairs from a .env file and set them as environment variables"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "python-dotenv-1.0.1.tar.gz", hash = "sha256:e324ee90a023d808f1959c46bcbc04446a10ced277783dc6ee09987c37ec10ca"},
+    {file = "python_dotenv-1.0.1-py3-none-any.whl", hash = "sha256:f7b63ef50f1b690dddf550d03497b66d609393b40b564ed0d674909a68ebf16a"},
+]
+
+[package.extras]
+cli = ["click (>=5.0)"]
 
 [[package]]
 name = "python-ipware"
@@ -1332,4 +1410,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "f630c5c439144158953e4faffe77ff2e4436ca00dc1314aea061ade92a6f42cf"
+content-hash = "b5c396b2bd5202ee53865db489db70cd742ea5fa10ee33c811483bb26d52e06b"
