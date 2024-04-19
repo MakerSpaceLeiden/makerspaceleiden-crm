@@ -33,7 +33,7 @@ function toggle() {
 					<ul class="list-group list-group-flush pt-0" >
 						{% for e in wifinetworks %}
 							{% if not e.adminsonly or user|isNetAdmin or user.is_privileged %}
-								<li class="list-group-item pt-2{% if e.adminsonly %} verysecret{% endif %}" 
+								<li class="list-group-item pt-2{% if e.adminsonly %} verysecret{% endif %}"
 								    style="{% if forloop.last %} border-bottom: none;{% endif %}{% if e.adminsonly %} display: none;{% endif %}">
 									<div class="row">
 										<div class="col-lg-6 col-md-7 col-12 mt-1 mb-1">
@@ -73,7 +73,7 @@ function toggle() {
 				{% if user|isNetAdmin or user.is_privileged %}
 				<small>
 					<input type=checkbox onChange="toggle()">
-					Show passwords that are only visible to the administrators, of which you are one. 
+					Show passwords that are only visible to the administrators, of which you are one.
 					<div class="verysecret" style="display: none;">
 							<font color=red>* </font>) Do not share outside this group, or consult with one of the trustees first.
 					</div>
