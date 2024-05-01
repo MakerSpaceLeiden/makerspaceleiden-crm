@@ -126,7 +126,14 @@ def pettycash_redirect(pk=None):
 
 
 def transact_raw(
-    request, src=None, dst=None, description=None, amount=None, reason=None, user=None
+    request,
+    src=None,
+    dst=None,
+    description=None,
+    amount=None,
+    reason=None,
+    user=None,
+    sent_alert=True,
 ):
     if None in [src, dst, description, amount, reason, user]:
         logger.error("Transact raw called with missing arguments. bug.")
@@ -138,8 +145,9 @@ def transact_raw(
         )
         logger.info("payment: %s" % reason)
         tx._change_reason = reason[:100]
-        tx.save()
-        alertOwnersToChange(tx, user, [])
+        tx.save(is_privileged=request.user.is_privileged)
+        if sent_alert:
+            alertOwnersToChange(tx, user, [])
 
     except Exception as e:
         logger.error(
@@ -822,9 +830,11 @@ def payoutform(request):
         request.POST or None,
         request.FILES or None,
         initial={
-            "dst": request.user,
+            "src": request.user,
+            "dst": User.objects.get(id=settings.POT_ID),
             "date": date.today(),
         },
+        is_privileged=request.user.is_privileged,
     )
     context = {
         "settings": settings,
@@ -833,10 +843,12 @@ def payoutform(request):
         "action": "request",
         "user": request.user,
         "has_permission": request.user.is_authenticated,
+        "is_privileged": request.user.is_privileged,
     }
 
     if form.is_valid():
         item = form.save(commit=False)
+        item.dst = User.objects.get(id=settings.POT_ID)
         item.viaTheBank = True
         item.isPayout = True
         if not item.date:
@@ -862,9 +874,11 @@ def reimburseform(request):
         request.POST or None,
         request.FILES or None,
         initial={
+            "src": User.objects.get(id=settings.POT_ID),
             "dst": request.user,
             "date": date.today(),
         },
+        is_privileged=request.user.is_privileged,
     )
     context = {
         "settings": settings,
@@ -876,12 +890,12 @@ def reimburseform(request):
     }
 
     if form.is_valid():
-        print(request.POST)
         item = form.save(commit=False)
         if not item.date:
             item.date = datetime.now()
         if not item.submitted:
             item.submitted = datetime.now()
+        item.src = User.objects.get(id=settings.POT_ID)
 
         item.save()
         context["item"] = item
@@ -950,15 +964,31 @@ def reimburseque(request):
                         attachments=attachments,
                     )
                 if item.isPayout or not item.viaTheBank:
-                    transact_raw(
+                    if item.viaTheBank:
+                        emailPlain(
+                            "email_payout_bank_approved.txt",
+                            toinform=[pettycash_treasurer_emails(), request.user.email],
+                            context=context,
+                            attachments=attachments,
+                        )
+                    if not transact_raw(
                         request,
-                        src=User.objects.get(id=settings.POT_ID),
+                        src=item.src,
                         dst=item.dst,
                         description=item.description,
                         amount=item.amount,
                         reason=context["reason"],
                         user=request.user,
-                    )
+                        sent_alert=False,
+                    ):
+                        logger.error(
+                            "Transaction failed. Queued item %s Not deleted from the queuue."
+                            % (item.pk)
+                        )
+                        return HttpResponse(
+                            "Failure", status=500, content_type="text/plain"
+                        )
+
             else:
                 context["reason"] = "Rejected by %s (%d)" % (request.user, item.pk)
                 emailPlain(

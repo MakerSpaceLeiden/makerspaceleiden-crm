@@ -1,0 +1,15 @@
+Subject: Payout by bank({{ item.dst }} {{ item.amount }}, {{ item.description }})
+
+This is to let you know that {{ user }} has approved a payout from
+the petty cash to your bank account. If it does not arrive in the next days
+then do not be shy to contact a trustee - as this is a manual process.
+
+Your spacebot (on behalf of {{ user }}).
+
+Details:
+
+Date:        {{ item.date }}
+To pay to:   {{ item.src }} by manual bank transfer.
+Amount:      {{ item.amount }}
+Deascription:{{ item.description }}
+Submitted:   {{ item.submitted }}

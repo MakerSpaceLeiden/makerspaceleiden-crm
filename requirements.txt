@@ -34,9 +34,6 @@ jsonfield2
 # Mailman scraping API
 lxml
 
-# For production
-mysqlclient
-
 # We're also including Pillow  as otherwise QR will fall back
 # to SVG - which is not as supported.
 Pillow
@@ -52,3 +49,5 @@ reportlab
 requests
 six
 wheel
+
+# Production requirements in requirements-production.txt
