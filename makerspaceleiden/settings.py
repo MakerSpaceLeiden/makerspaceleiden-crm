@@ -289,6 +289,9 @@ CURRENCIES = ["EUR"]
 MAX_PAY_API = Money(10.00, EUR)
 MAX_PAY_DEPOSITI = Money(100.00, EUR)
 MAX_PAY_REIMBURSE = Money(100.00, EUR)
+MAX_PAY_TRUSTEE = Money(
+    1000.00, EUR
+)  # as for Reimbursement; but now for 'is_priv' users.
 PAY_MAXNONCE_AGE_MINUTES = 20
 
 # Days and max number of unknown terminals to keep.
