@@ -151,7 +151,7 @@ def transact_raw(
 
     except Exception as e:
         logger.error(
-            "Unexpected error during initial save of new pettycash: {}".format(e)
+            "Unexpected error during initial (raw) save of new pettycash: {}".format(e)
         )
         return 0
 
@@ -164,6 +164,7 @@ def transact(
     form = PettycashTransactionForm(
         request.POST or None,
         initial={"src": src, "dst": dst, "description": description, "amount": amount},
+        is_privileged=request.user.is_privileged,
     )
     if form.is_valid():
         item = form.save(commit=False)
@@ -325,6 +326,7 @@ def transfer_to_member(request, src):
     form = PettycashTransactionForm(
         request.POST or None,
         initial={"src": src, "description": description, "amount": amount},
+        is_privileged=request.user.is_privileged,
     )
 
     if form.is_valid():
@@ -332,7 +334,7 @@ def transfer_to_member(request, src):
         item = form.save(commit=False)
         if not item.dst:
             item.dst = User.objects.get(id=settings.POT_ID)
-        if transact_raw(
+        if not transact_raw(
             request,
             src=request.user,
             dst=item.dst,
@@ -341,7 +343,10 @@ def transfer_to_member(request, src):
             reason="Logged in as {}, {}.".format(request.user, reason),
             user=request.user,
         ):
-            return pettycash_redirect(item.id)
+            return HttpResponse(
+                "Transaction failed", status=500, content_type="text/plain"
+            )
+        return pettycash_redirect(item.id)
 
     if src:
         form.fields["src"].widget = widgets.HiddenInput()
