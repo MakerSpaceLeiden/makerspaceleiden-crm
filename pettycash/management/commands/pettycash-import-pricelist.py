@@ -22,7 +22,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         file = options["pricelist-csv-file"][0]
         verbosity = int(options["verbosity"])
-        dryrun = options["dryrun"]
         rc = 0
 
         for file in options["pricelist-csv-file"]:
@@ -59,7 +58,7 @@ class Command(BaseCommand):
                     )
 
                 if not options["dryrun"]:
-                     sku.save()
+                    sku.save()
 
                 if verbosity > 0:
                     print(sku)
