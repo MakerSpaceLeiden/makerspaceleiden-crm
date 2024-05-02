@@ -387,6 +387,16 @@ class PettycashReimbursementRequest(models.Model):
     )
     history = HistoricalRecords()
 
+    def __str__(self):
+        return "%s Reimburse request %s %s (from %s) for: %s bank:%s" % (
+            self.date,
+            self.amount,
+            self.dst,
+            self.src,
+            self.description,
+            self.viaTheBank,
+        )
+
 
 class PettycashImportRecord(models.Model):
     date = models.DateField(help_text="Date of last import", default=timezone.now)
