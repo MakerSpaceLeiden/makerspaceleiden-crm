@@ -57,10 +57,11 @@ else
 	${POETRY_RUN}python${PYTHON_VERSION} manage.py import-wifi demo/wifi.csv
 	${POETRY_RUN}python${PYTHON_VERSION} manage.py import-machines demo/mac.csv
 	${POETRY_RUN}python${PYTHON_VERSION} manage.py import-consolidated demo/consolidated.txt
-	${POETRY_RUN}python${PYTHON_VERSION} manage.py pettycash-recache
 	${POETRY_RUN}python${PYTHON_VERSION} manage.py pettycash-import-pricelist demo/pricelist.csv
-    ${POETRY_RUN}python${PYTHON_VERSION} manage.py pettycash-activate-all-users
-    echo
+	${POETRY_RUN}python${PYTHON_VERSION} manage.py pettycash-demo-gendata
+	${POETRY_RUN}python${PYTHON_VERSION} manage.py pettycash-recache
+        ${POETRY_RUN}python${PYTHON_VERSION} manage.py pettycash-activate-all-users
+         echo
 	echo No invites with password-set requests sent. Passwords are all hardcoded to 1234 for:
 	grep @  demo/consolidated.txt
 fi
