@@ -245,7 +245,7 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
                     <h2 class="card-title">Tags</h2>
                 </div>
                 {% for tag in tags %}
-                <dl class="row mb-3" >
+                <dl class="row mb-4" >
                     <dt class="col-sm-3">Tag:</dt>
                     <dd class="col-sm-9">{{ tag.tag }}
                         <a href="{% url 'tag_edit' tag_id=tag.id %}"> [edit]</a>
@@ -438,8 +438,8 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
     <!-- Personal QR code Section -->
     <div class="col-xl-9 col-lg-12 col-sm-12">
         <div class="card mb-4">
-            <div class="card-body pb-4"><div><h2 class="card-title">Personal profile QR code</h2></div>
-                <div class="mb-1">
+            <div class="card-body pb-4"><div><h2 class="card-title">QR code to personal profile page</h2></div>
+                <div class="mt-3 mb-1">
                     {% qr_from_text member.url size="m" border=0 %}
                     <br/>
                     <font size=-2>{{ member.url }}</font>

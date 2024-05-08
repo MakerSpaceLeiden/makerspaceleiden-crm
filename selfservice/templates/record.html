@@ -3,7 +3,7 @@
 {% block content %}
 
 {% if saved %}
-  <p>The following record has been {% if created %}added{% else %}updated{% endif %}:<p>
+  <p>The following record has been {% if created %}added{% else %}updated{% endif %}:</p>
   <blockquote>
     <emph>{{ issuer }}
     has provided instructions to
@@ -11,14 +11,15 @@
     for the use of
 	{{ machines|join:", "  }}.
     </emph><br>
-   {{ issuer.first_name }} trusts {{ holder|join:" , "  }} to use this machine properly and safely.</i>
-   </p>
+   {{ issuer.first_name }} trusts {{ holder|join:" , "  }} to use this machine properly and safely.
+   
   </blockquote>
   <p>
     Thanks for helping us grow the makerspace !
+  </p>
   <hr>
-  <a href="">Record more instruction given</a> or
-  <a href="{% url 'index' %}">Back to the home page</a>
+  <a href="">Record more instructions given</a> or
+  <a href="{% url 'index' %}">back to the home page</a>.
 {% else %}
 {% if not lst %}
 Sorry - you have not had instructions on any machine yourself (yet). So you
