@@ -20,6 +20,8 @@ class MachineAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
         "requires_instruction",
         "requires_form",
         "requires_permit",
+        "wiki_title",
+        "wiki_url"
     )
 
 
