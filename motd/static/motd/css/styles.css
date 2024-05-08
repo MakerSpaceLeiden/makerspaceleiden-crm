@@ -1,0 +1,51 @@
+#motd-bar {
+    width: 100%; 
+    background-color: #0d6efd;
+
+}
+
+.custom-motd-bar {
+    overflow: hidden; 
+}
+
+.motd-text {
+    display: inline-block; 
+    white-space: nowrap;
+    animation-name: motd-animation; /* Specify animation name */
+    animation-duration: 15s; /* Specify animation duration */
+    animation-timing-function: linear; 
+    animation-iteration-count: infinite;   
+    padding-left: 100%; 
+    padding-top: 0.2rem;
+    padding-bottom: 0.2rem;
+    font-family: "Inconsolata", monospace;
+    font-weight: 600 !important; 
+}
+
+.motd-message {
+    margin-right: 10rem; 
+    color: white; 
+    background-color: #0d6efd; 
+    padding: 2px 4px; 
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3), 0 1px 3px rgba(0, 0, 0, 0.5) !important;
+    text-decoration: none !important;
+}
+
+.list-group-item-secondary {
+    background-color: rgb(246, 246, 246);
+}
+
+@keyframes motd-animation {
+    0% {
+        transform: translateX(-50%); /* Start from the middle */
+    }
+    50% {
+        transform: translateX(-100%); /* Move to the extreme left */
+    }
+    50.01% {
+        transform: translateX(0%); /* Move to the extreme right */
+    }
+    100% {
+        transform: translateX(-50%); /* Back to the middle */
+    }
+}
