@@ -11,7 +11,7 @@
   Thanks for helping us grow the makerspace !
  <p/>
   <hr>
-  <a href="{% url 'index' %}">back to the home page</a>
+  <a href="{% url 'personal_page' %}">Back to personal profile page</a>
 {% else %}
   <form method="post" enctype="multipart/form-data" novalidate>
     {% csrf_token %}
@@ -19,7 +19,7 @@
         {{ form.as_table }}
     </table>
     <button type="submit">Save</button>
-    <a href="{% url 'index' %}">Cancel</a>
+    <a href="{% url 'personal_page' %}">Cancel</a>
   </form>
 {% endif %}
 
