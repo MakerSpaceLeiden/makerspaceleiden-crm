@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     "memberlist",
     "navigation",
     "motd",
+    "agenda",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",

@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block content %}
-{{ form.media.css }}
+{{ form.media.css }} 
 {{ form.media.js }}
 
 
@@ -42,27 +42,30 @@
     </div>
 
     <div class="mb-3">
-        <label for="motd" class="form-label">Message of the day:</label>
-        <textarea id="motd" name="motd" class="form-control" rows="1" maxlength="600">{{ form.motd.value }}</textarea>
+        <label for="item_title" class="form-label">Agenda item title:</label>
+        <textarea id="item_title" name="item_title" class="form-control" rows="1" maxlength="600">{{ form.item_title.value }}</textarea>
     </div>
 
     <div class="mb-3">
-        <label for="motd_details" class="form-label">Message details:</label> <small>&nbsp; (Not required.)</small>
-        <textarea id="motd_details" name="motd_details" class="form-control" rows="8" wrap="soft">{{ form.motd_details.value }}</textarea>
+        <label for="item_details" class="form-label">Agenda item details:</label> <small>&nbsp; (Not required.)</small>
+        <textarea id="item_details" name="item_details" class="form-control" rows="8" wrap="soft">{{ form.item_details.value }}</textarea>
     </div>
-
+    
     <div class="mt-3">
-        {% if title == 'Edit message of the day' %}
-            <button type="button" onclick="window.location.href='{% url 'motd_messages_detail' pk=form.instance.pk %}'" class="btn btn-secondary me-1">Back</button>
+        {% if title == 'Edit agenda item' %}
+            <button type="button" onclick="window.location.href='{% url 'agenda_detail' pk=form.instance.pk %}'" class="btn btn-secondary me-1">Back</button>
             <button type="submit" class="btn btn-primary me-1">Save</button>
-            <button type="button" onclick="window.location.href='{% url 'motd_delete' pk=form.instance.pk %}'" class="btn btn-danger me-1">Delete</button>
+            <button type="button" onclick="window.location.href='{% url 'agenda_delete' pk=form.instance.pk %}'" class="btn btn-danger me-1">Delete</button>
         {% endif %}
-        {% if title == 'Create new message of the day' %}
-            <button type="button" onclick="window.location.href='{% url 'motd_messages' %}'" class="btn btn-secondary me-1">Cancel</button>
+        {% if title == 'Create new agenda item' %}
+            <button type="button" onclick="window.location.href='{% url 'agenda' %}'" class="btn btn-secondary me-1">Cancel</button>
             <button type="submit" class="btn btn-primary me-1">Create</button>
         {% endif %}
     </div>
 </form>
 
-<script src="{% static 'motd/js/motd_crud.js' %}"></script>
+<script src="{% static 'agenda/js/agenda_crud.js' %}"></script> 
 {% endblock %}
+
+
+

@@ -43,6 +43,22 @@ blockquote {
     font-size: 0.9rem;
 }
 
+a {
+    text-decoration: none; 
+}
+
+a:hover {
+    text-decoration: none;
+}
+
+a:active {
+    text-decoration: none;
+}
+
+a:visited {
+    text-decoration: none;
+}
+
 dt, dd {
     font-size: 1.0rem;
 }

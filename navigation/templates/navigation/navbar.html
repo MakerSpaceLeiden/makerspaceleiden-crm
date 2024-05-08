@@ -57,7 +57,6 @@
                       <li><a class="dropdown-item" href="{% url 'mytransactions' %}">Manage SpaceTegoed</a></li>
                       <li><a class="dropdown-item" href="{% url 'invoice' src=user.id %}">Pay for a product</a></li>
                       <li><a class="dropdown-item" href="{% url 'boxes' %}">Members boxes</a></li>
-                      <li><a class="dropdown-item" href="{% url 'mailinglists_archives' %}">Mailing lists archive</a></li>
                       {%  if settings.STORAGE %}
                       <li><a class="dropdown-item" href="{% url 'storage' %}">Storage management</a></li>
                       {% endif %}
@@ -116,7 +115,7 @@
                       <li><a class="dropdown-item" href="/api/v1/mainssensor/resolve">Sensor descriptions</a></li>
                     {% endif %}
 
-                    {% if user|isPettycashAdmin or user|isTreasurer %}
+                    {% if user.is_privileged or user|isPettycashAdmin or user|isTreasurer %}
                           <li><a class="dropdown-item" href="{% url 'unpaired' %}">Payment stations</a></li>
                     {% endif %}
                     </ul>

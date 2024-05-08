@@ -357,7 +357,7 @@ def tag_edit(request, tag_id=None):
 
     form = TagForm(instance=tag, canedittag=request.user.is_privileged)
     context["form"] = form
-    context["back"] = "overview"
+    context["back"] = "personal_page"
 
     return render(request, "crud.html", context)
 
@@ -388,7 +388,7 @@ def tag_delete(request, tag_id=None):
 
     form = TagForm(instance=tag, isdelete=True)
     context["form"] = form
-    context["back"] = "overview"
+    context["back"] = "personal_page"
 
     return render(request, "crud.html", context)
 
