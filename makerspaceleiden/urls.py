@@ -34,6 +34,7 @@ urlpatterns = [
     path("", include("acl.urls")),
     path("", include("navigation.urls")),
     path("", include("motd.urls")),
+    path("", include("agenda.urls")),
     path("members/", include("members.urls")),
     path("servicelog/", include("servicelog.urls")),
     path("mailinglists/", include("mailinglists.urls")),

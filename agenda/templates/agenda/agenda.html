@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% load django_bootstrap5 %}
+{% load static %}
+
+{% block content %}
+
+<style>
+    .list-group-item-secondary {
+        background-color: rgb(246, 246, 246) !important;
+    }
+</style>
+
+
+<div class="row mt-1">
+
+    <!-- Agenda item text -->
+    <div class="col-md-9 order-0 order-md-0 pt-2">
+        <div class="card scrollable pt-0 pb-3" id="item-text">
+            <div class="card-body" style="max-height: 600px; min-height:250px; overflow-y: auto;">
+                
+                {% if selected_item %}
+                <div class="row">
+                    <div class="col-xl-1 col-lg-2 col-12">
+                        <strong>From:</strong>
+                    </div>
+                    <div class="col-md">
+                        {{ selected_item.startdate|date:"l j M Y" }} - {{ selected_item.starttime|time:"H:i"  }}
+                    </div>
+                </div>
+    
+                <div class="row">
+                    <div class="col-xl-1 col-lg-2 col-12">
+                        <strong>To:</strong>
+                    </div>
+                    <div class="col-md">
+                        {{ selected_item.enddate|date:"l j M Y" }} - {{ selected_item.endtime|time:"H:i"  }}
+                    </div>
+                </div>
+
+                    {% if object_list %}
+                        <div class="card-text mt-4 mb-4" style="word-wrap: break-word; white-space: pre-wrap;">{{ selected_item.item_details|urlize }}</div>
+                        <br>
+                            <div class="creation-info">
+                                <small>This agenda item was created by {{ created_by }} at {{ creation_date|date:"l j M Y H:i" }}.</small>
+                            </div>
+                            {% if is_updated %} 
+                                <div class="update-info">
+                                    <small>This agenda item was updated by {{ updated_by }} at {{ update_date|date:"l j M Y H:i" }}.</small>
+                                </div>
+                            {% endif %}
+                    {% endif %}
+                {% else %}
+                    <small>There are no agenda items.</small>
+                {% endif %}
+            </div>
+        </div>
+        <div>
+            <div class="row pt-2 pb-4">
+                <div class="col-auto pe-0">
+                    <button type="button" onclick="window.location.href='{% url 'index' %}'" class="btn btn-secondary">Back</button>
+                </div>
+                {% if selected_item %}
+                <div class="col-auto pe-0">
+                    <button type="button" onclick="window.location.href='{% url 'agenda_update' selected_item.pk %}'" class="btn btn-primary">Edit</button>
+                </div>
+                {% endif %}  
+                <div class="col-auto">          
+                    <button type="button" onclick="window.location.href='{% url 'agenda_create' %}'" class="btn btn-primary">Create New</button>
+                </div>
+            </div>
+        </div>
+    
+    </div>
+
+    <!-- List of agenda items -->
+    <div class="col-md-3 order-2 order-md-1 pt-1" id="list-of-agenda-items">
+        <div>
+            <h2 style="margin-top:0 !important;">All agenda items</h2>
+        </div>
+        <div class="d-flex justify-content-between align-items-center">
+            <label class="form-check-label mb-0" for="toggleHistory" align="center">Include history</label>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" id="toggleHistory">
+            </div>
+        </div>
+        {% if object_list %}
+            <div class="scrollable rounded" style="max-height: 600px; overflow-y: auto;">
+                <ul class="list-group">
+                    {% for agenda_item in object_list %}
+                    <a class="list-group-item list-group-item-action pt-2 pb-1 {% if selected_item.pk == agenda_item.pk %}list-group-item-secondary{% endif %}" href="{% url 'agenda_detail' pk=agenda_item.pk %}?show_history={{ show_history }}">
+                                <div class="row">
+                                    <div class="col text-secondary" align="center" style="font-size: 14px;  ">
+                                        {{ agenda_item.startdate|date:"d-m-Y" }}{% if agenda_item.startdate != agenda_item.enddate %} - {{ agenda_item.enddate|date:"d-m-Y" }}{% endif %}  
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        {% if agenda_item.item_title|length > 30 %}{{ agenda_item.item_title|slice:":30" }}...{% else %}{{ agenda_item.item_title }}{% endif %}
+                                    </div>
+                                </div>
+                            </a>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% else %}
+        <div class="mt-3">
+            There are no agenda items.
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get the toggle switch element
+        var showHistorySwitch = document.getElementById('toggleHistory');
+
+        // Get the value of show_history from the context variable
+        var showHistoryValue = "{{ show_history }}";
+
+        // Update switch state based on show_history value
+        if (showHistoryValue === 'on') {
+            showHistorySwitch.checked = true;
+        } else {
+            showHistorySwitch.checked = false;
+        }
+
+        // Add event listener for switch change
+        showHistorySwitch.addEventListener('change', function(event) {
+            var state = event.target.checked ? 'on' : 'off';
+            updateUrlParameter('show_history', state);
+        });
+
+        // Function to update URL parameter
+        function updateUrlParameter(key, value) {
+            var url = new URL(window.location.href);
+            url.searchParams.set(key, value);
+            window.location.href = url.toString();
+        }
+    });
+</script>
+
+{% endblock %}
