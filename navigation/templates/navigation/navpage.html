@@ -34,7 +34,6 @@
                 <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'mytransactions' %}">Manage SpaceTegoed</a></li>
                 <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'invoice' src=user.id %}">Pay for a product</a></li>
                 <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'boxes' %}">Members boxes</a></li>
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'mailinglists_archives' %}">Mailing lists archive</a></li>
                 {%  if settings.STORAGE %}
                 <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'storage' %}">Storage management</a></li>
                 {% endif %}
