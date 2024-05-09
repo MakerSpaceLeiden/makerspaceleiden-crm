@@ -35,8 +35,6 @@ djproxy = "^2.3.6"
 django-bootstrap5 = "^23.4"
 django-flatpickr = "^2.0.3"
 djangorestframework = "^3.15.1"
-djproxy = "^2.3.6"
-
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.1.6"
