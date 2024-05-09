@@ -21,6 +21,9 @@ class NodeRedProxy(HttpProxy):
                 ).exists():
                     logger.warning("User is not privileged to access nodered")
                     raise ObjectDoesNotExist()
+            elif request.user.is_superuser:
+                pass
+            else:
                 logger.warning("User is not logged in and cannot access nodered")
                 raise ObjectDoesNotExist()
 
