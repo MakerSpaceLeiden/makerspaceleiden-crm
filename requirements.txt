@@ -1,3 +1,5 @@
+channels[daphne]
+
 Django
 django-dynamic-filenames
 django-flatpickr
@@ -21,13 +23,13 @@ django-simple-history
 django-six
 django-stdimage
 django-versatileimagefield
-djproxy
 
 # Bootstrap
 django_bootstrap5
 
 # Django REST Framework
 djangorestframework
+djproxy
 
 # JSON fields in the DB model
 jsonfield2
@@ -52,4 +54,5 @@ reportlab
 # Reverse proxy for the 3D printers
 requests
 six
+websockets
 wheel

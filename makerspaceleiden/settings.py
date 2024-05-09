@@ -36,6 +36,7 @@ STORAGE = False
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     "import_export",
     "simple_history",
     "search_admin_autocomplete.apps.SearchAdminAutocompleteConfig",
@@ -122,7 +123,8 @@ SETTINGS_EXPORT = [
     "TRUSTEES",
 ]
 
-WSGI_APPLICATION = "makerspaceleiden.wsgi.application"
+# WSGI_APPLICATION = "makerspaceleiden.wsgi.application"
+ASGI_APPLICATION = "makerspaceleiden.asgi.application"
 
 MAILINGLIST = "deelnemers@lists.makerspaceleiden.nl"
 TRUSTEES = "hetbestuur@lists.makerspaceleiden.nl"
