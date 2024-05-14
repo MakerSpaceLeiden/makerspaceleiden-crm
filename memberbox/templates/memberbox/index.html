@@ -124,7 +124,7 @@ The contents of the two main member cabinets along the long wall (on your left a
               </div>
 	        {% else %}
               <div class="box">
-              <i class="free">free</i>
+		      <a href="{% url 'claim' location=item.location %}"><i class="free">free</i></a>
 	        {% endif %}
             <div class="box-location">{{ item.location }}</div>
 		  </div>
