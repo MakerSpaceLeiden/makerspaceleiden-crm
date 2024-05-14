@@ -68,6 +68,9 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
                     {% if member == user %}
                     <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'password_change' %}'">Change password</button>
                     {% endif %}
+                    {% if user.is_privileged %}
+                    <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'send_reset_email' uid=user.id %}'">Sent password reset email</button>
+                    {% endif %}
                 </div>
             </div>
         </div>
