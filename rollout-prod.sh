@@ -1,5 +1,4 @@
 #!/bin/sh
-set -x
 UK=$$
 
 trap cleanup INT
@@ -8,7 +7,12 @@ cleanup () {
 }
 
 (
+test -d makerspaceleiden/settings.py
+
 set -e
+sudo chgrp -R crmadmin .
+sudo chmod -R g+rw .
+
 . ./venv/bin/activate
 
 pip install -r requirements.txt  --quiet
