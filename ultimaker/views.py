@@ -16,7 +16,7 @@ def index(request):
 
 def snapshot(request):
     try:
-        img = requests.get("http://127.0.0.1:9998/?action=snapshot").content
-    except ConnectionError as e:
+        img = requests.get("http://127.0.0.1:9998/?action=snapshot", timeout=15).content
+    except Exception as e:
         return HttpResponse("Ultimaker not on or LAN at space down", content_type="text/plain")
     return HttpResponse(img, content_type="image/jpeg")
