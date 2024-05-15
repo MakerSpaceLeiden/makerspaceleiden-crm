@@ -126,7 +126,7 @@ def addunknowntagtomember(request, tag_id=None):
     try:
         _ = Tag.objects.get(tag=tag["tag"])
         return HttpResponse("Tag already in use", status=500, content_type="text/plain")
-    except Exception as e:
+    except Exception:
         # logger.warning("Tag not in use: {}".format(str(e)))
         pass
 
