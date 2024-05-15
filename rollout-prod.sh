@@ -1,14 +1,26 @@
 #!/bin/sh
-set -x
 UK=$$
+DAYS=30
 
 trap cleanup INT
 cleanup () {
-	test -f /tmp/backup.$UK && echo Warning - you will need to clean up the backup files in /tmp/*.$UK
+	if test -f /tmp/backup.$UK; then
+	       	echo "Warning - the files /tmp/*.$UK will be deleted in ${DAYS} days."
+		echo "          Or you can do it earlier yourself."
+		echo
+		at now + ${DAYS} days <<EOM
+rm -rf /tmp/*.$UK
+EOM
+	fi
 }
 
 (
+test -d makerspaceleiden/settings.py
+
 set -e
+sudo chgrp -R crmadmin .
+sudo chmod -R g+rw .
+
 . ./venv/bin/activate
 
 pip install -r requirements.txt  --quiet
