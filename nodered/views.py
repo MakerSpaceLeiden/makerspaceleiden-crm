@@ -3,6 +3,7 @@ import logging
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import redirect
+from django.views.decorators.csrf import csrf_exempt
 from djproxy.views import HttpProxy
 
 logger = logging.getLogger(__name__)
@@ -12,6 +13,7 @@ class NodeRedProxy(HttpProxy):
     base_url = settings.NODERED_URL
     reverse_urls = [("/nodered/", "settings.NODERED_URL")]
 
+    @csrf_exempt
     def dispatch(self, request, *args, **kwargs):
         #  Using rest auth outside of the rest framework requires a manual check
         try:
