@@ -10,7 +10,8 @@
 	<td>
 	    {{ item.tx.description }}<br>
             {{ item.tx.date }}<br>
-            <b>{{ item.tx.dst }}</b><br>
+            Payment by <b>{{ item.tx.src }}</b><br>
+            Payment to <b>{{ item.tx.dst }}</b><br>
 	    <p>
             <i>Submitted {{ item.tx.submitted }}</i><br>
             {% if item.tx.scan %}

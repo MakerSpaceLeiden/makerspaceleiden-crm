@@ -1,6 +1,7 @@
 from django import forms
 from django.conf import settings
 from django.forms import ModelForm
+from djmoney.models.validators import MaxMoneyValidator, MinMoneyValidator
 
 from .models import (
     PettycashReimbursementRequest,
@@ -21,7 +22,37 @@ class PettycashPairForm(forms.Form):
     )
 
 
-class PettycashTransactionForm(ModelForm):
+# In some cases - we allow the trustees a higher limit. This is visible in both the form
+# and policed in the backend. Below base class shows this in the user interface.
+#
+class PettycashRequestFormBase(ModelForm):
+    def __init__(self, *args, **kwargs):
+        self.max_val = settings.MAX_PAY_REIMBURSE.amount
+        alternative_text = "Above that; contact the trustees directly (%s)" % (
+            settings.TRUSTEES
+        )
+        if "is_privileged" in kwargs:
+            if kwargs["is_privileged"]:
+                self.max_val = settings.MAX_PAY_TRUSTEE.amount
+                alternative_text = "Above that - split the transaction."
+            kwargs.pop("is_privileged")
+
+        super(PettycashRequestFormBase, self).__init__(*args, **kwargs)
+
+        self.fields["amount"].help_text = (
+            "This system will only accept amounts up to %s. %s"
+            % (
+                self.max_val,
+                alternative_text,
+            )
+        )
+        self.fields["amount"].validators = [
+            MinMoneyValidator(0),
+            MaxMoneyValidator(self.max_val),
+        ]
+
+
+class PettycashTransactionForm(PettycashRequestFormBase):
     def __init__(self, *args, **kwargs):
         super(PettycashTransactionForm, self).__init__(*args, **kwargs)
         self.fields["src"].empty_label = settings.POT_LABEL
@@ -38,13 +69,24 @@ class PettycashDeleteForm(forms.Form):
     )
 
 
-class PettycashPayoutRequestForm(ModelForm):
+class PettycashPayoutRequestForm(PettycashRequestFormBase):
+    def __init__(self, *args, **kwargs):
+        super(PettycashPayoutRequestForm, self).__init__(*args, **kwargs)
+        self.fields["description"].initial = "Afromen / Surplus"
+
     class Meta:
         model = PettycashReimbursementRequest
-        fields = ["dst", "description", "amount", "date"]
+        fields = ["src", "description", "amount", "date"]
+        labels = {"src": "Account"}
+        help_texts = {
+            "src": "From whose account (i.e. yousually your own) the money should be taken that is wired to you."
+        }
 
 
-class PettycashReimbursementRequestForm(ModelForm):
+class PettycashReimbursementRequestForm(PettycashRequestFormBase):
+    def __init__(self, *args, **kwargs):
+        super(PettycashReimbursementRequestForm, self).__init__(*args, **kwargs)
+
     class Meta:
         model = PettycashReimbursementRequest
         fields = ["dst", "description", "amount", "date", "viaTheBank", "scan"]
