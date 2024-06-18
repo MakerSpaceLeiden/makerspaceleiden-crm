@@ -41,8 +41,8 @@
                 <div class="col-auto pe-0">
                     <button type="button" onclick="window.location.href='{% url 'motd_update' selected_message.pk %}'" class="btn btn-primary">Edit</button>
                 </div>
-                {% endif %}  
-                <div class="col-auto">          
+                {% endif %}
+                <div class="col-auto">
                     <button type="button" onclick="window.location.href='{% url 'motd_create' %}'" class="btn btn-primary">Create New</button>
                 </div>
             </div>
@@ -67,7 +67,7 @@
                     <a class="list-group-item list-group-item-action pt-2 pb-1 {% if selected_message.pk == motd_item.pk %}list-group-item-secondary{% endif %}" href="{% url 'motd_messages_detail' pk=motd_item.pk %}?show_history={{ show_history }}">
                                 <div class="row">
                                     <div class="col text-secondary" align="center" style="font-size: 14px;  ">
-                                        {{ motd_item.startdate|date:"d-m-Y" }}{% if motd_item.startdate != motd_item.enddate %} - {{ motd_item.enddate|date:"d-m-Y" }}{% endif %}  
+                                        {{ motd_item.startdate|date:"d-m-Y" }}{% if motd_item.startdate != motd_item.enddate %} - {{ motd_item.enddate|date:"d-m-Y" }}{% endif %}
                                     </div>
                                 </div>
                                 <div class="row">
@@ -83,7 +83,7 @@
             <div class="mt-3">
                 There are no messages.
             </div>
-        {% endif %} 
+        {% endif %}
     </div>
 </div>
 

@@ -26,6 +26,10 @@ python3.7 -m venv venv
 #
 pip install -r requirements.txt
 
+# Uncomment to also include mysql and other production requirements.
+#
+# pip install -r requirements-production.txt
+
 # Prepare and set up the environment.
 #
 python manage.py makemigrations

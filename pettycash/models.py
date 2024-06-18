@@ -11,7 +11,7 @@ from django.db.models import Q
 from django.urls import reverse
 from django.utils import timezone
 from djmoney.models.fields import MoneyField
-from djmoney.models.validators import MaxMoneyValidator, MinMoneyValidator
+from djmoney.models.validators import MinMoneyValidator
 from moneyed import EUR, Money
 from simple_history.models import HistoricalRecords
 from stdimage.models import StdImageField
@@ -291,9 +291,16 @@ class PettycashTransaction(models.Model):
     def save(self, *args, **kwargs):
         bypass = False
 
-        if kwargs is not None and "bypass" in kwargs:
-            bypass = kwargs["bypass"]
-            del kwargs["bypass"]
+        max_val = settings.MAX_PAY_REIMBURSE.amount
+        if kwargs is not None:
+            if "bypass" in kwargs:
+                bypass = kwargs["bypass"]
+                del kwargs["bypass"]
+
+            if "is_privileged" in kwargs:
+                max_val = settings.MAX_PAY_TRUSTEE.amount
+                del kwargs["is_privileged"]
+
         if self.pk:
             if not bypass:
                 raise ValidationError(
@@ -314,6 +321,11 @@ class PettycashTransaction(models.Model):
                 raise ValidationError("Blocked negative transaction.")
             logger.info("Bypass for negative transaction used on save of %s" % self)
 
+        if self.amount > Money(max_val, EUR):
+            if not bypass:
+                raise ValidationError("Amount too high.")
+            logger.info("Bypass on max limites used on save of %s" % self)
+
         rc = super(PettycashTransaction, self).save(*args, **kwargs)
         try:
             adjust_balance_cache(self, self.src, -self.amount)
@@ -325,6 +337,14 @@ class PettycashTransaction(models.Model):
 
 
 class PettycashReimbursementRequest(models.Model):
+    src = models.ForeignKey(
+        User,
+        help_text="Party that pays (usually the %s)" % (settings.POT_LABEL),
+        on_delete=models.CASCADE,
+        related_name="isReimbursedBy",
+        default=settings.POT_ID,
+    )
+
     dst = models.ForeignKey(
         User,
         help_text="Person to reemburse (usually you, yourself)",
@@ -343,12 +363,6 @@ class PettycashReimbursementRequest(models.Model):
         max_digits=8,
         decimal_places=2,
         default_currency="EUR",
-        validators=[
-            MinMoneyValidator(0),
-            MaxMoneyValidator(settings.MAX_PAY_REIMBURSE.amount),
-        ],
-        help_text="This system will only accept reimbursement up to %s. Above that; contact the trustees directly (%s)"
-        % (settings.MAX_PAY_REIMBURSE.amount, settings.TRUSTEES),
     )
 
     viaTheBank = models.BooleanField(
@@ -372,6 +386,16 @@ class PettycashReimbursementRequest(models.Model):
         help_text="Scan, photo or similar of the receipt",
     )
     history = HistoricalRecords()
+
+    def __str__(self):
+        return "%s Reimburse request %s %s (from %s) for: %s bank:%s" % (
+            self.date,
+            self.amount,
+            self.dst,
+            self.src,
+            self.description,
+            self.viaTheBank,
+        )
 
 
 class PettycashImportRecord(models.Model):

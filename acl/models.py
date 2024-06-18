@@ -99,15 +99,17 @@ class Machine(models.Model):
     out_of_order = models.BooleanField(default=False)
 
     CATEGORY_CHOICES = [
-        ('machine', 'Machine'),
-        ('general_equipment', 'General equipment'),
-        ('lights', 'Lights')
+        ("machine", "Machine"),
+        ("general_equipment", "General equipment"),
+        ("lights", "Lights"),
     ]
 
-    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='machine')
+    category = models.CharField(
+        max_length=20, choices=CATEGORY_CHOICES, default="machine"
+    )
     wiki_title = models.CharField(max_length=200, blank=True)
     wiki_url = models.CharField(max_length=200, blank=True)
-    
+
     history = HistoricalRecords()
 
     def path(self):

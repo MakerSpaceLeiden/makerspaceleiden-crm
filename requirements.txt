@@ -1,3 +1,5 @@
+channels[daphne]
+
 Django
 django-dynamic-filenames
 django-flatpickr
@@ -27,15 +29,13 @@ django_bootstrap5
 
 # Django REST Framework
 djangorestframework
+djproxy
 
 # JSON fields in the DB model
 jsonfield2
 
 # Mailman scraping API
 lxml
-
-# For production
-mysqlclient
 
 # We're also including Pillow  as otherwise QR will fall back
 # to SVG - which is not as supported.
@@ -51,4 +51,7 @@ reportlab
 # Reverse proxy for the 3D printers
 requests
 six
+websockets
 wheel
+
+# Production requirements in requirements-production.txt

@@ -36,6 +36,7 @@ STORAGE = False
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     "import_export",
     "simple_history",
     "search_admin_autocomplete.apps.SearchAdminAutocompleteConfig",
@@ -59,6 +60,7 @@ INSTALLED_APPS = [
     "ultimaker.apps.UltimakerConfig",
     "spaceapi.apps.SpaceapiConfig",
     "memberlist",
+    "nodered.apps.NoderedConfig",
     "navigation",
     "motd",
     "agenda",
@@ -121,7 +123,8 @@ SETTINGS_EXPORT = [
     "TRUSTEES",
 ]
 
-WSGI_APPLICATION = "makerspaceleiden.wsgi.application"
+# WSGI_APPLICATION = "makerspaceleiden.wsgi.application"
+ASGI_APPLICATION = "makerspaceleiden.asgi.application"
 
 MAILINGLIST = "deelnemers@lists.makerspaceleiden.nl"
 TRUSTEES = "hetbestuur@lists.makerspaceleiden.nl"
@@ -280,6 +283,7 @@ PETTYCASH_TREASURER_GROUP = "pettycash admin group"
 PETTYCASH_TOPUP = 15
 PETTYCASH_TNS = "Stichting Makerspace Leiden"
 PETTYCASH_IBAN = "NL18RABO0123459876"
+DEVELOPERS_ADMIN_GROUP = "developers"
 POT_ID = 1
 NONE_ID = 217
 NONE_LABEL = "Former participant"
@@ -289,6 +293,9 @@ CURRENCIES = ["EUR"]
 MAX_PAY_API = Money(10.00, EUR)
 MAX_PAY_DEPOSITI = Money(100.00, EUR)
 MAX_PAY_REIMBURSE = Money(100.00, EUR)
+MAX_PAY_TRUSTEE = Money(
+    1000.00, EUR
+)  # as for Reimbursement; but now for 'is_priv' users.
 PAY_MAXNONCE_AGE_MINUTES = 20
 
 # Days and max number of unknown terminals to keep.
@@ -300,6 +307,8 @@ PAY_MAXNONCE_AGE_MINUTES = 20
 PETTYCASH_TERMS_MAX_UNKNOWN = 4
 PETTYCASH_TERMS_MIN_UNKNOWN = 1
 PETTYCASH_TERMS_MINS_CUTOFF = 10
+
+NODERED_URL = "http://localhost:1880"
 
 try:
     from .local import *  # noqa: F403

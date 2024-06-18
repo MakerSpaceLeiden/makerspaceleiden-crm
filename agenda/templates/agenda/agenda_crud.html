@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block content %}
-{{ form.media.css }} 
+{{ form.media.css }}
 {{ form.media.js }}
 
 
@@ -50,7 +50,7 @@
         <label for="item_details" class="form-label">Agenda item details:</label> <small>&nbsp; (Not required.)</small>
         <textarea id="item_details" name="item_details" class="form-control" rows="8" wrap="soft">{{ form.item_details.value }}</textarea>
     </div>
-    
+
     <div class="mt-3">
         {% if title == 'Edit agenda item' %}
             <button type="button" onclick="window.location.href='{% url 'agenda_detail' pk=form.instance.pk %}'" class="btn btn-secondary me-1">Back</button>
@@ -64,8 +64,5 @@
     </div>
 </form>
 
-<script src="{% static 'agenda/js/agenda_crud.js' %}"></script> 
+<script src="{% static 'agenda/js/agenda_crud.js' %}"></script>
 {% endblock %}
-
-
-
