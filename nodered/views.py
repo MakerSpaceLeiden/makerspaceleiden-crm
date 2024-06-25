@@ -36,3 +36,7 @@ class NodeRedProxy(HttpProxy):
             return super().dispatch(request, *args, **kwargs)
         except ObjectDoesNotExist:
             return redirect("overview")
+
+
+class NodeRedProxyDashboard(NodeRedProxy):
+    reverse_urls = [("/dashboard/", "settings.NODERED_URL")]
