@@ -1,11 +1,12 @@
+import os
 import sys
 
-FORCE_SCRIPT_NAME = "/crm"
-LOGIN_URL = "/crm/login/"
-LOGIN_REDIRECT_URL = "/crm/"
-LOGOUT_REDIRECT_URL = "/crm/"
-STATIC_URL = "/crm-static/"
-MEDIA_ROOT = "/usr/local/makerspaceleiden-crm/var/media"
+FORCE_SCRIPT_NAME = os.environ.get("FORCE_SCRIPT_NAME", "/crm")
+LOGIN_URL = os.environ.get("LOGIN_URL", "/crm/login/")
+LOGIN_REDIRECT_URL = os.environ.get("LOGIN_REDIRECT_URL", "/crm/")
+LOGOUT_REDIRECT_URL = os.environ.get("LOGOUT_REDIRECT_URL", "/crm/")
+STATIC_URL = os.environ.get("STATIC_URL", "/crm-static/")
+MEDIA_ROOT = os.environ.get("MEDIA_ROOT", "/usr/local/makerspaceleiden-crm/var/media")
 DEBUG = False
 with open("/etc/crm_secret_key.txt") as f:
     SECRET_KEY = f.read().strip()
@@ -46,7 +47,7 @@ LOGGING = {
         "file": {
             "level": "INFO",
             "class": "logging.handlers.RotatingFileHandler",
-            "filename": "/var/log/crm/crm-debug.log",
+            "filename": os.environ.get("LOG_FILE_NAME", "/var/log/crm/crm-debug.log"),
             "maxBytes": 1024 * 1024,
             "backupCount": 10,
             "formatter": "standard",
@@ -59,6 +60,10 @@ LOGGING = {
     },
     "loggers": {
         "django": {
+            "handlers": ["file"],
+            "propagate": True,
+        },
+        "daphne": {
             "handlers": ["file"],
             "propagate": True,
         },
