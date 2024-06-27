@@ -23,7 +23,9 @@ from makerspaceleiden.decorators import (
     superuser_or_bearer_required,
 )
 from makerspaceleiden.mail import emailPlain
+from makerspaceleiden.utils import pemToSHA256Fingerprint
 from members.models import Tag, User
+from terminal.models import Terminal
 
 from .camt53 import camt53_process
 from .forms import (
@@ -42,9 +44,7 @@ from .models import (
     PettycashReimbursementRequest,
     PettycashSku,
     PettycashStation,
-    PettycashTerminal,
     PettycashTransaction,
-    pemToSHA256Fingerprint,
     pettycash_admin_emails,
 )
 
@@ -387,11 +387,11 @@ def transfer(request, src, dst):
 @login_required
 def unpaired(request):
     lst = (
-        PettycashTerminal.objects.all()
+        Terminal.objects.all()
         .filter(Q(accepted=True) & Q(station=None))
         .order_by("-date")
     )
-    unlst = PettycashTerminal.objects.all().filter(Q(accepted=False))
+    unlst = Terminal.objects.all().filter(Q(accepted=False))
     paired = PettycashStation.objects.all().filter(~Q(terminal=None))
     unpaired = PettycashStation.objects.all().filter(Q(terminal=None))
     context = {
@@ -540,7 +540,7 @@ def cam53process(request):
 @superuser
 def forget(request, pk):
     try:
-        tx = PettycashTerminal.objects.get(id=pk)
+        tx = Terminal.objects.get(id=pk)
         tx.delete()
     except ObjectDoesNotExist:
         return HttpResponse("Not found", status=404, content_type="text/plain")
@@ -553,7 +553,7 @@ def forget(request, pk):
 @superuser
 def pair(request, pk):
     try:
-        tx = PettycashTerminal.objects.get(id=pk)
+        tx = Terminal.objects.get(id=pk)
     except ObjectDoesNotExist:
         return HttpResponse("Not found", status=404, content_type="text/plain")
 
@@ -1103,7 +1103,7 @@ def api2_register(request):
     #    and mark it as pending. Return a secret/nonce.
     #
     try:
-        terminal = PettycashTerminal.objects.get(fingerprint=client_sha)
+        terminal = Terminal.objects.get(fingerprint=client_sha)
 
     except ObjectDoesNotExist:
         logger.info(
@@ -1120,7 +1120,7 @@ def api2_register(request):
                 "Bad request, missing name", status=400, content_type="text/plain"
             )
 
-        terminal = PettycashTerminal(fingerprint=client_sha, name=name, accepted=False)
+        terminal = Terminal(fingerprint=client_sha, name=name, accepted=False)
         terminal.nonce = secrets.token_hex(32)
         terminal.accepted = False
         reason = "Added on first contact; from IP address %s" % (ip)
@@ -1291,7 +1291,7 @@ def api2_pay(request):
     # 2. Is this terminal acticated and assigned.
     #
     try:
-        terminal = PettycashTerminal.objects.get(fingerprint=client_sha)
+        terminal = Terminal.objects.get(fingerprint=client_sha)
     except ObjectDoesNotExist:
         logger.error("Unknwon terminal; fingerprint=%s" % client_sha)
         return HttpResponse(

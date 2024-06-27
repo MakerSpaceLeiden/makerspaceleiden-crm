@@ -34,6 +34,9 @@ djproxy
 # JSON fields in the DB model
 jsonfield2
 
+# Validation of json payloads from embedded HW
+jsonschema
+
 # Mailman scraping API
 lxml
 
