@@ -25,6 +25,10 @@ class NodeRedProxy(HttpProxy):
                     raise ObjectDoesNotExist()
             elif request.user.is_superuser:
                 pass
+            elif request.user.groups.filter(
+                name=settings.DEVELOPERS_ADMIN_GROUP
+            ).exists():
+                pass
             else:
                 logger.warning("User is not logged in and cannot access nodered")
                 raise ObjectDoesNotExist()
@@ -32,3 +36,7 @@ class NodeRedProxy(HttpProxy):
             return super().dispatch(request, *args, **kwargs)
         except ObjectDoesNotExist:
             return redirect("overview")
+
+
+class NodeRedProxyDashboard(NodeRedProxy):
+    reverse_urls = [("/dashboard/", "settings.NODERED_URL")]
