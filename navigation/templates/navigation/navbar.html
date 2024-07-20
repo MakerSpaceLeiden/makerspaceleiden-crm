@@ -72,8 +72,10 @@
                     <ul class="dropdown-menu">
                       <li><a class="dropdown-item" href="{% url 'space_state' %}">Who is there now</a></li>
                       <li><a class="dropdown-item" href="{% url 'space_state' %}">Machines in use</a></li>
-                      <li><a class="dropdown-item" href="{% url 'motd_messages' %}">Message of the day </a></li>
-                      <li><a class="dropdown-item" href="{% url 'ufo' %}">UFO lost and found </a></li>
+                      <li><a class="dropdown-item" href="{% url 'nodered_live_data_and_sensors' %}">Live data &amp; sensors</a></li>
+                      <li><a class="dropdown-item" href="{% url 'nodered_space_climate' %}">Space climate</a></li>
+                      <li><a class="dropdown-item" href="{% url 'motd_messages' %}">Message of the day</a></li>
+                      <li><a class="dropdown-item" href="{% url 'ufo' %}">UFO lost and found</a></li>
                       <li><a class="dropdown-item" href="{% url 'camindex' %}">Live printer camera</a></li>
                       <li><a class="dropdown-item" href="/crm/kwh">Power consumption of the space</a></li>
                     </ul>
@@ -118,6 +120,9 @@
 
                     {% if user.is_privileged or user|isPettycashAdmin or user|isTreasurer %}
                           <li><a class="dropdown-item" href="{% url 'unpaired' %}">Payment stations</a></li>
+                    {% endif %}
+                    {% if user.is_privileged or user|isNoderedAdmin %}
+                          <li><a class="dropdown-item" href="{% url 'nodered_proxy' '' %}">Node-Red editor</a></li>
                     {% endif %}
                     </ul>
                   </li>

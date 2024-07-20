@@ -122,6 +122,8 @@ function toggle() {
 {% endif %}
 	<li><a href="{% url 'chores' %}">Chores</a>
 	<p/>
+	<li><a href="{% url 'nodered_live_data_and_sensors' %}">Live data &amp; sensors</a></li>
+	<li><a href="{% url 'nodered_space_climate' %}">Space climate</a></li>
 {% if request.user|isMainsAdmin or user.is_privileged %}
 	<li> Lucas MainsSensors : <a href="{% url 'mainsindex' %}">admin interface</a>
 	<li> List of <a href="/crm/api/v1/mainssensor/resolve">sensors</a> names, descriptions and IDs.
@@ -133,8 +135,8 @@ function toggle() {
 	<li>List of <a href='{% url "unpaired" %}'>payment stations</a> and pairing.
 {% endif %}
 
-{% if user|isDeveloper or user.is_superuser %}
-	<li><a href='{% url "nodered_proxy" "" %}'>Nodered</a>
+{% if user|isNoderedAdmin or user.is_superuser %}
+	<li><a href='{% url "nodered_proxy" "" %}'>Nodered editor</a>
 {% endif %}
 
 {%if user.is_privileged %}

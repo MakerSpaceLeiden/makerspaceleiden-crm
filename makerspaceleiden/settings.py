@@ -287,6 +287,7 @@ PETTYCASH_TOPUP = 15
 PETTYCASH_TNS = "Stichting Makerspace Leiden"
 PETTYCASH_IBAN = "NL18RABO0123459876"
 DEVELOPERS_ADMIN_GROUP = "developers"
+NODERED_ADMIN_GROUP = "node-red admin group"
 
 # Assets of former participants; such as money or
 # boxes need to be caught somewhere. This user,
