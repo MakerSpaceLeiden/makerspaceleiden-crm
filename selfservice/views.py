@@ -20,6 +20,7 @@ from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.utils import timezone
 
 from acl.models import Entitlement, Machine, PermitType
 from makerspaceleiden.decorators import (
@@ -34,6 +35,7 @@ from selfservice.forms import (
     UserForm,
 )
 
+from agenda.models import Agenda
 from .aggregator_adapter import get_aggregator_adapter
 from .forms import TabledCheckboxSelectMultiple
 from .models import WiFiNetwork
@@ -97,10 +99,15 @@ logger = logging.getLogger(__name__)
 
 
 def index(request):
+
+    # Fetch items with dates from today and later, and fetch maximum 5 items
+    agenda_items = Agenda.objects.filter(enddate__gte=timezone.now()).order_by('startdate')[:5]
+
     context = {
         "has_permission": request.user.is_authenticated,
         "title": "Selfservice",
         "user": request.user,
+        "agenda_items": agenda_items, 
     }
     if request.user.is_authenticated:
         context["is_logged_in"] = request.user.is_authenticated

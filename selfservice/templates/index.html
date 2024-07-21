@@ -12,10 +12,41 @@ function toggle() {
 }
 </script>
 
-<div class="mb-4">
-	{% if is_logged_in %}
-		{% if wifinetworks %}
+{% if is_logged_in %}
 
+	<!-- Agenda -->
+	<div class="col-xl-9 col-lg-12 col-sm-12 pt-2 pb-1">
+		<h2>Agenda</h2>
+		<p>Upcoming events:</p>
+		<div class="card mt-2 mb-2">
+			<ul class="list-group list-group-flush pt-0 pb-0">
+				{% for agenda_item in agenda_items %}
+				<li class="list-group-item pt-2 pb-2">
+					<div class="row agenda-item-link">
+						<div class="pt-1 pb-1 border-end agenda-item-part" style="width:160px;">
+							{{ agenda_item.startdate|date:"l, j-m" }}
+						</div>
+						<div class="pt-1 pb-1 border-end agenda-item-part" style="width:70px">
+							{{ agenda_item.starttime|time:"G:i" }}
+						</div>
+						<div class="col pt-1 pb-1 agenda-item-part" style="font-weight:600;">
+							<a href="{% url 'agenda_detail' pk=agenda_item.pk %}">
+								{{ agenda_item.item_title }}
+							</a>
+						</div>
+						<div class="w-100"></div>
+					</div>
+				</li>
+				{% empty %}
+				<li class="list-group-item">No agenda items</li>
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+
+	<!-- Passwords -->
+	<div class="mb-4 pb-3">
+		{% if wifinetworks %}
 			<div class="col-xl-9 col-lg-12 col-sm-12 mt-4">
 				<h2>Passwords</h2>
 				For members only:
@@ -34,7 +65,7 @@ function toggle() {
 						{% for e in wifinetworks %}
 							{% if not e.adminsonly or user|isNetAdmin or user.is_privileged %}
 								<li class="list-group-item pt-2{% if e.adminsonly %} verysecret{% endif %}"
-								    style="{% if forloop.last %} border-bottom: none;{% endif %}{% if e.adminsonly %} display: none;{% endif %}">
+									style="{% if forloop.last %} border-bottom: none;{% endif %}{% if e.adminsonly %} display: none;{% endif %}">
 									<div class="row">
 										<div class="col-lg-6 col-md-7 col-12 mt-1 mb-1">
 											{{ e.network }}
@@ -86,81 +117,82 @@ function toggle() {
 		{% endif %}
 	</div>
 
-<h2>Manage your data</h2>
-<ul>
-	<li><a href="https://wiki.makerspaceleiden.nl">General documentation</a>
-	<li><a href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Categorie:Tool">List of all tools</a> and their documentation.
-<p/>
-        <li><a href="{% url 'space_state' %}">Who is there now</a> (<i>(State of the space)</i>.
-        <li><a href="{% url 'camindex' %}">printer camera</a> (<i>(photo of buildplate of the Ultimaker 3)</i>.
-	<li><a href="/crm/kwh">Power consumption of the space</a>
-	<li><a href="{% url 'overview' %}">All members </a>
-<p/>
-	<li><a href="{% url 'personal_page' %}">Your data</a>
-	<li><a href="{% url 'mytransactions' %}">Your cash balance</a>,  see all
-	<a href="{% url 'balances' %}">balances</a>, the <a href="{% url 'pricelist' %}">pricelist</a> and so on.
-	<li><a href="{% url 'mailinglists_edit' %}">Mailing lists subscriptions</a> and digest settings.
-	<li><a href="{% url 'mailinglists_archives' %}">Historic archives</a> of the mailing lists.
-{%if user.is_privileged %}
-	<li><a href="{% url 'mailinglists_subs' %}">Who is (not) subscribed</a> to one of the mailing lists.
-{%endif %}
-	<li><a href="{% url 'userdetails' %}">Update your personal details</a>
-	<li><a href="{% url 'password_change' %}">change your password</a>
-{%if settings.GRAND_AMNESTY %}
-	<li><a href="{% url 'amnesty' %}">Grand amnesty</a>
-{%endif %}
-<p/>
-	<li><a href="{% url 'ufo' %}">Unclaimed Floating Objects</a> -- lost and found & things about to be disposed.
-<p/>
-<!--	<li><a href="{% url 'members-index' %}">All machines that require instruction</a> -->
-	<li><a href="{% url 'machine_list' %}">All machines</a>
-	<li><a href="{% url 'add_instruction' %}">Record instructions you've just given</a> on a machine to someone.
-<p/>
-	<li><a href="{% url 'boxes' %}">Members box management</a>
-{%  if settings.STORAGE %}
-	<li><a href="{% url 'storage' %}">Storage management</a>
-{% endif %}
-	<li><a href="{% url 'chores' %}">Chores</a>
+	<!-- Manage your data -->
+	<h2>Manage your data</h2>
+	<ul>
+		<li><a href="https://wiki.makerspaceleiden.nl">General documentation</a>
+		<li><a href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Categorie:Tool">List of all tools</a> and their documentation.
 	<p/>
-	<li><a href="{% url 'nodered_live_data_and_sensors' %}">Live data &amp; sensors</a></li>
-	<li><a href="{% url 'nodered_space_climate' %}">Space climate</a></li>
-{% if request.user|isMainsAdmin or user.is_privileged %}
-	<li> Lucas MainsSensors : <a href="{% url 'mainsindex' %}">admin interface</a>
-	<li> List of <a href="/crm/api/v1/mainssensor/resolve">sensors</a> names, descriptions and IDs.
-        <li> Or alternatively use ...<code>//crm/api/v1/mainssensor/resolve/1234</code> to get just the name (decimal number).
-	</p>
-{% endif %}
-
-{% if user|isPettycashAdmin %}
-	<li>List of <a href='{% url "unpaired" %}'>payment stations</a> and pairing.
-{% endif %}
-
-{% if user|isNoderedAdmin or user.is_superuser %}
-	<li><a href='{% url "nodered_proxy" "" %}'>Nodered editor</a>
-{% endif %}
-
-{%if user.is_privileged %}
-	<li><a href="{% url 'newmember' %}">Add a NEW member</a>
+			<li><a href="{% url 'space_state' %}">Who is there now</a> (<i>(State of the space)</i>.
+			<li><a href="{% url 'camindex' %}">printer camera</a> (<i>(photo of buildplate of the Ultimaker 3)</i>.
+		<li><a href="/crm/kwh">Power consumption of the space</a>
+		<li><a href="{% url 'overview' %}">All members </a>
 	<p/>
-	<li><a href="{% url 'pending' %}">Instructions pending approval trustee</a>
-	<li><a href="{% url 'missing_doors' %}">People with no doors or tags</a>
+		<li><a href="{% url 'personal_page' %}">Your data</a>
+		<li><a href="{% url 'mytransactions' %}">Your cash balance</a>,  see all
+		<a href="{% url 'balances' %}">balances</a>, the <a href="{% url 'pricelist' %}">pricelist</a> and so on.
+		<li><a href="{% url 'mailinglists_edit' %}">Mailing lists subscriptions</a> and digest settings.
+		<li><a href="{% url 'mailinglists_archives' %}">Historic archives</a> of the mailing lists.
+	{%if user.is_privileged %}
+		<li><a href="{% url 'mailinglists_subs' %}">Who is (not) subscribed</a> to one of the mailing lists.
+	{%endif %}
+		<li><a href="{% url 'userdetails' %}">Update your personal details</a>
+		<li><a href="{% url 'password_change' %}">change your password</a>
+	{%if settings.GRAND_AMNESTY %}
+		<li><a href="{% url 'amnesty' %}">Grand amnesty</a>
+	{%endif %}
+	<p/>
+		<li><a href="{% url 'ufo' %}">Unclaimed Floating Objects</a> -- lost and found & things about to be disposed.
+	<p/>
+	<!--	<li><a href="{% url 'members-index' %}">All machines that require instruction</a> -->
+		<li><a href="{% url 'machine_list' %}">All machines</a>
+		<li><a href="{% url 'add_instruction' %}">Record instructions you've just given</a> on a machine to someone.
+	<p/>
+		<li><a href="{% url 'boxes' %}">Members box management</a>
+	{%  if settings.STORAGE %}
+		<li><a href="{% url 'storage' %}">Storage management</a>
+	{% endif %}
+		<li><a href="{% url 'chores' %}">Chores</a>
+		<p/>
+		<li><a href="{% url 'nodered_live_data_and_sensors' %}">Live data &amp; sensors</a></li>
+		<li><a href="{% url 'nodered_space_climate' %}">Space climate</a></li>
+	{% if request.user|isMainsAdmin or user.is_privileged %}
+		<li> Lucas MainsSensors : <a href="{% url 'mainsindex' %}">admin interface</a>
+		<li> List of <a href="/crm/api/v1/mainssensor/resolve">sensors</a> names, descriptions and IDs.
+			<li> Or alternatively use ...<code>//crm/api/v1/mainssensor/resolve/1234</code> to get just the name (decimal number).
+		</p>
+	{% endif %}
+
+	{% if user|isPettycashAdmin %}
+		<li>List of <a href='{% url "unpaired" %}'>payment stations</a> and pairing.
+	{% endif %}
+
+	{% if user|isNoderedAdmin or user.is_superuser %}
+		<li><a href='{% url "nodered_proxy" "" %}'>Nodered editor</a>
+	{% endif %}
+
+	{%if user.is_privileged %}
+		<li><a href="{% url 'newmember' %}">Add a NEW member</a>
+		<p/>
+		<li><a href="{% url 'pending' %}">Instructions pending approval trustee</a>
+		<li><a href="{% url 'missing_doors' %}">People with no doors or tags</a>
 	<li><a href="{% url 'missing_forms' %}">Missing waivers</a>
-	<li><a href="{% url 'filed_forms' %}">Filed waivers</a>
-	<li><a href="{% url 'userdetails' %}">Update your personal details</a>
-	<p/>
-	<li><a href="{% url 'admin:index' %}">raw database access</a>
-	<p/>
-	<li><a href="{% url 'unknowntags' %}">See unknown tags / link unknown tags to a member</a>
-	<p/>
-	<li><a href="{% url 'acl-index' %}">rfid acl stuff</a>
-        <p>
-	<li><a href="{% url 'cam53upload' %}">Upload Triodos transactions</a>
-        </p>
-{% endif %}
-	<li><a href="{% url 'logout' %}?next={% url 'index' %}">logout</a>
-	</ul>
+		<li><a href="{% url 'filed_forms' %}">Filed waivers</a>
+		<li><a href="{% url 'userdetails' %}">Update your personal details</a>
+		<p/>
+		<li><a href="{% url 'admin:index' %}">raw database access</a>
+		<p/>
+		<li><a href="{% url 'unknowntags' %}">See unknown tags / link unknown tags to a member</a>
+		<p/>
+		<li><a href="{% url 'acl-index' %}">rfid acl stuff</a>
+			<p>
+		<li><a href="{% url 'cam53upload' %}">Upload Triodos transactions</a>
+			</p>
+	{% endif %}
+		<li><a href="{% url 'logout' %}?next={% url 'index' %}">logout</a>
+		</ul>
 {% else %}
-Please <a href="{% url 'login' %}?next={% url 'index' %}">login</a> or <a href="{% url 'password_reset' %}">reset my password</a>
+	Please <a href="{% url 'login' %}?next={% url 'index' %}">login</a> or <a href="{% url 'password_reset' %}">reset my password</a>
 {% endif %}
 
 {% endblock %}
