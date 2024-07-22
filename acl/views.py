@@ -9,6 +9,7 @@ from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
+from django.db.models.functions import Upper
 from ipware import get_client_ip
 
 from mailinglists.models import Subscription
@@ -147,12 +148,18 @@ def api_index_legacy2(request):
 
 @login_required
 def machine_list(request):
-    machines = Machine.objects.order_by("name")
+    machines = Machine.objects.annotate(upper_name=Upper('name')).order_by('upper_name')
     members = User.objects.all().filter(is_active=True).order_by("first_name")
+
+    machines_category = {
+        "machines": machines.filter(category="machine").order_by('upper_name'),
+        "general_equipment": machines.filter(category="general_equipment").order_by('upper_name'),
+        "lights": machines.filter(category="lights").order_by('upper_name'),
+    }
 
     context = {
         "members": members,
-        "machines": machines,
+        "machines_category": machines_category,
         "has_permission": request.user.is_authenticated,
         "title": "Machines",
     }
@@ -231,7 +238,7 @@ def _overview(request, member_id=None):
             "User not found or access denied", status=404, content_type="text/plain"
         )
 
-    machines = Machine.objects.order_by()
+    machines = Machine.objects.annotate(upper_name=Upper('name')).order_by('upper_name')
     boxes = Memberbox.objects.all().filter(owner=member)
     storage = Storage.objects.all().filter(owner=member)
     subscriptions = Subscription.objects.all().filter(member=member)

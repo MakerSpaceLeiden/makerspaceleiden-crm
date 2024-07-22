@@ -2,15 +2,67 @@
 
 {% block content %}
 
-<ul>
-    {% for p in machines %}
-    <li> <a href="{% url 'machine_overview' p.id %}">{{ p.name }}</a>
-    (<i> {{ p.description }} </i>)
-{% if p.out_of_order %}
-	<b style="color: red;">OUT OF ORDER</b>
-{% endif %}
+<div class="row mb-3">
+    <div class="col-12">
+        <h2>Machines</h2>
+        <ul class="list-group list-group-flush pt-1">
+            {% for p in machines_category.machines %}
+            <li class="list-group-item border-0">
+                <a href="{% url 'machine_overview' p.id %}">{{ p.name }} </a>
+                <small class="text-muted ms-1">(<i>{{ p.description }}</i>)</small>
+                {% if p.out_of_order %}
+                <small>
+                    <a href="{% url 'machine_overview' p.id %}">
+                        <span class="badge bg-danger ms-1">OUT OF ORDER</span>
+                    </a>
+                </small>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
 
-    {% endfor %}
-</ul>
+<div class="row mb-3">
+    <div class="col-12">
+        <h2>General Equipment</h2>
+        <ul class="list-group list-group-flush pt-1">
+            {% for p in machines_category.general_equipment %}
+            <li class="list-group-item border-0">
+                <a href="{% url 'machine_overview' p.id %}">{{ p.name }} </a>
+                <small class="text-muted ms-1">(<i>{{ p.description }}</i>)</small>
+                {% if p.out_of_order %}
+                <small>
+                    <a href="{% url 'machine_overview' p.id %}" class="text-decoration-none">
+                        <a href="{% url 'machine_overview' p.id %}">
+                            <span class="badge bg-danger ms-1">OUT OF ORDER</span>
+                        </a>
+                    </a>
+                </small>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-12">
+        <h2>Lights</h2>
+        <ul class="list-group list-group-flush pt-1">
+            {% for p in machines_category.lights %}
+            <li class="list-group-item border-0">
+                <a href="{% url 'machine_overview' p.id %}">{{ p.name }} </a>
+                <small class="text-muted ms-1">(<i>{{ p.description }}</i>)</small>
+                {% if p.out_of_order %}
+                <a href="{% url 'machine_overview' p.id %}">
+                    <span class="badge bg-danger ms-1">OUT OF ORDER</span>
+                </a>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
 
 {% endblock %}

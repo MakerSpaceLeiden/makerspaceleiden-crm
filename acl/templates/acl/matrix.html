@@ -5,8 +5,8 @@
 <h1><hr/>XS matrix for {{ machines.first }} <hr/></h1>
 <table>
 	<tr><td alight=right>Machine: </td><td>{{ machines.first.name }}
-{% if machines.first.out_of_order %}
-		<b style="color: red;">OUT OF ORDER</b>
+	{% if machines.first.out_of_order %}
+		<span class="badge bg-danger ms-1 mt-0">OUT OF ORDER</span>
 {% endif %}
         </td></tr>
 	<tr><td alight=right></td><td>{{ machines.first.description}}<br/></td></tr>
