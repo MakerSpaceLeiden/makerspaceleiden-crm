@@ -52,6 +52,7 @@ def getall(current_user_id=None, subset=None):
                 continue
             this_user_volunteered = current_user_id in [
                 user.id for user in event["volunteers"]
+                if hasattr(user, 'id')
             ]
             if num_missing_volunteers > 0:
                 for idx in range(num_missing_volunteers):
@@ -70,6 +71,13 @@ def getall(current_user_id=None, subset=None):
                         "events": [],
                     }
                 )
+
+            try:
+                chore = Chore.objects.get(id=chore_id)
+                event["wiki_url"] = chore.wiki_url
+            except ObjectDoesNotExist:
+                event["wiki_url"] = None
+
             event_groups[-1]["events"].append(event)
 
     return sorted(event_groups, key=lambda e: e["timestamp"])
