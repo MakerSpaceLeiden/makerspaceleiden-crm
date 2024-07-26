@@ -138,7 +138,9 @@ def signup(request, chore_id, ts):
     except Exception as e:
         logger.error("Something else went wrong during mail sent: {0}".format(e))
 
-    return redirect("chores")
+    redirect_to = request.GET.get('redirect_to', 'chores')
+
+    return redirect(redirect_to)
 
 
 @login_required
@@ -169,4 +171,6 @@ def remove_signup(request, chore_id, ts):
     except Exception as e:
         logger.error("Something else went wrong during remove mail sent: {0}".format(e))
 
-    return redirect("chores")
+    redirect_to = request.GET.get('redirect_to', 'chores')
+
+    return redirect(redirect_to)
