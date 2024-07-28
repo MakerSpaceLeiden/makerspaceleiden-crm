@@ -17,7 +17,7 @@ function toggle() {
 	<!-- Agenda -->
 	<div class="col-xl-9 col-lg-12 col-sm-12 pt-2 pb-2">
 		<h2>Agenda</h2>
-		<p>Upcoming events:</p>
+		<p>Upcoming events (max 5). View all events <a href="{% url 'agenda' %}" class="agenda-link">here</a>.</p>
 		<div class="card mt-2 mb-2">
 			<ul class="list-group list-group-flush pt-0 pb-0">
 				{% for agenda_item in agenda_items %}

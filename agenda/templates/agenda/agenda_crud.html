@@ -54,12 +54,12 @@
     <div class="mt-3">
         {% if title == 'Edit agenda item' %}
             <button type="button" onclick="window.location.href='{% url 'agenda_detail' pk=form.instance.pk %}'" class="btn btn-secondary me-1">Back</button>
-            <button type="submit" class="btn btn-primary me-1">Save</button>
+            <button type="submit" class="btn btn-primary btn-primary-custom me-1">Save</button>
             <button type="button" onclick="window.location.href='{% url 'agenda_delete' pk=form.instance.pk %}'" class="btn btn-danger me-1">Delete</button>
         {% endif %}
         {% if title == 'Create new agenda item' %}
             <button type="button" onclick="window.location.href='{% url 'agenda' %}'" class="btn btn-secondary me-1">Cancel</button>
-            <button type="submit" class="btn btn-primary me-1">Create</button>
+            <button type="submit" class="btn btn-primary btn-primary-custom me-1">Create</button>
         {% endif %}
     </div>
 </form>

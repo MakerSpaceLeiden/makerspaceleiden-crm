@@ -122,12 +122,10 @@ def AgendaItemsView(request, pk=None):
             update_date = history.last().history_date
             updated_by = history.last().history_user
 
-    title = selected_item.item_title if selected_item else "Agenda"
-
     context = {
         "object_list": agenda_list,
         "selected_item": selected_item,
-        "title": title,
+        "title": "Agenda",
         "has_permission": request.user.is_authenticated,
         "show_history": show_history,
     }
