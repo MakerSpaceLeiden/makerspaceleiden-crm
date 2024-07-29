@@ -496,7 +496,10 @@ def api_getok_by_node(request, node=None, tag=None):
 
 @csrf_exempt
 @is_paired_terminal
-def api_gettags(request, node=None):
+# Note: we are not checking if this terminal is actually associated
+#       with this node or machine. I.e any valid terminal can ask
+#       anything about the others. We may not want that in the future.
+def api_gettags4node(request, terminal=None, node=None):
     if not node:
         logger.error("No node, denied.")
         return HttpResponse("No node", status=404, content_type="text/plain")
@@ -514,10 +517,32 @@ def api_gettags(request, node=None):
     out = {}
     for user in User.objects.filter(is_active=True):
         for machine in machines:
+            out[machine.name] = []
             if machine.canOperate(user):
                 for tag in Tag.objects.filter(owner=user):
-                    out[machine].append({"tag": tag, "name": user})
-    return out
+                    out[machine.name].append({"tag": tag.tag, "name": str(tag.owner)})
+
+    return JsonResponse(out)
+
+
+@csrf_exempt
+@is_paired_terminal
+# Note: we are not checking if this terminal is actually associated
+#       with this node or machine. I.e any valid terminal can ask
+#       anything about the others. We may not want that in the future.
+def api_gettags4machine(request, terminal=None, machine=None):
+    try:
+        machine = Machine.objects.get(name=machine)
+    except ObjectDoesNotExist:
+        logger.error(f"Machine {machine} not found, denied.")
+        return HttpResponse("Machine not found", status=404, content_type="text/plain")
+
+    out = []
+    for user in User.objects.filter(is_active=True):
+        if machine.canOperate(user):
+            for tag in Tag.objects.filter(owner=user):
+                out.append({"tag": tag.tag, "name": str(tag.owner)})
+    return JsonResponse(out, safe=False)
 
 
 @csrf_exempt
@@ -525,7 +550,7 @@ def api_gettags(request, node=None):
 @checktag
 def api_getok(request, machine=None, tag=None):
     try:
-        machine = Machine.objects.get(node_machine_name=machine)
+        machine = Machine.objects.get(name=machine)
     except ObjectDoesNotExist:
         logger.error("Machine '{}' not found, denied.".format(machine))
         return HttpResponse("Machine not found", status=404, content_type="text/plain")
