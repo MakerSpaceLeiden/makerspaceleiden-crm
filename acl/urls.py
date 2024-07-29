@@ -44,8 +44,13 @@ urlpatterns = [
         name="acl-v1-gettags",
     ),
     path(
-        "acl/api/v1/gettags4machine/<str:machine>",
-        views.api_gettags4machine,
-        name="acl-v1-gettags",
+        "acl/api/v1/gettags4machineJSON/<str:machine>",
+        views.api_gettags4machineJSON,
+        name="acl-v1-gettags-json",
+    ),
+    path(
+        "acl/api/v1/gettags4machineCSV/<str:machine>",
+        views.api_gettags4machineCSV,
+        name="acl-v1-gettags-csv",
     ),
 ]

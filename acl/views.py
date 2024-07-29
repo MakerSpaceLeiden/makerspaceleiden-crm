@@ -525,8 +525,6 @@ def api_gettags4node(request, terminal=None, node=None):
     return JsonResponse(out)
 
 
-@csrf_exempt
-@is_paired_terminal
 # Note: we are not checking if this terminal is actually associated
 #       with this node or machine. I.e any valid terminal can ask
 #       anything about the others. We may not want that in the future.
@@ -539,10 +537,7 @@ def api_gettags4machine(request, terminal=None, machine=None):
         return HttpResponse("Machine not found", status=404, content_type="text/plain")
 
     out = []
-    #    for user in User.objects.filter(is_active=True):
-    #        if machine.canOperate(user):
-    #            for tag in Tag.objects.filter(owner=user):
-    #                out.append({"tag": tag.tag, "name": str(tag.owner)})
+
     for user in User.objects.all():
         (needs, has) = machine.useState(user)
         xs = useNeedsToStateStr(needs, has)
@@ -557,8 +552,28 @@ def api_gettags4machine(request, terminal=None, machine=None):
                     "xs": xs,
                 }
             )
+    return out
 
+
+@csrf_exempt
+@is_paired_terminal
+def api_gettags4machineJSON(request, terminal=None, machine=None):
+    out = api_gettags4machine(request, terminal, machine)
     return JsonResponse(out, safe=False)
+
+
+@csrf_exempt
+@is_paired_terminal
+def api_gettags4machineCSV(request, terminal=None, machine=None):
+    outstr = []
+    for e in api_gettags4machine(request, terminal, machine):
+        outstr.append(f"{e['tag']},{e['needs']},{e['has']},{e['name']}")
+
+    # We sort; on ascii of the tag - to make a bin-search possible on the client.
+    #
+    outstr.sort()
+
+    return HttpResponse("\n".join(outstr), status=200, content_type="text/plain")
 
 
 @csrf_exempt

@@ -70,7 +70,13 @@ curl --silent \
         -H "SSL-CLIENT-CERT: $CLIENT_PEM" \
         -H "SSL-SERVER-CERT: $SERVER_PEM" \
         --cert client-$NAME.crt \
-	http://127.0.0.1:8000/acl/api/v1/gettags4machine/${MACHINE} | jq | sed -e 's/^/ *   /'
+	http://127.0.0.1:8000/acl/api/v1/gettags4machineJSON/${MACHINE} | jq | sed -e 's/^/ *   /'
+curl --silent \
+        -H "X-FORWARDED-FOR: ${IP}"  \
+        -H "SSL-CLIENT-CERT: $CLIENT_PEM" \
+        -H "SSL-SERVER-CERT: $SERVER_PEM" \
+        --cert client-$NAME.crt \
+	http://127.0.0.1:8000/acl/api/v1/gettags4machineCSV/${MACHINE} | sed -e 's/^/ *   /'
 echo " ."; echo
 
 echo "OK"
