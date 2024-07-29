@@ -303,6 +303,11 @@ POT_ID = 3
 # Amounts that can be paid through the boxes on the table.
 # Increased from 10 to 25 euro's as we now have the option
 # to pay for Filament in larger voulumes
+#
+# Note - PAY_API needs to be <= MAX_PAY_DEPOSITI -- as there
+# is a check in the model/raw transact on the latter. While
+#
+# the first just gets imposed on the API itself.
 MAX_PAY_API = Money(25.00, EUR)
 
 # Max that can be paid through automatic bank parsing
