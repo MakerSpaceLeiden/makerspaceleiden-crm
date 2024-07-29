@@ -58,7 +58,7 @@ class PettycashPairForm(forms.Form):
 #
 class PettycashRequestFormBase(ModelForm):
     def __init__(self, *args, **kwargs):
-        self.max_val = settings.MAX_PAY_REIMBURSE.amount
+        self.max_val = settings.MAX_PAY_CRM.amount
         alternative_text = "Above that; contact the trustees directly (%s)" % (
             settings.TRUSTEES
         )

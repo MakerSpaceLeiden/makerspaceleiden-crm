@@ -300,9 +300,18 @@ NONE_ID = 2
 POT_LABEL = "Makerspace (de zwarte Pot)"
 POT_ID = 3
 
+# Amounts that can be paid through the boxes on the table.
+# Increased from 10 to 25 euro's as we now have the option
+# to pay for Filament in larger voulumes
 MAX_PAY_API = Money(25.00, EUR)
+
+# Max that can be paid through automatic bank parsing
 MAX_PAY_DEPOSITI = Money(100.00, EUR)
-MAX_PAY_REIMBURSE = Money(250.00, EUR)
+
+# Max that can be paid through the CRM
+MAX_PAY_CRM = Money(100.00, EUR)
+
+# May for trustees (when they are in admin mode)
 MAX_PAY_TRUSTEE = Money(
     1000.00, EUR
 )  # as for Reimbursement; but now for 'is_priv' users.
