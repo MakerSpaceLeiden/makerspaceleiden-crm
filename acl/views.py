@@ -18,7 +18,7 @@ from pettycash.models import PettycashBalanceCache
 from storage.models import Storage
 from terminal.decorators import is_paired_terminal
 
-from .models import Entitlement, Machine, PermitType, RecentUse
+from .models import Entitlement, Machine, PermitType, RecentUse, useNeedsToStateStr
 
 logger = logging.getLogger(__name__)
 
@@ -530,6 +530,7 @@ def api_gettags4node(request, terminal=None, node=None):
 # Note: we are not checking if this terminal is actually associated
 #       with this node or machine. I.e any valid terminal can ask
 #       anything about the others. We may not want that in the future.
+#
 def api_gettags4machine(request, terminal=None, machine=None):
     try:
         machine = Machine.objects.get(name=machine)
@@ -538,10 +539,25 @@ def api_gettags4machine(request, terminal=None, machine=None):
         return HttpResponse("Machine not found", status=404, content_type="text/plain")
 
     out = []
-    for user in User.objects.filter(is_active=True):
-        if machine.canOperate(user):
-            for tag in Tag.objects.filter(owner=user):
-                out.append({"tag": tag.tag, "name": str(tag.owner)})
+    #    for user in User.objects.filter(is_active=True):
+    #        if machine.canOperate(user):
+    #            for tag in Tag.objects.filter(owner=user):
+    #                out.append({"tag": tag.tag, "name": str(tag.owner)})
+    for user in User.objects.all():
+        (needs, has) = machine.useState(user)
+        xs = useNeedsToStateStr(needs, has)
+        for tag in Tag.objects.filter(owner=user):
+            out.append(
+                {
+                    "tag": tag.tag,
+                    "name": str(tag.owner),
+                    "needs": needs,
+                    "has": has,
+                    "resukt": has & needs == needs,
+                    "xs": xs,
+                }
+            )
+
     return JsonResponse(out, safe=False)
 
 

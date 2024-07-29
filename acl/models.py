@@ -1,5 +1,6 @@
 import datetime
 import logging
+from enum import IntEnum
 
 from django.conf import settings
 from django.contrib.sites.models import Site
@@ -22,6 +23,43 @@ logger = logging.getLogger(__name__)
 #
 MAX_USERS_TRACKED = 5
 DAYS_USERS_TRACKED = 3
+
+
+class MachineUseFlags(IntEnum):
+    ACTIVE = 1
+    PERMIT = 2
+    FORM = 4
+    APPROVE = 8
+
+
+def bits2str(needs, has):
+    if needs:
+        if has:
+            return "ok"
+        else:
+            return "fail"
+    return "nn"
+
+
+def useNeedsToStateStr(needs, has):
+    out = "user:" + bits2str(
+        needs & MachineUseFlags.ACTIVE, has & MachineUseFlags.ACTIVE
+    )
+    out += ", permit:" + bits2str(
+        needs & MachineUseFlags.PERMIT, has & MachineUseFlags.PERMIT
+    )
+    out += ", waiver:" + bits2str(
+        needs & MachineUseFlags.FORM, has & MachineUseFlags.FORM
+    )
+    out += ", approve:" + bits2str(
+        needs & MachineUseFlags.APPROVE, has & MachineUseFlags.APPROVE
+    )
+    out += " = "
+    if has & needs == needs:
+        out += "ok"
+    else:
+        out += "denied"
+    return out
 
 
 class PermitType(models.Model):
@@ -120,6 +158,32 @@ class Machine(models.Model):
 
     def __str__(self):
         return self.name
+
+    def useState(self, user):
+        e = (
+            Entitlement.objects.all()
+            .filter(holder=user, permit=self.requires_permit)
+            .first()
+        )
+
+        needs = MachineUseFlags.ACTIVE
+        if self.requires_permit:
+            needs |= MachineUseFlags.PERMIT
+        if self.requires_form:
+            needs |= MachineUseFlags.FORM
+        if self.requires_permit and self.requires_permit.require_ok_trustee:
+            needs |= MachineUseFlags.APPROVE
+
+        flags = 0
+        if user.is_active:
+            flags |= MachineUseFlags.ACTIVE
+        if user.form_on_file:
+            flags |= MachineUseFlags.FORM
+        if e:
+            flags |= MachineUseFlags.PERMIT
+        if e and e.active:
+            flags |= MachineUseFlags.APPROVE
+        return [needs, flags]
 
     def canOperate(self, user):
         if not user.is_active:
