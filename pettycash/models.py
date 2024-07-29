@@ -55,12 +55,11 @@ class PettycashSku(models.Model):
     name = models.CharField(max_length=300, blank=False, null=True)
     description = models.CharField(max_length=300, blank=False, null=True)
     amount = MoneyField(
-        #       max_value = settings.MAX_PAY_API,
+        # max_value = settings.MAX_PAY_API,
         max_digits=8,
         decimal_places=2,
         default_currency="EUR",
         null=True,
-        help_text=f"Max is set to {settings.MAX_PAY_API}, change this in settings.py. This is the maximum payment that the payment terminals will be able to accept. If you enter a higher value - it will be capped to this value.",
     )
 
     history = HistoricalRecords()

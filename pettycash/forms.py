@@ -24,6 +24,10 @@ class PettycashSkuForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # We do this here; rather than in models; so we can pick up the actual value.
+        self.fields["amount"].help_text = (
+            f"Max is set to {settings.MAX_PAY_API}, change this in settings.py. This is the maximum payment that the payment terminals will be able to accept. If you enter a higher value - it will be capped to this value.",
+        )
 
     #       # for some reason - below does not work. Not does doing this in Model.
     #       self.fields["amount"].fields[0].max_value = settings.MAX_PAY_API
