@@ -16,6 +16,7 @@ from members.forms import TagForm
 from members.models import Tag, User, clean_tag_string
 from pettycash.models import PettycashBalanceCache
 from storage.models import Storage
+from terminal.decorators import is_paired_terminal
 
 from .models import Entitlement, Machine, PermitType, RecentUse
 
@@ -491,6 +492,32 @@ def api_getok_by_node(request, node=None, tag=None):
             out[machine.node_machine_name] = r
 
     return JsonResponse(out)
+
+
+@csrf_exempt
+@is_paired_terminal
+def api_gettags(request, node=None):
+    if not node:
+        logger.error("No node, denied.")
+        return HttpResponse("No node", status=404, content_type="text/plain")
+    try:
+        machines = Machine.objects.filter(node_name=node)
+    except ObjectDoesNotExist:
+        logger.error("Node not found, denied.")
+        return HttpResponse("Node not found", status=404, content_type="text/plain")
+    if not machines:
+        return HttpResponse(
+            "Node does not have any machines connecte to it",
+            status=404,
+            content_type="text/plain",
+        )
+    out = {}
+    for user in User.objects.filter(is_active=True):
+        for machine in machines:
+            if machine.canOperate(user):
+                for tag in Tag.objects.filter(owner=user):
+                    out[machine].append({"tag": tag, "name": user})
+    return out
 
 
 @csrf_exempt

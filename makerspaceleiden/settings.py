@@ -36,7 +36,7 @@ STORAGE = False
 # Application definition
 
 INSTALLED_APPS = [
-    "daphne",
+    #    "daphne",
     "import_export",
     "simple_history",
     "search_admin_autocomplete.apps.SearchAdminAutocompleteConfig",
@@ -60,7 +60,7 @@ INSTALLED_APPS = [
     "ultimaker.apps.UltimakerConfig",
     "spaceapi.apps.SpaceapiConfig",
     "memberlist",
-    "nodered.apps.NoderedConfig",
+    #    "nodered.apps.NoderedConfig",
     "navigation",
     "motd",
     "agenda",
@@ -72,7 +72,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     #    'autocomplete_light',
     "django.contrib.sites",
-    "revproxy",
+    #    "revproxy",
     "django_bootstrap5",
     "django_flatpickr",
     "rest_framework",
