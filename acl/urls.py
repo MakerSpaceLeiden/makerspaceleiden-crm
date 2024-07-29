@@ -28,4 +28,9 @@ urlpatterns = [
     ),
     path("acl/api/v1/gettaginfo", views.api_gettaginfo, name="acl-v1-gettaginfo"),
     path("acl/<int:machine_id>", views.api_details, name="details"),
+    path(
+        "acl/api/v1/getchangecounter",
+        views.api_getchangecounter,
+        name="acl-v1-getchangecounter",
+    ),
 ]
