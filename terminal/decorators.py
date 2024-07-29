@@ -5,7 +5,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse
 
 from makerspaceleiden.utils import client_cert
-from terminal.model import Terminal
+from terminal.models import Terminal
 
 logger = logging.getLogger(__name__)
 
