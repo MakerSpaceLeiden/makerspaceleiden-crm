@@ -112,7 +112,7 @@ def adjust_balance_cache(last, dst, amount, isreal=True):
     try:
         balance = PettycashBalanceCache.objects.get(owner=dst)
     except ObjectDoesNotExist:
-        logger.info("Warning - creating for dst=%s" % (dst))
+        logger.info("Warning - creating petty cache entry for dst=%s" % (dst))
 
         balance = PettycashBalanceCache(owner=dst, balance=Money(0, EUR))
         for tx in PettycashTransaction.objects.all().filter(Q(dst=dst)):

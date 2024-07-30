@@ -59,9 +59,18 @@ else
 	${POETRY_RUN}python${PYTHON_VERSION} manage.py import-machines demo/mac.csv
 	${POETRY_RUN}python${PYTHON_VERSION} manage.py import-consolidated demo/consolidated.txt
 	${POETRY_RUN}python${PYTHON_VERSION} manage.py pettycash-import-pricelist demo/pricelist.csv
+	echo -n Balance prior to loading:
+	${POETRY_RUN}python${PYTHON_VERSION} manage.py pettycash-balance-check
+	echo
 	${POETRY_RUN}python${PYTHON_VERSION} manage.py pettycash-demo-gendata
 	${POETRY_RUN}python${PYTHON_VERSION} manage.py pettycash-recache
+	echo -n Balance post loading:
+	${POETRY_RUN}python${PYTHON_VERSION} manage.py pettycash-balance-check
+	echo
+	${POETRY_RUN}python${PYTHON_VERSION} manage.py pettycash-recache
+	${POETRY_RUN}python${PYTHON_VERSION} manage.py pettycash-balance-check
         ${POETRY_RUN}python${PYTHON_VERSION} manage.py pettycash-activate-all-users
+	${POETRY_RUN}python${PYTHON_VERSION} manage.py pettycash-balance-check
          echo
 	echo No invites with password-set requests sent. Passwords are all hardcoded to 1234 for:
 	grep @  demo/consolidated.txt
