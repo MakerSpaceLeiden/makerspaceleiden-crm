@@ -18,3 +18,8 @@ peter.wood@makerspaceleiden.nl
 	Peter Wood
  	tablesaw doors
 	+31715149999
+former-user@admin.nl
+        9-9-9-9
+        This user is normally invisible and for petty cash accounting purposes only
+        doors
+        +312345678

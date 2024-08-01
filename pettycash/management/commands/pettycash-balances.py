@@ -11,13 +11,15 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         rc = 0
 
-        print("# Member,Balance,lastchange")
+        #        print("# Member,Balance,lastchange")
+        print("# Member,Balance")
 
         for balance in PettycashBalanceCache.objects.all():
-            dt = "None"
-            if balance.last:
-                dt = balance.last.date
+            #            dt = "None"
+            #            if balance.last:
+            #                dt = balance.last.date
 
-            print("%s,%s,%s" % (balance.owner, balance.balance, dt))
+            #            print("%s,%s,%s" % (balance.owner, balance.balance, dt))
+            print("%s,%s" % (balance.owner, balance.balance))
 
         sys.exit(rc)
