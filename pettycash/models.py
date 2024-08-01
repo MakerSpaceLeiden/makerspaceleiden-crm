@@ -4,7 +4,7 @@ from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import models
 from django.db.models import Q
-from django.db.models.signals import post_delete, pre_delete
+from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 from django.urls import reverse
 from django.utils import timezone
@@ -179,12 +179,13 @@ class PettycashTransaction(models.Model):
     # https://docs.djangoproject.com/en/dev/ref/contrib/admin/actions/
     #
     # so we do below from an signal rather than 'normal' delete(), and
-    # register this as a callback/signal on 'post_delete' of any
+    # register this as a callback/signal on 'pre_delete' of any
     # trnsaction.
     #
     def delete_callback(self, *args, **kwargs):
         # rc = super(PettycashTransaction, self).delete(*args, **kwargs)
         try:
+            # Essentially roll the transaction back from the cache.
             adjust_balance_cache(self, self.src, self.amount)
             adjust_balance_cache(self, self.dst, -self.amount)
         except Exception as e:
@@ -323,9 +324,12 @@ class PettycashImportRecord(models.Model):
     )
 
 
-# See above note/comment near delete_callback()
+# See above note/comment near delete_callback(). We need
+# to do this _pre_ -- as we want to record the name of
+# the user leaving and use the transaction itself. And
+# cannot do this once things are deleted.
 #
-@receiver(post_delete, sender=PettycashTransaction)
+@receiver(pre_delete, sender=PettycashTransaction)
 def pre_delete_tx_callback(sender, instance, using, **kwargs):
     tx = instance
     tx.delete_callback(using, kwargs)
@@ -345,8 +349,8 @@ def pre_delete_user_callback(sender, instance, using, **kwargs):
         amount -= tx.amount
 
     msg = "Left donating"
-    t = User.objects.get(id=settings.NONE_ID)
-    f = User.objects.get(id=settings.POT_ID)
+    f = User.objects.get(id=settings.NONE_ID)
+    t = User.objects.get(id=settings.POT_ID)
 
     if amount.amount < 0:
         msg = "Left with a debt"
