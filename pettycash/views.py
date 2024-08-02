@@ -21,11 +21,9 @@ from makerspaceleiden.decorators import (
     superuser_or_bearer_required,
 )
 from makerspaceleiden.mail import emailPlain
-from makerspaceleiden.utils import pemToSHA256Fingerprint
 from members.models import Tag, User
 from terminal.decorators import is_paired_terminal
 from terminal.models import Terminal
-from terminal.views import api2_register as newapi2_register
 
 from .camt53 import camt53_process
 from .forms import (
@@ -145,7 +143,10 @@ def transact_raw(
         )
         logger.info("payment: %s" % reason)
         tx._change_reason = reason[:100]
-        tx.save(is_privileged=request.user.is_privileged)
+        priv = False
+        if request.user.is_authenticated:
+            priv = request.user.is_privileged
+        tx.save(is_privileged=priv)
         if sent_alert:
             alertOwnersToChange(tx, user, [])
 
@@ -1037,14 +1038,17 @@ def reimburseque(request):
 @superuser_or_bearer_required
 def api_pay(request):
     try:
-        node = request.GET.get("node", None)
-        tagstr = request.GET.get("src", None)
-        amount_str = request.GET.get("amount", None)
-        description = request.GET.get("description", None)
+        rq = request.GET
+        if request.method == "POST":
+            rq = request.POST
+        node = rq.get("node", None)
+        tagstr = rq.get("src", None)
+        amount_str = rq.get("amount", None)
+        description = rq.get("description", None)
         amount = Money(amount_str, EUR)
-    except Exception:
-        logger.error("Tag payment has param issues.")
-        return HttpResponse("Params problems", status=400, content_type="text/plain")
+    except Exception as e:
+        logger.error(f"Tag payment has param issues: {e}")
+        return HttpResponse("Params issues", status=400, content_type="text/plain")
 
     if None in [tagstr, amount_str, description, amount, node]:
         logger.error("Missing param, Payment at %s denied" % (node))
@@ -1091,6 +1095,7 @@ def api_pay(request):
 def api2_register(request):
     return api2_register(request)
 
+
 @csrf_exempt
 def api_get_skus(request):
     out = []
@@ -1124,6 +1129,7 @@ def api_get_sku(request, sku):
 
     return HttpResponse("Error", status=500, content_type="text/plain")
 
+
 @csrf_exempt
 @is_paired_terminal
 def api2_pay(request, terminal):
@@ -1136,13 +1142,17 @@ def api2_pay(request, terminal):
         )
 
     try:
-        tagstr = request.GET.get("src", None)
-        amount_str = request.GET.get("amount", None)
-        description = request.GET.get("description", None)
+        rq = request.GET
+        if request.method == "POST":
+            rq = request.POST
+        tagstr = rq.get("src", None)
+        amount_str = rq.get("amount", None)
+        description = rq.get("description", None)
         amount = Money(amount_str, EUR)
-    except Exception:
+    except Exception as e:
         logger.error(
-            "Param issue for terminal %s@%s" % (terminal.name, station.description)
+            "Param issue for terminal %s@%s: %s"
+            % (terminal.name, station.description, e)
         )
         return HttpResponse("Params problems", status=400, content_type="text/plain")
 
