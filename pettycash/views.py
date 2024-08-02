@@ -144,10 +144,7 @@ def transact_raw(
         )
         logger.info("payment: %s" % reason)
         tx._change_reason = reason[:100]
-        if request.user.is_authenticated:
-            tx.save(is_privileged=request.user.is_privileged)
-        else:
-            tx.save()
+        tx.save(is_privileged=request.user.is_privileged)
         if sent_alert:
             alertOwnersToChange(tx, user, [])
 

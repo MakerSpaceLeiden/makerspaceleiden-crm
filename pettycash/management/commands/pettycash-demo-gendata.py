@@ -38,7 +38,6 @@ class Command(BaseCommand):
                 tx.save()
 
                 print(tx)
-        return
 
         # Have a couple of users request reimbursement.
         for i in range(5):
