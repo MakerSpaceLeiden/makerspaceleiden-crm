@@ -13,9 +13,9 @@ class Command(BaseCommand):
 
         total = 0
 
-        for balance in PettycashBalanceCache.objects.all():
-            if balance.last:
-                total += balance.balance.amount
+        for e in PettycashBalanceCache.objects.all():
+            if e.balance.amount:
+                total += e.balance.amount
 
         print(f"Balance across all accounts: {total}")
 
