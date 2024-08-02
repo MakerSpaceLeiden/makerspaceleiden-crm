@@ -265,8 +265,11 @@ def spends(request):
             "count": 0,
             "price": sku.amount,
         }
+        desc = sku.name
+        if sku.description:
+            desc = sku.description
         for tx in PettycashTransaction.objects.all().filter(
-            description__startswith=sku.description
+            description__startswith=desc
         ):
             e["amount"] += tx.amount
             e["count"] += 1
