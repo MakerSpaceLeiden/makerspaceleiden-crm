@@ -845,12 +845,13 @@ def amnesty(request):
 
     return render(request, "amnesty.html", context)
 
+
 @superuser
-def send_reset_email(request,uid):
+def send_reset_email(request, uid):
     user = User.objects.get(pk=uid)
-    template='registration/password_reset_email.html'
-    form = PasswordResetForm({'email': user.email})
+    template = "registration/password_reset_email.html"
+    form = PasswordResetForm({"email": user.email})
     if form.is_valid():
-       form.save(email_template_name=template)
+        form.save(email_template_name=template)
 
     return redirect("overview", member_id=uid)

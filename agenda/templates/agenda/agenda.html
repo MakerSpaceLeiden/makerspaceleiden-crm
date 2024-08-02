@@ -17,7 +17,7 @@
     <div class="col-md-9 order-0 order-md-0 pt-2">
         <div class="card scrollable pt-0 pb-3" id="item-text">
             <div class="card-body" style="max-height: 600px; min-height:250px; overflow-y: auto;">
-                
+
                 {% if selected_item %}
                 <div class="row">
                     <div class="col-xl-1 col-lg-2 col-12">
@@ -27,7 +27,7 @@
                         {{ selected_item.startdate|date:"l j M Y" }} - {{ selected_item.starttime|time:"H:i"  }}
                     </div>
                 </div>
-    
+
                 <div class="row">
                     <div class="col-xl-1 col-lg-2 col-12">
                         <strong>To:</strong>
@@ -43,7 +43,7 @@
                             <div class="creation-info">
                                 <small>This agenda item was created by {{ created_by }} at {{ creation_date|date:"l j M Y H:i" }}.</small>
                             </div>
-                            {% if is_updated %} 
+                            {% if is_updated %}
                                 <div class="update-info">
                                     <small>This agenda item was updated by {{ updated_by }} at {{ update_date|date:"l j M Y H:i" }}.</small>
                                 </div>
@@ -63,13 +63,13 @@
                 <div class="col-auto pe-0">
                     <button type="button" onclick="window.location.href='{% url 'agenda_update' selected_item.pk %}'" class="btn btn-primary">Edit</button>
                 </div>
-                {% endif %}  
-                <div class="col-auto">          
+                {% endif %}
+                <div class="col-auto">
                     <button type="button" onclick="window.location.href='{% url 'agenda_create' %}'" class="btn btn-primary">Create New</button>
                 </div>
             </div>
         </div>
-    
+
     </div>
 
     <!-- List of agenda items -->
@@ -90,7 +90,7 @@
                     <a class="list-group-item list-group-item-action pt-2 pb-1 {% if selected_item.pk == agenda_item.pk %}list-group-item-secondary{% endif %}" href="{% url 'agenda_detail' pk=agenda_item.pk %}?show_history={{ show_history }}">
                                 <div class="row">
                                     <div class="col text-secondary" align="center" style="font-size: 14px;  ">
-                                        {{ agenda_item.startdate|date:"d-m-Y" }}{% if agenda_item.startdate != agenda_item.enddate %} - {{ agenda_item.enddate|date:"d-m-Y" }}{% endif %}  
+                                        {{ agenda_item.startdate|date:"d-m-Y" }}{% if agenda_item.startdate != agenda_item.enddate %} - {{ agenda_item.enddate|date:"d-m-Y" }}{% endif %}
                                     </div>
                                 </div>
                                 <div class="row">

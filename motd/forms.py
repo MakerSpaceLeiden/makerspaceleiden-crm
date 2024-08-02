@@ -1,15 +1,16 @@
-from django_flatpickr.widgets import DateTimePickerInput, DatePickerInput, TimePickerInput
-from django_flatpickr.schemas import FlatpickrOptions
+from datetime import datetime, timedelta
+
 from django import forms
-from django.utils import timezone
 from django.core.exceptions import ValidationError
-from members.models import User
+from django_flatpickr.schemas import FlatpickrOptions
+from django_flatpickr.widgets import DatePickerInput, TimePickerInput
+
 from .models import Motd
-from datetime import date, datetime, timedelta 
+
 
 class MotdForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
-        form_type = kwargs.pop("form_type", "create_message")
+        _ = kwargs.pop("form_type", "create_message")
         super().__init__(*args, **kwargs)
         self.fields["startdate"].error_messages = {
             "required": "Required: Please enter the start date."
@@ -47,7 +48,9 @@ class MotdForm(forms.ModelForm):
             # Check if the difference between start and end dates is more than 2 weeks
             difference = end_datetime - start_datetime
             if difference > timedelta(weeks=2):
-                raise ValidationError("Maximum time limit: The start date and end date cannot be more than two weeks apart.")
+                raise ValidationError(
+                    "Maximum time limit: The start date and end date cannot be more than two weeks apart."
+                )
 
     class Meta:
         model = Motd

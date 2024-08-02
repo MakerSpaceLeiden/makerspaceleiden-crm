@@ -101,7 +101,10 @@ class Command(BaseCommand):
         balances = PettycashBalanceCache.objects.order_by("balance")
         if not options["all"]:
             balances = balances.filter(
-                (Q(balance__gt=Money(0, EUR)) & Q(last__date__gt=cutoff_date))
+                (
+                    Q(balance__gt=Money(0, EUR))
+                    # & Q(last__date__gt=cutoff_date)
+                )
                 | Q(balance__lt=Money(0, EUR))
             ).filter(~Q(owner=settings.POT_ID) & ~Q(owner=settings.NONE_ID))
 
@@ -116,8 +119,11 @@ class Command(BaseCommand):
                 "count": 0,
                 "price": sku.amount,
             }
+            desc = sku.name
+            if sku.description:
+                desc = sku.description
             for tx in PettycashTransaction.objects.all().filter(
-                description__startswith=sku.description
+                description__startswith=desc
             ):
                 e["amount"] += tx.amount
                 e["count"] += 1

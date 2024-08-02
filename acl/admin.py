@@ -6,7 +6,7 @@ from simple_history.admin import SimpleHistoryAdmin
 
 from members.models import User
 
-from .models import Entitlement, Location, Machine, PermitType, RecentUse
+from .models import ChangeTracker, Entitlement, Location, Machine, PermitType, RecentUse
 
 
 # class MachineAdmin(ImportExportModelAdmin,admin.ModelAdmin):
@@ -22,7 +22,7 @@ class MachineAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
         "requires_permit",
         "category",
         "wiki_title",
-        "wiki_url"
+        "wiki_url",
     )
 
 
@@ -85,3 +85,27 @@ class RecentUseAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
 
 
 admin.site.register(RecentUse, RecentUseAdmin)
+
+
+# We lock this class down - as making changes is rather
+# confusing for the (payment/access) nodes; as this controls
+# their caching and updates.
+#
+class ChangeTrackerAdmin(admin.ModelAdmin):
+    class Meta:
+        view_only = True
+
+    list_display = ("count", "changed")
+    readonly_fields = ("count", "changed")
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, rec=None):
+        return False
+
+    def has_delete_permission(self, request, rec=None):
+        return False
+
+
+admin.site.register(ChangeTracker, ChangeTrackerAdmin)

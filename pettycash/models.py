@@ -4,6 +4,8 @@ from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import models
 from django.db.models import Q
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
 from django.urls import reverse
 from django.utils import timezone
 from djmoney.models.fields import MoneyField
@@ -32,8 +34,13 @@ class PettycashSku(models.Model):
     name = models.CharField(max_length=300, blank=False, null=True)
     description = models.CharField(max_length=300, blank=False, null=True)
     amount = MoneyField(
-        max_digits=8, decimal_places=2, null=True, default_currency="EUR"
+        # max_value = settings.MAX_PAY_API,
+        max_digits=8,
+        decimal_places=2,
+        default_currency="EUR",
+        null=True,
     )
+
     history = HistoricalRecords()
 
     def __str__(self):
@@ -78,13 +85,11 @@ class PettycashBalanceCache(models.Model):
     balance = MoneyField(
         max_digits=8, decimal_places=2, null=True, default_currency="EUR"
     )
-    last = models.ForeignKey(
-        "PettycashTransaction",
-        on_delete=models.SET_DEFAULT,
-        null=True,
+
+    lasttxdate = models.DateTimeField(
         blank=True,
-        default=None,
-        help_text="Last transaction that changed the balance",
+        null=True,
+        help_text="Date of most recent balance changing transaction (excluding any technical/system ones)",
     )
 
     history = HistoricalRecords()
@@ -102,20 +107,19 @@ class PettycashBalanceCache(models.Model):
         return super(PettycashBalanceCache, self).save()
 
 
-def adjust_balance_cache(last, dst, amount):
+def adjust_balance_cache(last, dst, amount, isreal=True):
     try:
         balance = PettycashBalanceCache.objects.get(owner=dst)
     except ObjectDoesNotExist:
-        logger.info("Warning - creating for dst=%s" % (dst))
+        logger.info("Warning - creating petty cache entry for dst=%s" % (dst))
 
         balance = PettycashBalanceCache(owner=dst, balance=Money(0, EUR))
         for tx in PettycashTransaction.objects.all().filter(Q(dst=dst)):
-            # Exclude the current transaction we are working with
-            if tx.id is not last.id:
-                balance.balance += tx.amount
+            balance.balance += tx.amount
 
     balance.balance += amount
-    balance.last = last
+    if isreal:
+        balance.lasttxdate = timezone.now()
     balance.save()
 
 
@@ -172,15 +176,21 @@ class PettycashTransaction(models.Model):
             self.amount,
         )
 
-    def delete(self, *args, **kwargs):
-        rc = super(PettycashTransaction, self).delete(*args, **kwargs)
+    # There is a bug/limitation in Django's admin interface:
+    # https://docs.djangoproject.com/en/dev/ref/contrib/admin/actions/
+    #
+    # so we do below from an signal rather than 'normal' delete(), and
+    # register this as a callback/signal on 'pre_delete' of any
+    # trnsaction.
+    #
+    def delete_callback(self, *args, **kwargs):
+        # rc = super(PettycashTransaction, self).delete(*args, **kwargs)
         try:
+            # Essentially roll the transaction back from the cache.
             adjust_balance_cache(self, self.src, self.amount)
             adjust_balance_cache(self, self.dst, -self.amount)
         except Exception as e:
-            logger.error("Transaction cache failure on delete: %s" % (e))
-
-        return rc
+            logger.error("Transaction cache failure on update post delete: %s" % (e))
 
     def refund_booking(self):
         """
@@ -235,6 +245,7 @@ class PettycashTransaction(models.Model):
         try:
             adjust_balance_cache(self, self.src, -self.amount)
             adjust_balance_cache(self, self.dst, self.amount)
+            print(f"Cache Adjust: {self.src} -> {self.dst} = {self.amount}")
         except Exception as e:
             logger.error("Transaction cache failure: %s" % (e))
 
@@ -311,4 +322,61 @@ class PettycashImportRecord(models.Model):
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
+    )
+
+
+# See above note/comment near delete_callback(). We need
+# to do this _pre_ -- as we want to record the name of
+# the user leaving and use the transaction itself. And
+# cannot do this once things are deleted.
+#
+@receiver(pre_delete, sender=PettycashTransaction)
+def pre_delete_tx_callback(sender, instance, using, **kwargs):
+    tx = instance
+    tx.delete_callback(using, kwargs)
+
+
+@receiver(pre_delete, sender=User)
+def pre_delete_user_callback(sender, instance, using, **kwargs):
+    # Run through all the current transactions of the user;
+    # sum them up; and move the balance to former participant
+    # account. In effect - we keep a PL in this account.
+    #
+    user = instance
+    amount = 0
+    for tx in PettycashTransaction.objects.all().filter(Q(dst=user)):
+        amount += tx.amount
+    for tx in PettycashTransaction.objects.all().filter(Q(src=user)):
+        amount -= tx.amount
+
+    msg = "Left donating"
+    f = User.objects.get(id=settings.NONE_ID)
+    t = User.objects.get(id=settings.POT_ID)
+
+    if amount.amount < 0:
+        msg = "Left with a debt"
+        amount = -amount
+        ff = t
+        t = f
+        f = ff
+
+    print(f"Transaction: {f.id} {t.id} user = {user.id}")
+
+    tx = PettycashTransaction(
+        src=f,
+        dst=t,
+        amount=amount,
+        description=f"Deleted participant {user}. {msg}",
+    )
+    tx._change_reason = "Participant was deleted"
+    tx.save()
+
+    emailPlain(
+        "email_payout_leave.txt",
+        toinform=pettycash_admin_emails(),
+        context={
+            "user": user,
+            "amount": amount,
+            "msg": msg,
+        },
     )

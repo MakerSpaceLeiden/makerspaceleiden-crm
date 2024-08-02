@@ -5,9 +5,40 @@ from djmoney.models.validators import MaxMoneyValidator, MinMoneyValidator
 
 from .models import (
     PettycashReimbursementRequest,
+    PettycashSku,
     PettycashStation,
     PettycashTransaction,
 )
+
+
+# As payments on the terminals are always done via the API, limit
+# the amounts on creation to the current max. This is not really
+# compliance reasons (that is done in the save/transaction) - but
+# just to prevent someone from creating something that is too
+# expensive to buy (without editing the settings).
+#
+class PettycashSkuForm(forms.ModelForm):
+    class Meta:
+        model = PettycashSku
+        exclude = []
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # We do this here; rather than in models; so we can pick up the actual value.
+        self.fields["amount"].help_text = (
+            f"Max is set to {settings.MAX_PAY_API}, change this in settings.py. This is the maximum payment that the payment terminals will be able to accept. If you enter a higher value - it will be capped to this value.",
+        )
+
+    #       # for some reason - below does not work. Not does doing this in Model.
+    #       self.fields["amount"].fields[0].max_value = settings.MAX_PAY_API
+
+    # Can only give a error by raising an exception; so cap the
+    # value for now.
+    def clean_amount(self):
+        amt = self.cleaned_data.get("amount")
+        if amt > settings.MAX_PAY_API:
+            return settings.MAX_PAY_API
+        return amt
 
 
 class UserChoiceField(forms.ModelChoiceField):

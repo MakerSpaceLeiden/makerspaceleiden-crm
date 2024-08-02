@@ -4,40 +4,55 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('acl', '0008_auto_20230328_1839'),
+        ("acl", "0008_auto_20230328_1839"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='historicalmachine',
-            name='category',
-            field=models.CharField(choices=[('machine', 'Machine'), ('general_equipment', 'General equipment'), ('lights', 'Lights')], default='machine', max_length=20),
+            model_name="historicalmachine",
+            name="category",
+            field=models.CharField(
+                choices=[
+                    ("machine", "Machine"),
+                    ("general_equipment", "General equipment"),
+                    ("lights", "Lights"),
+                ],
+                default="machine",
+                max_length=20,
+            ),
         ),
         migrations.AddField(
-            model_name='historicalmachine',
-            name='wiki_title',
+            model_name="historicalmachine",
+            name="wiki_title",
             field=models.CharField(blank=True, max_length=200),
         ),
         migrations.AddField(
-            model_name='historicalmachine',
-            name='wiki_url',
+            model_name="historicalmachine",
+            name="wiki_url",
             field=models.CharField(blank=True, max_length=200),
         ),
         migrations.AddField(
-            model_name='machine',
-            name='category',
-            field=models.CharField(choices=[('machine', 'Machine'), ('general_equipment', 'General equipment'), ('lights', 'Lights')], default='machine', max_length=20),
+            model_name="machine",
+            name="category",
+            field=models.CharField(
+                choices=[
+                    ("machine", "Machine"),
+                    ("general_equipment", "General equipment"),
+                    ("lights", "Lights"),
+                ],
+                default="machine",
+                max_length=20,
+            ),
         ),
         migrations.AddField(
-            model_name='machine',
-            name='wiki_title',
+            model_name="machine",
+            name="wiki_title",
             field=models.CharField(blank=True, max_length=200),
         ),
         migrations.AddField(
-            model_name='machine',
-            name='wiki_url',
+            model_name="machine",
+            name="wiki_url",
             field=models.CharField(blank=True, max_length=200),
         ),
     ]

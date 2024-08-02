@@ -16,12 +16,6 @@ repos:
       - id: requirements-txt-fixer
       - id: detect-private-key
 
-  - repo: https://github.com/psf/black
-    rev: 23.11.0
-    hooks:
-    - id: black
-      alias: autoformat
-
   - repo: https://github.com/pycqa/isort
     rev: 5.12.0
     hooks:

@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class AgendaConfig(AppConfig):
+class NoderedConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
-    name = "agenda"
+    name = "nodered"

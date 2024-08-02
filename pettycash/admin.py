@@ -6,6 +6,7 @@ from django.forms import CheckboxSelectMultiple
 from import_export.admin import ImportExportModelAdmin
 from simple_history.admin import SimpleHistoryAdmin
 
+from .forms import PettycashSkuForm
 from .models import (
     PettycashBalanceCache,
     PettycashImportRecord,
@@ -20,6 +21,7 @@ logger = logging.getLogger(__name__)
 
 class PettycashSkuAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     list_display = ("pk", "name", "amount", "description")
+    form = PettycashSkuForm
     pass
 
 
@@ -59,7 +61,7 @@ class PettycashTransactionAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
 
 
 class PettycashBalanceCacheAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
-    list_display = ("owner", "balance", "last")
+    list_display = ("owner", "balance", "lasttxdate")
     pass
 
 
