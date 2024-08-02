@@ -282,6 +282,10 @@ def clean_tag_string(tag):
     return None
 
 
+def none_user():
+    return User.objects.get(id=settings.NONE_ID)
+
+
 # Handle image cleanup.
 # pre_delete.connect(pre_delete_delete_callback, sender=User)
 # pre_save.connect(pre_save_delete_callback, sender=User)

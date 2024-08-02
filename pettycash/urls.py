@@ -46,8 +46,9 @@ urlpatterns = [
     path("api/v2/register", views.api2_register, name="acl-v2-register"),
     path("api/v2/pay", views.api2_pay, name="acl-v1-pay"),
     # Calls with no security (yet)
+    #
     path("api/v1/skus", views.api_get_skus, name="acl-v1-get-skus"),
     path("api/v1/sku/<int:sku>", views.api_get_sku, name="acl-v1-get-sku"),
-    path("api/v2/skus", views.api_get_skus, name="acl-v1-get-skus"),
-    path("api/v2/sku/<int:sku>", views.api_get_sku, name="acl-v1-get-sku"),
+    path("api/v2/skus", views.api_get_skus, name="acl-v2-get-skus"),
+    path("api/v2/sku/<int:sku>", views.api_get_sku, name="acl-v2-get-sku"),
 ]

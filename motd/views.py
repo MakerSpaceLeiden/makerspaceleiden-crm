@@ -1,7 +1,11 @@
+from datetime import date
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils import timezone
 from django.views.decorators.http import require_safe
 
 from .forms import MotdForm
@@ -78,16 +82,36 @@ def MotdView(request):
 @require_safe
 @login_required
 def MotdMessagesView(request, pk=None):
-    motd_list = Motd.objects.order_by(
-        "-startdate", "-starttime", "-enddate", "-endtime"
-    )
+    show_history = request.GET.get(
+        "show_history", "off"
+    )  # Get the state of the show_history parameter
+    now = timezone.now()
+
+    if show_history == "off":
+        motd_list = Motd.objects.filter(
+            Q(enddate=date.today(), endtime__gte=now) | Q(enddate__gt=date.today())
+        ).order_by(
+            "enddate", "endtime", "startdate", "starttime"
+        )  # Filter out messages with end date and time after now
+    else:
+        motd_list = Motd.objects.all().order_by(
+            "enddate", "endtime", "startdate", "starttime"
+        )
+
     selected_message = None
 
     if motd_list.exists():
         if pk:
             selected_message = get_object_or_404(Motd, pk=pk)
         else:
-            selected_message = Motd.objects.order_by("id").first()
+            selected_message = (
+                Motd.objects.filter(
+                    Q(enddate=date.today(), endtime__gte=now)
+                    | Q(enddate__gt=date.today())
+                )
+                .order_by("enddate", "endtime", "startdate", "starttime")
+                .first()
+            )
 
     is_updated = False
     creation_date = "Time Unknown"
@@ -111,6 +135,7 @@ def MotdMessagesView(request, pk=None):
         "selected_message": selected_message,
         "title": "Message of the day",
         "has_permission": request.user.is_authenticated,
+        "show_history": show_history,
     }
 
     if selected_message:

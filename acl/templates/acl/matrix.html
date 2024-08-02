@@ -36,6 +36,14 @@
 	</td></tr>
 {% endif %}
 	<tr><td alight=right>Location: </td><td>{{ machines.first.location}}</td></tr>
+
+	{% if machines.first.wiki_title %}
+		<tr>
+			<td>Wiki:</td>
+			<td><a href="{{ machines.first.wiki_url }}" target="_blank"> {{ machines.first.wiki_title }} </a></td>
+		</tr>
+	{% endif %}
+
 	<tr><td alight=right>Waiver: </td><td>
 			{% if  machines.first.requires_form %}
 			The waiver form needs to be on file.

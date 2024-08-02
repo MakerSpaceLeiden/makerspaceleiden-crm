@@ -1,3 +1,5 @@
+channels[daphne]
+
 Django
 django-dynamic-filenames
 django-flatpickr
@@ -27,9 +29,13 @@ django_bootstrap5
 
 # Django REST Framework
 djangorestframework
+djproxy
 
 # JSON fields in the DB model
 jsonfield2
+
+# Validation of json payloads from embedded HW
+jsonschema
 
 # Mailman scraping API
 lxml
@@ -48,6 +54,7 @@ reportlab
 # Reverse proxy for the 3D printers
 requests
 six
+websockets
 wheel
 
 # Production requirements in requirements-production.txt

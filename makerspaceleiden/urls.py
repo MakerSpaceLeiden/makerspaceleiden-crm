@@ -35,6 +35,7 @@ urlpatterns = [
     path("", include("acl.urls")),
     path("", include("navigation.urls")),
     path("", include("motd.urls")),
+    path("", include("agenda.urls")),
     path("members/", include("members.urls")),
     path("servicelog/", include("servicelog.urls")),
     path("mailinglists/", include("mailinglists.urls")),
@@ -49,6 +50,8 @@ urlpatterns = [
     path("ultimaker/", include("ultimaker.urls")),
     path("pettycash/", include("pettycash.urls")),
     path("spaceapi/", include("spaceapi.urls")),
+    path("terminal/", include("terminal.urls")),
+    path("", include("nodered.urls")),
 ]
 
 urlpatterns += static(r"/favicon.ico", document_root="static/favicon.ico")

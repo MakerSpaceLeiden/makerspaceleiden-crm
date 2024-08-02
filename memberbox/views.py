@@ -73,7 +73,7 @@ def index(request):
 
 
 @login_required
-def create(request):
+def claim(request, location):
     if request.method == "POST":
         form = NewMemberboxForm(
             request.POST or None, request.FILES, initial={"owner": request.user.id}
@@ -94,7 +94,12 @@ def create(request):
                     "Unexpected error during create of new box : {0}".format(e)
                 )
     else:
-        form = NewMemberboxForm(initial={"owner": request.user.id})
+        form = NewMemberboxForm(
+            initial={
+                "owner": request.user.id,
+                "location": location,
+            }
+        )
 
     context = {
         "label": "Describe a new box",
@@ -108,6 +113,11 @@ def create(request):
         "back": "boxes",
     }
     return render(request, "crud.html", context)
+
+
+@login_required
+def create(request):
+    return claim(request, "")
 
 
 @login_required

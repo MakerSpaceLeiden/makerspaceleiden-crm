@@ -23,6 +23,8 @@ class Command(BaseCommand):
             # Create some payment of a user to the general account for
             # 3 to 5 random items from the price list.
             #
+            if user.id == settings.NONE_ID or user.id == settings.POT_ID:
+                continue
             for i in range(random.randrange(3, 5)):
                 sku = random.choice(skus)
 
@@ -40,6 +42,8 @@ class Command(BaseCommand):
         # Have a couple of users request reimbursement.
         for i in range(5):
             user = random.choice(users)
+            if user.id == settings.NONE_ID or user.id == settings.POT_ID:
+                continue
 
             rq = PettycashReimbursementRequest(
                 src=User.objects.get(id=settings.POT_ID),

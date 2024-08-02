@@ -1,7 +1,6 @@
 import sys
 
 from django.core.management.base import BaseCommand
-from moneyed import EUR, Money
 
 from pettycash.models import PettycashBalanceCache
 
@@ -12,11 +11,12 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         rc = 0
 
-        total = Money(0, EUR)
+        total = 0
+
         for balance in PettycashBalanceCache.objects.all():
             if balance.last:
-                total += balance.last.amount
+                total += balance.balance.amount
 
-        print("Balance across all accounts: %s" % (total))
+        print(f"Balance across all accounts: {total}")
 
         sys.exit(rc)
