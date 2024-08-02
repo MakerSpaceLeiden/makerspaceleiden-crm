@@ -15,7 +15,6 @@ from simple_history.models import HistoricalRecords
 from stdimage.models import StdImageField
 
 from acl.models import Location
-from makerspaceleiden.mail import emailPlain
 from makerspaceleiden.utils import upload_to_pattern
 from members.models import User, none_user
 from terminal.models import Terminal

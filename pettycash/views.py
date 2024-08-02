@@ -21,6 +21,7 @@ from makerspaceleiden.decorators import (
     superuser_or_bearer_required,
 )
 from makerspaceleiden.mail import emailPlain
+from makerspaceleiden.utils import pemToSHA256Fingerprint
 from members.models import Tag, User
 from terminal.decorators import is_paired_terminal
 from terminal.models import Terminal
@@ -1088,8 +1089,7 @@ def api_pay(request):
 
 @csrf_exempt
 def api2_register(request):
-    return newapi2_register(request)
-
+    return api2_register(request)
 
 @csrf_exempt
 def api_get_skus(request):
@@ -1123,7 +1123,6 @@ def api_get_sku(request, sku):
         return HttpResponse("SKU not found", status=404, content_type="text/plain")
 
     return HttpResponse("Error", status=500, content_type="text/plain")
-
 
 @csrf_exempt
 @is_paired_terminal

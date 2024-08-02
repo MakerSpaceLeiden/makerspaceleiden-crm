@@ -20,7 +20,8 @@ fi
 if test -f x-client-$NAME.pem; then
 	echo existing key used
 else
-	openssl genrsa > x-client-$NAME.key
+
+openssl genrsa > x-client-$NAME.key
 	openssl x509 -new  -subj "/CN=$NAME/O=terminal" -out x-client-$NAME.pem -key x-client-$NAME.key
 	cat x-client-$NAME.key x-client-$NAME.pem > x-client-$NAME.crt
 fi
