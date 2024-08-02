@@ -223,9 +223,11 @@ def transact(
 
 @login_required
 def index(request, days=30):
-    lst = PettycashBalanceCache.objects.all().filter(
-        ~Q(owner=settings.NONE_ID)
-    )  # .order_by("-last")
+    lst = (
+        PettycashBalanceCache.objects.all()
+        .filter(~Q(owner=settings.NONE_ID))
+        .order_by("-lasttxdate")
+    )
     prices = PettycashSku.objects.all()
     context = {
         "title": "Balances",

@@ -86,14 +86,12 @@ class PettycashBalanceCache(models.Model):
     balance = MoneyField(
         max_digits=8, decimal_places=2, null=True, default_currency="EUR"
     )
-    #    last = models.ForeignKey(
-    #        "PettycashTransaction",
-    #        on_delete=models.SET_DEFAULT,
-    #        null=True,
-    #        blank=True,
-    #        default=None,
-    #        help_text="Last transaction that changed the balance",
-    #    )
+
+    lasttxdate = models.DateTimeField(
+        blank=True,
+        null=True,
+        help_text="Date of most recent balance changing transaction (excluding any technical/system ones)",
+    )
 
     history = HistoricalRecords()
 
@@ -110,7 +108,7 @@ class PettycashBalanceCache(models.Model):
         return super(PettycashBalanceCache, self).save()
 
 
-def adjust_balance_cache(last, dst, amount):
+def adjust_balance_cache(last, dst, amount, isreal=True):
     try:
         balance = PettycashBalanceCache.objects.get(owner=dst)
     except ObjectDoesNotExist:
@@ -118,12 +116,11 @@ def adjust_balance_cache(last, dst, amount):
 
         balance = PettycashBalanceCache(owner=dst, balance=Money(0, EUR))
         for tx in PettycashTransaction.objects.all().filter(Q(dst=dst)):
-            # Exclude the current transaction we are working with
-            #            if tx.id is not last.id:
             balance.balance += tx.amount
 
     balance.balance += amount
-    #    balance.last = last
+    if isreal:
+        balance.lasttxdate = timezone.now()
     balance.save()
 
 

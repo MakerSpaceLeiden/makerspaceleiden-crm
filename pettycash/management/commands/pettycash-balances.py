@@ -15,11 +15,10 @@ class Command(BaseCommand):
         print("# Member,Balance")
 
         for balance in PettycashBalanceCache.objects.all():
-            #            dt = "None"
-            #            if balance.last:
-            #                dt = balance.last.date
+            dt = "Never"
+            if balance.lasttxdate:
+                dt = balance.lasttxdate
 
-            #            print("%s,%s,%s" % (balance.owner, balance.balance, dt))
-            print("%s,%s" % (balance.owner, balance.balance))
+            print("%s,%s,%s" % (balance.owner, balance.balance, dt))
 
         sys.exit(rc)

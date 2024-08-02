@@ -61,11 +61,7 @@ class PettycashTransactionAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
 
 
 class PettycashBalanceCacheAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
-    # list_display = ("owner", "balance", "last")
-    list_display = (
-        "owner",
-        "balance",
-    )
+    list_display = ("owner", "balance", "lasttxdate")
     pass
 
 
