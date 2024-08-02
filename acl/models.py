@@ -7,12 +7,13 @@ from django.contrib.sites.models import Site
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import EmailMessage
 from django.db import models
+from django.db.models.signals import post_save
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
 from simple_history.models import HistoricalRecords
 
-from members.models import User
+from members.models import Tag, User
 
 logger = logging.getLogger(__name__)
 
@@ -426,3 +427,48 @@ def yn(v):
     if v:
         return "yes"
     return "no"
+
+
+# This class tracks XS changes; it gets updated everytime something is
+# touched that pertains to the ACL system. It is to aid the nodes in
+# caching things & updating timely.
+#
+class ChangeTracker(models.Model):
+    class Meta:
+        verbose_name = "ACL and XS change counter"
+        verbose_name_plural = verbose_name
+
+    changed = models.DateTimeField(
+        auto_now=True,
+        help_text="Date and time of the last change in the XS control system",
+    )
+    count = models.IntegerField(
+        default=0,
+        help_text="Number of times something in the XS control ssytem changed",
+    )
+
+
+def change_tracker_counter():
+    return ChangeTracker.objects.first()
+
+
+def tagacl_change_tracker(sender, *args, **kwargs):
+    c = ChangeTracker.objects.first()
+    if c is None:
+        c = ChangeTracker()
+
+    c.changed = timezone.now()
+    c.count = c.count + 1
+    c.save()
+
+
+post_save.connect(tagacl_change_tracker, sender=Entitlement)  # actual ok bit
+#
+post_save.connect(tagacl_change_tracker, sender=Tag)  # People getting/loosing tags
+post_save.connect(
+    tagacl_change_tracker, sender=PermitType
+)  # definiton of permits; e.g. stricter/more slack
+post_save.connect(tagacl_change_tracker, sender=Machine)  # permit required
+post_save.connect(
+    tagacl_change_tracker, sender=User
+)  # for waiver-form and status changes

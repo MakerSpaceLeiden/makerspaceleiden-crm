@@ -1,6 +1,7 @@
 import logging
 from functools import wraps
 
+from dateutil.tz.tz import EPOCH
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404, HttpResponse, JsonResponse
@@ -18,7 +19,7 @@ from pettycash.models import PettycashBalanceCache
 from storage.models import Storage
 from terminal.decorators import is_paired_terminal
 
-from .models import Entitlement, Machine, PermitType, RecentUse, useNeedsToStateStr
+from .models import Entitlement, Machine, PermitType, RecentUse, change_tracker_counter, useNeedsToStateStr
 
 logger = logging.getLogger(__name__)
 
@@ -595,3 +596,18 @@ def api_getok(request, machine=None, tag=None):
             )
         )
     return JsonResponse(get_perms(tag, machine))
+
+
+@csrf_exempt
+def api_getchangecounter(request):
+    c = change_tracker_counter()
+    if c is None:
+        return HttpResponse("Counter not found", status=500, content_type="text/plain")
+
+    secs = int((c.changed.replace(tzinfo=None) - EPOCH).total_seconds())
+
+    return HttpResponse(
+        f"{c.count},{secs}\t# Last change: {c.changed}",
+        status=200,
+        content_type="text/plain",
+    )

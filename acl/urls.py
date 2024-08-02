@@ -39,6 +39,11 @@ urlpatterns = [
     # calls to provide all tags for a given node/machine. Requires a valid
     # terminal cert.
     path(
+        "acl/api/v1/getchangecounter",
+        views.api_getchangecounter,
+        name="acl-v1-getchangecounter",
+    ),
+    path(
         "acl/api/v1/gettags4node/<str:node>",
         views.api_gettags4node,
         name="acl-v1-gettags",
