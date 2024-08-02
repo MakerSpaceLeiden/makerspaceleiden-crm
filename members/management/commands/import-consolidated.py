@@ -26,12 +26,7 @@ class Command(BaseCommand):
         try:
             admin = User.objects.get(email="admin@admin.nl")
         except Exception:
-            logger.warning("Admin user not found, creating")
-            admin = User.objects.create_superuser("admin@admin.nl", "1234")
-            admin.first_name = ("Ad",)
-            admin.last_name = "Min"
-            admin.save()
-        print("Admin = {}".format(admin.email))
+            raise Exception("No admin; did you run user-init ?")
 
         woodpermit, wasCreated = PermitType.objects.get_or_create(
             name="Wood Instruction"

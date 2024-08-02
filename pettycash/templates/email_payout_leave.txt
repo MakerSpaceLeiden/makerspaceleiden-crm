@@ -1,0 +1,10 @@
+Subject: [makerbot] Participant {{ user }} left with a balance of {{ amount }}
+L.S.
+
+Just to let you know; the participant {{ user }} was deleted from the CRM.
+
+This person left a {{ msg }}: {{ amount }}
+
+Your friendly makerbot.
+--
+Makerspace Leiden, internal payment notifcations.

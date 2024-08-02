@@ -54,6 +54,7 @@ echo
 if test -f demo/example.json; then
 	${POETRY_RUN}python${PYTHON_VERSION} manage.py loaddata demo/example.json
 else
+        ${POETRY_RUN}python${PYTHON_VERSION} manage.py user-init
 	${POETRY_RUN}python${PYTHON_VERSION} manage.py import-wifi demo/wifi.csv
 	${POETRY_RUN}python${PYTHON_VERSION} manage.py import-machines demo/mac.csv
 	${POETRY_RUN}python${PYTHON_VERSION} manage.py import-consolidated demo/consolidated.txt

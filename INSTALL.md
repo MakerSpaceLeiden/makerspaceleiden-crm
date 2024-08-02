@@ -40,6 +40,16 @@ python manage.py collectstatic
 # log in.
 python manage.py createsuperuser
 
+# Next create some special role users for payments
+# and a 'none' user that acts as a garbage collector for
+# users who have left (i.e. owns thier boxes/money, etc)
+#
+# You do not have to create these here. It is also
+# possible to change the NONE_ID and POT_IDs in settings
+# to point to some manually created user.
+#
+python manage.py user-init.
+
 # And start the server.
 #
 python manage.py runserver

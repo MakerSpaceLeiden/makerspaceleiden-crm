@@ -7,7 +7,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-django = "^4.2.11"
+django = "^4.2.14"
 pytz = "^2023.3.post1"
 wheel = "^0.42.0"
 django-import-export = "^3.3.3"

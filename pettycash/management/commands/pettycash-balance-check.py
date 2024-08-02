@@ -13,9 +13,8 @@ class Command(BaseCommand):
         rc = 0
 
         total = Money(0, EUR)
-        for balance in PettycashBalanceCache.objects.all():
-            if balance.last:
-                total += balance.last.amount
+        for ce in PettycashBalanceCache.objects.all():
+            total += ce.balance
 
         print("Balance across all accounts: %s" % (total))
 

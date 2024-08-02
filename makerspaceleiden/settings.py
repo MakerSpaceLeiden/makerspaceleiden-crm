@@ -36,7 +36,7 @@ STORAGE = False
 # Application definition
 
 INSTALLED_APPS = [
-    "daphne",
+    #    "daphne",
     "import_export",
     "simple_history",
     "search_admin_autocomplete.apps.SearchAdminAutocompleteConfig",
@@ -60,7 +60,7 @@ INSTALLED_APPS = [
     "ultimaker.apps.UltimakerConfig",
     "spaceapi.apps.SpaceapiConfig",
     "memberlist",
-    "nodered.apps.NoderedConfig",
+    #    "nodered.apps.NoderedConfig",
     "navigation",
     "motd",
     "agenda",
@@ -72,10 +72,11 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     #    'autocomplete_light',
     "django.contrib.sites",
-    "revproxy",
+    #    "revproxy",
     "django_bootstrap5",
     "django_flatpickr",
     "rest_framework",
+    "terminal.apps.TerminalConfig",
 ]
 
 SITE_ID = 1
@@ -284,8 +285,8 @@ PETTYCASH_TOPUP = 15
 PETTYCASH_TNS = "Stichting Makerspace Leiden"
 PETTYCASH_IBAN = "NL18RABO0123459876"
 DEVELOPERS_ADMIN_GROUP = "developers"
-POT_ID = 1
-NONE_ID = 217
+NONE_ID = 2
+POT_ID = 3
 NONE_LABEL = "Former participant"
 POT_LABEL = "Makerspace (de zwarte Pot)"
 CURRENCIES = ["EUR"]
