@@ -285,18 +285,30 @@ PETTYCASH_TOPUP = 15
 PETTYCASH_TNS = "Stichting Makerspace Leiden"
 PETTYCASH_IBAN = "NL18RABO0123459876"
 DEVELOPERS_ADMIN_GROUP = "developers"
-NONE_ID = 2
-POT_ID = 3
-NONE_LABEL = "Former participant"
-POT_LABEL = "Makerspace (de zwarte Pot)"
-CURRENCIES = ["EUR"]
 
-MAX_PAY_API = Money(10.00, EUR)
+# Assets of former participants; such as money or
+# boxes need to be caught somewhere. This user,
+# which is marked inactive; acts as a vessel.
+NONE_LABEL = "Former participant"
+NONE_ID = 2
+
+# The pettycash of the makerspace itself needs
+# a `user' to holds its money. Use this user.
+#
+POT_LABEL = "Makerspace (de zwarte Pot)"
+POT_ID = 3
+
+MAX_PAY_API = Money(25.00, EUR)
 MAX_PAY_DEPOSITI = Money(100.00, EUR)
-MAX_PAY_REIMBURSE = Money(100.00, EUR)
+MAX_PAY_REIMBURSE = Money(250.00, EUR)
 MAX_PAY_TRUSTEE = Money(
     1000.00, EUR
 )  # as for Reimbursement; but now for 'is_priv' users.
+CURRENCIES = ["EUR"]
+
+# How long an admin has to accept a new terminal post
+# it booting up with a new key.
+#
 PAY_MAXNONCE_AGE_MINUTES = 20
 
 # Days and max number of unknown terminals to keep.
