@@ -43,10 +43,10 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
                 </dl>
                 <div>
                 {% if user.is_privileged or member == user %}
-                <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'userdetails' %}'">Edit</button>
+                <button type="button" class="btn btn-primary btn-primary-custom" onclick="window.location.href='{% url 'userdetails' %}'">Edit</button>
                 {% endif %}
                 {% if user.is_privileged %}
-                <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'userdelete' member.id %}'">Delete</button>
+                <button type="button" class="btn btn-danger" onclick="window.location.href='{% url 'userdelete' member.id %}'">Delete</button>
                 {% endif %}
                 </div>
             </div>
@@ -69,10 +69,10 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
                 </dl>
                 <div>
                     {% if member == user %}
-                    <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'password_change' %}'">Change password</button>
+                    <button type="button" class="btn btn-primary btn-primary-custom" onclick="window.location.href='{% url 'password_change' %}'">Change password</button>
                     {% endif %}
                     {% if user.is_privileged %}
-                    <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'send_reset_email' uid=user.id %}'">Sent password reset email</button>
+                    <button type="button" class="btn btn-primary btn-primary-custom" onclick="window.location.href='{% url 'send_reset_email' uid=user.id %}'">Sent password reset email</button>
                     {% endif %}
                 </div>
             </div>
@@ -96,7 +96,7 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
                 </div>
                 {% if member == user %}
                 <div>
-                <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'userdetails' %}'">Edit</button>
+                <button type="button" class="btn btn-primary btn-primary-custom" onclick="window.location.href='{% url 'userdetails' %}'">Edit</button>
                 </div>
                 {% endif %}
             </div>
@@ -121,7 +121,7 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
                 </dl>
                 <div>
                     {% if member == user %}
-                    <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'mytransactions' %}'">Manage</button>
+                    <button type="button" class="btn btn-primary btn-primary-custom" onclick="window.location.href='{% url 'mytransactions' %}'">Manage</button>
                     {% endif %}
                 </div>
             </div>
@@ -149,7 +149,7 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
                 </dl>
                 <div>
                 {%if member == user %}
-                <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'waiverform' user_id=member.id %}'">Download</button>
+                <button type="button" class="btn btn-primary btn-primary-custom" onclick="window.location.href='{% url 'waiverform' user_id=member.id %}'">Download</button>
                 {% endif %}
                 </div>
             </div>
@@ -177,10 +177,10 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
                 {% endfor %}
                 <div>
                 {% if member == user %}
-                <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'mailinglists_edit' user_id=member.id %}'">Edit</button>
+                <button type="button" class="btn btn-primary btn-primary-custom" onclick="window.location.href='{% url 'mailinglists_edit' user_id=member.id %}'">Edit</button>
                 {% else %}
                     {% if user.is_privileged %}
-                    <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'mailinglists_edit' user_id=member.id %}'">Edit the subscriptions for {{ member.name }}</button>
+                    <button type="button" class="btn btn-primary btn-primary-custom" onclick="window.location.href='{% url 'mailinglists_edit' user_id=member.id %}'">Edit the subscriptions for {{ member.name }}</button>
                     {% endif %}
                 {% endif %}
                 </div>
@@ -212,7 +212,7 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
                 </dl>
                 <div>
                     {% if member == user %}
-                    <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'notification_settings' %}'">Edit</button>
+                    <button type="button" class="btn btn-primary btn-primary-custom" onclick="window.location.href='{% url 'notification_settings' %}'">Edit</button>
                     {% endif %}
                 </div>
             </div>
@@ -370,7 +370,7 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
                 {% endif %}
                 <div>
                     {% if member == user %}
-                        <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'boxes' %}'">Edit</button>
+                        <button type="button" class="btn btn-primary btn-primary-custom" onclick="window.location.href='{% url 'boxes' %}'">Edit</button>
                     {% endif %}
                 </div>
             </div>
@@ -407,7 +407,7 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
                 </dl>
                 <div>
                     {% if user.is_privileged or member == user %}
-                    <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'storage' %}'">Edit</button>
+                    <button type="button" class="btn btn-primary btn-primary-custom" onclick="window.location.href='{% url 'storage' %}'">Edit</button>
                     {% endif %}
                 </div>
                 {% endif %}
@@ -416,11 +416,11 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
     </div>
     {% endif %}
 
-    <!-- Machines recently used Section -->
+    <!-- Recent activity -->
     {% if user.is_privileged or member == user %}
     <div class="col-xl-9 col-lg-12 col-sm-12">
         <div class="card mb-4">
-            <div class="card-body pb-4"><div><h2 class="card-title">Machines Recently Used</h2></div>
+            <div class="card-body pb-4"><div><h2 class="card-title">Recent activity</h2></div>
                 {% if used %}
                 <dl class="row mb-0">
                 {% for r in used %}
