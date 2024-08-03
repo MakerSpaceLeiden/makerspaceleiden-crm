@@ -76,7 +76,13 @@ def create(request):
             )
             item.save()
 
-            alertOwnersToChange(item, request.user, [item.owner.email])
+            # Try to alert the owner, but don't give an error in the frontend if it doesn't work
+            try:
+                alertOwnersToChange(item, request.user, [item.owner.email])
+            except Exception as e:
+                logger.error("Failed to alert owners: {}".format(e))
+
+            # Redirect after successful save
             return ufo_redirect(item.id)
 
         except Exception as e:
