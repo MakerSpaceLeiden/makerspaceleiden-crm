@@ -42,6 +42,11 @@ class Ufo(models.Model):
     dispose_by_date = models.DateField(blank=True, null=True)
 
     lastChange = models.DateField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
+
+    claimed_by = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True, related_name='claimed_ufos')
+    claimed_at = models.DateTimeField(blank=True, null=True)
+
     owner = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
 
     history = HistoricalRecords()

@@ -37,6 +37,7 @@ from selfservice.forms import (
 
 from agenda.models import Agenda
 from chores.utils import get_chores_data
+from ufo.models import Ufo
 from .aggregator_adapter import get_aggregator_adapter
 from .forms import TabledCheckboxSelectMultiple
 from .models import WiFiNetwork
@@ -103,6 +104,12 @@ def index(request):
 
     # Fetch items with dates from today and later, and fetch maximum 5 items
     agenda_items = Agenda.objects.filter(enddate__gte=timezone.now()).order_by('startdate')[:5]
+   
+    # Fetch Ufo items
+    ufo_items = Ufo.objects.filter(
+    state='UNK',
+    deadline__gte=timezone.now()
+    ).order_by('created_at')[:4]
 
     # Get chores data using the chores/utils/get_chores_data function
     chores_data, error_message = get_chores_data(current_user_id=request.user.id)
@@ -113,6 +120,7 @@ def index(request):
         "user": request.user,
         "agenda_items": agenda_items,
         "event_groups": chores_data if chores_data else [],
+        "ufo_items": ufo_items,
     }
     if request.user.is_authenticated:
         context["is_logged_in"] = request.user.is_authenticated

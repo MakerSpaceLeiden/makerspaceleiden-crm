@@ -18,7 +18,7 @@ Images uploaded OK:
 <a href="{{ item.path }}"><img alt="" src="{{ item.image.thumbnail.url   }}"/></a>{% endfor %}
 <p/>
 <hr/>
-<a href="{% url "ufo" %}">back</a> to the overview.
+<a href="{% url "ufo" %}">Back</a> to UFO.
 {% else %}
   <form method="post"  enctype="multipart/form-data">
 <table>
@@ -29,7 +29,7 @@ Images uploaded OK:
   </form>
 <hr>
 <p>
-<a href="{% url "ufo" %}">back</a> to the overview.
+<a href="{% url "ufo" %}">Back</a> to UFO.
 <p>
 {% endif %}
 {% endblock %}

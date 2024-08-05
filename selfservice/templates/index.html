@@ -38,7 +38,7 @@ function toggle() {
 					</div>
 				</li>
 				{% empty %}
-				<li class="list-group-item">No agenda items</li>
+				<li class="list-group-item">No upcoming events</li>
 				{% endfor %}
 			</ul>
 		</div>
@@ -118,6 +118,37 @@ function toggle() {
 			{% else %}
 				No upcoming tasks for the next 4 weeks, view all upcoming chores <a href="{% url 'chores' %}" class="chores-link">here</a>.
 			{% endif %}
+		</div>
+	</div>
+
+	<!-- Unclaimed Floating Objects -->
+	<div class="pt-2 pb-2">
+		<div class="col-xl-9 col-lg-12 col-sm-12 mt-4">
+			<h2>Unclaimed Floating Objects</h2>
+			<div class="mb-3">
+				Free floating objects or projects spotted at the space (max 4). Add a <a href="{% url 'ufo' %}">newly spotted object</a>.
+			</div>
+			<div class="ufo-container">
+				{% for ufo in ufo_items %}
+					<div class="ufo-item">
+						<div>
+							<a href="{% url 'showufo' pk=ufo.id %}">
+								<img src="{{ ufo.image.medium.url }}" alt="{{ ufo.description }}" class="rounded-image" />
+							</a>
+						</div>
+						<div class="mt-1 mb-2">
+							Spotted on {{ ufo.created_at|date:"m-d @ H:i" }}
+						</div>
+						<div>
+							<p><a href="{% url 'showufo' pk=ufo.id %}" class="btn btn-outline-secondary btn-sm">Claim this object</a></p>
+						</div>
+					</div>
+				{% empty %}
+				<div class="col-12 border rounded ps-3 pt-2 pb-2">
+					<p class="mb-0">No free floating objects that need a home. At the moment.</p>
+				</div>
+				{% endfor %}
+			</div>
 		</div>
 	</div>
 
@@ -287,6 +318,29 @@ function toggle() {
 	.chore-volunteer-column {
 		width: 190px;
 		padding-right: 0px;
+	}
+
+	/* Container for UFO items */
+	.ufo-container {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 15px; /* Adjust spacing between items */
+		justify-content: left;
+	}
+
+	/* Each UFO item */
+	.ufo-item {
+		text-align: center;
+		width: 220px; /* Adjust width as needed */
+	}
+
+	/* Style for rounded images */
+	.rounded-image {
+		width: 100%; /* Ensure the image takes up the full width of its container */
+		height: 220px; /* Set a fixed height to make the image round */
+		object-fit: cover; /* Ensures the image covers the area without distortion */
+		border-radius: 50%; /* Makes the image round */
+		border: 2px solid #ddd; /* Optional: adds a border around the image */
 	}
 
 	/* Media query for large screens and smaller */
