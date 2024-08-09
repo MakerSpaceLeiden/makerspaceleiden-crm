@@ -1,4 +1,5 @@
 import logging
+import requests
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
@@ -43,7 +44,14 @@ class NodeRedProxy(HttpProxy):
 
 @login_required
 def NoderedLiveDataAndSensorsView(request):
-    node_red_available = True
+    try:
+        response = requests.get(settings.NODERED_URL)
+        if response.status_code == 200:
+            node_red_available = True
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Node-RED is not available: {e}")
+        node_red_available = False
+
     context = {
         "node_red_available": node_red_available,
         "has_permission": request.user.is_authenticated,
@@ -52,7 +60,14 @@ def NoderedLiveDataAndSensorsView(request):
 
 @login_required
 def NoderedSpaceClimateView(request):
-    node_red_available = True
+    try:
+        response = requests.get(settings.NODERED_URL)
+        if response.status_code == 200:
+            node_red_available = True
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Node-RED is not available: {e}")
+        node_red_available = False
+
     context = {
         "node_red_available": node_red_available,
         "has_permission": request.user.is_authenticated,

@@ -246,9 +246,6 @@ ul.messagelist li {
 
 
 @media (max-width: 1024px) {
-    a {
-        font-size: 0.9rem ;
-    }
 
     #header {
         padding-top: 8px !important;

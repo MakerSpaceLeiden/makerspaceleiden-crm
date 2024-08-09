@@ -56,11 +56,11 @@
                                         {% if user.is_privileged %}
                                             <small> <a href="" class="admin-info" title="You are logged in as an admin" style="font-size: 11px">(ADMIN)</a></small>
                                             {% if not user.is_superuser %}
-                                                <small><a href="{% url 'drop' %}" title="Stop temporary admin privileges" style="font-size: 11px">| [STOP ADMIN PRIV]</a></small>
+                                                <small><a href="{% url 'drop' %}" title="Stop temporary admin privileges" style="font-size: 11px">| [STOP ADMIN ACCESS]</a></small>
                                             {% endif %}
                                         {% else %}
                                             {% if user.can_escalate_to_priveleged %}
-                                            <small> <a href="{% url 'sudo' %}" title="Request temporary admin privileges" style="font-size: 11px">[REQUEST ADMIN PRIV]</a></small>
+                                            <small> <a href="{% url 'sudo' %}" title="Request temporary admin privileges" style="font-size: 11px">[REQUEST ADMIN ACCESS]</a></small>
                                             {% endif %}
                                         {% endif %}
                                         {% endblock %}

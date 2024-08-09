@@ -116,7 +116,7 @@ def index(request):
 
     context = {
         "has_permission": request.user.is_authenticated,
-        "title": "Selfservice",
+        "title": "Dashboard",
         "user": request.user,
         "agenda_items": agenda_items,
         "event_groups": chores_data if chores_data else [],
@@ -219,7 +219,7 @@ def recordinstructions(request):
     context = {
         "machines": machines,
         "members": members,
-        "title": "Selfservice - record instructions",
+        "title": "Record instructions",
         "is_logged_in": request.user.is_authenticated,
         "user": request.user,
         "has_permission": True,
