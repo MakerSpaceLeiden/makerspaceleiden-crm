@@ -286,47 +286,50 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
                     <h2 class="card-title">Entitlements</h2>
                 </div>
                 <dl class="row mb-2">
-                {% for machine, info in lst.items %}
-                    <dt class="col-sm-3 mb-1 mt-1"><a href="{{ info.path }}">{{ machine }}:</a></dt>
-                    <dd class="col-sm-9">
-                        {% if info.xs == True %}
-                            <b>yes</b>
-                            {%if info.requires_permit %}
-                                -- permit '{{ info.requires_permit }}'
-                                {% if info.requires_form and member.form_on_file == True  %}
-                                    and liability waiver form
+                    {% for category, machines in machines.items %}
+                        <dt class="col-sm-12 mb-2 mt-2"><h3>{{ category }}</h3></dt>
+                        {% for info in machines %}
+                            <dt class="col-sm-3 mb-1 mt-1"><a href="{{ info.path }}">{{ info.name }}:</a></dt>
+                            <dd class="col-sm-9">
+                                {% if info.xs == True %}
+                                    <b>yes</b>
+                                    {% if info.requires_permit %}
+                                        -- permit '{{ info.requires_permit }}'
+                                        {% if info.requires_form and member.form_on_file == True  %}
+                                            and liability waiver form
+                                        {% endif %}
+                                        on file.
+                                    {% elif info.requires_instruction == False %}
+                                        -- <i>(no instructions needed)</i>
+                                    {% endif %}
+                                {% else %}
+                                    <i>no.</i>
+                                    {% if info.requires_permit %}
+                                        {% if info.has_permit %}
+                                            <i>Already has the required permit</i>
+                                            {% if not info.activated %}
+                                                <i>but it is not yet activated by a trustee</i>
+                                            {% endif %}.
+                                        {% else %}
+                                            <i>Requires the permit '{{ info.requires_permit }}'.</i>
+                                        {% endif %}
+                                    {% else %}
+                                        {% if info.requires_instruction == True %}
+                                            <i>Instruction needed.</i>
+                                        {% endif %}
+                                    {% endif %}
+                                    {% if info.requires_form == True %}
+                                        <i>The required liability waiver</i>
+                                        {%if member.form_on_file == False %}
+                                            <i>is not yet filed.</i>
+                                        {% else %}
+                                            <i>is already on file.</i>
+                                        {% endif %}
+                                    {% endif %}
                                 {% endif %}
-                                on file.
-                            {% elif info.requires_instruction == False %}
-                                -- <i>(no instructions needed)</i>
-                            {% endif %}
-                        {% else %}
-                        <i>no.</i>
-                        {% if info.requires_permit %}
-                            {% if info.has_permit %}
-                            <i>Already has the required permit</i>
-                                {% if not info.activated %}
-                                <i>but it is not yet activated by a trustee</i>
-                                {% endif %}.
-                            {% else %}
-                            <i>Requires the permit '{{ info.requires_permit }}'.</i>
-                            {% endif %}
-                        {% else %}
-                            {%if info.requires_instruction == True %}
-                            <i>Instruction needed.</i>
-                            {% endif %}
-                        {% endif %}
-                        {%if info.requires_form == True %}
-                            <i>The required liability waiver</i>
-                            {%if member.form_on_file == False %}
-                                <i>is not yet filed.</i>
-                            {% else %}
-                                <i>is already on file.</i>
-                            {% endif %}
-                        {% endif %}
-                    {% endif %}
-                </dd>
-                {% endfor %}
+                            </dd>
+                        {% endfor %}
+                    {% endfor %}
                 </dl>
             </div>
         </div>

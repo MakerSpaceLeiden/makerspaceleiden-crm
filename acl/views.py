@@ -243,19 +243,42 @@ def _overview(request, member_id=None):
     storage = Storage.objects.all().filter(owner=member)
     subscriptions = Subscription.objects.all().filter(member=member)
 
-    normal_permits = {}
-    for m in machines:
-        normal_permits[m.requires_permit] = True
+    # Create lst dictionary with machine details
+    lst = {}
+    for mchn in machines:
+        details = matrix_mm(mchn, member)
+        details["name"] = mchn.name         # Add name here
+        details["category"] = mchn.get_category_display()
+        details["path"] = mchn.path()
+        lst[mchn.name] = details
+
+    # Categorize and sort machines
+    categorized_machines = {
+        'Machine': [],
+        'General equipment': [],
+        'Lights': []
+    }
+
+    for name, details in lst.items():
+        human_readable_category = details.get("category", "Uncategorized")
+        if human_readable_category in categorized_machines:
+            categorized_machines[human_readable_category].append(details)
+
+    # Sort each category's machines by name
+    for category in categorized_machines:
+        categorized_machines[category] = sorted(categorized_machines[category], key=lambda x: x["name"].upper())
+
+    # Fetch entitlements
+    normal_permits = {m.requires_permit: True for m in machines if m.requires_permit}
+    specials = [
+        e for e in Entitlement.objects.filter(holder=member)
+        if e.permit not in normal_permits
+    ]
 
     specials = []
     for e in Entitlement.objects.all().filter(holder=member):
         if e.permit not in normal_permits:
             specials.append(e)
-
-    lst = {}
-    for mchn in machines:
-        lst[mchn.name] = matrix_mm(mchn, member)
-        lst[mchn.name]["path"] = mchn.path()
 
     user = request.user
     balance = 0
@@ -268,7 +291,7 @@ def _overview(request, member_id=None):
     context = {
         "title": member.first_name + " " + member.last_name,
         "member": member,
-        "machines": machines,
+        "machines": categorized_machines,
         "storage": storage,
         "boxes": boxes,
         "lst": lst,
