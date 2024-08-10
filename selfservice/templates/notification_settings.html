@@ -63,14 +63,15 @@
   {% endif %}
 </p>
 
-<p style="margin-top: 30px;">
-  <a href="{% url 'overview' member_id=user.id  %}">Back to your data</a>
-</p>
 
 <p style="margin-top: 30px;">
     <a style="background-color: #ffffcc; border-radius: 3px; border: 1px solid #003366; font-size: 12px; padding: 5px; color: black;" href="{% url 'notification_test' %}">Send test notification message</a><br/>
 </p>
 
+<p style="margin-top: 30px;">
+  <a href="{% url 'overview' member_id=user.id  %}">Back to your data</a>
+  
+</p>
 
 <script type="text/javascript">
    var link = document.getElementById('telegram_connect');

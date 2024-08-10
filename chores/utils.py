@@ -1,5 +1,5 @@
 from collections import defaultdict
-from datetime import datetime
+from datetime import datetime, timedelta
 import time
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
@@ -13,9 +13,13 @@ def get_chores_data(current_user_id=None, subset=None):
     if not aggregator_adapter:
         return None, "No aggregator configuration found"
 
-    now = time.time()
-    four_weeks_from_now = now + (4 * 7 * 24 * 60 * 60)  # Current time + 4 weeks
-    volunteers_turns = ChoreVolunteer.objects.filter(timestamp__gte=now)
+    now = datetime.now()
+    three_weeks_from_now = now + timedelta(weeks=2)  # Current time + 3 weeks
+
+    now_timestamp = now.timestamp()
+    three_weeks_from_now_timestamp = three_weeks_from_now.timestamp()
+
+    volunteers_turns = ChoreVolunteer.objects.filter(timestamp__gte=now_timestamp)
     volunteers_by_key = defaultdict(list)
     for turn in volunteers_turns:
         key = f"{turn.chore.id}-{turn.timestamp}"
@@ -29,8 +33,8 @@ def get_chores_data(current_user_id=None, subset=None):
     ts = None
     for event in data["events"]:
         event_ts = datetime.fromtimestamp(event["when"]["timestamp"])
-        if event_ts.timestamp() > four_weeks_from_now:
-             continue  # Skip events beyond the next 4 weeks
+        if event_ts < now or event_ts > three_weeks_from_now:
+            continue  # Skip events outside the range
 
         event_ts_str = event_ts.strftime("%A, %d-%m")
         event["time_str"] = event_ts.strftime("%H:%M")
@@ -38,7 +42,7 @@ def get_chores_data(current_user_id=None, subset=None):
         timestamp = event["when"]["timestamp"]
         event["volunteers"] = volunteers_by_key[f"{chore_id}-{timestamp}"]
         num_missing_volunteers = event["chore"]["min_required_people"] - len(event["volunteers"])
-        
+
         if subset is not None and event["chore"]["name"] != subset:
             continue
         

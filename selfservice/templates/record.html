@@ -32,8 +32,9 @@ cannot give instructions to others.
     <table>
         {{ form.as_table }}
     </table>
-    <button type="submit">Save</button>
-    <a href="{% url 'index' %}">Cancel</a>
+    
+    <button type="button" onclick="window.location.href='{% url 'index' %}'" class="btn btn-secondary me-1">Cancel</button>
+    <button type="submit" class="btn btn-primary btn-primary-custom me-1">Save</button>
   </form>
 {% endif %}
 {% endif %}

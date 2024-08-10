@@ -13,6 +13,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import EmailMessage
 from django.db.models import Q
+from django.db.models.functions import Lower
 from django.forms import widgets
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
@@ -21,14 +22,15 @@ from django.urls import reverse
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils import timezone
+from moneyed import Money
 
-from acl.models import Entitlement, Machine, PermitType
+from acl.models import Entitlement, Machine, PermitType, RecentUse
 from makerspaceleiden.decorators import (
     is_superuser_or_bearer,
     superuser_or_bearer_required,
     superuser_required,
 )
-from members.models import User
+from members.models import User, Tag
 from selfservice.forms import (
     EmailNotificationSettingsForm,
     SignalNotificationSettingsForm,
@@ -36,6 +38,7 @@ from selfservice.forms import (
 )
 
 from agenda.models import Agenda
+from pettycash.models import PettycashBalanceCache
 from chores.utils import get_chores_data
 from ufo.models import Ufo
 from .aggregator_adapter import get_aggregator_adapter
@@ -114,6 +117,30 @@ def index(request):
     # Get chores data using the chores/utils/get_chores_data function
     chores_data, error_message = get_chores_data(current_user_id=request.user.id)
 
+    # Initialize cash balance
+    cash_balance = '--,--'
+    is_balance_positive = True
+
+    if request.user.is_authenticated:
+        try:
+            cash_balance_obj = PettycashBalanceCache.objects.get(owner=request.user).balance
+            cash_balance = cash_balance_obj if cash_balance_obj else '--,--'
+            is_balance_positive = cash_balance_obj.amount >= 0 if cash_balance_obj else False
+            
+        except (ObjectDoesNotExist, ValueError) as e:
+            cash_balance = '--,--'
+            is_balance_positive = True
+
+    if request.user.is_authenticated:
+        try:
+            # Get the 5 most recent activities for the user
+            recent_activity = RecentUse.objects.filter(user=request.user).order_by('-used')[:5]
+        except RecentUse.DoesNotExist:
+            recent_activity = []
+
+    tags = Tag.objects.filter(owner=request.user)
+    has_tags = tags.exists()
+
     context = {
         "has_permission": request.user.is_authenticated,
         "title": "Dashboard",
@@ -121,6 +148,10 @@ def index(request):
         "agenda_items": agenda_items,
         "event_groups": chores_data if chores_data else [],
         "ufo_items": ufo_items,
+        "cash_balance": cash_balance,
+        "is_balance_positive": is_balance_positive,
+        "recent_activity": recent_activity,
+        "has_tags": has_tags,
     }
     if request.user.is_authenticated:
         context["is_logged_in"] = request.user.is_authenticated
@@ -661,6 +692,13 @@ def space_state(request):
         logger.error("No data available, exception: {0}".format(str(e)))
         context["no_data_available"] = True
 
+    # Sort 'machines' by machine name alphabetically
+    if "machines" in context and isinstance(context["machines"], list):
+        context["machines"] = sorted(
+            context["machines"],
+            key=lambda machine_state: machine_state['machine']['name'].lower()
+        )
+
     context["user"] = user
     context["title"] = "State of the Space"
     context["has_permission"] = request.user.is_authenticated
@@ -755,6 +793,7 @@ def space_checkout(request):
 
 @login_required
 def userdetails(request):
+    cancel_button_url = request.GET.get('redirect_to', 'index')
     try:
         member = request.user
         old_email = "{}".format(member.email)
@@ -818,6 +857,7 @@ def userdetails(request):
         "user": request.user,
         "form": form,
         "has_permission": True,
+        "cancel_button_url": cancel_button_url,
     }
     return render(request, "userdetails.html", context)
 
