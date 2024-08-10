@@ -3,21 +3,24 @@
 
 {% block content %}
 
-Your balance
+Your balance is
 {% if balance == 0 %}
 	&euro; 0,-
 {% else %}
 	{{ balance.balance }}
 {% endif %}
 {% if balance.balance.amount > 5 %}
-	<i>(Positive balance, so you have money left to spend)</i>.
+	<i>&nbsp;(Your balance is positive, so you have money left to spend)</i>.
 {% else %}
 {% if balance.balance.amount >= 0 %}
-So there little, if any, left in your acount.
+&nbsp;So there little, if any, left in your acount.
 Thererfore you may want to make a <a href="{% url 'manual_deposit' %}">deposit</a>
 before this runs out. As it takes a few days (or more) before the monies wired will show up in your account.
 {%else%}
-	<b>Negative, so you owe the space money; and should make a <a href="{% url 'manual_deposit' %}">deposit</a> as soon as possible.</b>
+
+<span class="text-danger">
+	&nbsp;<b>Your balance is negative, so you owe the space money; and should make a <a href="{% url 'manual_deposit' %}">deposit</a> as soon as possible.</b>
+</span>
 {% endif %}
 {% endif %}
 {% if last_import %}
@@ -53,7 +56,7 @@ The last import/synchronisation with the bank account was done by {{ last_import
 		<a href="{% url 'transactions' user.id %}">View your past transactions</a>
 	</li>	
 	<li> 
-		<a href="{% url 'balances' %}">View everyone else their transactions</a>
+		<a href="{% url 'balances' %}">View everyone else's transactions.</a>
 	</li>
 	<li>
 		<a href="{% url 'spends' %}">Our spending this month</a>
@@ -62,14 +65,14 @@ The last import/synchronisation with the bank account was done by {{ last_import
 
 <h2>More info</h2>
 <ul>
+	<li> 
+		<a href="{% url 'pricelist' %}">See the current pricelist</a>
+	</li>
 	<li>
 		For more information about SpaceTegoed, visit the 
 		<a href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/SpaceTegoed" target="_blank" class="wiki-link" title="wiki ">
 			<i class="fas fa-external-link-alt" style="font-size: 0.7em;"></i> wiki page
 		</a>
-	</li>
-	<li> 
-		<a href="{% url 'pricelist' %}">See the current pricelist</a>
 	</li>
 	<li> 
 		People that can help with fixing (erroneous) payments and other issues:

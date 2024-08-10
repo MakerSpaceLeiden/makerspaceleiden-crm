@@ -62,16 +62,6 @@
 
 </pre>
 
-<h2>Pricelist</h2>
-
-A pricelist can be found <a href='{% url "pricelist" %}'>here</a>; as is <a href='{% url "spends" %}'>our spending this month</a>.
-
-{% if user.is_privileged %}
-<h2>Terminal and station management</h2>
-See <a href='{% url "unpaired" %}'>here</a> (<i>only visible to privelidged users</i>)
-{% endif %}
-
-<p>
 <hr>
 <a href="{% url 'mytransactions' %}">Back to SpaceTegoed</a>
 {% endblock %}
