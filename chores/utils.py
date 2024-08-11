@@ -14,12 +14,13 @@ def get_chores_data(current_user_id=None, subset=None):
         return None, "No aggregator configuration found"
 
     now = datetime.now()
-    three_weeks_from_now = now + timedelta(weeks=2)  # Current time + 3 weeks
+    start_of_today = datetime(now.year, now.month, now.day) 
+    two_weeks_from_now = now + timedelta(weeks=2)  # Current time + 2 weeks
 
-    now_timestamp = now.timestamp()
-    three_weeks_from_now_timestamp = three_weeks_from_now.timestamp()
+    start_of_today_timestamp = start_of_today.timestamp()
+    two_weeks_from_now_timestamp = two_weeks_from_now.timestamp()
 
-    volunteers_turns = ChoreVolunteer.objects.filter(timestamp__gte=now_timestamp)
+    volunteers_turns = ChoreVolunteer.objects.filter(timestamp__gte=start_of_today_timestamp)
     volunteers_by_key = defaultdict(list)
     for turn in volunteers_turns:
         key = f"{turn.chore.id}-{turn.timestamp}"
@@ -33,7 +34,7 @@ def get_chores_data(current_user_id=None, subset=None):
     ts = None
     for event in data["events"]:
         event_ts = datetime.fromtimestamp(event["when"]["timestamp"])
-        if event_ts < now or event_ts > three_weeks_from_now:
+        if event_ts < start_of_today or event_ts > two_weeks_from_now:
             continue  # Skip events outside the range
 
         event_ts_str = event_ts.strftime("%A, %d-%m")

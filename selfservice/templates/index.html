@@ -27,7 +27,10 @@ function toggle() {
 							<div class="pt-1 pb-1 border-end agenda-item-part" style="width:160px;">
 								{{ agenda_item.startdate|date:"l, j-m" }}
 							</div>
-							<div class="pt-1 pb-1 border-end agenda-item-part" style="width:70px">
+							<div class="pt-1 pb-1 agenda-item-part d-sm-none d-block" style="width:70px">
+								{{ agenda_item.starttime|time:"G:i" }}
+							</div>
+							<div class="pt-1 pb-1 agenda-item-part border-end d-none d-sm-block" style="width:70px">
 								{{ agenda_item.starttime|time:"G:i" }}
 							</div>
 							<div class="col pt-1 pb-1 agenda-item-part" style="font-weight:600;">
@@ -224,7 +227,7 @@ function toggle() {
 	<!-- Sidebar Column (Right) -->
 	<div class="col-xl-3 col-lg-3 col-sm-12" >
 		<!-- Personal Info Section -->
-		<div class="mt-2 mb-2 mx-lg-4 pl-4 pt-2 pb-3">
+		<div class="mt-2 mb-2 ms-lg-4 pl-4 pt-2 pb-3">
 			<h2>Personal info</h2>
 			<a class="nav-link pt-0 pb-0 pe-0 ps-0" href="{% url 'personal_page' %}">Personal profile </a>
 			<a class="nav-link pt-0 pb-0 pe-0 ps-0" href="{% url 'userdetails' %}">Change personal details</a>

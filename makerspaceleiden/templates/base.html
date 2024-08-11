@@ -42,6 +42,9 @@
                             {% block branding %}
                             <div class= "branding makerspace-name-div">
                                 <a class="makerspace-name" href="{% url 'index' %}">Makerspace Leiden</a>
+                                <div class="d-block d-md-none">
+                                    <b>INTRANET</b>
+                                </div>
                             </div>
                             {% endblock %}
                         </div>
@@ -81,9 +84,9 @@
                                 </div>
                             </div>
                         </div>
-                            {% endif %}
-                            {% block nav-global %}
-                            {% endblock %}
+                        {% endif %}
+                        {% block nav-global %}
+                        {% endblock %}
                     </div>
                 </div>
             </div>

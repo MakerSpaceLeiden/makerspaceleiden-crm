@@ -287,7 +287,7 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
                 </div>
                 <dl class="row mb-2">
                     {% for category, machines in machines.items %}
-                        <dt class="col-sm-12 mb-2 mt-2"><h3>{{ category }}</h3></dt>
+                        <dt class="col-sm-12 mb-0 mt-1"><h3>{{ category }}</h3></dt>
                         {% for info in machines %}
                             <dt class="col-sm-3 mb-1 mt-1"><a href="{{ info.path }}">{{ info.name }}:</a></dt>
                             <dd class="col-sm-9">
