@@ -104,24 +104,36 @@ logger = logging.getLogger(__name__)
 
 
 def index(request):
-
-    # Fetch items with dates from today and later, and fetch maximum 5 items
-    agenda_items = Agenda.objects.filter(enddate__gte=timezone.now()).order_by('startdate')[:5]
-   
-    # Fetch Ufo items
-    ufo_items = Ufo.objects.filter(
-    state='UNK',
-    deadline__gte=timezone.now()
-    ).order_by('created_at')[:4]
-
-    # Get chores data using the chores/utils/get_chores_data function
-    chores_data, error_message = get_chores_data(current_user_id=request.user.id)
-
-    # Initialize cash balance
+    # Default values
+    agenda_items = []
+    ufo_items = []
+    chores_data = []
+    recent_activity = []
     cash_balance = '--,--'
     is_balance_positive = True
+    has_tags = False
+    is_logged_in = False
+    wifinetworks = []
+    mainsadmin = False
+    title = 'Welcome'
 
     if request.user.is_authenticated:
+        # Fetch items with dates from today and later, and fetch maximum 5 items
+        agenda_items = Agenda.objects.filter(enddate__gte=timezone.now()).order_by('startdate')[:5]
+    
+        # Fetch Ufo items
+        ufo_items = Ufo.objects.filter(
+        state='UNK',
+        deadline__gte=timezone.now()
+        ).order_by('created_at')[:4]
+
+        # Get chores data using the chores/utils/get_chores_data function
+        chores_data, error_message = get_chores_data(current_user_id=request.user.id)
+
+        # Initialize cash balance
+        cash_balance = '--,--'
+        is_balance_positive = True
+
         try:
             cash_balance_obj = PettycashBalanceCache.objects.get(owner=request.user).balance
             cash_balance = cash_balance_obj if cash_balance_obj else '--,--'
@@ -131,19 +143,20 @@ def index(request):
             cash_balance = '--,--'
             is_balance_positive = True
 
-    if request.user.is_authenticated:
         try:
             # Get the 5 most recent activities for the user
             recent_activity = RecentUse.objects.filter(user=request.user).order_by('-used')[:5]
         except RecentUse.DoesNotExist:
             recent_activity = []
 
-    tags = Tag.objects.filter(owner=request.user)
-    has_tags = tags.exists()
+        tags = Tag.objects.filter(owner=request.user)
+        has_tags = tags.exists()
+
+        title = "Dashboard"
 
     context = {
         "has_permission": request.user.is_authenticated,
-        "title": "Dashboard",
+        "title": title,
         "user": request.user,
         "agenda_items": agenda_items,
         "event_groups": chores_data if chores_data else [],
