@@ -11,7 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 from ipware import get_client_ip
 
 from mailinglists.models import Subscription
-from makerspaceleiden.decorators import superuser_or_bearer_required
+from makerspaceleiden.decorators import superuser_or_bearer_required, superuser_required
 from memberbox.models import Memberbox
 from members.forms import TagForm
 from members.models import Tag, User, clean_tag_string
@@ -19,7 +19,14 @@ from pettycash.models import PettycashBalanceCache
 from storage.models import Storage
 from terminal.decorators import is_paired_terminal
 
-from .models import Entitlement, Machine, PermitType, RecentUse, change_tracker_counter, useNeedsToStateStr
+from .models import (
+    Entitlement,
+    Machine,
+    PermitType,
+    RecentUse,
+    change_tracker_counter,
+    useNeedsToStateStr,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -210,8 +217,7 @@ def members(request):
     return render(request, "acl/members.html", context)
 
 
-@login_required
-def member_overview(request, member_id=None):
+def _overview(request, member_id=None):
     if member_id is None:
         member_id = request.user.id
     try:
@@ -277,7 +283,32 @@ def member_overview(request, member_id=None):
         not context["uses_signal"] and not context["uses_telegram"]
     ) or request.user.always_uses_email
 
-    return render(request, "acl/member_overview.html", context)
+    return context
+
+
+@login_required
+def member_overview(request, member_id=None):
+    return render(request, "acl/member_overview.html", _overview(request, member_id))
+
+
+@superuser_required
+def member_delete_confirm(request, member_id=None):
+    return render(request, "acl/delete_overview.html", _overview(request, member_id))
+
+
+@superuser_required
+def member_delete(request, member_id=None):
+    try:
+        member = User.objects.get(pk=member_id)
+    except ObjectDoesNotExist:
+        return HttpResponse("User not found", status=404, content_type="text/plain")
+
+    try:
+        member.delete()
+    except Exception as e:
+        raise Http404("Delete failed: {}".format(str(e)))
+
+    return redirect("index")
 
 
 @superuser_or_bearer_required

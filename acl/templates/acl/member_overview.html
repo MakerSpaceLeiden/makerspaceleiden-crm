@@ -42,8 +42,11 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
                     {% endif %}
                 </dl>
                 <div>
-                {% if member == user %}
+                {% if user.is_privileged or member == user %}
                 <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'userdetails' %}'">Edit</button>
+                {% endif %}
+                {% if user.is_privileged %}
+                <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'userdelete' member.id %}'">Delete</button>
                 {% endif %}
                 </div>
             </div>
@@ -51,7 +54,7 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
     </div>
 
     <!-- Password -->
-    {% if member == user %}
+    {% if user.is_privileged or member == user %}
     <div class="col-xl-9 col-lg-12 col-sm-12">
         <div class="card mb-4">
             <div class="card-body pb-4">
@@ -101,7 +104,7 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
     </div>
 
     <!-- SpaceTegoed -->
-    {% if member == user %}
+    {% if user.is_privileged or member == user %}
     <div class="col-xl-9 col-lg-12 col-sm-12">
         <div class="card mb-4">
             <div class="card-body pb-4">
@@ -186,7 +189,7 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
     </div>
 
     <!-- Notifications Section -->
-    {% if member == user %}
+    {% if user.is_privileged or member == user %}
     <div class="col-xl-9 col-lg-12 col-sm-12">
         <div class="card mb-4">
             <div class="card-body pb-4">
@@ -403,7 +406,7 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
                     <dd class="col-sm-9">No items in special storage.</dd>
                 </dl>
                 <div>
-                    {% if member == user %}
+                    {% if user.is_privileged or member == user %}
                     <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'storage' %}'">Edit</button>
                     {% endif %}
                 </div>

@@ -24,8 +24,8 @@ from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from acl.models import Entitlement, Machine, PermitType
 from makerspaceleiden.decorators import (
     is_superuser_or_bearer,
-    superuser,
     superuser_or_bearer_required,
+    superuser_required,
 )
 from members.models import User
 from selfservice.forms import (
@@ -846,7 +846,7 @@ def amnesty(request):
     return render(request, "amnesty.html", context)
 
 
-@superuser
+@superuser_required
 def send_reset_email(request, uid):
     user = User.objects.get(pk=uid)
     template = "registration/password_reset_email.html"

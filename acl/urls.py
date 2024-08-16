@@ -6,6 +6,16 @@ urlpatterns = [
     path("me", views.member_overview, name="my_page"),
     path("acl/personal_page", views.member_overview, name="personal_page"),
     path("acl/member/<int:member_id>", views.member_overview, name="overview"),
+    path(
+        "acl/member/delete/<int:member_id>",
+        views.member_delete_confirm,
+        name="userdelete",
+    ),
+    path(
+        "acl/member/delete_confirm/<int:member_id>",
+        views.member_delete,
+        name="userdelete_confirm",
+    ),
     path("acl/member/", views.members, name="overview"),
     path("acl/tag/edit/<int:tag_id>", views.tag_edit, name="tag_edit"),
     path("acl/tag/delete/<int:tag_id>", views.tag_delete, name="tag_delete"),

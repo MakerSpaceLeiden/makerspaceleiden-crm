@@ -17,8 +17,8 @@ from moneyed.l10n import format_money
 
 from makerspaceleiden.decorators import (
     login_or_priveleged,
-    superuser,
     superuser_or_bearer_required,
+    superuser_required,
 )
 from makerspaceleiden.mail import emailPlain
 from members.models import Tag, User
@@ -411,7 +411,7 @@ def unpaired(request):
     return render(request, "pettycash/unpaired.html", context)
 
 
-@superuser
+@superuser_required
 def cam53upload(request):
     if request.method == "POST":
         form = CamtUploadForm(request.POST, request.FILES)
@@ -473,7 +473,7 @@ def cam53upload(request):
     return render(request, "pettycash/upload.html", context)
 
 
-@superuser
+@superuser_required
 def cam53process(request):
     if request.method != "POST":
         return HttpResponse("Unknown FAIL", status=400, content_type="text/plain")
@@ -542,7 +542,7 @@ def cam53process(request):
     return render(request, "pettycash/importlog-results.html", context)
 
 
-@superuser
+@superuser_required
 def forget(request, pk):
     try:
         tx = Terminal.objects.get(id=pk)
@@ -555,7 +555,7 @@ def forget(request, pk):
     return redirect("unpaired")
 
 
-@superuser
+@superuser_required
 def pair(request, pk):
     try:
         tx = Terminal.objects.get(id=pk)
@@ -600,7 +600,7 @@ def api_none(request):
     return HttpResponse("OK\n", status=200, content_type="text/plain")
 
 
-@superuser
+@superuser_required
 def deposit(request, dst):
     try:
         dst = User.objects.get(id=dst)

@@ -10,7 +10,7 @@ from django.shortcuts import redirect
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 
-from makerspaceleiden.decorators import superuser
+from makerspaceleiden.decorators import superuser_required
 from makerspaceleiden.mail import emailPlain
 from makerspaceleiden.utils import client_cert, client_ip, server_cert
 from members.models import Tag
@@ -21,7 +21,7 @@ from .models import Terminal, terminal_admin_emails
 logger = logging.getLogger(__name__)
 
 
-@superuser
+@superuser_required
 def forget(request, pk):
     try:
         tx = Terminal.objects.get(id=pk)
