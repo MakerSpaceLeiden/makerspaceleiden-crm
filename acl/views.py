@@ -2,6 +2,7 @@ import logging
 from functools import wraps
 
 from dateutil.tz.tz import EPOCH
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404, HttpResponse, JsonResponse
@@ -339,6 +340,24 @@ def missing_forms(request):
         "title": "Missing waivers",
         "desc": "Missing waiver forms (of people who had instruction on a machine that needs it).",
         "amiss": missing(False),
+        "has_permission": request.user.is_authenticated,
+    }
+    return render(request, "acl/missing.html", context)
+
+
+@login_required
+def missing_doors(request):
+    missing = (
+        User.objects.all()
+        .filter(is_active=True)
+        .exclude(isGivenTo__permit=settings.DOORS)
+        .order_by("-id")
+    )
+
+    context = {
+        "title": "No doors or tags",
+        "desc": "People with no doors and/or tags",
+        "amiss": missing,
         "has_permission": request.user.is_authenticated,
     }
     return render(request, "acl/missing.html", context)
