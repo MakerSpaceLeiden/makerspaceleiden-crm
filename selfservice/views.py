@@ -41,7 +41,12 @@ from .waiverform.waiverform import generate_waiverform_fd
 
 
 def send_email_verification(
-    request, user, new_email, old_email=None, template="email_verification_email.txt"
+    request,
+    user,
+    new_email,
+    old_email=None,
+    template_user="email_verification_email.txt",
+    template_trustee="email_verification_email_inform.txt",
 ):
     current_site = get_current_site(request)
     subject = "Confirm your email adddress ({})".format(current_site.domain)
@@ -56,9 +61,11 @@ def send_email_verification(
         # 'uid': urlsafe_base64_encode(force_bytes(user.pk)).decode(),
         "uid": urlsafe_base64_encode(force_bytes(user.pk)),
         "token": email_check_token.make_token(user),
+        "noc_email": settings.DEFAULT_FROM_EMAIL,
+        "trustees_email": settings.TRUSTEES,
     }
 
-    msg = render_to_string(template, context)
+    msg = render_to_string(template_user, context)
     EmailMessage(
         subject, msg, to=[user.email], from_email=settings.DEFAULT_FROM_EMAIL
     ).send()
@@ -67,7 +74,7 @@ def send_email_verification(
         subject = "[spacebot] User {} {} is changing their email address".format(
             user.first_name, user.last_name
         )
-        msg = render_to_string("email_verification_email_inform.txt", context)
+        msg = render_to_string(template_trustee, context)
         EmailMessage(
             subject,
             msg,
@@ -297,7 +304,7 @@ def recordinstructions(request):
 
 
 @login_required
-def confirmemail(request, uidb64, token, newemail):
+def confirmemail(request, uidb64, token, new_email):
     try:
         uid = force_str(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=uid)
@@ -307,30 +314,37 @@ def confirmemail(request, uidb64, token, newemail):
                 status=500,
                 content_type="text/plain",
             )
-        email = user.email
+        old_email = user.email
         if email_check_token.check_token(user, token):
-            user.email = newemail
+            user.email = new_email
             user.email_confirmed = True
             user.save()
+            send_email_verification(
+                request,
+                user,
+                new_email,
+                old_email,
+                template_user="email_confirm_email.txt",
+                template_trustee="email_confirm_email_inform.txt",
+            )
+            return render(request, "email_verification_ok.html")
         else:
             return HttpResponse(
                 "Failed to confirm", status=500, content_type="text/plain"
             )
 
         logger.debug(
-            "Change of email from '{}' to '{}' confirmed.".format(email, newemail)
+            "Change of email from '{}' to '{}' confirmed.".format(old_email, new_email)
         )
     except (TypeError, ValueError, OverflowError, User.DoesNotExist) as e:
         # We perhaps should not provide the end user with feedback -- e.g. prentent all
         # went well. As we do not want to function as an oracle.
         #
         logger.error("Something else went wrong in confirm email: {0}".format(e))
-        HttpResponse(
-            "Something went wrong. Sorry.", status=500, content_type="text/plain"
-        )
 
-    # return redirect('userdetails')
-    return render(request, "email_verification_ok.html")
+    return HttpResponse(
+        "Something went wrong. Sorry.", status=500, content_type="text/plain"
+    )
 
 
 @login_required
