@@ -73,6 +73,7 @@
                 {% if user.is_privileged %}
                     <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'newmember' %}">Add a new member</a></li>
                     <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'pending' %}">Instructions pending approval</a></li>
+                    <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'missing_doors' %}">People with no doors or tags</a></li>
                     <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'missing_forms' %}">Missing waivers</a></li>
                     <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'filed_forms' %}">Filed waivers</a></li>
                     <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'admin:index' %}">Raw database access</a></li>

@@ -102,6 +102,7 @@
                     {% if user.is_privileged %}
                       <li><a class="dropdown-item" href="{% url 'newmember' %}">Add a new member</a></li>
                       <li><a class="dropdown-item" href="{% url 'pending' %}">Instructions pending approval</a></li>
+                      <li><a class="dropdown-item" href="{% url 'missing_doors' %}">Missing doors or tags</a></li>
                       <li><a class="dropdown-item" href="{% url 'missing_forms' %}">Missing waivers</a></li>
                       <li><a class="dropdown-item" href="{% url 'filed_forms' %}">Filed waivers</a></li>
                       <li><a class="dropdown-item" href="{% url 'admin:index' %}">Raw database access</a></li>

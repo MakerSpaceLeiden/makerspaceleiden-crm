@@ -1,19 +1,18 @@
 import logging
 
 from django.contrib import admin
-from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.forms import CheckboxSelectMultiple
 from import_export.admin import ImportExportModelAdmin
 from simple_history.admin import SimpleHistoryAdmin
 
+from .forms import PettycashSkuForm
 from .models import (
     PettycashBalanceCache,
     PettycashImportRecord,
     PettycashReimbursementRequest,
     PettycashSku,
     PettycashStation,
-    PettycashTerminal,
     PettycashTransaction,
 )
 
@@ -22,23 +21,24 @@ logger = logging.getLogger(__name__)
 
 class PettycashSkuAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     list_display = ("pk", "name", "amount", "description")
+    form = PettycashSkuForm
     pass
 
 
-class PettycashTerminalAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
-    list_display = ("accepted", "date", "get_station", "name", "fingerprint")
-    readonly_fields = ["fingerprint", "nonce"]
-
-    def get_station(self, terminal):
-        try:
-            station = PettycashStation.objects.get(terminal=terminal)
-            return station.description
-        except ObjectDoesNotExist:
-            pass
-        return "-"
-
-    get_station.short_description = "Station"
-    get_station.admin_order_field = "station__name"
+# class PettycashTerminalAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
+#    list_display = ("accepted", "date", "get_station", "name", "fingerprint")
+#    readonly_fields = ["fingerprint", "nonce"]
+#
+#    def get_station(self, terminal):
+#        try:
+#            station = PettycashStation.objects.get(terminal=terminal)
+#            return station.description
+#        except ObjectDoesNotExist:
+#            pass
+#        return "-"
+#
+#    get_station.short_description = "Station"
+#    get_station.admin_order_field = "station__name"
 
 
 class PettycashStationAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
@@ -61,7 +61,7 @@ class PettycashTransactionAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
 
 
 class PettycashBalanceCacheAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
-    list_display = ("owner", "balance", "last")
+    list_display = ("owner", "balance", "lasttxdate")
     pass
 
 
@@ -75,7 +75,7 @@ class PettycashImportRecordAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
 
 
 admin.site.register(PettycashSku, PettycashSkuAdmin)
-admin.site.register(PettycashTerminal, PettycashTerminalAdmin)
+# admin.site.register(PettycashTerminal, PettycashTerminalAdmin)
 admin.site.register(PettycashStation, PettycashStationAdmin)
 admin.site.register(PettycashTransaction, PettycashTransactionAdmin)
 admin.site.register(PettycashBalanceCache, PettycashBalanceCacheAdmin)

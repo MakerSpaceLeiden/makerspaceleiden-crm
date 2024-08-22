@@ -1,6 +1,8 @@
 import logging
 from functools import wraps
 
+from dateutil.tz.tz import EPOCH
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404, HttpResponse, JsonResponse
@@ -10,14 +12,22 @@ from django.views.decorators.csrf import csrf_exempt
 from ipware import get_client_ip
 
 from mailinglists.models import Subscription
-from makerspaceleiden.decorators import superuser_or_bearer_required
+from makerspaceleiden.decorators import superuser_or_bearer_required, superuser_required
 from memberbox.models import Memberbox
 from members.forms import TagForm
 from members.models import Tag, User, clean_tag_string
 from pettycash.models import PettycashBalanceCache
 from storage.models import Storage
+from terminal.decorators import is_paired_terminal
 
-from .models import Entitlement, Machine, PermitType, RecentUse
+from .models import (
+    Entitlement,
+    Machine,
+    PermitType,
+    RecentUse,
+    change_tracker_counter,
+    useNeedsToStateStr,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -208,8 +218,7 @@ def members(request):
     return render(request, "acl/members.html", context)
 
 
-@login_required
-def member_overview(request, member_id=None):
+def _overview(request, member_id=None):
     if member_id is None:
         member_id = request.user.id
     try:
@@ -275,7 +284,32 @@ def member_overview(request, member_id=None):
         not context["uses_signal"] and not context["uses_telegram"]
     ) or request.user.always_uses_email
 
-    return render(request, "acl/member_overview.html", context)
+    return context
+
+
+@login_required
+def member_overview(request, member_id=None):
+    return render(request, "acl/member_overview.html", _overview(request, member_id))
+
+
+@superuser_required
+def member_delete_confirm(request, member_id=None):
+    return render(request, "acl/delete_overview.html", _overview(request, member_id))
+
+
+@superuser_required
+def member_delete(request, member_id=None):
+    try:
+        member = User.objects.get(pk=member_id)
+    except ObjectDoesNotExist:
+        return HttpResponse("User not found", status=404, content_type="text/plain")
+
+    try:
+        member.delete()
+    except Exception as e:
+        raise Http404("Delete failed: {}".format(str(e)))
+
+    return redirect("index")
 
 
 @superuser_or_bearer_required
@@ -306,6 +340,24 @@ def missing_forms(request):
         "title": "Missing waivers",
         "desc": "Missing waiver forms (of people who had instruction on a machine that needs it).",
         "amiss": missing(False),
+        "has_permission": request.user.is_authenticated,
+    }
+    return render(request, "acl/missing.html", context)
+
+
+@login_required
+def missing_doors(request):
+    missing = (
+        User.objects.all()
+        .filter(is_active=True)
+        .exclude(isGivenTo__permit=settings.DOORS)
+        .order_by("-id")
+    )
+
+    context = {
+        "title": "No doors or tags",
+        "desc": "People with no doors and/or tags",
+        "amiss": missing,
         "has_permission": request.user.is_authenticated,
     }
     return render(request, "acl/missing.html", context)
@@ -494,11 +546,93 @@ def api_getok_by_node(request, node=None, tag=None):
 
 
 @csrf_exempt
+@is_paired_terminal
+# Note: we are not checking if this terminal is actually associated
+#       with this node or machine. I.e any valid terminal can ask
+#       anything about the others. We may not want that in the future.
+def api_gettags4node(request, terminal=None, node=None):
+    if not node:
+        logger.error("No node, denied.")
+        return HttpResponse("No node", status=404, content_type="text/plain")
+    try:
+        machines = Machine.objects.filter(node_name=node)
+    except ObjectDoesNotExist:
+        logger.error("Node not found, denied.")
+        return HttpResponse("Node not found", status=404, content_type="text/plain")
+    if not machines:
+        return HttpResponse(
+            "Node does not have any machines connecte to it",
+            status=404,
+            content_type="text/plain",
+        )
+    out = {}
+    for user in User.objects.filter(is_active=True):
+        for machine in machines:
+            out[machine.name] = []
+            if machine.canOperate(user):
+                for tag in Tag.objects.filter(owner=user):
+                    out[machine.name].append({"tag": tag.tag, "name": str(tag.owner)})
+
+    return JsonResponse(out)
+
+
+# Note: we are not checking if this terminal is actually associated
+#       with this node or machine. I.e any valid terminal can ask
+#       anything about the others. We may not want that in the future.
+#
+def api_gettags4machine(request, terminal=None, machine=None):
+    try:
+        machine = Machine.objects.get(name=machine)
+    except ObjectDoesNotExist:
+        logger.error(f"Machine {machine} not found, denied.")
+        return HttpResponse("Machine not found", status=404, content_type="text/plain")
+
+    out = []
+
+    for user in User.objects.all():
+        (needs, has) = machine.useState(user)
+        xs = useNeedsToStateStr(needs, has)
+        for tag in Tag.objects.filter(owner=user):
+            out.append(
+                {
+                    "tag": tag.tag,
+                    "name": str(tag.owner),
+                    "needs": needs,
+                    "has": has,
+                    "resukt": has & needs == needs,
+                    "xs": xs,
+                }
+            )
+    return out
+
+
+@csrf_exempt
+@is_paired_terminal
+def api_gettags4machineJSON(request, terminal=None, machine=None):
+    out = api_gettags4machine(request, terminal, machine)
+    return JsonResponse(out, safe=False)
+
+
+@csrf_exempt
+@is_paired_terminal
+def api_gettags4machineCSV(request, terminal=None, machine=None):
+    outstr = []
+    for e in api_gettags4machine(request, terminal, machine):
+        outstr.append(f"{e['tag']},{e['needs']},{e['has']},{e['name']}")
+
+    # We sort; on ascii of the tag - to make a bin-search possible on the client.
+    #
+    outstr.sort()
+
+    return HttpResponse("\n".join(outstr), status=200, content_type="text/plain")
+
+
+@csrf_exempt
 @superuser_or_bearer_required
 @checktag
 def api_getok(request, machine=None, tag=None):
     try:
-        machine = Machine.objects.get(node_machine_name=machine)
+        machine = Machine.objects.get(name=machine)
     except ObjectDoesNotExist:
         logger.error("Machine '{}' not found, denied.".format(machine))
         return HttpResponse("Machine not found", status=404, content_type="text/plain")
@@ -512,3 +646,18 @@ def api_getok(request, machine=None, tag=None):
             )
         )
     return JsonResponse(get_perms(tag, machine))
+
+
+@csrf_exempt
+def api_getchangecounter(request):
+    c = change_tracker_counter()
+    if c is None:
+        return HttpResponse("Counter not found", status=500, content_type="text/plain")
+
+    secs = int((c.changed.replace(tzinfo=None) - EPOCH).total_seconds())
+
+    return HttpResponse(
+        f"{c.count},{secs}\t# Last change: {c.changed}",
+        status=200,
+        content_type="text/plain",
+    )

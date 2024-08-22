@@ -35,7 +35,7 @@ def is_superuser_or_bearer(request):
     return False
 
 
-def superuser(function):
+def superuser_required(function):
     @wraps(function)
     def wrap(request, *args, **kwargs):
         if not request.user.is_anonymous and request.user.is_privileged:

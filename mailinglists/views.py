@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 
-from makerspaceleiden.decorators import superuser
+from makerspaceleiden.decorators import superuser_required
 from members.models import User
 
 from .forms import SubscriptionForm
@@ -104,7 +104,7 @@ def mailinglists_archives(request):
 
 
 @login_required
-@superuser
+@superuser_required
 def mailinglists_subs(request):
     lists = Mailinglist.objects.all()
     users = User.objects.all()

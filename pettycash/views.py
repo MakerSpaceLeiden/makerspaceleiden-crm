@@ -1,7 +1,5 @@
-import hashlib
 import logging
-import secrets
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 from email.mime.image import MIMEImage
 
 from django.conf import settings
@@ -19,11 +17,13 @@ from moneyed.l10n import format_money
 
 from makerspaceleiden.decorators import (
     login_or_priveleged,
-    superuser,
     superuser_or_bearer_required,
+    superuser_required,
 )
 from makerspaceleiden.mail import emailPlain
 from members.models import Tag, User
+from terminal.decorators import is_paired_terminal
+from terminal.models import Terminal
 
 from .camt53 import camt53_process
 from .forms import (
@@ -42,9 +42,7 @@ from .models import (
     PettycashReimbursementRequest,
     PettycashSku,
     PettycashStation,
-    PettycashTerminal,
     PettycashTransaction,
-    pemToSHA256Fingerprint,
     pettycash_admin_emails,
 )
 
@@ -145,10 +143,10 @@ def transact_raw(
         )
         logger.info("payment: %s" % reason)
         tx._change_reason = reason[:100]
+        priv = False
         if request.user.is_authenticated:
-            tx.save(is_privileged=request.user.is_privileged)
-        else:
-            tx.save()
+            priv = request.user.is_privileged
+        tx.save(is_privileged=priv)
         if sent_alert:
             alertOwnersToChange(tx, user, [])
 
@@ -172,11 +170,11 @@ def transact(
     if form.is_valid():
         item = form.save(commit=False)
 
-        if item.amount < Money(0, EUR) or item.amount > settings.MAX_PAY_API:
+        if item.amount < Money(0, EUR) or item.amount > settings.MAX_PAY_REIMBURSE:
             if not request.user.is_privileged:
                 return HttpResponse(
                     "Only transactions between %s and %s"
-                    % (Money(0, EUR), settings.MAX_PAY_API),
+                    % (Money(0, EUR), settings.MAX_PAY_REIMBURSE),
                     status=406,
                     content_type="text/plain",
                 )
@@ -224,7 +222,11 @@ def transact(
 
 @login_required
 def index(request, days=30):
-    lst = PettycashBalanceCache.objects.all().order_by("-last")
+    lst = (
+        PettycashBalanceCache.objects.all()
+        .filter(~Q(owner=settings.NONE_ID))
+        .order_by("-lasttxdate")
+    )
     prices = PettycashSku.objects.all()
     context = {
         "title": "Balances",
@@ -264,8 +266,11 @@ def spends(request):
             "count": 0,
             "price": sku.amount,
         }
+        desc = sku.name
+        if sku.description:
+            desc = sku.description
         for tx in PettycashTransaction.objects.all().filter(
-            description__startswith=sku.description
+            description__startswith=desc
         ):
             e["amount"] += tx.amount
             e["count"] += 1
@@ -387,11 +392,11 @@ def transfer(request, src, dst):
 @login_required
 def unpaired(request):
     lst = (
-        PettycashTerminal.objects.all()
+        Terminal.objects.all()
         .filter(Q(accepted=True) & Q(station=None))
         .order_by("-date")
     )
-    unlst = PettycashTerminal.objects.all().filter(Q(accepted=False))
+    unlst = Terminal.objects.all().filter(Q(accepted=False))
     paired = PettycashStation.objects.all().filter(~Q(terminal=None))
     unpaired = PettycashStation.objects.all().filter(Q(terminal=None))
     context = {
@@ -406,7 +411,7 @@ def unpaired(request):
     return render(request, "pettycash/unpaired.html", context)
 
 
-@superuser
+@superuser_required
 def cam53upload(request):
     if request.method == "POST":
         form = CamtUploadForm(request.POST, request.FILES)
@@ -468,7 +473,7 @@ def cam53upload(request):
     return render(request, "pettycash/upload.html", context)
 
 
-@superuser
+@superuser_required
 def cam53process(request):
     if request.method != "POST":
         return HttpResponse("Unknown FAIL", status=400, content_type="text/plain")
@@ -537,10 +542,10 @@ def cam53process(request):
     return render(request, "pettycash/importlog-results.html", context)
 
 
-@superuser
+@superuser_required
 def forget(request, pk):
     try:
-        tx = PettycashTerminal.objects.get(id=pk)
+        tx = Terminal.objects.get(id=pk)
         tx.delete()
     except ObjectDoesNotExist:
         return HttpResponse("Not found", status=404, content_type="text/plain")
@@ -550,10 +555,10 @@ def forget(request, pk):
     return redirect("unpaired")
 
 
-@superuser
+@superuser_required
 def pair(request, pk):
     try:
-        tx = PettycashTerminal.objects.get(id=pk)
+        tx = Terminal.objects.get(id=pk)
     except ObjectDoesNotExist:
         return HttpResponse("Not found", status=404, content_type="text/plain")
 
@@ -595,7 +600,7 @@ def api_none(request):
     return HttpResponse("OK\n", status=200, content_type="text/plain")
 
 
-@superuser
+@superuser_required
 def deposit(request, dst):
     try:
         dst = User.objects.get(id=dst)
@@ -1033,14 +1038,17 @@ def reimburseque(request):
 @superuser_or_bearer_required
 def api_pay(request):
     try:
-        node = request.GET.get("node", None)
-        tagstr = request.GET.get("src", None)
-        amount_str = request.GET.get("amount", None)
-        description = request.GET.get("description", None)
+        rq = request.GET
+        if request.method == "POST":
+            rq = request.POST
+        node = rq.get("node", None)
+        tagstr = rq.get("src", None)
+        amount_str = rq.get("amount", None)
+        description = rq.get("description", None)
         amount = Money(amount_str, EUR)
-    except Exception:
-        logger.error("Tag payment has param issues.")
-        return HttpResponse("Params problems", status=400, content_type="text/plain")
+    except Exception as e:
+        logger.error(f"Tag payment has param issues: {e}")
+        return HttpResponse("Params issues", status=400, content_type="text/plain")
 
     if None in [tagstr, amount_str, description, amount, node]:
         logger.error("Missing param, Payment at %s denied" % (node))
@@ -1085,160 +1093,7 @@ def api_pay(request):
 
 @csrf_exempt
 def api2_register(request):
-    ip = client_ip(request)
-
-    # 1. We're always offered an x509 client cert.
-    #
-    cert = request.META.get("SSL_CLIENT_CERT", None)
-    if cert is None:
-        logger.error("Bad request, missing cert")
-        return HttpResponse(
-            "No client identifier, rejecting", status=400, content_type="text/plain"
-        )
-
-    client_sha = pemToSHA256Fingerprint(cert)
-    server_sha = pemToSHA256Fingerprint(request.META.get("SSL_SERVER_CERT"))
-
-    # 2. If we do not yet now this cert - add its fingrerprint to the database
-    #    and mark it as pending. Return a secret/nonce.
-    #
-    try:
-        terminal = PettycashTerminal.objects.get(fingerprint=client_sha)
-
-    except ObjectDoesNotExist:
-        logger.info(
-            "Fingerprint %s not found, adding to the list of unknowns" % client_sha
-        )
-
-        name = request.GET.get("name", None)
-        if not name:
-            logger.error(
-                "Bad request, client unknown, but no name provided (%s @ %s"
-                % (client_sha, ip)
-            )
-            return HttpResponse(
-                "Bad request, missing name", status=400, content_type="text/plain"
-            )
-
-        terminal = PettycashTerminal(fingerprint=client_sha, name=name, accepted=False)
-        terminal.nonce = secrets.token_hex(32)
-        terminal.accepted = False
-        reason = "Added on first contact; from IP address %s" % (ip)
-        terminal._change_reason = reason[:100]
-        terminal.save()
-
-        logger.info("Issuing first time nonce to %s at %s" % (client_sha, ip))
-        return HttpResponse(terminal.nonce, status=401, content_type="text/plain")
-
-    # 3. If this is a new terminal; check that it has the right nonce from the initial
-    #    exchange; and verify that it knows a secret (the tag id of an admin). If so
-    #    auto approve it.
-    #
-    if not terminal.accepted:
-        cutoff = timezone.now() - timedelta(minutes=settings.PAY_MAXNONCE_AGE_MINUTES)
-        if cutoff > terminal.date:
-            logger.info(
-                "Fingerprint %s known, but too old. Issuing new one." % client_sha
-            )
-            terminal.nonce = secrets.token_hex(32)
-            terminal.date = timezone.now()
-            terminal._change_reason = (
-                "Updating nonce, repeat register; but the old one was too old."
-            )
-            terminal.save()
-            logger.info("Updating nonce for  %s at %s" % (client_sha, ip))
-            return HttpResponse(terminal.nonce, status=401, content_type="text/plain")
-
-        response = request.GET.get("response", None)
-        if not response:
-            logger.error(
-                "Bad request, missing response for %s at %s" % (client_sha, ip)
-            )
-            return HttpResponse(
-                "Bad request, missing response", status=400, content_type="text/plain"
-            )
-
-        # This response should be the SHA256 of nonce + tag + client-cert-sha256 + server-cert-256.
-        # and the tag should be owned by someone whcih has the right admin rights.
-        #
-        for tag in Tag.objects.all().filter(
-            owner__groups__name=settings.PETTYCASH_ADMIN_GROUP
-        ):
-            m = hashlib.sha256()
-            m.update(terminal.nonce.encode("ascii"))
-            m.update(tag.tag.encode("ascii"))
-            m.update(bytes.fromhex(client_sha))
-            m.update(bytes.fromhex(server_sha))
-            sha = m.hexdigest()
-
-            if sha.lower() == response.lower():
-                terminal.accepted = True
-                reason = "%s, IP=%s tag-=%d %s" % (
-                    terminal.name,
-                    ip,
-                    tag.id,
-                    tag.owner,
-                )
-                terminal._change_reason = reason[:100]
-                terminal.save()
-                logger.error(
-                    "Terminal %s accepted, tag swipe by %s matched."
-                    % (terminal, tag.owner)
-                )
-
-                emailPlain(
-                    "email_accept.txt",
-                    toinform=pettycash_admin_emails(),
-                    context={
-                        "base": settings.BASE,
-                        "settings": settings,
-                        "tag": tag,
-                        "terminal": terminal,
-                    },
-                )
-
-                # proof to the terminal that we know the tag too. This prolly
-                # should be an HMAC
-                #
-                m = hashlib.sha256()
-                m.update(tag.tag.encode("ascii"))
-                m.update(bytes.fromhex(sha))
-                sha = m.hexdigest()
-                return HttpResponse(sha, status=200, content_type="text/plain")
-
-        logger.error(
-            "RQ ok; but response could not be correlated to a tag (%s, ip=%s, c=%s)"
-            % (terminal, ip, client_sha)
-        )
-        return HttpResponse("Pairing failed", status=400, content_type="text/plain")
-
-    # 4. We're talking to an approved terminal - give it its SKU list if it has
-    #    been wired to a station; or just an empty list if we do not know yet.
-    #
-    try:
-        station = PettycashStation.objects.get(terminal=terminal)
-    except ObjectDoesNotExist:
-        return JsonResponse({})
-
-    avail = []
-    for item in station.available_skus.all():
-        e = {
-            "name": item.name,
-            "description": item.description,
-            "price": item.amount.amount,
-        }
-        if item == station.default_sku:
-            e["default"] = True
-        avail.append(e)
-
-    return JsonResponse(
-        {
-            "name": terminal.name,
-            "description": station.description,
-            "pricelist": avail,
-        },
-        safe=False,
-    )
+    return api2_register(request)
 
 
 @csrf_exempt
@@ -1276,49 +1131,28 @@ def api_get_sku(request, sku):
 
 
 @csrf_exempt
-def api2_pay(request):
-    # 1. We're always offered an x509 client cert.
-    #
-    cert = request.META.get("SSL_CLIENT_CERT", None)
-    if cert is None:
-        logger.error("Bad request, missing cert")
-        return HttpResponse(
-            "No client identifier, rejecting", status=400, content_type="text/plain"
-        )
-
-    client_sha = pemToSHA256Fingerprint(cert)
-
-    # 2. Is this terminal acticated and assigned.
-    #
-    try:
-        terminal = PettycashTerminal.objects.get(fingerprint=client_sha)
-    except ObjectDoesNotExist:
-        logger.error("Unknwon terminal; fingerprint=%s" % client_sha)
-        return HttpResponse(
-            "No client identifier, rejecting", status=400, content_type="text/plain"
-        )
-
-    if not terminal.accepted:
-        logger.error("Terminal %s not activated; rejecting." % terminal.name)
-        return HttpResponse(
-            "Terminal not activated, rejecting", status=400, content_type="text/plain"
-        )
+@is_paired_terminal
+def api2_pay(request, terminal):
     try:
         station = PettycashStation.objects.get(terminal=terminal)
     except ObjectDoesNotExist:
-        logger.error("No station for terminal; fingerprint=%s" % client_sha)
+        logger.error("No station for terminal %s" % terminal)
         return HttpResponse(
             "Terminal not paired, rejecting", status=400, content_type="text/plain"
         )
 
     try:
-        tagstr = request.GET.get("src", None)
-        amount_str = request.GET.get("amount", None)
-        description = request.GET.get("description", None)
+        rq = request.GET
+        if request.method == "POST":
+            rq = request.POST
+        tagstr = rq.get("src", None)
+        amount_str = rq.get("amount", None)
+        description = rq.get("description", None)
         amount = Money(amount_str, EUR)
-    except Exception:
+    except Exception as e:
         logger.error(
-            "Param issue for terminal %s@%s" % (terminal.name, station.description)
+            "Param issue for terminal %s@%s: %s"
+            % (terminal.name, station.description, e)
         )
         return HttpResponse("Params problems", status=400, content_type="text/plain")
 

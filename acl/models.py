@@ -1,17 +1,19 @@
 import datetime
 import logging
+from enum import IntEnum
 
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import EmailMessage
 from django.db import models
+from django.db.models.signals import post_save
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
 from simple_history.models import HistoricalRecords
 
-from members.models import User
+from members.models import Tag, User
 
 logger = logging.getLogger(__name__)
 
@@ -22,6 +24,43 @@ logger = logging.getLogger(__name__)
 #
 MAX_USERS_TRACKED = 5
 DAYS_USERS_TRACKED = 3
+
+
+class MachineUseFlags(IntEnum):
+    ACTIVE = 1
+    PERMIT = 2
+    FORM = 4
+    APPROVE = 8
+
+
+def bits2str(needs, has):
+    if needs:
+        if has:
+            return "ok"
+        else:
+            return "fail"
+    return "nn"
+
+
+def useNeedsToStateStr(needs, has):
+    out = "user:" + bits2str(
+        needs & MachineUseFlags.ACTIVE, has & MachineUseFlags.ACTIVE
+    )
+    out += ", permit:" + bits2str(
+        needs & MachineUseFlags.PERMIT, has & MachineUseFlags.PERMIT
+    )
+    out += ", waiver:" + bits2str(
+        needs & MachineUseFlags.FORM, has & MachineUseFlags.FORM
+    )
+    out += ", approve:" + bits2str(
+        needs & MachineUseFlags.APPROVE, has & MachineUseFlags.APPROVE
+    )
+    out += " = "
+    if has & needs == needs:
+        out += "ok"
+    else:
+        out += "denied"
+    return out
 
 
 class PermitType(models.Model):
@@ -120,6 +159,32 @@ class Machine(models.Model):
 
     def __str__(self):
         return self.name
+
+    def useState(self, user):
+        e = (
+            Entitlement.objects.all()
+            .filter(holder=user, permit=self.requires_permit)
+            .first()
+        )
+
+        needs = MachineUseFlags.ACTIVE
+        if self.requires_permit:
+            needs |= MachineUseFlags.PERMIT
+        if self.requires_form:
+            needs |= MachineUseFlags.FORM
+        if self.requires_permit and self.requires_permit.require_ok_trustee:
+            needs |= MachineUseFlags.APPROVE
+
+        flags = 0
+        if user.is_active:
+            flags |= MachineUseFlags.ACTIVE
+        if user.form_on_file:
+            flags |= MachineUseFlags.FORM
+        if e:
+            flags |= MachineUseFlags.PERMIT
+        if e and e.active:
+            flags |= MachineUseFlags.APPROVE
+        return [needs, flags]
 
     def canOperate(self, user):
         if not user.is_active:
@@ -362,3 +427,48 @@ def yn(v):
     if v:
         return "yes"
     return "no"
+
+
+# This class tracks XS changes; it gets updated everytime something is
+# touched that pertains to the ACL system. It is to aid the nodes in
+# caching things & updating timely.
+#
+class ChangeTracker(models.Model):
+    class Meta:
+        verbose_name = "ACL and XS change counter"
+        verbose_name_plural = verbose_name
+
+    changed = models.DateTimeField(
+        auto_now=True,
+        help_text="Date and time of the last change in the XS control system",
+    )
+    count = models.IntegerField(
+        default=0,
+        help_text="Number of times something in the XS control ssytem changed",
+    )
+
+
+def change_tracker_counter():
+    return ChangeTracker.objects.first()
+
+
+def tagacl_change_tracker(sender, *args, **kwargs):
+    c = ChangeTracker.objects.first()
+    if c is None:
+        c = ChangeTracker()
+
+    c.changed = timezone.now()
+    c.count = c.count + 1
+    c.save()
+
+
+post_save.connect(tagacl_change_tracker, sender=Entitlement)  # actual ok bit
+#
+post_save.connect(tagacl_change_tracker, sender=Tag)  # People getting/loosing tags
+post_save.connect(
+    tagacl_change_tracker, sender=PermitType
+)  # definiton of permits; e.g. stricter/more slack
+post_save.connect(tagacl_change_tracker, sender=Machine)  # permit required
+post_save.connect(
+    tagacl_change_tracker, sender=User
+)  # for waiver-form and status changes
