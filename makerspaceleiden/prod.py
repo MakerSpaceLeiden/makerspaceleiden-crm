@@ -1,9 +1,14 @@
-FORCE_SCRIPT_NAME = "/crm"
-LOGIN_URL = "/crm/login/"
-LOGIN_REDIRECT_URL = "/crm/"
-LOGOUT_REDIRECT_URL = "/crm/"
-STATIC_URL = "/crm-static/"
-MEDIA_ROOT = "/usr/local/makerspaceleiden-crm/var/media"
+import os
+import sys
+
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+FORCE_SCRIPT_NAME = os.environ.get("FORCE_SCRIPT_NAME", "/crm")
+LOGIN_URL = os.environ.get("LOGIN_URL", "/crm/login/")
+LOGIN_REDIRECT_URL = os.environ.get("LOGIN_REDIRECT_URL", "/crm/")
+LOGOUT_REDIRECT_URL = os.environ.get("LOGOUT_REDIRECT_URL", "/crm/")
+STATIC_URL = os.environ.get("STATIC_URL", "/crm-static/")
+MEDIA_ROOT = os.environ.get("MEDIA_ROOT", "/usr/local/makerspaceleiden-crm/var/media")
 DEBUG = False
 with open("/etc/crm_secret_key.txt") as f:
     SECRET_KEY = f.read().strip()
@@ -13,7 +18,7 @@ SECURE_BROWSER_XSS_FILTER = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 X_FRAME_OPTIONS = "DENY"
-SECURE_SSL_REDIRECT = True
+SECURE_SSL_REDIRECT = os.getenv("SECURE_SSL_REDIRECT", "True") == "True"
 SECURE_HSTS_PRELOAD = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 
@@ -28,7 +33,6 @@ DATABASES = {
 
 EMAIL_BACKEND = "django_sendmail_backend.backends.EmailBackend"
 
-import sys
 
 LOGGING = {
     "version": 1,
@@ -45,7 +49,7 @@ LOGGING = {
         "file": {
             "level": "INFO",
             "class": "logging.handlers.RotatingFileHandler",
-            "filename": "/var/log/crm/crm-debug.log",
+            "filename": os.environ.get("LOG_FILE_NAME", "/var/log/crm/crm-debug.log"),
             "maxBytes": 1024 * 1024,
             "backupCount": 10,
             "formatter": "standard",
@@ -58,6 +62,10 @@ LOGGING = {
     },
     "loggers": {
         "django": {
+            "handlers": ["file"],
+            "propagate": True,
+        },
+        "daphne": {
             "handlers": ["file"],
             "propagate": True,
         },
@@ -86,13 +94,18 @@ LOGGING = {
             "level": "DEBUG",
             "propagate": True,
         },
+        "mailinglists": {
+            "handlers": ["file"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
         "": {
             "handlers": ["file"],
             "propagate": True,
         },
     },
 }
-ALSO_INFORM_EMAIL_ADDRESSES = ["deelnemers@mailman.makerspaceleiden.nl"]
+ALSO_INFORM_EMAIL_ADDRESSES = ["deelnemers@lists.makerspaceleiden.nl"]
 
 # v1 legacy
 DOORS = 3
@@ -104,8 +117,7 @@ with open("/etc/crm_uk_bearer_secret.txt") as f:
 
 GRAND_AMNESTY = False
 
-ML_ADMINURL = "https://mailman.makerspaceleiden.nl/mailman"
-with open("/etc/crm_ml_secret.txt") as f:
-    ML_PASSWORD = f.read().strip()
+PETTYCASH_IBAN = "NL30TRIO0197694519"
 
 POT_ID = 63
+NONE_ID = 217

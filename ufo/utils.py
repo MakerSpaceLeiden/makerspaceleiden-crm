@@ -1,45 +1,13 @@
-from django.shortcuts import render
-from django.contrib.sites.shortcuts import get_current_site
-from django.contrib.admin.sites import AdminSite
-from django.template import loader
-from django.http import HttpResponse
-from django.conf import settings
-from django.shortcuts import redirect
-from django.views.generic import ListView, CreateView, UpdateView
-from django.contrib.auth.decorators import login_required
-from django import forms
-from django.contrib.auth import login, authenticate
-from django.shortcuts import render, redirect
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.shortcuts import render
-from django.views.decorators.csrf import csrf_protect
-from django.db.models import Q
-from simple_history.admin import SimpleHistoryAdmin
-from django.template.loader import render_to_string, get_template
-from django.core.mail import EmailMessage
-from django.conf import settings
-from django.contrib.admin.sites import AdminSite
-from django.core.exceptions import ObjectDoesNotExist
-from django.core.mail import EmailMultiAlternatives
-
-from email.mime.text import MIMEText
+import logging
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
-import datetime
-import uuid
-import zipfile
-import os
-import re
-
-import logging
+from django.conf import settings
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
 
 logger = logging.getLogger(__name__)
-
-from .models import Ufo
-from .admin import UfoAdmin
-from .forms import UfoForm, NewUfoForm, UfoZipUploadForm
-from members.models import User
 
 
 def emailUfoInfo(itemsToAttachImage, template, toinform=[], context={}):

@@ -6,8 +6,11 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
-import locale
-from moneyed import Money, EUR
+
+from moneyed import EUR, Money
+from stdimage.validators import MaxSizeValidator, MinSizeValidator
+
+os.umask(2)
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -33,9 +36,10 @@ STORAGE = False
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     "import_export",
     "simple_history",
-    "search_admin_autocomplete",
+    "search_admin_autocomplete.apps.SearchAdminAutocompleteConfig",
     "qr_code",
     "djmoney",
     "makerspaceleiden",
@@ -53,6 +57,13 @@ INSTALLED_APPS = [
     "mainssensor.apps.MainssensorConfig",
     "kwh.apps.KwhConfig",
     "pettycash.apps.PettycashConfig",
+    "ultimaker.apps.UltimakerConfig",
+    "spaceapi.apps.SpaceapiConfig",
+    "memberlist",
+    "nodered.apps.NoderedConfig",
+    "navigation",
+    "motd",
+    "agenda",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -62,6 +73,10 @@ INSTALLED_APPS = [
     #    'autocomplete_light',
     "django.contrib.sites",
     "revproxy",
+    "django_bootstrap5",
+    "django_flatpickr",
+    "rest_framework",
+    "terminal.apps.TerminalConfig",
 ]
 
 SITE_ID = 1
@@ -93,6 +108,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "django_settings_export.settings_export",
+                "motd.context_processors.motd_context",
             ],
         },
     },
@@ -100,17 +116,19 @@ TEMPLATES = [
 
 SETTINGS_EXPORT = [
     "GRAND_AMNESTY",
-    "ML_ADMINURL",
     "STORAGE",
     "POT_ID",
     "POT_LABEL",
+    "NONE_ID",
+    "NONE_LABEL",
     "TRUSTEES",
 ]
 
-WSGI_APPLICATION = "makerspaceleiden.wsgi.application"
+# WSGI_APPLICATION = "makerspaceleiden.wsgi.application"
+ASGI_APPLICATION = "makerspaceleiden.asgi.application"
 
-MAILINGLIST = "deelnemers@makerspaceleiden.nl"
-TRUSTEES = "hetbestuur@makerspaceleiden.nl"
+MAILINGLIST = "deelnemers@lists.makerspaceleiden.nl"
+TRUSTEES = "hetbestuur@lists.makerspaceleiden.nl"
 
 DEFAULT_FROM_EMAIL = "noc@makerspaceleiden.nl"
 # Leave it to FORCE_SCRPT do do the psotfix right
@@ -202,8 +220,6 @@ MIN_IMAGE_SIZE = 2 * 1024
 MAX_IMAGE_SIZE = 8 * 1024 * 1024
 MAX_IMAGE_WIDTH = 1280
 
-from stdimage.validators import MinSizeValidator, MaxSizeValidator
-
 IMG_VALIDATORS = [MinSizeValidator(100, 100), MaxSizeValidator(8000, 8000)]
 
 # Note: the labels are effectively 'hardcoded' in the templates
@@ -248,9 +264,6 @@ UT_BEARER_SECRET = "not-so-very-secret-127.0.0.1"
 UT_DAYS_CUTOFF = 7
 UT_COUNT_CUTOFF = 10
 
-ML_PASSWORD = "Foo"
-ML_ADMINURL = "https://mailman.foo.com/mailman"
-
 # Extact spelling as created in 'group' through the /admin/ interface.
 SENSOR_USER_GROUP = "mains Sensor Admins"
 NETADMIN_USER_GROUP = "network admins"
@@ -273,13 +286,31 @@ PETTYCASH_TREASURER_GROUP = "pettycash admin group"
 PETTYCASH_TOPUP = 15
 PETTYCASH_TNS = "Stichting Makerspace Leiden"
 PETTYCASH_IBAN = "NL18RABO0123459876"
-POT_ID = 1
+DEVELOPERS_ADMIN_GROUP = "developers"
+
+# Assets of former participants; such as money or
+# boxes need to be caught somewhere. This user,
+# which is marked inactive; acts as a vessel.
+NONE_LABEL = "Former participant"
+NONE_ID = 2
+
+# The pettycash of the makerspace itself needs
+# a `user' to holds its money. Use this user.
+#
 POT_LABEL = "Makerspace (de zwarte Pot)"
+POT_ID = 3
+
+MAX_PAY_API = Money(25.00, EUR)
+MAX_PAY_DEPOSITI = Money(100.00, EUR)
+MAX_PAY_REIMBURSE = Money(250.00, EUR)
+MAX_PAY_TRUSTEE = Money(
+    1000.00, EUR
+)  # as for Reimbursement; but now for 'is_priv' users.
 CURRENCIES = ["EUR"]
 
-MAX_PAY_API = Money(10.00, EUR)
-MAX_PAY_DEPOSITI = Money(100.00, EUR)
-MAX_PAY_REIMBURSE = Money(100.00, EUR)
+# How long an admin has to accept a new terminal post
+# it booting up with a new key.
+#
 PAY_MAXNONCE_AGE_MINUTES = 20
 
 # Days and max number of unknown terminals to keep.
@@ -292,8 +323,10 @@ PETTYCASH_TERMS_MAX_UNKNOWN = 4
 PETTYCASH_TERMS_MIN_UNKNOWN = 1
 PETTYCASH_TERMS_MINS_CUTOFF = 10
 
+NODERED_URL = "http://localhost:1880"
+
 try:
-    from .local import *
+    from .local import *  # noqa: F403
 except ImportError:
     print(
         "WARNING -- no local configs. You propably want to copy makerspaceleiden/debug.py to local.py & tweak it !!"

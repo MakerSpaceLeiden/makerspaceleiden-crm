@@ -1,10 +1,10 @@
+from datetime import datetime, timedelta, timezone
+
 from django import template
 from django.conf import settings
-from pettycash.models import PettycashBalanceCache
 from django.core.exceptions import ObjectDoesNotExist
-from django.utils import timezone
 
-from datetime import datetime, timedelta
+from pettycash.models import PettycashBalanceCache
 
 register = template.Library()
 
@@ -24,6 +24,11 @@ def isNetAdmin(user):
     return user.groups.filter(name=settings.NETADMIN_USER_GROUP).exists()
 
 
+@register.filter(name="isDeveloper")
+def isDeveloper(user):
+    return user.groups.filter(name=settings.DEVELOPERS_ADMIN_GROUP).exists()
+
+
 @register.filter(name="isPettycashUser")
 def isPettycashUser(user):
     if "PETTYCASH_DEMO_USER_GROUP" in globals():
@@ -40,10 +45,12 @@ def isPettycashUser(user):
         cutoff = datetime.now(tz=timezone.utc) - timedelta(
             days=settings.PETTYCASH_NOUSE_DAYS
         )
-        if b.last and b.last.date > cutoff:
-            return True
+        # Needs to be replaced by actual tx check.
+        #
+        # if b.last and b.last.date > cutoff:
+        #     return True
 
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         pass
 
     return False

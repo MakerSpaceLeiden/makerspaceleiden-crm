@@ -33,9 +33,9 @@
 				{% if tx.dst.id == settings.POT_ID %}
 					{{ settings.POT_LABEL }}
 				{% else %}
-					{{ tx.dst }} 
+					{{ tx.dst }}
 				{% endif %}
-					<i>(paid)</i></td>
+					<i>(paid to)</i></td>
 				<td>{{ tx.description }}</td>
 				<td style="border-right: solid 1px" ></td>
 				<td style="border-right: solid 1px" align=right>{{ tx.amount }}</td>
@@ -50,9 +50,9 @@
 				{% if tx.src.id == settings.POT_ID %}
 					{{ settings.POT_LABEL }}
 				{% else %}
-					{{ tx.src }} 
+					{{ tx.src }}
 				{% endif %}
-				<i>(received)</i></td>
+				<i>(received from)</i></td>
 				<td>{{ tx.description }}</td>
 				<td style="border-right: solid 1px" align=right>{{ tx.amount }}</td>
 				<td style="border-right: solid 1px" ></td>

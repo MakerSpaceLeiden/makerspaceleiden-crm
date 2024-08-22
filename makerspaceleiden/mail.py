@@ -1,19 +1,13 @@
-from django.shortcuts import render, redirect
-from django.template.loader import render_to_string, get_template
-from django.core.mail import EmailMessage
-from django.core.mail import EmailMultiAlternatives
-
-from django.conf import settings
-
-from email.mime.text import MIMEText
-from email.mime.image import MIMEImage
-from email.mime.multipart import MIMEMultipart
-from email.charset import Charset, QP
-import email.mime, email.mime.nonmultipart, email.charset
-
-import datetime
+import html
 import logging
 import re
+from email.charset import QP, Charset
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
+from django.conf import settings
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
 
 logger = logging.getLogger(__name__)
 
@@ -35,9 +29,10 @@ def emails_for_group(group):
     return list(
         User.objects.all().filter(groups__name=group).values_list("email", flat=True)
     )
-
-
-def emailPlain(template, subject=None, toinform=[], context={}, attachments=[]):
+  
+def emailPlain(
+    template, subject=None, toinform=[], context={}, attachments=[], forreal=True
+):
     # try to stick to rfc822 (django default is base64) religiously; also
     # as it helps with spam filters.
     cs = Charset("utf-8")
@@ -56,10 +51,12 @@ def emailPlain(template, subject=None, toinform=[], context={}, attachments=[]):
         subject = re.sub("^Subject:\s+", string=subject, repl="", flags=re.IGNORECASE)
         body = "\n".join(body[1:])
 
-    body_html = (
-        "<html><head><title>%s</title></head><body><pre>%s</pre></body><html>"
-        % (subject, body)
-    )
+    body_html = body
+    if not re.search("^\s*<html>", body_html, re.IGNORECASE):
+        body_html = (
+            "<html><head><title>%s</title></head><body><pre>%s</pre></body><html>"
+            % (subject, html.escape(body))
+        )
 
     msg = MIMEMultipart("alternative")
 
@@ -79,4 +76,7 @@ def emailPlain(template, subject=None, toinform=[], context={}, attachments=[]):
     msg.attach(part2)
 
     email.attach(msg)
-    email.send()
+    if forreal:
+        email.send()
+    else:
+        print("To:\t%s\nSubject: %s\n%s\n\n" % (to, subject, body))

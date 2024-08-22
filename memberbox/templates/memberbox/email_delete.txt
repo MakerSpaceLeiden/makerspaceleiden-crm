@@ -10,6 +10,7 @@ Yours,
 
 the makerspace bot, on behalf of the trusteeds (bestuur@makerspaceleiden.nl).
 
+
 {% if admins %}
 {% load human_list %}
 PS: if there is any problem; the following people have volunteered to help manage these boxes: {{ admins|human_list_with_commas }}.

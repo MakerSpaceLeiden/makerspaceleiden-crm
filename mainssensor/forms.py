@@ -1,8 +1,6 @@
-from django import forms
-from django.contrib.auth.forms import UserCreationForm
-from .models import Mainssensor
 from django.forms import ModelForm
-import re
+
+from .models import Mainssensor
 
 
 class NewMainssensorForm(ModelForm):

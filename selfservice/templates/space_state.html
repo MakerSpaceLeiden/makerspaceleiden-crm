@@ -1,7 +1,12 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>State of the Space
+
+{% if no_data_available %}
+<span> No data available.</span>
+{% else %}
+
+<h1>
   {% if space_open %}
     <span style="color: green; font-weight: bold;">- Space is OPEN</span>
   {% endif %}
@@ -70,5 +75,5 @@
   </tbody>
 </table>
 
+{% endif %}
 {% endblock %}
-

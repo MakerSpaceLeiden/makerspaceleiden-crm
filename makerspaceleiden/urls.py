@@ -13,14 +13,16 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
-from django.conf.urls.static import static
-from django.conf import settings
+
+from .admin import admin_view
 
 # from qr_code import urls as qr_code_urls
 
-from .admin import admin_view
 
 admin.site.admin_view = admin_view
 
@@ -31,6 +33,9 @@ urlpatterns = [
     path("", include("mainssensor.urls")),
     path("", include("django.contrib.auth.urls")),
     path("", include("acl.urls")),
+    path("", include("navigation.urls")),
+    path("", include("motd.urls")),
+    path("", include("agenda.urls")),
     path("members/", include("members.urls")),
     path("servicelog/", include("servicelog.urls")),
     path("mailinglists/", include("mailinglists.urls")),
@@ -42,7 +47,11 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     #   path('qr_code/', include(qr_code_urls, namespace='qr_code')),
     path("kwh/", include("kwh.urls")),
+    path("ultimaker/", include("ultimaker.urls")),
     path("pettycash/", include("pettycash.urls")),
+    path("spaceapi/", include("spaceapi.urls")),
+    path("terminal/", include("terminal.urls")),
+    path("", include("nodered.urls")),
 ]
 
 urlpatterns += static(r"/favicon.ico", document_root="static/favicon.ico")

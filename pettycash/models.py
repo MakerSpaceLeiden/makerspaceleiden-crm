@@ -1,145 +1,56 @@
-from django.conf import settings
-from simple_history.models import HistoricalRecords
-from djmoney.models.fields import MoneyField
-from django.conf import settings
-from django.urls import reverse
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from django.forms.models import ModelChoiceField
-from django.db.models import Q
-from djmoney.models.validators import MaxMoneyValidator, MinMoneyValidator
-from stdimage.models import StdImageField
-from stdimage.validators import MinSizeValidator, MaxSizeValidator
+import logging
 
-from django.db.models.signals import pre_delete, pre_save
+from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.db import models
+from django.db.models import Q
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
+from django.urls import reverse
+from django.utils import timezone
+from djmoney.models.fields import MoneyField
+from djmoney.models.validators import MinMoneyValidator
+from moneyed import EUR, Money
+from simple_history.models import HistoricalRecords
+from stdimage.models import StdImageField
 
 from acl.models import Location
-
-from django.db import models
-from members.models import User
-from datetime import timedelta
 from makerspaceleiden.mail import emailPlain
 from makerspaceleiden.utils import upload_to_pattern
-
-from django.utils import timezone
-import uuid
-import os
-import re
-import base64
-import hashlib
-import binascii
-
-from moneyed import Money, EUR
-
-import logging
+from members.models import User, none_user
+from terminal.models import Terminal
 
 logger = logging.getLogger(__name__)
 
-import base64
-import hashlib
 
-
-def pemToSHA256Fingerprint(pem):
-    pem = pem[27:-25]
-    der = base64.b64decode(pem.encode("ascii"))
-    return hashlib.sha256(der).hexdigest()
-
-
-def hexsha2pin(sha256_hex_a, sha256_hex_b):
-    a = binascii.unhexlify(sha256_hex_a)
-    b = binascii.unhexlify(sha256_hex_b)
-    if (len(a) != 32) or (len(b) != 32):
-        raise NameError("Not a SHA256")
-    fp = hashlib.sha256(a + b).hexdigest()
-    return fp[:6].upper()
+def pettycash_admin_emails():
+    return list(
+        User.objects.all()
+        .filter(groups__name=settings.PETTYCASH_ADMIN_GROUP)
+        .values_list("email", flat=True)
+    )
 
 
 class PettycashSku(models.Model):
-    name = models.CharField(max_length=300, blank=True, null=True)
-    description = models.CharField(max_length=300, blank=True, null=True)
+    name = models.CharField(max_length=300, blank=False, null=True)
+    description = models.CharField(max_length=300, blank=False, null=True)
     amount = MoneyField(
-        max_digits=8, decimal_places=2, null=True, default_currency="EUR"
+        # max_value = settings.MAX_PAY_API,
+        max_digits=8,
+        decimal_places=2,
+        default_currency="EUR",
+        null=True,
     )
+
     history = HistoricalRecords()
 
     def __str__(self):
         return "%s (%s)" % (self.name, self.amount)
 
 
-class PettycashTerminal(models.Model):
-    name = models.CharField(
-        max_length=300,
-        blank=True,
-        null=True,
-        help_text="Name, initially as reported by the firmware. Potentially not unique!",
-    )
-    fingerprint = models.CharField(
-        max_length=64,
-        blank=True,
-        null=True,
-        help_text="SHA256 fingerprint of the client certificate.",
-    )
-    nonce = models.CharField(
-        max_length=64, blank=True, null=True, help_text="256 bit nonce (as HEX)"
-    )
-    date = models.DateTimeField(
-        blank=True,
-        null=True,
-        help_text="Time and date the device was last seen",
-        auto_now_add=True,
-    )
-    accepted = models.BooleanField(
-        default=False,
-        help_text="Wether an administrator has checked the fingerprint against the display on the device and accepted it.",
-    )
-    history = HistoricalRecords()
-
-    def __str__(self):
-        return "%s@%s %s...%s" % (
-            self.name,
-            self.date.strftime("%Y/%m/%d %H:%M"),
-            self.fingerprint[:3],
-            self.fingerprint[-3:],
-        )
-
-    def save(self, *args, **kwargs):
-        cutoff = timezone.now() - timedelta(
-            minutes=settings.PETTYCASH_TERMS_MINS_CUTOFF
-        )
-
-        # Drop anything that is too old; and only keep the most recent up to
-        # a cap -- feeble attempt at foiling obvious DOS. Mainly as the tags
-        # can be as short as 32 bits and we did not want to also add a shared
-        # scecret in the Arduino code. As these easily get committed to github
-        # by accident.
-        stale = (
-            PettycashTerminal.objects.all().filter(Q(accepted=False)).order_by("date")
-        )
-        if len(stale) > settings.PETTYCASH_TERMS_MAX_UNKNOWN:
-            lst = (
-                User.objects.all()
-                .filter(groups__name=settings.PETTYCASH_ADMIN_GROUP)
-                .values_list("email", flat=True)
-            )
-            emailPlain(
-                "pettycash-dos-warn.txt",
-                toinform=lst,
-                context={"base": settings.BASE, "settings": settings, "stale": stale},
-            )
-            logger.info("DOS mail set about too many terminals in waiting.")
-        todel = set()
-        for s in stale.filter(Q(date__lt=cutoff)):
-            todel.add(s)
-        for s in stale[settings.PETTYCASH_TERMS_MIN_UNKNOWN :]:
-            todel.add(s)
-        for s in todel:
-            s.delete()
-
-        return super(PettycashTerminal, self).save(*args, **kwargs)
-
-
 class PettycashStation(models.Model):
     terminal = models.ForeignKey(
-        PettycashTerminal,
+        Terminal,
         related_name="station",
         on_delete=models.SET_NULL,
         null=True,
@@ -175,13 +86,11 @@ class PettycashBalanceCache(models.Model):
     balance = MoneyField(
         max_digits=8, decimal_places=2, null=True, default_currency="EUR"
     )
-    last = models.ForeignKey(
-        "PettycashTransaction",
-        on_delete=models.SET_DEFAULT,
-        null=True,
+
+    lasttxdate = models.DateTimeField(
         blank=True,
-        default=None,
-        help_text="Last transaction that changed the balance",
+        null=True,
+        help_text="Date of most recent balance changing transaction (excluding any technical/system ones)",
     )
 
     history = HistoricalRecords()
@@ -192,21 +101,26 @@ class PettycashBalanceCache(models.Model):
     def path(self):
         return reverse("balances", kwargs={"pk": self.id})
 
+    def save(self):
+        if not self.owner:
+            self.owner = none_user()
 
-def adjust_balance_cache(last, dst, amount):
+        return super(PettycashBalanceCache, self).save()
+
+
+def adjust_balance_cache(last, dst, amount, isreal=True):
     try:
         balance = PettycashBalanceCache.objects.get(owner=dst)
-    except ObjectDoesNotExist as e:
-        logger.info("Warning - creating for dst=%s" % (dst))
+    except ObjectDoesNotExist:
+        logger.info("Warning - creating petty cache entry for dst=%s" % (dst))
 
         balance = PettycashBalanceCache(owner=dst, balance=Money(0, EUR))
         for tx in PettycashTransaction.objects.all().filter(Q(dst=dst)):
-            # Exclude the current transaction we are working with
-            if tx.id is not last.id:
-                balance.balance += tx.amount
+            balance.balance += tx.amount
 
     balance.balance += amount
-    balance.last = last
+    if isreal:
+        balance.lasttxdate = timezone.now()
     balance.save()
 
 
@@ -263,15 +177,21 @@ class PettycashTransaction(models.Model):
             self.amount,
         )
 
-    def delete(self, *args, **kwargs):
-        rc = super(PettycashTransaction, self).delete(*args, **kwargs)
+    # There is a bug/limitation in Django's admin interface:
+    # https://docs.djangoproject.com/en/dev/ref/contrib/admin/actions/
+    #
+    # so we do below from an signal rather than 'normal' delete(), and
+    # register this as a callback/signal on 'pre_delete' of any
+    # trnsaction.
+    #
+    def delete_callback(self, *args, **kwargs):
+        # rc = super(PettycashTransaction, self).delete(*args, **kwargs)
         try:
+            # Essentially roll the transaction back from the cache.
             adjust_balance_cache(self, self.src, self.amount)
             adjust_balance_cache(self, self.dst, -self.amount)
         except Exception as e:
-            logger.error("Transaction cache failure on delete: %s" % (e))
-
-        return rc
+            logger.error("Transaction cache failure on update post delete: %s" % (e))
 
     def refund_booking(self):
         """
@@ -287,9 +207,16 @@ class PettycashTransaction(models.Model):
     def save(self, *args, **kwargs):
         bypass = False
 
-        if kwargs is not None and "bypass" in kwargs:
-            bypass = kwargs["bypass"]
-            del kwargs["bypass"]
+        max_val = settings.MAX_PAY_REIMBURSE.amount
+        if kwargs is not None:
+            if "bypass" in kwargs:
+                bypass = kwargs["bypass"]
+                del kwargs["bypass"]
+
+            if "is_privileged" in kwargs:
+                max_val = settings.MAX_PAY_TRUSTEE.amount
+                del kwargs["is_privileged"]
+
         if self.pk:
             if not bypass:
                 raise ValidationError(
@@ -300,15 +227,26 @@ class PettycashTransaction(models.Model):
         if not self.date:
             self.date = timezone.now()
 
+        if not self.src:
+            self.src = none_user()
+        if not self.dst:
+            self.dst = none_user()
+
         if self.amount < Money(0, EUR):
-            if not bypas:
+            if not bypass:
                 raise ValidationError("Blocked negative transaction.")
             logger.info("Bypass for negative transaction used on save of %s" % self)
+
+        if self.amount > Money(max_val, EUR):
+            if not bypass:
+                raise ValidationError("Amount too high.")
+            logger.info("Bypass on max limites used on save of %s" % self)
 
         rc = super(PettycashTransaction, self).save(*args, **kwargs)
         try:
             adjust_balance_cache(self, self.src, -self.amount)
             adjust_balance_cache(self, self.dst, self.amount)
+            print(f"Cache Adjust: {self.src} -> {self.dst} = {self.amount}")
         except Exception as e:
             logger.error("Transaction cache failure: %s" % (e))
 
@@ -316,6 +254,14 @@ class PettycashTransaction(models.Model):
 
 
 class PettycashReimbursementRequest(models.Model):
+    src = models.ForeignKey(
+        User,
+        help_text="Party that pays (usually the %s)" % (settings.POT_LABEL),
+        on_delete=models.CASCADE,
+        related_name="isReimbursedBy",
+        default=settings.POT_ID,
+    )
+
     dst = models.ForeignKey(
         User,
         help_text="Person to reemburse (usually you, yourself)",
@@ -334,18 +280,13 @@ class PettycashReimbursementRequest(models.Model):
         max_digits=8,
         decimal_places=2,
         default_currency="EUR",
-        validators=[
-            MinMoneyValidator(0),
-            MaxMoneyValidator(settings.MAX_PAY_REIMBURSE.amount),
-        ],
-        help_text="This system will only accept reimbursement up to %s. Above that; contact the trustees directly (%s)"
-        % (settings.MAX_PAY_REIMBURSE.amount, settings.TRUSTEES),
     )
 
     viaTheBank = models.BooleanField(
         default=False,
         help_text="Check this box if you want to be paid via a IBAN/SEPA transfer; otherwise the amount will be credited to your Makerspace petty cash acount",
     )
+    isPayout = models.BooleanField(default=False, help_text="Internal hidden field")
 
     description = models.CharField(
         max_length=300,
@@ -362,3 +303,81 @@ class PettycashReimbursementRequest(models.Model):
         help_text="Scan, photo or similar of the receipt",
     )
     history = HistoricalRecords()
+
+    def __str__(self):
+        return "%s Reimburse request %s %s (from %s) for: %s bank:%s" % (
+            self.date,
+            self.amount,
+            self.dst,
+            self.src,
+            self.description,
+            self.viaTheBank,
+        )
+
+
+class PettycashImportRecord(models.Model):
+    date = models.DateField(help_text="Date of last import", default=timezone.now)
+    by = models.ForeignKey(
+        User,
+        help_text="Person that did this import",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+    )
+
+
+# See above note/comment near delete_callback(). We need
+# to do this _pre_ -- as we want to record the name of
+# the user leaving and use the transaction itself. And
+# cannot do this once things are deleted.
+#
+@receiver(pre_delete, sender=PettycashTransaction)
+def pre_delete_tx_callback(sender, instance, using, **kwargs):
+    tx = instance
+    tx.delete_callback(using, kwargs)
+
+
+@receiver(pre_delete, sender=User)
+def pre_delete_user_callback(sender, instance, using, **kwargs):
+    # Run through all the current transactions of the user;
+    # sum them up; and move the balance to former participant
+    # account. In effect - we keep a PL in this account.
+    #
+    user = instance
+    amount = 0
+    for tx in PettycashTransaction.objects.all().filter(Q(dst=user)):
+        amount += tx.amount
+    for tx in PettycashTransaction.objects.all().filter(Q(src=user)):
+        amount -= tx.amount
+
+    msg = "Left donating"
+    f = User.objects.get(id=settings.NONE_ID)
+    t = User.objects.get(id=settings.POT_ID)
+
+    if amount.amount < 0:
+        msg = "Left with a debt"
+        amount = -amount
+        ff = t
+        t = f
+        f = ff
+
+    print(f"Transaction: {f.id} {t.id} user = {user.id}")
+
+    tx = PettycashTransaction(
+        src=f,
+        dst=t,
+        amount=amount,
+        description=f"Deleted participant {user}. {msg}",
+    )
+    tx._change_reason = "Participant was deleted"
+    tx.save()
+
+    emailPlain(
+        "email_payout_leave.txt",
+        toinform=pettycash_admin_emails(),
+        context={
+            "user": user,
+            "amount": amount,
+            "msg": msg,
+        },
+    )

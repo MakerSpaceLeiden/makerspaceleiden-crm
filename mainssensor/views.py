@@ -1,25 +1,15 @@
-from django.shortcuts import render, redirect
-from django.urls import path
-from django.http import HttpResponse
-from django.conf import settings
-from django.db.models import Q
+import logging
 
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
+from django.http import HttpResponse
+from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
 
-from .models import Mainssensor
 from .decorators import superuser_or_mainsadmin_required
-from members.models import Tag, User, clean_tag_string
-from acl.models import Entitlement, PermitType
-
-from makerspaceleiden.decorators import superuser_or_bearer_required
-
-from .forms import NewMainssensorForm, MainssensorForm
-
-import logging
-import datetime
-import re
-from django.utils import timezone
+from .forms import MainssensorForm, NewMainssensorForm
+from .models import Mainssensor
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +27,7 @@ def resolve(request, tag=None):
             return render(
                 request, "single-sensor.txt", {"item": item}, content_type="text/plain"
             )
-        except:
+        except Exception:
             return HttpResponse(
                 "Unknown sensor id\n", status=404, content_type="text/plain"
             )

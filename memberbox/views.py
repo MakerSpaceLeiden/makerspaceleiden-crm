@@ -1,13 +1,14 @@
-from django.http import HttpResponse
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
-from django.core.exceptions import ObjectDoesNotExist
-
-from .models import Memberbox
-from .forms import MemberboxForm, NewMemberboxForm
-from storage.definitions import parse_box_location, STORAGES
-
 import logging
+
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
+from django.http import HttpResponse
+from django.shortcuts import redirect, render
+
+from storage.definitions import STORAGES, parse_box_location
+
+from .forms import MemberboxForm, NewMemberboxForm
+from .models import Memberbox
 
 logger = logging.getLogger(__name__)
 
@@ -40,8 +41,15 @@ def index(request):
         for storage_key, storage_data in STORAGES.items()
     )
 
-    # Fill up data structures
+    # Fill up data structures; and do a count/owner on the side
+    count = {}
+    morethanone = {}
     for box in Memberbox.objects.order_by("location"):
+        if box.owner.id in count:
+            count[box.owner.id] = count[box.owner.id] + 1
+            morethanone[box.owner] = count[box.owner.id]
+        else:
+            count[box.owner.id] = 1
         box_location = parse_box_location(box.location)
         if box_location:
             num_rows = STORAGES[box_location.storage]["num_rows"]
@@ -58,14 +66,14 @@ def index(request):
         "storages": list(storages.values()),
         "floating": floating,
         "yours": yours,
-        "has_permission": request.user.is_authenticated,
+        "morethanone": morethanone,
     }
 
     return render(request, "memberbox/index.html", context)
 
 
 @login_required
-def create(request):
+def claim(request, location):
     if request.method == "POST":
         form = NewMemberboxForm(
             request.POST or None, request.FILES, initial={"owner": request.user.id}
@@ -86,7 +94,12 @@ def create(request):
                     "Unexpected error during create of new box : {0}".format(e)
                 )
     else:
-        form = NewMemberboxForm(initial={"owner": request.user.id})
+        form = NewMemberboxForm(
+            initial={
+                "owner": request.user.id,
+                "location": location,
+            }
+        )
 
     context = {
         "label": "Describe a new box",
@@ -97,8 +110,14 @@ def create(request):
         "owner": request.user,
         "form": form,
         "has_permission": request.user.is_authenticated,
+        "back": "boxes",
     }
-    return render(request, "memberbox/crud.html", context)
+    return render(request, "crud.html", context)
+
+
+@login_required
+def create(request):
+    return claim(request, "")
 
 
 @login_required
@@ -138,11 +157,12 @@ def modify(request, pk):
         "user": request.user,
         "owner": box.owner,
         "form": form,
-        "box": box,
+        "item": box,
         "has_permission": request.user.is_authenticated,
+        "back": "boxes",
     }
 
-    return render(request, "memberbox/crud.html", context)
+    return render(request, "crud.html", context)
 
 
 @login_required

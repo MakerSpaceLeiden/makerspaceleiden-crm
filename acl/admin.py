@@ -1,18 +1,13 @@
+from django.conf import settings
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from import_export import resources
 from import_export.admin import ImportExportModelAdmin
 from simple_history.admin import SimpleHistoryAdmin
-from import_export import resources
-from django.conf import settings
-
-from django.utils.translation import ugettext_lazy as _
 
 from members.models import User
-from .models import PermitType
-from .models import Machine
-from .models import Location
-from .models import Entitlement
-from .models import RecentUse
+
+from .models import ChangeTracker, Entitlement, Location, Machine, PermitType, RecentUse
+
 
 # class MachineAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 class MachineAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
@@ -25,10 +20,14 @@ class MachineAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
         "requires_instruction",
         "requires_form",
         "requires_permit",
+        "category",
+        "wiki_title",
+        "wiki_url",
     )
 
 
 admin.site.register(Machine, MachineAdmin)
+
 
 # class LocationAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 class LocationAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
@@ -86,3 +85,27 @@ class RecentUseAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
 
 
 admin.site.register(RecentUse, RecentUseAdmin)
+
+
+# We lock this class down - as making changes is rather
+# confusing for the (payment/access) nodes; as this controls
+# their caching and updates.
+#
+class ChangeTrackerAdmin(admin.ModelAdmin):
+    class Meta:
+        view_only = True
+
+    list_display = ("count", "changed")
+    readonly_fields = ("count", "changed")
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, rec=None):
+        return False
+
+    def has_delete_permission(self, request, rec=None):
+        return False
+
+
+admin.site.register(ChangeTracker, ChangeTrackerAdmin)

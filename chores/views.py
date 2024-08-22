@@ -1,28 +1,25 @@
+import json
+import logging
 import time
 from collections import defaultdict
 from datetime import datetime
-from django.shortcuts import render
-from selfservice.aggregator_adapter import get_aggregator_adapter
-from django.http import HttpResponse
-from django.shortcuts import redirect
-from django.core.exceptions import ObjectDoesNotExist
-from .admin import ChoreAdmin
-from .models import ChoreVolunteer, Chore
-from django.contrib.auth.decorators import login_required
 
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import EmailMessage
-from django.template.loader import render_to_string, get_template
+from django.http import HttpResponse
+from django.shortcuts import redirect, render
+from django.template.loader import render_to_string
 
-import logging
+from selfservice.aggregator_adapter import get_aggregator_adapter
+
+from .models import Chore, ChoreVolunteer
 
 logger = logging.getLogger(__name__)
 
 
-@login_required
-def index(request):
-    current_user_id = request.user.id
-
+def getall(current_user_id=None, subset=None):
     aggregator_adapter = get_aggregator_adapter()
     if not aggregator_adapter:
         return HttpResponse(
@@ -40,7 +37,7 @@ def index(request):
 
     event_groups = []
     ts = None
-    if data != None:
+    if data is not None:
         for event in data["events"]:
             event_ts = datetime.fromtimestamp(event["when"]["timestamp"])
             event_ts_str = event_ts.strftime("%d%m%Y")
@@ -51,6 +48,8 @@ def index(request):
             num_missing_volunteers = event["chore"]["min_required_people"] - len(
                 event["volunteers"]
             )
+            if subset is not None and not event["chore"]["name"] == subset:
+                continue
             this_user_volunteered = current_user_id in [
                 user.id for user in event["volunteers"]
             ]
@@ -60,18 +59,48 @@ def index(request):
                         event["volunteers"].append("offer_volunteering")
                     else:
                         event["volunteers"].append(None)
+            event["volunteers"] = [str(n) for n in event["volunteers"]]
+
             if event_ts_str != ts:
                 ts = event_ts_str
                 event_groups.append(
-                    {"ts_str": event_ts.strftime("%A %d/%m/%Y"), "events": []}
+                    {
+                        "ts_str": event_ts.strftime("%A %d/%m/%Y"),
+                        "timestamp": timestamp,
+                        "events": [],
+                    }
                 )
             event_groups[-1]["events"].append(event)
+
+    return sorted(event_groups, key=lambda e: e["timestamp"])
+
+
+def index_api(request, name=None):
+    chores = getall(None, name)
+
+    if not chores:
+        return HttpResponse("No chores found", status=404, content_type="text/plain")
+    payload = {
+        "title": "Chores of this week",
+        "version": "1.00",
+        "chores": chores,
+    }
+    if name:
+        payload["title"] = name
+
+    js = json.dumps(payload).encode("utf8")
+    return HttpResponse(js, content_type="application/json")
+
+
+@login_required
+def index(request):
+    event_groups = getall(request.user.id, None)
 
     context = {
         "title": "Chores",
         "event_groups": event_groups,
+        "has_permission": request.user.is_authenticated,
     }
-
     return render(request, "chores.html", context)
 
 
@@ -79,7 +108,7 @@ def index(request):
 def signup(request, chore_id, ts):
     try:
         chore = Chore.objects.get(pk=chore_id)
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         return HttpResponse("Chore not found", status=404, content_type="text/plain")
 
     try:
@@ -108,7 +137,7 @@ def signup(request, chore_id, ts):
 def remove_signup(request, chore_id, ts):
     try:
         chore = Chore.objects.get(pk=chore_id)
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         return HttpResponse("Chore not found", status=404, content_type="text/plain")
 
     try:

@@ -14,4 +14,3 @@ To pay to:   {{ item.dst }}
 Amount:      {{ item.amount }}
 Deascription:{{ item.description }}
 Submitted:   {{ item.submitted }}
-

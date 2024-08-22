@@ -6,14 +6,14 @@ Welcome to the Makerspace Leiden !
 1)	Next - set a password on your account in our system; so you get
 	access to the Wifi and so on.
 
-	Your username will be your email address ({{ user.get_username }}). 
+	Your username will be your email address ({{ user.get_username }}).
 
 	Click on the link below to set your password:
 
 	{{ protocol }}://{{ domain }}{% url 'password_reset_confirm' uidb64=uid token=token %}
 
-	If clicking the link above doesn't work, please copy and paste the URL in a new 
-	browser window instead. 
+	If clicking the link above doesn't work, please copy and paste the URL in a new
+	browser window instead.
 
 	If that fails too - contact 'noc@makerspaceleiden.nl' for help.
 
@@ -27,7 +27,7 @@ Welcome to the Makerspace Leiden !
 	Consider uploading a picture - to help people know you.
 
 3)	You will also have been subscribed to two mailing lists; `deelnemeners'
-        and `spacelog'. 
+        and `spacelog'.
 
 	The first, `deelnemers' is used for all communication between participants.
 	For example when someone wants help (or instrucition) with a machine.
@@ -39,14 +39,14 @@ Welcome to the Makerspace Leiden !
 
 4)	Next you will want to go to the wiki  {{ protocol }}://{{ domain }} --> Wiki.
 
-	Here - read at the very least the first page; and in particular the 'Safety and 
+	Here - read at the very least the first page; and in particular the 'Safety and
  	Noise' section and the 'Procedures and Principles'. Safety is not optional.
 
 	And some machines absolutely require mandatory instruction.
 
 5)	If you want to use category 1 and 2 machines (the two most dangerous classes,
- 	these include the large three phase powered woodworking machines) - then 
-	be sure to ask & arrange for instrucitons on the deelnemers@ mailing list. 
+ 	these include the large three phase powered woodworking machines) - then
+	be sure to ask & arrange for instrucitons on the deelnemers@ mailing list.
 
 	And also go to {{ protocol }}://{{ domain }}{% url 'index' %},
 	navigate to `your data'; sign and print out the waiver form and
@@ -84,4 +84,3 @@ Have fun making !
 Your friendly makerbot.
 
 {% endautoescape %}
-

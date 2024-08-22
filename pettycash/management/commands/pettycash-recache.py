@@ -1,17 +1,12 @@
-from django.core.management.base import BaseCommand, CommandError
+import sys
 
-from django.conf import settings
-from django.core.mail import EmailMessage
-from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.management.base import BaseCommand
+from django.db.models import Q
+from moneyed import EUR, Money
 
-from pettycash.models import PettycashBalanceCache, PettycashTransaction
 from members.models import User
-
-from moneyed import Money, EUR
-
-import sys, os
-import datetime
+from pettycash.models import PettycashBalanceCache, PettycashTransaction
 
 
 class Command(BaseCommand):
@@ -29,6 +24,7 @@ class Command(BaseCommand):
         rc = 0
         verbosity = int(options["verbosity"])
 
+        total = Money(0, EUR)
         for user in User.objects.all():
             balance = PettycashBalanceCache(owner=user, balance=Money(0, EUR))
             old_balance = Money(0, EUR)
@@ -36,7 +32,7 @@ class Command(BaseCommand):
             try:
                 balance = PettycashBalanceCache.objects.get(owner=user)
                 old_balance = balance.balance
-            except ObjectDoesNotExist as e:
+            except ObjectDoesNotExist:
                 act = "initial creation"
                 pass
 
@@ -50,9 +46,11 @@ class Command(BaseCommand):
                 for tx in trns:
                     if tx.dst == user:
                         balance.balance += tx.amount
+                        total += tx.amount
                     else:
                         balance.balance -= tx.amount
-            except ObjectDoesNotExist as e:
+                        total -= tx.amount
+            except ObjectDoesNotExist:
                 pass
 
             old_balance = old_balance - balance.balance
@@ -65,4 +63,6 @@ class Command(BaseCommand):
             if (err != "" and act != "initial creation") or verbosity > 1:
                 print("%s: %s%s" % (user, balance.balance, err))
 
+        if total != Money(0, EUR) or verbosity > 1:
+            print("Total %s" % (total))
         sys.exit(rc)

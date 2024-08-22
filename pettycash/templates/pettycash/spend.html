@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load isingroup %}
+
+{% block content %}
+
+{% if per_sku %}
+Spend in the last {{ delta.days }} days on normal things that are on the pricelist (i.e. excluding any specials):
+<p>
+<table>
+	<tr>
+		<th>SKU</th><th>Count</th><th>Unit price</th><th>total</th>
+	</tr>
+{% for e in per_sku %}
+	<tr>
+		<td>{{ e.name }}</td>
+		<td>{{ e.count }}</td>
+		<td>{{ e.price }}</td>
+		<td>{{ e.amount }}</td>
+	</tr>
+{% endfor %}
+</table>
+{% else %}
+No recent spend.
+
+{% endif %}
+
+<p>
+Return to the <a href="{% url 'mytransactions' %}">[balance]</a>.
+
+{% endblock %}

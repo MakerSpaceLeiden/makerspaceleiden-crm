@@ -1,27 +1,19 @@
+import datetime
+import logging
+
 from django.conf import settings
+from django.db import models
+from django.urls import reverse
 
 # frmm django.contrib.auth import get_user_model
 from simple_history.models import HistoricalRecords
-from django.conf import settings
 from stdimage.models import StdImageField
-from stdimage.validators import MinSizeValidator, MaxSizeValidator
-from django.urls import reverse
 
-
-from django.db.models.signals import pre_delete, pre_save
+from makerspaceleiden.utils import upload_to_pattern
+from members.models import User
 
 # from stdimage.utils import pre_delete_delete_callback, pre_save_delete_callback
 
-from django.db import models
-from members.models import User
-from makerspaceleiden.utils import upload_to_pattern
-import datetime
-import uuid
-import os
-
-import re
-
-import logging
 
 logger = logging.getLogger(__name__)
 

@@ -1,55 +1,32 @@
-from django.shortcuts import render
-from django.contrib.sites.shortcuts import get_current_site
-from django.contrib.admin.sites import AdminSite
-from django.template import loader
-from django.http import HttpResponse
-from django.conf import settings
-from django.shortcuts import redirect
-from django.views.generic import ListView, CreateView, UpdateView
-from django.contrib.auth.decorators import login_required
-from django import forms
-from django.contrib.auth import login, authenticate
-from django.shortcuts import render, redirect
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.shortcuts import render
-from django.views.decorators.csrf import csrf_protect
-from django.db.models import Q
-from simple_history.admin import SimpleHistoryAdmin
-from django.template.loader import render_to_string, get_template
-from django.core.mail import EmailMessage
-from django.conf import settings
-from django.contrib.admin.sites import AdminSite
-from django.core.exceptions import ObjectDoesNotExist
-from django.core.mail import EmailMultiAlternatives
-from django.urls import reverse
-
-from email.mime.text import MIMEText
-from email.mime.image import MIMEImage
-from email.mime.multipart import MIMEMultipart
-from ufo.utils import emailUfoInfo
-
-
 import datetime
-import uuid
-import zipfile
+import logging
 import os
 import re
+import uuid
+import zipfile
 
-import logging
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q
+from django.http import HttpResponse
+from django.shortcuts import redirect, render
+from django.urls import reverse
+
+from ufo.utils import emailUfoInfo
+
+from .forms import NewUfoForm, UfoForm, UfoZipUploadForm
+from .models import Ufo
 
 logger = logging.getLogger(__name__)
 
-from .models import Ufo
-from .admin import UfoAdmin
-from .forms import UfoForm, NewUfoForm, UfoZipUploadForm
-from members.models import User
 
 # Note - we do this here; rather than in the model its save() - as this
 # lets admins change things through the database interface silently.
 # Which can help when sheparding the community.
 #
 def alertOwnersToChange(items, userThatMadeTheChange=None, toinform=[]):
-    context = {
+    _ = {
         "user": userThatMadeTheChange,
         "base": settings.BASE,
     }
@@ -75,7 +52,7 @@ def index(request, days=30):
         tooOld = datetime.date.today() - datetime.timedelta(days=days)
         lst = lst.filter(Q(lastChange__gte=tooOld) | Q(state="UNK"))
     context = {
-        "title": "Uknown Floating Objects",
+        "title": "Unclaimed Floating Objects",
         "lst": lst,
         "days": days,
         "has_permission": request.user.is_authenticated,
@@ -112,22 +89,23 @@ def create(request):
         )
 
     context = {
-        "title": "Add an Uknown Floating Objects",
+        "title": "Add an Unclaimed Floating Object",
         "form": form,
         "action": "Add",
         "has_permission": request.user.is_authenticated,
+        "back": "ufo",
     }
-    return render(request, "ufo/crud.html", context)
+    return render(request, "crud.html", context)
 
 
 def show(request, pk):
     try:
         item = Ufo.objects.get(pk=pk)
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         return HttpResponse("UFO not found", status=404, content_type="text/plain")
 
     context = {
-        "title": "Uknown Floating Objects",
+        "title": "Unclaimed Floating Objects",
         "item": item,
         "has_permission": request.user.is_authenticated,
     }
@@ -138,7 +116,7 @@ def show(request, pk):
 def modify(request, pk):
     try:
         oitem = Ufo.objects.get(pk=pk)
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         return HttpResponse("UFO not found", status=404, content_type="text/plain")
 
     toinform = []
@@ -146,7 +124,7 @@ def modify(request, pk):
         toinform.append(oitem.owner.email)
 
     context = {
-        "title": "Update an Uknown Floating Objects",
+        "title": "Update an Unclaimed Floating Object",
         "action": "Update",
         "item": oitem,
         "has_permission": request.user.is_authenticated,
@@ -174,15 +152,16 @@ def modify(request, pk):
 
     form = UfoForm(instance=oitem)
     context["form"] = form
+    context["back"] = "ufo"
 
-    return render(request, "ufo/crud.html", context)
+    return render(request, "crud.html", context)
 
 
 @login_required
 def mine(request, pk):
     try:
         item = Ufo.objects.get(pk=pk)
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         return HttpResponse("UFO not found", status=404, content_type="text/plain")
 
     item.changeReason = "claimed as 'mine' by {} via self service portal".format(
@@ -200,7 +179,7 @@ def mine(request, pk):
 def delete(request, pk):
     try:
         item = Ufo.objects.get(pk=pk)
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         return HttpResponse("UFO not found", status=404, content_type="text/plain")
 
     form = UfoForm(request.POST or None, instance=item)
@@ -217,8 +196,9 @@ def delete(request, pk):
             "form": form,
             "item": item,
             "delete": True,
+            "back": "ufo",
         }
-        return render(request, "ufo/crud.html", context)
+        return render(request, "crud.html", context)
 
     if not form.is_valid():
         return HttpResponse("Eh - confused ?!", status=403, content_type="text/plain")
@@ -255,10 +235,10 @@ def upload_zip(request):
             lst = []
             with zipfile.ZipFile(tmpZip, "r") as z:
                 for zi in z.infolist():
+                    f = zi.filename
                     if zi.is_dir():
                         skipped.append("{0}: skipped, directory".format(f))
                         continue
-                    f = zi.filename
                     if re.match("\..*", f):
                         skipped.append("{0}: skipped, hidden file".format(f))
                         continue
@@ -310,7 +290,7 @@ def upload_zip(request):
                     lst.append(ufo)
             try:
                 os.remove(tmpZip)
-            except:
+            except Exception as e:
                 logger.error("Error during cleanup of {}: {}".format(tmpZip, e))
 
             if lst:

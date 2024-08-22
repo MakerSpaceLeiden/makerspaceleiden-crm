@@ -2,6 +2,9 @@
 
 -	Make sure you have a somewhat recent python version
 
+-   [OPTIONAL] If you want to use `poetry` instead, install [poetry](https://python-poetry.org/docs/#installation)
+    - Add environment variable `POETRY` with the value true. Can be done by running: `cp example.env .env`
+
 -	sh loaddemo.sh
 
 Then go to
@@ -9,6 +12,21 @@ Then go to
 	http://localhost:8000/
 
 and login using the accounts created & shown to you during the loaddemo.sh script.
+
+Or use URLs such as
+
+	curl -H "X-Bearer: Foo" -F tag=1-2-4 http://127.0.0.1:8000/acl/api/v1/getok4node/foonode
+
+to check  the API (this assumes local.py to contain the Foo password; see debug.py) and some machine
+given a node name.
+
+# Committing
+
+Make sure `pre-commit` is installed when committing. This can be done by installing using poetry (pre-commit is a dev dependency) or manually installing pre-commit with the instructions found [here](https://pre-commit.com/#install).
+
+Once `pre-commit` is installed, you can run `pre-commit install` to install the necessary git hooks. After this you're set to commit!
+
+There are pipelines running pre-commit is as well to check whether pre-commit was run successfully. If any issues arise in the pipeline, first try to run pre-commit locally using `pre-commit run --all-files`.
 
 # Requirements
 
@@ -45,7 +63,7 @@ and login using the accounts created & shown to you during the loaddemo.sh scrip
 
 ## Self service (bonus)
 
--	report accident 
+-	report accident
 
 - 	report outages
 	activate lockout
@@ -79,7 +97,7 @@ and login using the accounts created & shown to you during the loaddemo.sh scrip
 
 - Normal Django users; Members adds a field to that (form on file). May
 	add more in the future (e.g. emergency contact).
-	
+
 - Machines
 	Machines or things that you can interact with (like doors).
 	May require instructions
@@ -98,4 +116,3 @@ and login using the accounts created & shown to you during the loaddemo.sh scrip
 	i.e. the instruction permit, if so specified (one deep)
 
 ## issues with the current design
-	

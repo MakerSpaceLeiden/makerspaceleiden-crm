@@ -1,22 +1,19 @@
-from django.core.management.base import BaseCommand, CommandError
-
-from simple_history.models import HistoricalRecords
-from members.models import User
-from members.models import Tag, User
-from selfservice.models import WiFiNetwork
-
 # import sys,os
 import argparse
 
-""" 
-Imports SSID-password pairs for the network according to the following table format:
+from django.core.management.base import BaseCommand
 
-| SSID            | PSK          |
-| MakerSpace-5GHz | SomePassword |
-"""
+from selfservice.models import WiFiNetwork
 
 
 class Command(BaseCommand):
+    """
+    Imports SSID-password pairs for the network according to the following table format:
+
+    | SSID            | PSK          | staff only |
+    | MakerSpace-5GHz | SomePassword | 0 or 1     |
+    """
+
     help = "Import CSV file with SSID/Password pairs for the wifi"
 
     def add_arguments(self, parser):
@@ -27,7 +24,11 @@ class Command(BaseCommand):
             for line in file:
                 line.strip()
                 print(line)
-                network, password = line.split(",")
+                network, password, staffOnly = line.split(",")
+                if int(staffOnly) > 0:
+                    staffOnly = True
+                else:
+                    staffOnly = False
 
                 if network == "name" or network.startswith("#"):
                     continue
@@ -35,6 +36,7 @@ class Command(BaseCommand):
                 wifi, wasCreated = WiFiNetwork.objects.get_or_create(network=network)
                 wifi.network = network
                 wifi.password = password
+                wifi.adminsonly = staffOnly
 
                 if wasCreated:
                     wifi.changeReason = "Added during bulk import."

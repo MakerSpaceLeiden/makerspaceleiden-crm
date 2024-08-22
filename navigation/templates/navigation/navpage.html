@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load isingroup %}
+
+{% block content %}
+
+<style>
+    .custom-nav-menu li {
+        list-style-type: none;
+    }
+
+</style>
+
+    <div class="row">
+        <div class="col-12 col-lg-2 mb-0 me-3">
+            <h2>Profile Settings</h2>
+            <ul class="nav flex-column custom-nav-menu">
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'personal_page' %}">Personal profile </a></li>
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'userdetails' %}">Change personal details</a></li>
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'password_change' %}">Change password</a></li>
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'mytransactions' %}">Cash balance</a></li>
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'mailinglists_edit' %}">Mailing lists subscriptions</a></li>
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'notification_settings' %}">Notifications</a></li>
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'boxes' %}">Member box</a></li>
+
+            </ul>
+        </div>
+        <div class="col-12 col-lg-2 me-3">
+            <h2>Machines & Community</h2>
+            <ul class="nav flex-column custom-nav-menu">
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'overview' %}">All members</a></li>
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'machine_list' %}">Machines</a></li>
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'chores' %}">Chore volunteer registration </a></li>
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'add_instruction' %}">Record instructions</a></li>
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'mytransactions' %}">Manage SpaceTegoed</a></li>
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'invoice' src=user.id %}">Pay for a product</a></li>
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'boxes' %}">Members boxes</a></li>
+                {%  if settings.STORAGE %}
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'storage' %}">Storage management</a></li>
+                {% endif %}
+                {% if settings.GRAND_AMNESTY %}
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'amnesty' %}">Grand amnesty</a></li>
+                {% endif %}
+            </ul>
+        </div>
+        <div class="col-12 col-lg-2 me-3">
+            <h2>Current Events</h2>
+            <ul class="nav flex-column custom-nav-menu">
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'space_state' %}">Who is there now</a></li>
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'space_state' %}">Machines in use</a></li>
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'motd_messages' %}">Message of the day</a></li>
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'ufo' %}">UFO lost and found</a></li>
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'camindex' %}">Live printer camera</a></li>
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="/crm/kwh">Power consumption of the space</a></li>
+            </ul>
+        </div>
+        <div class="col-12 col-lg-2 me-3">
+            <h2>Wiki & Public Info</h2>
+            <ul class="nav flex-column custom-nav-menu">
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="https://wiki.makerspaceleiden.nl/">Wiki documentation</a></li>
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Categorie:Tool">Tools</a></li>
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Makerspace_Leiden#Veiligheid_en_geluidsproductie">Safety and noise production</a></li>
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Makerspace_Leiden#Procedures_en_Principes">Procedures and principles</a></li>
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Nieuw_artikel_aanmaken">Create a new wiki</a></li>
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Nieuweblog">Create a new blog article</a></li>
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="https://makerspaceleiden.nl">Members projects</a></li>
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="https://makerspaceleiden.nl">About Us</a></li>
+            </ul>
+        </div>
+        {% if user.is_privileged or user|isPettycashAdmin or user|isTreasurer or user|isMainsAdmin %}
+            <div class="col-12 col-lg-2 me-0">
+                <h2>Trustee</h2>
+                <ul class="nav flex-column custom-nav-menu">
+                {% if user.is_privileged %}
+                    <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'newmember' %}">Add a new member</a></li>
+                    <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'pending' %}">Instructions pending approval</a></li>
+                    <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'missing_doors' %}">People with no doors or tags</a></li>
+                    <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'missing_forms' %}">Missing waivers</a></li>
+                    <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'filed_forms' %}">Filed waivers</a></li>
+                    <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'admin:index' %}">Raw database access</a></li>
+                    <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'unknowntags' %}">Unknown tags</a></li>
+                    <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'acl-index' %}">Permit use</a></li>
+                    <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'cam53upload' %}">Upload member transactions</a></li>
+                    <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'mailinglists_subs' %}">Members mailing list subscriptions</a></li>
+                {% endif %}
+                {% if user.is_privileged or user|isMainsAdmin %}
+                    <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'mainsindex' %}">Lucas MainsSensors</a></li>
+                    <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="/api/v1/mainssensor/resolve">Sensor descriptions</a></li>
+                {% endif %}
+                {% if user.is_privileged or user|isPettycashAdmin or user|isTreasurer %}
+                    <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'unpaired' %}">Payment stations</a></li>
+                {% endif %}
+                </ul>
+            </div>
+        {% endif %}
+    </div>
+
+{% endblock %}

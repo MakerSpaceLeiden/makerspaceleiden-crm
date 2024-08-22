@@ -2,12 +2,12 @@
 
 {% block content %}
 
+{% if products %}
+  <h2>Products</h2>
 Select one of the products below to pre-populate the form with the right data. Or enter any description and amount in the form (up to a 100 euro).
 
 Once you've done that - press pay.
 
-{% if products %}
-  <h2>Products</h2>
   <table>
     <tr>
       <th>Name</th>
@@ -22,7 +22,7 @@ Once you've done that - press pay.
       <td>{{item.amount}}</td>
       <td>
         <a href="{% url 'pay' %}?description={{item.description}}&amount={{item.amount.amount}}">Pay</a>
-	for this or use this 
+	for this or use this
         <a href="{% url 'qrcode' %}?description={{item.description}}&amount={{item.amount.amount}}">QR-code</a>
       </td>
     </tr>

@@ -1,7 +1,4 @@
-from django import forms
-from django.contrib.auth.forms import UserCreationForm
 from django.forms import ModelForm
-from django.conf import settings
 
 from .models import Subscription
 
@@ -9,7 +6,8 @@ from .models import Subscription
 class SubscriptionForm(ModelForm):
     class Meta:
         model = Subscription
-        labels = {"active": "Subcribed", "digest": "Receive in digest form"}
+        # labels = {"active": "Subcribed", "digest": "Receive in digest form"}
+        labels = {"active": "Subcribed"}
         fields = [
             "active",
             "digest",

@@ -1,7 +1,6 @@
 import re
 from collections import namedtuple
 
-
 STORAGES = {
     "L": {
         "description": "Left cabinet (near door)",

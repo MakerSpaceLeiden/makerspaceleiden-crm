@@ -2,12 +2,26 @@
 
 {% block content %}
 
-Select one of the products below to pre-populate the form with the right data. Or enter any description and amount in the form (up to a 100 euro).
 
-Once you've done that - press pay.
+Enter any description and amount in the form (up to a 100 euro) and press pay to pay. Or alternatively select something from the pricelist below.
+
+  <h2>{{ label }}</h2>
+  <form method="post"  enctype="multipart/form-data">
+  <table>
+    {% csrf_token %}
+    {{ form.as_table }}
+    <tr><td></td><td>
+	      <button name="submit" value="pay" type="submit">{{ action }}</button> <br>
+<i>You have not yet paid; press this button to pay</i>.
+    </td></tr>
+  </table>
+  </form>
 
 {% if products %}
   <h2>Products</h2>
+Select one of the products below to pre-populate the form with the right data.
+<p>
+
   <table>
     <tr>
       <th>Name</th>
@@ -22,7 +36,7 @@ Once you've done that - press pay.
       <td>{{item.amount}}</td>
       <td>
         <a href="{% url 'pay' %}?description={{item.description}}&amount={{item.amount.amount}}">Pay</a>
-	for this or use this 
+	for this or use this
         <a href="{% url 'qrcode' %}?description={{item.description}}&amount={{item.amount.amount}}">QR-code</a>
       </td>
     </tr>
@@ -32,17 +46,6 @@ Once you've done that - press pay.
 <p>
 
 
-  <h2>{{ label }}</h2>
-  <form method="post"  enctype="multipart/form-data">
-  <table>
-    {% csrf_token %}
-    {{ form.as_table }}
-    <tr><td></td><td>
-	      <button name="submit" value="pay" type="submit">{{ action }}</button> <br>
-<i>You have not yet paid; press this button to pay</i>.
-    </td></tr>
-  </table>
-  </form>
   </p>
 
 <hr>

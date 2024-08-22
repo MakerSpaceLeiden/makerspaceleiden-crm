@@ -1,8 +1,8 @@
-from django import forms
-from django.contrib.auth.forms import UserCreationForm
-from .models import Memberbox
-from django.forms import ModelForm
 import re
+
+from django.forms import ModelForm
+
+from .models import Memberbox
 
 
 class NewMemberboxForm(ModelForm):

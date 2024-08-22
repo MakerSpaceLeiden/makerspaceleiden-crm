@@ -109,10 +109,10 @@ share
 .sqlite
 .sqlite3
 venv
-static
+/static
+!search_admin_autocomplete/static
 
 initial_populate
-*/migrations/0*.py
 *.swp
 
 makerspaceleiden/local.py

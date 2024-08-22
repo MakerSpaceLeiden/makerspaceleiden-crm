@@ -1,15 +1,8 @@
-from django.core.management.base import BaseCommand, CommandError
+import sys
 
-from django.conf import settings
-from django.core.mail import EmailMessage
-from django.db.models import Q
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.management.base import BaseCommand
 
-from pettycash.models import PettycashBalanceCache, PettycashTransaction
-from members.models import User
-
-import sys, os
-import datetime
+from pettycash.models import PettycashBalanceCache
 
 
 class Command(BaseCommand):
@@ -18,12 +11,13 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         rc = 0
 
-        print("# Member,Balance,lastchange")
+        #        print("# Member,Balance,lastchange")
+        print("# Member,Balance")
 
         for balance in PettycashBalanceCache.objects.all():
-            dt = "None"
-            if balance.last:
-                dt = balance.last.date
+            dt = "Never"
+            if balance.lasttxdate:
+                dt = balance.lasttxdate
 
             print("%s,%s,%s" % (balance.owner, balance.balance, dt))
 

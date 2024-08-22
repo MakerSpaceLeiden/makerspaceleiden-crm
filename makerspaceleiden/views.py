@@ -1,8 +1,14 @@
-from django.http import HttpResponseRedirect, HttpResponse
+from django.contrib.admin.sites import AdminSite
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
+from django.shortcuts import render
+from simple_history.admin import SimpleHistoryAdmin
+
+from storage.forms import StorageForm
+from storage.models import Storage
 
 
 class MySimpleHistoryAdmin(SimpleHistoryAdmin):
-
     object_history_template = "object_history.html"
 
     # Bit risky - routes in to bypass for naughtyness in below showhistory.
@@ -15,7 +21,7 @@ class MySimpleHistoryAdmin(SimpleHistoryAdmin):
 def showhistory(request, aClass, pk, rev=None):
     try:
         o = aClass.objects.get(pk=pk)
-    except DoesNotExist:
+    except o.DoesNotExist:
         return HttpResponse(
             "History not found", pk, status=404, content_type="text/plain"
         )

@@ -1,0 +1,20 @@
+{% load static %}
+
+<head>
+    <link rel="stylesheet" type="text/css" href="{% block stylesheet_motd %}{% static "motd/css/styles.css" %}{% endblock %}">
+</head>
+
+
+{% if motd_items %}
+<div id="motd-bar" class="custom-motd-bar">
+    <div class="motd-text" id="motd-text">
+    {% for motd_item in motd_items %}
+    <a href="{% url 'motd_messages_detail'  pk=motd_item.pk %}">
+            <span class="motd-message">{{ motd_item.motd }}</span>
+        </a>
+    {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<script src="{% static 'motd/js/motd_animation.js' %}"></script>

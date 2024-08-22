@@ -1,22 +1,24 @@
-from lxml import etree
+import base64
+import hashlib
+import hmac
 import re
-from django.core.management.base import BaseCommand, CommandError
 
 from django.conf import settings
-from django.core.mail import EmailMessage
-from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q
+from lxml import etree
+from moneyed import EUR, Money
 
-from pettycash.models import PettycashBalanceCache, PettycashTransaction
 from members.models import User
-
-from moneyed import Money, EUR
-
-import sys, os
-import datetime
+from pettycash.models import PettycashTransaction
 
 
-def camt53_process(file):
+def camt53_process(
+    file,
+    triggerwords=["space", "tegoed", "zwarte pot", "zwartepot", "storting", "spacepot"],
+    uidmapping=(),
+    nouidcheck=False,
+):
     print(file)
     xmlparser = etree.XMLParser(
         ns_clean=True, remove_blank_text=True, remove_comments=True, no_network=True
@@ -30,16 +32,20 @@ def camt53_process(file):
     for e in triodos.xpath(
         "/camt:Document/camt:BkToCstmrStmt/camt:Stmt/camt:Ntry", namespaces=namespaces
     ):
-        results.append(process(e, namespaces))
+        results.append(process(e, namespaces, triggerwords, uidmapping, nouidcheck))
 
     return results
 
 
-def process(e, namespaces):
-    ref = e.xpath("camt:NtryRef/text()", namespaces=namespaces)[0]
+def process(e, namespaces, triggerwords, uidmapping, nouidcheck=False, maskiban=True):
     out = {}
+
+    ref = e.xpath("camt:NtryRef/text()", namespaces=namespaces)[0]
     out["ref"] = ref
     out["success"] = False
+
+    dte = e.xpath("camt:BookgDt/camt:Dt/text()", namespaces=namespaces)[0]
+    out["date"] = dte
 
     tpe = e.xpath("camt:CdtDbtInd/text()", namespaces=namespaces)[0]
     if tpe == "CRDT":
@@ -91,7 +97,30 @@ def process(e, namespaces):
         ]
         if item is not None and item != ""
     )[0]
-    iban_str = "%s*****%s" % (iban_str[0:8], iban_str[-3:])
+
+    # Rather than hash just the IBAN; we mix in our (production) secret key to make it
+    # a bit more resistant against, say, a dictionary search based on a list of all
+    # Dutch bank accounts (these things are floating around on the internet).
+    #
+    iban_keyed_hash = base64.b64encode(
+        hmac.new(
+            settings.SECRET_KEY.encode("utf-8"),
+            iban_str.encode("ASCII"),
+            hashlib.sha256,
+        ).digest()
+    )
+
+    valdigits = 0
+    try:
+        valdigits = int(iban_str[2:4])
+    except Exception as e:
+        # out["msg"] = "Skipping - could not convert/parse IBAN for check digits."
+        # return out
+        valdigits = 0
+
+    iban_raw = iban_str
+    if maskiban:
+        iban_str = "%s*****%s" % (iban_str[0:8], iban_str[-3:])
 
     details = e.xpath(
         "camt:NtryDtls/camt:TxDtls/camt:AddtlTxInf/text()", namespaces=namespaces
@@ -102,6 +131,8 @@ def process(e, namespaces):
         details = ""
 
     out["iban_str"] = iban_str
+    out["iban_keyed_has"] = iban_keyed_hash
+    out["iban_valdigits"] = valdigits
     out["name_str"] = name_str
     out["details"] = details
 
@@ -128,57 +159,72 @@ def process(e, namespaces):
         out["error"] = True
         return out
 
-    matches = [
-        w
-        for w in ["space", "tegoed", "zwarte pot", "zwartepot", "storting", "spacepot"]
-        if w in details.lower()
-    ]
-    if len(matches) < 2:
-        out["msg"] = "Skipping - not enough trigger words"
+    matches = [w for w in triggerwords if w in details.lower()]
+    if len(matches) < 1:
+        out["msg"] = "Skipping - not enough trigger words "
         return out
 
-    m = re.search(r"\b(\d+)\b", details)
-    if not m:
-        out["msg"] = "ERROR Skipping - no uid"
-        out["error"] = True
-        return out
-
-    try:
-        uid = int(m.group(0))
-    except:
-        out["msg"] = "ERROR - Skipping - uid could not be parsed"
-        out["error"] = True
-        return out
-
-    MAX_UID = 10000
-    if uid <= 0 or uid > MAX_UID:
-        out["msg"] = "ERROR - Skipping no usabable user id"
-        out["error"] = True
-        return out
-
-    try:
-        user = User.objects.get(pk=uid)
-        out["user"] = user
-    except:
-        out["msg"] = "ERROR - Skipping, no user with uid=%d" % uid
-        out["error"] = True
-        return out
-
-    try:
-        h = PettycashTransaction.history.filter(Q(history_change_reason__contains=ref))
-        if h.count() > 0:
-            out["msg"] = (
-                "ERROR - Skipping, already %d transction(s) in the history with identifier=%s: first:%s"
-                % (h.count(), ref, h.first())
+    uid = 0
+    if uidmapping:
+        hits = [line for line in uidmapping.keys() if iban_raw in line]
+        if len(hits) == 0:
+            out["msg"] = "ERROR Skipping - no ibanstr to map to uid"
+            out["error"] = True
+            return out
+        if len(hits) > 1:
+            out["msg"] = "ERROR Skipping - {} appears for multiple UIDs".format(
+                iban_str
             )
             out["error"] = True
             return out
-    except ObjectDoesNotExist as e:
-        pass
-    except Exception as e:
-        out["msg"] = "ERROR - Skipping, error looking up '%s': %s" % (ref, e)
+        uid = int(uidmapping[hits[0]])
+
+    if uid == 0:
+        m = re.search(r"\b(\d+)\b", details)
+        if m:
+            try:
+                uid = int(m.group(0))
+            except Exception:
+                out["msg"] = "ERROR - Skipping - uid could not be parsed"
+                out["error"] = True
+                return out
+
+    MAX_UID = 10000
+    if uid <= 0 or uid > MAX_UID:
+        out["msg"] = "ERROR - Skipping -- no usabable user id"
         out["error"] = True
         return out
+
+    if nouidcheck:
+        out["uid"] = uid
+        user, created = User.objects.get_or_create(email=uid)
+        user.last_name = name_str
+    else:
+        try:
+            user = User.objects.get(pk=uid)
+            out["user"] = user
+        except Exception:
+            out["msg"] = "ERROR - Skipping, no user with uid=%d" % uid
+            out["error"] = True
+            return out
+
+        try:
+            h = PettycashTransaction.history.filter(
+                Q(history_change_reason__contains=ref)
+            )
+            if h.count() > 0:
+                out["msg"] = (
+                    "ERROR - Skipping, already %d transction(s) in the history with identifier=%s: first:%s"
+                    % (h.count(), ref, h.first())
+                )
+                out["error"] = True
+                return out
+        except ObjectDoesNotExist:
+            pass
+        except Exception as e:
+            out["msg"] = "ERROR - Skipping, error looking up '%s': %s" % (ref, e)
+            out["error"] = True
+            return out
 
     out["success"] = True
     out["description"] = "Deposit by %s, %s" % (name_str, iban_str)

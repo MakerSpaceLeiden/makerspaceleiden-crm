@@ -1,13 +1,11 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
-from .models import Tag, clean_tag_string, AuditRecord
 from django.forms import ModelForm
 
+from mailinglists.models import Mailinglist
 from members.models import User
-from mailinglists.models import Mailinglist, Subscription
 from unknowntags.models import Unknowntag
 
-import re
+from .models import AuditRecord, Tag, clean_tag_string
 
 
 class NewTagForm(ModelForm):
@@ -74,10 +72,11 @@ class NewUserForm(forms.Form):
     )
     activate_doors = forms.BooleanField(
         initial=True,
+        required=False,
         help_text="Also give this user door permits if they did not have it yet. Only applicable if above tag is specified.",
     )
     mailing_lists = forms.ModelMultipleChoiceField(
-        queryset=Mailinglist.objects.all(),
+        queryset=Mailinglist.objects.filter(hidden=False),
         required=False,
         help_text="Lists to initially subscribe the user to.",
         widget=forms.CheckboxSelectMultiple(attrs={"checked": ""}),

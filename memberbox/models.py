@@ -1,18 +1,20 @@
-from django.db import models
-from django.conf import settings
-from django.contrib.auth import get_user_model
-from simple_history.models import HistoricalRecords
-from members.models import User
-from stdimage.models import StdImageField
-from django.db.models.signals import pre_delete, pre_save
+import logging
 
-# from stdimage.utils import pre_delete_delete_callback, pre_save_delete_callback
-from makerspaceleiden.utils import upload_to_pattern
+from django.conf import settings
+from django.core.mail import EmailMessage
+from django.db import models
+from django.template.loader import render_to_string
+from django.urls import reverse
+from simple_history.models import HistoricalRecords
+from stdimage.models import StdImageField
+
 from django.urls import reverse
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string, get_template
 
 from makerspaceleiden.mail import emailPlain, emails_for_group
+from makerspaceleiden.utils import upload_to_pattern
+from members.models import User
 
 import logging
 
@@ -43,9 +45,9 @@ class Memberbox(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     history = HistoricalRecords()
 
-    def url(self):
-        return settings.BASE + self.path()
-
+    # Return the relative path of this member (we do not
+    # yet have a page for the box(es) of a member.
+    #
     def url(self):
         return reverse("overview", kwargs={"member_id": self.id})
 

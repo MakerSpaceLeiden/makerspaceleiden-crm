@@ -2,7 +2,7 @@ Subject:  "[makerbot] Account balance {{ user}} {{ balance.balance }}
 
 Dear {{ user }},
 
-Your current account balanace is {{ balance.balance }}; which means that 
+Your current account balanace is {{ balance.balance }}; which means that
 you {% if goodstanding  %}do not have to do anything.
 {% else %}should do a payment as soon as possible.
 
@@ -11,6 +11,10 @@ to the {{ settings.PETTYCASH_IBAN }} its bank account.
 
 You can find the account details and a QR code (if your bank supports
 this) on {{ base }}{% url 'manual_deposit' %}.
+
+With regard to the deposits into the bank acount; last import of the
+bank-statements with your deposits was done on {{ last_import.date}}
+by {{ last_import.by }}.
 {% endif %}
 
 See {{ base }}{% url 'mytransactions' %} for the full details.
@@ -21,7 +25,7 @@ the makerspace bot, on behalf of the trustees (bestuur@makerspaceleiden.nl).
 
 
 {% for tx in transactions %}
-{% if tx.src == who and tx.dst == who %}
+{% if tx.src == user and tx.dst == user %}
 Balance previous billing cycle      {{ tx.amount}}
 {% else %}{% if tx.src == user %}{{tx.date}} {{ tx.description }}
                                  af {{ tx.amount }}
@@ -32,4 +36,3 @@ Balance previous billing cycle      {{ tx.amount}}
                           Balance   {{ balance.balance }}
 
 See more at {{ base }}{% url 'transactions' pk=user.id%}
-

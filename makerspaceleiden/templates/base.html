@@ -1,104 +1,144 @@
-{% load i18n static %}<!DOCTYPE html>
+{% load i18n static %}
+{% load django_bootstrap5 %}
+{% load motd_tag %}
+{% load isingroup %}
+
+<!DOCTYPE html>
 {% get_current_language as LANGUAGE_CODE %}{% get_current_language_bidi as LANGUAGE_BIDI %}
 <html lang="{{ LANGUAGE_CODE|default:"en-us" }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
+
 <head>
-<title>{% block title %}{% endblock %}</title>
-<link rel="stylesheet" type="text/css" href="{% block stylesheet %}{% static "admin/css/base.css" %}{% endblock %}">
-{% block extrastyle %}{% endblock %}
-{% if LANGUAGE_BIDI %}<link rel="stylesheet" type="text/css" href="{% block stylesheet_rtl %}{% static "admin/css/rtl.css" %}{% endblock %}">{% endif %}
-{% block extrahead %}{% endblock %}
-{% block responsive %}
-    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="{% static "admin/css/responsive.css" %}">
-    {% if LANGUAGE_BIDI %}<link rel="stylesheet" type="text/css" href="{% static "admin/css/responsive_rtl.css" %}">{% endif %}
-{% endblock %}
-{% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE">{% endblock %}
-</head>
-{% load i18n %}
+    <title>{% block title %}{% endblock %}</title>
 
-<body class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}"
-  data-admin-utc-offset="{% now "Z" %}">
+    <link rel="stylesheet" type="text/css" href="{% block stylesheet_base %}{% static "admin/css/base.css" %}{% endblock %}">
+    <link rel="stylesheet" type="text/css" href="{% block stylesheet_custom %}{% static "makerspaceleiden/css/styles.css" %}{% endblock %}">
+    <link rel="stylesheet" type="text/css" href="{% block stylesheet_fontawesome %}{% static "fontawesome/css/all.min.css" %}{% endblock %}">
+    {% bootstrap_css %}
 
-<!-- Container -->
-<div id="container">
-
-    {% if not is_popup %}
-    <!-- Header -->
-    <div id="header">
-        <div id="branding"> 
-        {% block branding %}Makerspace Leiden{% endblock %}
-        </div>
-        {% block usertools %}
-	{%if has_permission %}
-        <div id="user-tools">
-            {% block welcome-msg %}
-                {% trans 'Welcome,' %}
-                <strong>{% firstof user.get_short_name user.get_username %}</strong>.
-{% if user.is_privileged %}<b>(admin)</b>
-   {% if not user.is_superuser %}
-	/ <a href="{% url 'drop' %}">[drop]</a> / 
-   {% endif %}
-{% else %}
-   {% if user.can_escalate_to_priveleged %}
-	/ <a href="{% url 'sudo' %}">[SUDO]</a> /
-   {% endif %}
-{% endif %}
-            {% endblock %}
-            {% block userlinks %}
-                {% if site_url %}
-                    <a href="{{ site_url }}">{% trans 'View site' %}</a> /
-                {% else %}
-                    <a href="{% url 'index' %}">{% trans 'home' %}</a> /
-                {% endif %}
-                {% if user.is_active and user.is_priveleged %}
-                    {% url 'django-admindocs-docroot' as docsroot %}
-                    {% if docsroot %}
-                        <a href="{{ docsroot }}">{% trans 'Documentation' %}</a> /
-                    {% endif %}
-                {% endif %}
-                {% if user.has_usable_password %}
-                <a href="{% url 'password_change' %}">{% trans 'Change password' %}</a> /
-                {% endif %}
-                <a href="{% url 'logout' %}">{% trans 'Log out' %}</a>
-            {% endblock %}
-        </div>
-	{% endif %}
-        {% endblock %}
-        {% block nav-global %}{% endblock %}
-    </div>
-    <!-- END Header base -->
-    {% block breadcrumbs %}
-    <div class="breadcrumbs">
-    <a href="{% url 'index' %}">{% trans 'Home' %}</a>
-    {% if title %} &rsaquo; {{ title }}{% endif %}
-    </div>
-    {% endblock %}
+    {% block extrastyle %}{% endblock %}
+    {% if LANGUAGE_BIDI %}
+        <link rel="stylesheet" type="text/css" href="{% block stylesheet_rtl %}{% static "admin/css/rtl.css" %}{% endblock %}">
     {% endif %}
+    {% block extrahead %}{% endblock %}
+    {% block responsive %}
+        <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0">
+        <link rel="stylesheet" type="text/css" href="{% static "admin/css/responsive.css" %}">
+        {% if LANGUAGE_BIDI %}<link rel="stylesheet" type="text/css" href="{% static "admin/css/responsive_rtl.css" %}">{% endif %}
+    {% endblock %}
+    {% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE">{% endblock %}
+</head>
 
-    {% block messages %}
-        {% if messages %}
-        <ul class="messagelist">{% for message in messages %}
-          <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|capfirst }}</li>
-        {% endfor %}</ul>
+{% load i18n %}
+<body class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}" data-admin-utc-offset="{% now "Z" %}">
+
+    <!-- Container -->
+    <div id="container">
+        {% if not is_popup %}
+            <!-- Header -->
+            <div id="header">
+                <div class="container">
+                    <div class="row align-items-left">
+                        <div class="col">
+                            {% block branding %}
+                            <div class= "branding makerspace-name-div">
+                                <a class="makerspace-name" href="{% url 'index' %}">Makerspace Leiden</a>
+                            </div>
+                            {% endblock %}
+                        </div>
+
+                        {% if has_permission %}
+                        <div class="col">
+                            <div class="d-flex justify-content-end">
+                                {% block usertools %}
+                                <div class="">
+                                    <div class= "user-tools fs-6">
+                                        {% block welcome-msg %}
+                                        {% if user.is_privileged %}
+                                            <small> <a href="" class="admin-info" title="You are logged in as an admin" style="font-size: 11px">(ADMIN)</a></small>
+                                            {% if not user.is_superuser %}
+                                                <small><a href="{% url 'drop' %}" title="Stop temporary admin privileges" style="font-size: 11px">| [STOP ADMIN PRIV]</a></small>
+                                            {% endif %}
+                                        {% else %}
+                                            {% if user.can_escalate_to_priveleged %}
+                                            <small> <a href="{% url 'sudo' %}" title="Request temporary admin privileges" style="font-size: 11px">[REQUEST ADMIN PRIV]</a></small>
+                                            {% endif %}
+                                        {% endif %}
+                                        {% endblock %}
+                                    </div>
+                                </div>
+                                {% endblock %}
+                                <div class="user-profile-icon">
+                                    <button class="btn btn-light rounded-circle" id="user-profile-button" onclick="window.location.href='{% url 'personal_page' %}'" title="Personal profile">
+                                        <i class="fa-solid fa-user ms-0" style="color: #417690;"></i>
+                                    </button>
+                                </div>
+                                <div class="log-out-icon">
+                                    <button class="btn btn-light rounded-circle" id="log-out-button" onclick="window.location.href='{% url 'logout' %}'" title="Logout">
+                                        <i class="fas fa-right-from-bracket ms-0" style="color: #417690;"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                            {% endif %}
+                            {% block nav-global %}
+                            {% endblock %}
+                    </div>
+                </div>
+            </div>
+            {% if user.is_authenticated %}
+                <div class="dark-color-bar">
+                    <div class="navbar-block">
+                        {% block navbar %}
+                            {% include 'navigation/navbar.html' %}
+                        {% endblock %}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if user.is_authenticated %}
+                <div class="motd-bar-block">
+                    {% block motd %}
+                        {% if include_motd %}
+                            {% render_motd %}
+                        {% endif %}
+                    {% endblock %}
+                </div>
+            {% endif %}
+
         {% endif %}
-    {% endblock messages %}
 
-    <!-- Content -->
-    <div id="content" class="{% block coltype %}colM{% endblock %}">
-        {% block pretitle %}{% endblock %}
-        {% block content_title %}{% if title %}<h1>{{ title }}</h1>{% endif %}{% endblock %}
-        {% block content %}
-        {% block object-tools %}{% endblock %}
-        {{ content }}
-        {% endblock %}
-        {% block sidebar %}{% endblock %}
-        <br class="clear">
+        {% block messages %}
+            {% if messages %}
+            <ul class="messagelist">
+                {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|capfirst }}</li>
+                {% endfor %}</ul>
+            {% endif %}
+        {% endblock messages %}
+
+        <!-- Content -->
+        <div id="content" class="{% block coltype %}colM{% endblock %}">
+            <div class="container">
+            {% block pretitle %}{% endblock %}
+            {% block content_title %}
+                {% if title %}<h1>{{ title }}</h1>{% endif %}
+            {% endblock %}
+            {% block content %}
+            {% block object-tools %}{% endblock %}
+                {{ content }}
+            {% endblock %}
+            {% block sidebar %}{% endblock %}
+            <br class="clear">
+        </div>
+        </div>
+
+        <!-- Footer -->
+        {% block footer %}<div id="footer"></div>{% endblock %}
     </div>
-    <!-- END Content -->
 
-    {% block footer %}<div id="footer"></div>{% endblock %}
-</div>
-<!-- END Container -->
+    {% block scripts %}
+        {% bootstrap_javascript %}
+    {% endblock %}
 
 </body>
 </html>

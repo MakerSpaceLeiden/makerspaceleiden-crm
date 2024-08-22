@@ -1,45 +1,52 @@
+import json
+import logging
 import re
+import sys
 
-from django.contrib.sites.shortcuts import get_current_site
-from django.utils.encoding import force_bytes, force_text
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.template.loader import render_to_string
-from django.http import HttpResponse
-from django.contrib.auth.decorators import login_required
+import six
 from django import forms
-from django.shortcuts import render, redirect
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.db.models import Q
+from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import EmailMessage
-from django.urls import reverse
+from django.db.models import Q
 from django.forms import widgets
+from django.http import HttpResponse
+from django.shortcuts import redirect, render
+from django.template.loader import render_to_string
+from django.urls import reverse
+from django.utils.encoding import force_bytes, force_str
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 
-from makerspaceleiden.decorators import superuser_or_bearer_required
-
-from .forms import TabledCheckboxSelectMultiple
-
-from django.conf import settings
-
-import logging
-import json
-import sys
-import six
-
-from members.models import User
-from acl.models import Machine, Entitlement, PermitType
-from selfservice.forms import (
-    UserForm,
-    SignalNotificationSettingsForm,
-    EmailNotificationSettingsForm,
+from acl.models import Entitlement, Machine, PermitType
+from makerspaceleiden.decorators import (
+    is_superuser_or_bearer,
+    superuser_or_bearer_required,
+    superuser_required,
 )
+from members.models import User
+from selfservice.forms import (
+    EmailNotificationSettingsForm,
+    SignalNotificationSettingsForm,
+    UserForm,
+)
+
+from .aggregator_adapter import get_aggregator_adapter
+from .forms import TabledCheckboxSelectMultiple
 from .models import WiFiNetwork
 from .waiverform.waiverform import generate_waiverform_fd
-from .aggregator_adapter import get_aggregator_adapter
 
 
 def send_email_verification(
-    request, user, new_email, old_email=None, template="email_verification_email.txt"
+    request,
+    user,
+    new_email,
+    old_email=None,
+    template_user="email_verification_email.txt",
+    template_trustee="email_verification_email_inform.txt",
 ):
     current_site = get_current_site(request)
     subject = "Confirm your email adddress ({})".format(current_site.domain)
@@ -54,9 +61,11 @@ def send_email_verification(
         # 'uid': urlsafe_base64_encode(force_bytes(user.pk)).decode(),
         "uid": urlsafe_base64_encode(force_bytes(user.pk)),
         "token": email_check_token.make_token(user),
+        "noc_email": settings.DEFAULT_FROM_EMAIL,
+        "trustees_email": settings.TRUSTEES,
     }
 
-    msg = render_to_string(template, context)
+    msg = render_to_string(template_user, context)
     EmailMessage(
         subject, msg, to=[user.email], from_email=settings.DEFAULT_FROM_EMAIL
     ).send()
@@ -65,7 +74,7 @@ def send_email_verification(
         subject = "[spacebot] User {} {} is changing their email address".format(
             user.first_name, user.last_name
         )
-        msg = render_to_string("email_verification_email_inform.txt", context)
+        msg = render_to_string(template_trustee, context)
         EmailMessage(
             subject,
             msg,
@@ -202,6 +211,7 @@ def recordinstructions(request):
     if request.method == "POST" and form.is_valid():
         context["machines"] = []
         context["holder"] = []
+        holder = []
 
         for mid in form.cleaned_data["machine"]:
             try:
@@ -209,13 +219,13 @@ def recordinstructions(request):
                 if request.user.is_privileged and form.cleaned_data["issuer"]:
                     i = User.objects.get(pk=form.cleaned_data["issuer"])
                 else:
-                    i = user = request.user
+                    i = request.user
 
                 pt = None
                 if m.requires_permit:
                     pt = PermitType.objects.get(pk=m.requires_permit.id)
 
-                if pt == None:
+                if pt is None:
                     logger.error(f"{m} skipped - no permit - bug ?")
                     continue
 
@@ -252,7 +262,9 @@ def recordinstructions(request):
                     record.active = not pt.require_ok_trustee
                     try:
                         record.save(request=request)
-                        context["holder"].append(p)
+                        logger.error("Creation of {0} completed".format(record))
+                        holder.append(p)
+
                     except Exception as e:
                         logger.error("Updating of instructions failed: {0}".format(e))
                         return HttpResponse(
@@ -264,6 +276,9 @@ def recordinstructions(request):
                 context["created"] = created
                 context["machines"].append(m)
                 context["issuer"] = i
+                context["holder"] = list(
+                    set(holder)
+                )  # Using set() to remove duplicates
 
                 saved = True
             # except Exception as e:
@@ -289,9 +304,9 @@ def recordinstructions(request):
 
 
 @login_required
-def confirmemail(request, uidb64, token, newemail):
+def confirmemail(request, uidb64, token, new_email):
     try:
-        uid = force_text(urlsafe_base64_decode(uidb64))
+        uid = force_str(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=uid)
         if request.user != user:
             return HttpResponse(
@@ -299,31 +314,37 @@ def confirmemail(request, uidb64, token, newemail):
                 status=500,
                 content_type="text/plain",
             )
-        email = user.email
-        user.email = newemail
+        old_email = user.email
         if email_check_token.check_token(user, token):
-            user.email = newemail
+            user.email = new_email
             user.email_confirmed = True
             user.save()
+            send_email_verification(
+                request,
+                user,
+                new_email,
+                old_email,
+                template_user="email_confirm_email.txt",
+                template_trustee="email_confirm_email_inform.txt",
+            )
+            return render(request, "email_verification_ok.html")
         else:
             return HttpResponse(
                 "Failed to confirm", status=500, content_type="text/plain"
             )
 
         logger.debug(
-            "Change of email from '{}' to '{}' confirmed.".format(email, newemail)
+            "Change of email from '{}' to '{}' confirmed.".format(old_email, new_email)
         )
     except (TypeError, ValueError, OverflowError, User.DoesNotExist) as e:
         # We perhaps should not provide the end user with feedback -- e.g. prentent all
         # went well. As we do not want to function as an oracle.
         #
         logger.error("Something else went wrong in confirm email: {0}".format(e))
-        HttpResponse(
-            "Something went wrong. Sorry.", status=500, content_type="text/plain"
-        )
 
-    # return redirect('userdetails')
-    return render(request, "email_verification_ok.html")
+    return HttpResponse(
+        "Something went wrong. Sorry.", status=500, content_type="text/plain"
+    )
 
 
 @login_required
@@ -335,7 +356,7 @@ def waiverformredir(request):
 def waiverform(request, user_id=None):
     try:
         member = User.objects.get(pk=user_id)
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         return HttpResponse("User not found", status=404, content_type="text/plain")
     confirmation_url = request.build_absolute_uri(
         reverse("waiver_confirmation", kwargs=dict(user_id=user_id))
@@ -366,7 +387,7 @@ def confirm_waiver(request, user_id=None):
 
     try:
         member = User.objects.get(pk=user_id)
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         return HttpResponse("User not found", status=404, content_type="text/plain")
 
     if not operator_user.is_staff:
@@ -395,7 +416,7 @@ def telegram_connect(request):
 
     try:
         User.objects.get(pk=user.id)
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         return HttpResponse("User not found", status=404, content_type="text/plain")
 
     aggregator_adapter = get_aggregator_adapter()
@@ -421,7 +442,7 @@ def telegram_disconnect(request):
 
     try:
         User.objects.get(pk=user.id)
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         return HttpResponse("User not found", status=404, content_type="text/plain")
 
     aggregator_adapter = get_aggregator_adapter()
@@ -453,7 +474,7 @@ def signal_disconnect(request):
 
     try:
         User.objects.get(pk=user.id)
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         return HttpResponse("User not found", status=404, content_type="text/plain")
 
     user.uses_signal = False
@@ -481,7 +502,7 @@ def notification_settings(request):
 
     try:
         User.objects.get(pk=user.id)
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         return HttpResponse("User not found", status=404, content_type="text/plain")
 
     aggregator_adapter = get_aggregator_adapter()
@@ -504,6 +525,7 @@ def notification_settings(request):
             "uses_email": (not user.uses_signal and not user.telegram_user_id)
             or user.always_uses_email,
             "user": user,
+            "has_permission": request.user.is_authenticated,
         },
     )
 
@@ -521,7 +543,7 @@ def save_signal_notification_settings(request):
 
     try:
         User.objects.get(pk=user.id)
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         return HttpResponse("User not found", status=404, content_type="text/plain")
 
     aggregator_adapter = get_aggregator_adapter()
@@ -555,7 +577,7 @@ def save_email_notification_settings(request):
 
     try:
         User.objects.get(pk=user.id)
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         return HttpResponse("User not found", status=404, content_type="text/plain")
 
     aggregator_adapter = get_aggregator_adapter()
@@ -586,7 +608,7 @@ def notification_test(request):
 
     try:
         User.objects.get(pk=user.id)
-    except ObjectDoesNotExist as e:
+    except ObjectDoesNotExist:
         return HttpResponse("User not found", status=404, content_type="text/plain")
 
     aggregator_adapter = get_aggregator_adapter()
@@ -610,17 +632,22 @@ def space_state(request):
             content_type="text/plain",
         )
 
+    context = {}
     aggregator_adapter = get_aggregator_adapter()
-    if not aggregator_adapter:
-        return HttpResponse(
-            "No aggregator configuration found", status=500, content_type="text/plain"
-        )
-    context = aggregator_adapter.fetch_state_space()
+
+    try:
+        context = aggregator_adapter.fetch_state_space()
+    except Exception as e:
+        logger.error("No data available, exception: {0}".format(str(e)))
+        context["no_data_available"] = True
+
     context["user"] = user
+    context["title"] = "State of the Space"
+    context["has_permission"] = request.user.is_authenticated
+
     return render(request, "space_state.html", context)
 
 
-@superuser_or_bearer_required
 def space_state_api(request):
     aggregator_adapter = get_aggregator_adapter()
     if not aggregator_adapter:
@@ -630,9 +657,16 @@ def space_state_api(request):
     context = aggregator_adapter.fetch_state_space()
 
     payload = {}
-    for e in ["space_open", "machines", "users_in_space", "lights_on"]:
+    l = 0
+    for e in ["space_open", "lights_on", "machines", "users_in_space"]:
         if e in context:
             payload[e] = context[e]
+            if e == "users_in_space":
+                l = len(context[e])
+    if not is_superuser_or_bearer(request):
+        payload = {}
+
+    payload["num_users_in_space"] = l
 
     return HttpResponse(
         json.dumps(payload).encode("utf8"), content_type="application/json"
@@ -714,8 +748,6 @@ def userdetails(request):
     if request.method == "POST":
         try:
             user = UserForm(request.POST, request.FILES, instance=request.user)
-            logger.error("DEBUG: {}".format(user))
-
             save_user = user.save(commit=False)
             if user.is_valid():
                 new_email = "{}".format(user.cleaned_data["email"])
@@ -825,3 +857,14 @@ def amnesty(request):
     context["form"] = form
 
     return render(request, "amnesty.html", context)
+
+
+@superuser_required
+def send_reset_email(request, uid):
+    user = User.objects.get(pk=uid)
+    template = "registration/password_reset_email.html"
+    form = PasswordResetForm({"email": user.email})
+    if form.is_valid():
+        form.save(email_template_name=template)
+
+    return redirect("overview", member_id=uid)

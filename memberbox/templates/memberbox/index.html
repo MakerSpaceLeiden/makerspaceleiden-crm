@@ -1,11 +1,29 @@
-<style type="text/css" media="print">
-    .dontprint { 
-	display: none; 
-    }
-</style>
 {% extends 'base.html' %}
-
 {% block content %}
+
+<style type="text/css" media="print">
+  .dontprint {
+	    display: none;
+    }
+
+  /* hides the navigation bar in base.html when printing */
+  .navbar-block {
+      display: none ;
+  }
+
+  /* hides the user-tools menu in base.html when printing */
+  .user-tools {
+      display: none ;
+  }
+
+  .user-profile-icon {
+      display: none ;
+  }
+
+  .log-out-icon {
+      display: none ;
+  }
+</style>
 
 <style>
     .showhover { display: none; }
@@ -106,7 +124,7 @@ The contents of the two main member cabinets along the long wall (on your left a
               </div>
 	        {% else %}
               <div class="box">
-              <i class="free">free</i>
+		      <a href="{% url 'claim' location=item.location %}"><i class="free">free</i></a>
 	        {% endif %}
             <div class="box-location">{{ item.location }}</div>
 		  </div>
@@ -139,6 +157,20 @@ In a few <i>exceptional</i> cases - there is permission for a member to store th
 </div>
 	</td>
 	<td>{{ item.extra_info }}</rd>
+  </tr>
+  {% endfor %}
+</table>
+{% endif %}
+
+{% if morethanone|length %}
+<h2>People having more than one storage box or item</h2>
+
+<table>
+  <tr><th>person</th><th>number of items</th><th></th></tr>
+  {% for person,count in morethanone.items %}
+  <tr>
+	  <td><a href="{{ person.path  }}">{{ person }}</a></td>
+	  <td>{{ count }}</td>
   </tr>
   {% endfor %}
 </table>

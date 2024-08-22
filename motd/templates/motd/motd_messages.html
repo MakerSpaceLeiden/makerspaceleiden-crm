@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% load django_bootstrap5 %}
+{% load static %}
+
+{% block content %}
+
+<div class="row mt-1">
+
+    <!-- Message text -->
+    <div class="col-md-9 order-0 order-md-0 pt-2">
+        <div class="card scrollable pt-0 pb-3" id="message-text">
+            <div class="card-body " style="max-height: 600px; min-height:250px; overflow-y: auto;">
+
+                {% if selected_message %}
+                    <div>
+                        <h1 class="card-title" >{{ selected_message.motd|urlize }}</h1>
+                    </div>
+                    {% if object_list %}
+                        <div class="card-text mt-4 mb-4" style="word-wrap: break-word; white-space: pre-wrap;">{{ selected_message.motd_details|urlize }}</div>
+                        <br>
+                            <div class="creation-info">
+                                <small>This message was posted by {{ created_by }} at {{ creation_date|date:"l j M Y H:i" }}.</small>
+                            </div>
+                            {% if is_updated %}
+                                <div class="update-info">
+                                    <small>This message was updated by {{ updated_by }} at {{ update_date|date:"l j M Y H:i" }}.</small>
+                                </div>
+                            {% endif %}
+                    {% endif %}
+                {% else %}
+                    <small>There are no messages.</small>
+                {% endif %}
+            </div>
+        </div>
+        <div>
+            <div class="row pt-2 pb-4">
+                <div class="col-auto pe-0">
+                    <button type="button" onclick="window.location.href='{% url 'index' %}'" class="btn btn-secondary">Back</button>
+                </div>
+                {% if selected_message %}
+                <div class="col-auto pe-0">
+                    <button type="button" onclick="window.location.href='{% url 'motd_update' selected_message.pk %}'" class="btn btn-primary">Edit</button>
+                </div>
+                {% endif %}
+                <div class="col-auto">
+                    <button type="button" onclick="window.location.href='{% url 'motd_create' %}'" class="btn btn-primary">Create New</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- List of messages -->
+    <div class="col-md-3 order-2 order-md-1 pt-1" id="list-of-messages">
+        <div>
+            <h2 style="margin-top:0 !important;">All messages</h2>
+        </div>
+        <div class="d-flex justify-content-between align-items-center">
+            <label class="form-check-label mb-0" for="toggleHistory" align="center">Include history</label>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" id="toggleHistory">
+            </div>
+        </div>
+        {% if object_list %}
+            <div class="scrollable rounded" style="max-height: 600px; overflow-y: auto;">
+                <ul class="list-group">
+                    {% for motd_item in object_list %}
+                    <a class="list-group-item list-group-item-action pt-2 pb-1 {% if selected_message.pk == motd_item.pk %}list-group-item-secondary{% endif %}" href="{% url 'motd_messages_detail' pk=motd_item.pk %}?show_history={{ show_history }}">
+                                <div class="row">
+                                    <div class="col text-secondary" align="center" style="font-size: 14px;  ">
+                                        {{ motd_item.startdate|date:"d-m-Y" }}{% if motd_item.startdate != motd_item.enddate %} - {{ motd_item.enddate|date:"d-m-Y" }}{% endif %}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        {% if motd_item.motd|length > 30 %}{{ motd_item.motd|slice:":30" }}...{% else %}{{ motd_item.motd }}{% endif %}
+                                    </div>
+                                </div>
+                            </a>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% else %}
+            <div class="mt-3">
+                There are no messages.
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get the toggle switch element
+        var showHistorySwitch = document.getElementById('toggleHistory');
+
+        // Get the value of show_history from the context variable
+        var showHistoryValue = "{{ show_history }}";
+
+        // Update switch state based on show_history value
+        if (showHistoryValue === 'on') {
+            showHistorySwitch.checked = true;
+        } else {
+            showHistorySwitch.checked = false;
+        }
+
+        // Add event listener for switch change
+        showHistorySwitch.addEventListener('change', function(event) {
+            var state = event.target.checked ? 'on' : 'off';
+            updateUrlParameter('show_history', state);
+        });
+
+        // Function to update URL parameter
+        function updateUrlParameter(key, value) {
+            var url = new URL(window.location.href);
+            url.searchParams.set(key, value);
+            window.location.href = url.toString();
+        }
+    });
+</script>
+
+{% endblock %}

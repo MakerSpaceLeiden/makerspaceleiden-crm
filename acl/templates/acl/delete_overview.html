@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% load qr_code  %}
+{% load django_bootstrap5 %}
+
+{% block content %}
+
+{% if not member.is_active %}
+<hr>
+<h1>WARNIG - DEACTIVATED ACCOUNT</h1>
+Last record change: {{ member.history.first.history_date }} {{ member.history.first.changeReason }}
+</hr>
+{% endif %}
+
+{% if lst %}
+<div class="row mt-3">
+    <h2 class="card-title">Confirmation to delete participant</h2>
+    <div class="col-xl-9 col-lg-12 col-sm-12">
+        <div class="card mb-4">
+            <div class="card-body pb-4">
+                <div>
+                   <h2 class="card-title">Personal Details</h2>
+                </div>
+                <dl class="row mb-1" >
+                    <dt class="col-sm-3 ">First Name:</dt>
+                    <dd class="col-sm-9">{{ member.first_name }}</dd>
+
+                    <dt class="col-sm-3 ">Last Name:</dt>
+                    <dd class="col-sm-9">{{ member.last_name }}</dd>
+
+                    <dt class="col-sm-3 ">Email:</dt>
+                    <dd class="col-sm-9">{{ member.email }}</dd>
+
+                    <dt class="col-sm-3 ">Phone:</dt>
+                    <dd class="col-sm-9">{{ member.phone_number }}</dd>
+
+                    <dt class="col-sm-3">Balance:</dt>
+                    {% if balance == 0 %}
+                    <dd class="col-sm-9"> &euro; 0,-</dd>
+                    {% else %}
+                    <dd class="col-sm-9"> {{ balance.balance }} </dd>
+                    {% endif %}
+
+                    <dt class="col-sm-3">Tags:</dt>
+                    <dd class="col-sm-9">
+                    {% if tags %}
+                       {% for tag in tags %}
+                          {{ tag.tag }}
+                          {% if tag.description %}
+                             <i>{{ tag.description }})</i>
+                          {% endif %}
+			  <br/>
+                          {% if tags.last_used %}
+                             {{ tag.last_used }}
+                          {% else %}
+                          Not used recently.
+                          {% endif %}
+                          <hr/>
+                      {% endfor %}
+                   {% else %}
+                      no tags
+                   {% endif %}
+		   </dd>
+                <dt class="col-sm-3">Boxes:</dt>
+                <dd class="col-sm-9">
+                {% if boxes %}
+                {% for box in boxes %}
+			{{ box.location }}
+                    {% if box.extra_info %}
+                    	<br/><i>{{ box.extra_info }}<i>
+                    {% endif %}
+                    {% if box.image %}
+                        <div class="mt-3 mb-2">
+                            <a href="{{ box.image.url }}"><img alt="" src="{{ box.image.thumbnail.url  }}"/></a>
+                        </div>
+                    {% endif %}
+		    <hr/>
+                {% endfor %}
+                {% else %}
+			No box assigned yet.
+                {% endif %}
+		</dd>
+                <dt class="col-sm-3">Storage:</dt>
+                <dd class="col-sm-9">
+                {% if storage %}
+                {% for box in storage %}
+                    {{ box.location }}<br/>
+                    {{ box.duration }} days until {{ box.enddate }}<br/>
+                    {{ box.extra_info }}<br/>
+                    {% if box.image %}
+                    <a href="{{ box.owner_path }}"><img alt="" src="{{ box.image.thumbnail.url }}"/></a><br/>
+                    {% endif %}
+		    <hr/>
+                {% endfor %}
+                {% else %}
+                    No items in special storage.
+                {% endif %}
+		</dd>
+                </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+    Confirm delete:
+    <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'machine_overview' member.id %}'">cancel</button>
+    <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'userdelete_confirm' member.id %}'">DELETE {{ member.name }}</button>
+{% endif %}
+{% endblock %}

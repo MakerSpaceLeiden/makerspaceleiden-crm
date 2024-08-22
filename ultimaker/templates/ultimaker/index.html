@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+	<script>
+	setInterval(() => {
+        	const cam = document.getElementById("snapshot");
+		cam.src = "snapshot?cachebust=" + new Date().getTime();
+	},10*1000);
+	</script>
+<img src="snapshot" id="snapshot"/>
+<p/>
+<i>press reload to refresh -- should refresh every 10 seconds or so</i>
+<p>
+
+{% endblock %}

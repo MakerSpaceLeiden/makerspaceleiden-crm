@@ -1,0 +1,11 @@
+{% autoescape off %}
+Trustees,
+
+This is to let you know that {{ user.name }} has completed the change of
+their email address from {{ old_email }} to {{ new_email }}.
+
+A copy of this message has been sent to {{ user.name }}'s old email address as well.
+
+Your friendly spacebot.
+
+{% endautoescape %}

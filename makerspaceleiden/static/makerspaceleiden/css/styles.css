@@ -1,0 +1,233 @@
+
+body {
+    font-size: 1.0rem;
+}
+
+h1 {
+    font-size: 1.5rem !important;
+    margin-top: 0.5rem !important;
+    margin-bottom: 0.5rem !important;
+}
+
+h2 {
+    font-size: 1.15rem !important;
+    margin-top: 0.5rem !important;
+    margin-bottom: 0.5rem !important;
+    font-weight: 600 !important;
+}
+
+h3 {
+    font-size: 1.0rem !important;
+    font-weight: 700 !important;
+    margin-top: 0.5rem !important;
+    margin-bottom: 0.5rem !important;
+}
+
+h4 {
+    font-size: 1.0rem;
+}
+
+h5 {
+    font-size: 0.9rem;
+}
+
+blockquote {
+    font-size: 0.9rem;
+}
+
+.small {
+    font-size: 0.9rem;
+}
+
+.mini {
+    font-size: 0.9rem;
+}
+
+a {
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: none;
+}
+
+a:active {
+    text-decoration: none;
+}
+
+a:visited {
+    text-decoration: none;
+}
+
+dt, dd {
+    font-size: 1.0rem;
+}
+
+li {
+    font-size: 1.0rem;
+    padding-top: 0.1rem !important;
+    padding-bottom: 0.3rem !important;
+}
+
+ul {
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.1rem !important;
+}
+
+ul.messagelist li {
+    font-size: 1.0rem;
+}
+
+ul.errorlist li {
+    font-size: 1.0rem;
+}
+
+table tbody tr {
+    background-color: transparent !important;
+    border-bottom: 0.05rem solid #eee;
+}
+
+table {
+    margin-top: 1.0rem !important;
+    margin-bottom: 1.0rem !important;
+}
+
+td, th {
+    font-size: 0.9rem;
+    margin-top: 0.5rem !important;
+    margin-bottom: 0.5rem !important;
+}
+
+thead th,
+tfoot td {
+    font-size: 0.9rem;
+}
+
+
+th label{
+    font-size: 1.0rem ;
+    line-height: 1.25rem;
+}
+
+td span{
+    display: block;
+    margin-top: 0.7rem !important;
+    margin-bottom: 0.0rem !important;
+    line-height: 1.25rem;
+}
+
+input, textarea, select, .form-row p, form .button {
+    font-size: 1.0rem;
+}
+
+#header {
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+.help, p.help, form p.help, div.help, form div.help, div.help li {
+    font-size: 0.9rem;
+}
+
+.errornote {
+    font-size: 1.0rem;
+}
+
+.object-tools a:link, .object-tools a:visited {
+    font-size: 0.9rem;
+}
+
+#branding h2 {
+    font-size: 1.0rem;
+}
+
+#user-tools, #logout-form button{
+    font-size: 0.9rem;
+}
+
+
+.module h2, .module caption, .inline-group h2 {
+    font-size: 1.0rem;
+}
+
+#content-related h4 {
+    font-size: 1.0rem;
+}
+
+.paginator {
+    font-size: 1.0rem;
+}
+
+.paginator .this-page {
+    font-size: 1.0rem;
+}
+
+#user-profile-button {
+    padding-top: 2px;
+    padding-bottom: 3px;
+    padding-left:7px;
+    padding-right:7px;
+    font-size: 0.85rem;
+}
+
+#log-out-button {
+    padding-top: 2px;
+    padding-bottom: 3px;
+    padding-left:6px;
+    padding-right:6px;
+    font-size: 0.85rem;
+}
+
+
+.user-profile-icon {
+    padding-left:14px;
+}
+
+.log-out-icon {
+    padding-left:10px;
+}
+
+.makerspace-name {
+    color: #ffc !important;
+    font-size: 1rem;
+    text-decoration: none !important;
+}
+
+.makerspace-name-div {
+    padding-top: 2px !important;
+    padding-bottom: 2px !important;
+}
+
+.date-input {
+    min-width: 120px !important;
+    max-width: 120px !important;
+    text-align: center;
+}
+
+.input-group-text {
+    padding-bottom: 0.25rem !important;
+}
+
+ul.messagelist li {
+    background-position: 40px 4px;
+}
+
+.login .navbar {
+    display: none;
+}
+
+.dark-color-bar {
+    background-color: rgb(121, 174, 200);
+}
+
+
+@media (max-width: 1024px) {
+    a {
+        font-size: 0.9rem ;
+    }
+
+    #header {
+        padding-top: 8px !important;
+        padding-bottom: 8px !important;
+    }
+}

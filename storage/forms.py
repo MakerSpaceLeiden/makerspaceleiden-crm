@@ -1,9 +1,9 @@
+import logging
+
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
-from .models import Storage
 from django.forms import ModelForm
 
-import logging
+from .models import Storage
 
 logger = logging.getLogger(__name__)
 

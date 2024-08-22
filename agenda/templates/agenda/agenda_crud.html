@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% load django_bootstrap5 %}
+{% load static %}
+
+{% block content %}
+{{ form.media.css }}
+{{ form.media.js }}
+
+
+<form method="post">
+  {% csrf_token %}
+
+  <!-- Display validation errors -->
+  {% if form.errors %}
+  <div class="alert alert-danger" role="alert">
+    Please correct the following:
+    <ul>
+      {% for field, error_list in form.errors.items %}
+        {% for error in error_list %}
+          <li> {{ error }}</li>
+        {% endfor %}
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+    <div class="mb-3">
+        <label for="startdate" class="form-label">Start time:</label>
+        <div class="input-group" id="custom_startdate_group" >
+            {{ form.startdate }}
+            <span class="input-group-text">at</span>
+            {{ form.starttime }}
+        </div>
+    </div>
+    <div class="mb-3">
+        <label for="enddate" class="form-label">End time:</label>
+        <div class="input-group" id="custom_enddate_group">
+            {{ form.enddate }}
+            <span class="input-group-text">at</span>
+            {{ form.endtime }}
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label for="item_title" class="form-label">Agenda item title:</label>
+        <textarea id="item_title" name="item_title" class="form-control" rows="1" maxlength="600">{{ form.item_title.value }}</textarea>
+    </div>
+
+    <div class="mb-3">
+        <label for="item_details" class="form-label">Agenda item details:</label> <small>&nbsp; (Not required.)</small>
+        <textarea id="item_details" name="item_details" class="form-control" rows="8" wrap="soft">{{ form.item_details.value }}</textarea>
+    </div>
+
+    <div class="mt-3">
+        {% if title == 'Edit agenda item' %}
+            <button type="button" onclick="window.location.href='{% url 'agenda_detail' pk=form.instance.pk %}'" class="btn btn-secondary me-1">Back</button>
+            <button type="submit" class="btn btn-primary me-1">Save</button>
+            <button type="button" onclick="window.location.href='{% url 'agenda_delete' pk=form.instance.pk %}'" class="btn btn-danger me-1">Delete</button>
+        {% endif %}
+        {% if title == 'Create new agenda item' %}
+            <button type="button" onclick="window.location.href='{% url 'agenda' %}'" class="btn btn-secondary me-1">Cancel</button>
+            <button type="submit" class="btn btn-primary me-1">Create</button>
+        {% endif %}
+    </div>
+</form>
+
+<script src="{% static 'agenda/js/agenda_crud.js' %}"></script>
+{% endblock %}

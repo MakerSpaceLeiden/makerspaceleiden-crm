@@ -4,10 +4,10 @@
 # - On a 64-bit system, 64-bit Python is required for installation of MySql and Django-dynamic-filenames
 
 # Bash set -e equivalent for powershell, which doesn't respond directly to python/pip error codes
-function RunWithErrorCheck ([string]$command) 
+function RunWithErrorCheck ([string]$command)
 {
-    Invoke-Expression $command 
-    
+    Invoke-Expression $command
+
     if($lastexitcode -ne 0)
     {
         Write-Warning "Script terminated due to an error"
@@ -19,7 +19,7 @@ Write-Host "Loading demo for Makerspace CRM/CMS"
 
 RunWithErrorCheck "python -m venv ./venv/bin/activate" #create virtual environment for crm
 RunWithErrorCheck ".\venv\bin\activate\Scripts\Activate.ps1"
-RunWithErrorCheck "pip install -r requirements.txt" 
+RunWithErrorCheck "pip install -r requirements.txt"
 
 if(Test-Path .\db.sqlite3) #rebuild db using migrations
 {
@@ -40,7 +40,7 @@ else
     RunWithErrorCheck "python manage.py import-machines demo/mac.csv "
     RunWithErrorCheck "python manage.py import-consolidated demo/consolidated.txt"
     RunWithErrorCheck "python manage.py pettycash-activate-all-users"
-    
+
     $I = Read-Host "Reset all passwords and generate invites? (Y/N Default: N)"
     if($I -eq "Y")
     {

@@ -15,28 +15,41 @@
           {% if user|isPettycashAdmin or b.owner.id != settings.POT_ID %}
 		<tr>
 			<td>
+			{% if b.owner.id and user.id %}
 			<a href="{% url 'transactions' pk=b.owner.id %}">
+			{% endif %}
           		{% if b.owner.id == settings.POT_ID %}
 				{{ settings.POT_LABEL }}
 			{% else %}
-				{{b.owner }}
+			{% if b.owner.id %}
+					{{b.owner }}
+				{% else %}
+				<i>participant that has left</i>
+				{% endif %}
+
 			{% endif %}
 			</a></td>
 			<td>
-			{% if b.last %}
-				{{ b.last.date }}
+			{% if b.lasttxdate %}
+				{{ b.lasttxdate }}
 			{% else %}
 				<i>never</i>
 			{% endif %}
 			</td>
 			<td>{{ b.balance }}</td>
+			{% if b.owner.id and user.id %}
                         {% if user.id == b.owner.id %}
 				<td><a href="{% url 'invoice' src=b.owner.id %}">[pay to {{ settings.POT_LABEL }}]</a></td>
                         {% else %}
+				{% if b.owner.id != settings.POT_ID %}
 				<td><a href="{% url 'transfer' src=user.id dst=b.owner.id %}">[pay this person]</a></td>
+				{% endif %}
 			{% endif %}
 			{% if user.is_privileged and b.owner.id != settings.POT_ID %}
 				<td><a href="{% url 'deposit' dst=b.owner.id %}">[deposit]</a></td>
+			{% endif %}
+			{% else %}
+				deleted participant
 			{% endif %}
 		</tr>
             {% endif %}
@@ -51,7 +64,7 @@
 
 <h2>Pricelist</h2>
 
-A pricelist can be found <a href='{% url "pricelist" %}'>here</a>.
+A pricelist can be found <a href='{% url "pricelist" %}'>here</a>; as is <a href='{% url "spends" %}'>our spending this month</a>.
 
 {% if user.is_privileged %}
 <h2>Terminal and station management</h2>
@@ -63,4 +76,3 @@ See <a href='{% url "unpaired" %}'>here</a> (<i>only visible to privelidged user
 Back to your <a href="{% url "mytransactions" %}">overview</a>.
 
 {% endblock %}
-
