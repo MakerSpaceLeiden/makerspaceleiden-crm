@@ -45,8 +45,10 @@ def isPettycashUser(user):
         cutoff = datetime.now(tz=timezone.utc) - timedelta(
             days=settings.PETTYCASH_NOUSE_DAYS
         )
-        if b.last and b.last.date > cutoff:
-            return True
+        # Needs to be replaced by actual tx check.
+        #
+        # if b.last and b.last.date > cutoff:
+        #     return True
 
     except ObjectDoesNotExist:
         pass
