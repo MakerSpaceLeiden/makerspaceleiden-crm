@@ -110,7 +110,7 @@ def _register(request):
     response = request.GET.get("response", None)
     if not response:
         logger.error(
-            "Bad request, missing response for KNOWN %s at %s" % (client_sha, ip)
+            "Bad request, missing response for known %s at %s" % (client_sha, ip)
         )
         return HttpResponse(
             "Bad request, missing response", status=400, content_type="text/plain"

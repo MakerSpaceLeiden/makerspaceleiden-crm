@@ -24,6 +24,7 @@ from makerspaceleiden.mail import emailPlain
 from members.models import Tag, User
 from terminal.decorators import is_paired_terminal
 from terminal.models import Terminal
+from terminal.views import api2_register as new_api2_register
 
 from .camt53 import camt53_process
 from .forms import (
@@ -1093,7 +1094,7 @@ def api_pay(request):
 
 @csrf_exempt
 def api2_register(request):
-    return api2_register(request)
+    return new_api2_register(request)
 
 
 @csrf_exempt
