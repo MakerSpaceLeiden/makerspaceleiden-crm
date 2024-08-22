@@ -4,20 +4,19 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('pettycash', '0013_remove_historicalpettycashbalancecache_last_and_more'),
+        ("pettycash", "0013_remove_historicalpettycashbalancecache_last_and_more"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='historicalpettycashterminal',
-            name='history_user',
+            model_name="historicalpettycashterminal",
+            name="history_user",
         ),
         migrations.DeleteModel(
-            name='PettycashTerminal',
+            name="PettycashTerminal",
         ),
         migrations.DeleteModel(
-            name='HistoricalPettycashTerminal',
+            name="HistoricalPettycashTerminal",
         ),
     ]

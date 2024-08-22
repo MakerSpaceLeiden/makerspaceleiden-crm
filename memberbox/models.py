@@ -1,22 +1,15 @@
 import logging
 
 from django.conf import settings
-from django.core.mail import EmailMessage
 from django.db import models
 from django.template.loader import render_to_string
 from django.urls import reverse
 from simple_history.models import HistoricalRecords
 from stdimage.models import StdImageField
 
-from django.urls import reverse
-from django.core.mail import EmailMessage
-from django.template.loader import render_to_string, get_template
-
 from makerspaceleiden.mail import emailPlain, emails_for_group
 from makerspaceleiden.utils import upload_to_pattern
 from members.models import User
-
-import logging
 
 logger = logging.getLogger(__name__)
 
