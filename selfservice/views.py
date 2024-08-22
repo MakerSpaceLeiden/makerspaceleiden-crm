@@ -308,7 +308,6 @@ def confirmemail(request, uidb64, token, newemail):
                 content_type="text/plain",
             )
         email = user.email
-        user.email = newemail
         if email_check_token.check_token(user, token):
             user.email = newemail
             user.email_confirmed = True
