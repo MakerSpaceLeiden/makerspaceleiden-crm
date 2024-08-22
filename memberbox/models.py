@@ -8,8 +8,15 @@ from django.urls import reverse
 from simple_history.models import HistoricalRecords
 from stdimage.models import StdImageField
 
+from django.urls import reverse
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string, get_template
+
+from makerspaceleiden.mail import emailPlain, emails_for_group
 from makerspaceleiden.utils import upload_to_pattern
 from members.models import User
+
+import logging
 
 logger = logging.getLogger(__name__)
 
@@ -56,11 +63,28 @@ class Memberbox(models.Model):
             )
         return "Box at " + self.location + " (owner unknown)"
 
-    def delete(self, save=True):
+    def can_delete(user):
+        if self.owner == user:
+            return True
+        if user.is_privileged:
+            return True
+        return user.in_group(settings.MEMBERBOX_ADMIN_GROUP)
+
+    def delete(self, user, save=True):
+        if not self.can_delete(user):
+            logger.critical(
+                "User {} tried to delete box {} owned by {}. Denied".format(
+                    user, self, self.owner
+                )
+            )
+            raise Exception("Access denied")
+
+        dst = self.owner.email
         context = {
             "email": self.owner.email,
             "owner": self.owner.first_name + " " + self.owner.last_name,
             "location": self.location,
+            "user": user,
         }
         try:
             body = render_to_string("memberbox/email_delete.txt", context)
@@ -68,15 +92,17 @@ class Memberbox(models.Model):
                 "memberbox/email_delete_subject.txt", context
             ).strip()
 
-            EmailMessage(
-                subject,
-                body,
-                to=[context["email"], settings.TRUSTEES, "dirkx@webweaving.org"],
-                from_email=settings.DEFAULT_FROM_EMAIL,
-            ).send()
+            admins = emails_for_group(settings.MEMBERBOX_ADMIN_GROUP)
+            if admins:
+                context["admins"] = admins
+                dst.append(admins)
+            else:
+                dst.append(settings.TRUSTEES)
+
+            emailPlain("memberbox/email_delete.txt", toinform=dst, context=context)
         except Exception as e:
             logger.critical(
-                "Failed to sent empty your storage box email: {}".format(str(e))
+                "Failed to sent 'empty your storage box' email: {}".format(str(e))
             )
 
         super(Memberbox, self).delete()

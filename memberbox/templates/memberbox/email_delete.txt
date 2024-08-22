@@ -1,9 +1,17 @@
+Membersbox {{location}} of {{ name }} put up for re-use; any contents left in it will soon be junked/recycled.
+
 Dear {{ owner }},
 
-The storage location {{ location }} was marked for re-use.
+The storage location {{ location }} was marked for re-use {% if owner != user %} by {{ user }}{% endif %}.
 
 If there is any junk left in it; be sure to get, or ask for, it within a few days - as otherwise it wil be thrown away or recycled soon.
 
 Yours,
 
 the makerspace bot, on behalf of the trusteeds (bestuur@makerspaceleiden.nl).
+
+
+{% if admins %}
+{% load human_list %}
+PS: if there is any problem; the following people have volunteered to help manage these boxes: {{ admins|human_list_with_commas }}.
+{% endif %}

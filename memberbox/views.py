@@ -172,13 +172,13 @@ def delete(request, pk):
     except Memberbox.DoesNotExist:
         return HttpResponse("Box not found", status=404, content_type="text/plain")
 
-    if box.owner != request.user:
+    if not box.can_delete(request.user):
         return HttpResponse(
-            "Eh - not your box ?!", status=403, content_type="text/plain"
+            "Eh - not your box/no permission ?!", status=403, content_type="text/plain"
         )
 
     try:
-        box.delete()
+        box.delete(request.user)
     except Exception as e:
         logger.error("Unexpected error during delete of box: {0}".format(e))
         return HttpResponse("Box fail", status=400, content_type="text/plain")

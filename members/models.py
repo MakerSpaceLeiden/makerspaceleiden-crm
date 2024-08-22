@@ -144,6 +144,10 @@ class User(AbstractUser):
             return "No images uploaded yet."
 
     @property
+    def in_group(group):
+        return request.user.groups.filter(name=group).exists()
+
+    @property
     def is_privileged(self):
         if self.is_superuser:
             return True

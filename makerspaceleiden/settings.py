@@ -268,6 +268,8 @@ UT_COUNT_CUTOFF = 10
 SENSOR_USER_GROUP = "mains Sensor Admins"
 NETADMIN_USER_GROUP = "network admins"
 
+# Membership boxes; delegation
+MEMBERBOX_ADMIN_GROUP = "memberbox admin group"
 
 # REGISTRATION_OPEN = False
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
