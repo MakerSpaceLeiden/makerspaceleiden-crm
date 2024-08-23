@@ -7,6 +7,11 @@ urlpatterns = [
     path("", views.index, name="index"),
     path("record_instructions/", views.recordinstructions, name="add_instruction"),
     path("userdetails/", views.userdetails, name="userdetails"),
+    path(
+        "userdetails/edit/<int:user_id>",
+        views.userdetails_admin_edit,
+        name="userdetails_admin_edit",
+    ),
     path("waiverform/", views.waiverformredir, name="waiverformredir"),
     path("waiver/<int:user_id>/form", views.waiverform, name="waiverform"),
     path(

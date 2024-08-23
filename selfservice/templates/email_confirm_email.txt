@@ -3,7 +3,7 @@ Hi {{ user.first_name }},
 
 This is to confirm that your request for an email change from:
 
-from:	{{ user.email }}
+from:	{{ old_email }}
 to:	{{ new_email }}
 
 was applied. If you did not request this change - alert {{ noc_email }}
