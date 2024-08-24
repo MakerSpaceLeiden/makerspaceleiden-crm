@@ -7,14 +7,14 @@
   <link rel="stylesheet" type="text/css" href="{% block stylesheet_navbar %}{% static "navigation/css/styles.css" %}{% endblock %}">
 </head>
 
-<nav class="navbar col-auto navbar-expand-lg navbar-custom">
+<nav class="navbar col-auto navbar-expand-md navbar-custom">
   <div class="container">
     <div class="row row-cols-1 w-100">
       <div class="col-10 order-0 pe-0">
         <div class="row">
 
         <!-- Navigation icon for mobile -->
-          <div class="col-6 order-0 d-lg-none col-sm-6">
+          <div class="col-6 order-0 d-md-none col-sm-6">
             <div class="navbar-icon-mobile-div">
               <button class="navbar-toggler navbar-icon-mobile" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -23,10 +23,10 @@
           </div>
 
           <!-- Navigation icon for large screen -->
-          <div class="col-auto order-0 d-none d-lg-inline">
+          <div class="col-auto order-0 d-none d-md-inline">
             <div class="navbar-icon-large-div">
               <a class="navbar-expand-md navbar-light navbar-icon-large" href="{% url 'navpage' %}" title="Navigation">
-                <i class="fa-solid fa-bars text-white d-none d-lg-inline navbar-navmenu"></i>
+                <i class="fa-solid fa-bars text-white d-none d-md-inline navbar-navmenu"></i>
               </a>
             </div>
           </div>
@@ -44,7 +44,7 @@
           <div class="col-9 order-2 mt-1">
             <div>
               <div class=" navbar-collapse collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-lg-0">
+                <ul class="navbar-nav me-auto mb-md-0">
                   <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                       Machines & Community
@@ -71,11 +71,13 @@
                     </a>
                     <ul class="dropdown-menu">
                       <li><a class="dropdown-item" href="{% url 'space_state' %}">Who is there now</a></li>
-                      <li><a class="dropdown-item" href="{% url 'space_state' %}">Machines in use</a></li>
-                      <li><a class="dropdown-item" href="{% url 'motd_messages' %}">Message of the day </a></li>
-                      <li><a class="dropdown-item" href="{% url 'ufo' %}">UFO lost and found </a></li>
-                      <li><a class="dropdown-item" href="{% url 'camindex' %}">Live printer camera</a></li>
-                      <li><a class="dropdown-item" href="/crm/kwh">Power consumption of the space</a></li>
+                      <li><a class="dropdown-item" href="{% url 'agenda' %}">Agenda</a></li>
+                      <li><a class="dropdown-item" href="{% url 'nodered_live_data_and_sensors' %}">Live data &amp; sensors</a></li>
+                      <li><a class="dropdown-item" href="{% url 'nodered_space_climate' %}">Space climate</a></li>
+                      <li><a class="dropdown-item" href="{% url 'motd_messages' %}">Message of the day</a></li>
+                      <li><a class="dropdown-item" href="{% url 'ufo' %}">UFO lost and found</a></li>
+                      <li><a class="dropdown-item" href="{% url 'camindex' %}">Live 3D printer camera</a></li>
+                      <li><a class="dropdown-item" href="{% url 'kwh_view' %}">Power consumption</a></li>
                     </ul>
                   </li>
                   <li class="nav-item dropdown">
@@ -83,14 +85,15 @@
                       Wiki & Public Info
                     </a>
                     <ul class="dropdown-menu">
-                      <li><a class="dropdown-item" href="https://wiki.makerspaceleiden.nl/">Wiki documentation</a></li>
-                      <li><a class="dropdown-item" href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Categorie:Tool">Tools</a></li>
-                      <li><a class="dropdown-item" href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Makerspace_Leiden#Veiligheid_en_geluidsproductie">Safety and noise production</a></li>
-                      <li><a class="dropdown-item" href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Makerspace_Leiden#Procedures_en_Principes">Procedures and principles</a></li>
-                      <li><a class="dropdown-item" href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Nieuw_artikel_aanmaken">Create a new wiki</a></li>
-                      <li><a class="dropdown-item" href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Nieuweblog">Create a new blog article</a></li>
-                      <li><a class="dropdown-item" href="https://makerspaceleiden.nl">Members projects</a></li>
-                      <li><a class="dropdown-item" href="https://makerspaceleiden.nl">About Us</a></li>
+                      <li><a class="dropdown-item" href="https://wiki.makerspaceleiden.nl/" target="_blank">Wiki documentation</a></li>
+                      <li><a class="dropdown-item" href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Categorie:Tool" target="_blank">Tools</a></li>
+                      <li><a class="dropdown-item" href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Makerspace_Leiden#Veiligheid_en_geluidsproductie" target="_blank">Safety and noise production</a></li>
+                      <li><a class="dropdown-item" href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Makerspace_Leiden#Procedures_en_Principes" target="_blank">Procedures and principles</a></li>
+                      <li><a class="dropdown-item" href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Nieuw_artikel_aanmaken" target="_blank">Create a new wiki</a></li>
+                      <li><a class="dropdown-item" href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Nieuweblog" target="_blank">Create a new blog article</a></li>
+                      <li><a class="dropdown-item" href="https://makerspaceleiden.nl" target="_blank">Members projects</a></li>
+                      <li><a class="dropdown-item" href="https://github.com/MakerSpaceLeiden" target="_blank">Github</a></li>
+                      <li><a class="dropdown-item" href="https://makerspaceleiden.nl" target="_blank">About Us</a></li>
                     </ul>
                   </li>
                   {% if user.is_privileged or user|isPettycashAdmin or user|isTreasurer or user|isMainsAdmin %}
@@ -100,15 +103,15 @@
                     </a>
                     <ul class="dropdown-menu">
                     {% if user.is_privileged %}
+                      <li><a class="dropdown-item" href="{% url 'admin:index' %}">Raw database access</a></li>
                       <li><a class="dropdown-item" href="{% url 'newmember' %}">Add a new member</a></li>
                       <li><a class="dropdown-item" href="{% url 'pending' %}">Instructions pending approval</a></li>
                       <li><a class="dropdown-item" href="{% url 'missing_doors' %}">Missing doors or tags</a></li>
                       <li><a class="dropdown-item" href="{% url 'missing_forms' %}">Missing waivers</a></li>
                       <li><a class="dropdown-item" href="{% url 'filed_forms' %}">Filed waivers</a></li>
-                      <li><a class="dropdown-item" href="{% url 'admin:index' %}">Raw database access</a></li>
                       <li><a class="dropdown-item" href="{% url 'unknowntags' %}">Unknown tags</a></li>
                       <li><a class="dropdown-item" href="{% url 'acl-index' %}">Permit use</a></li>
-                      <li><a class="dropdown-item" href="{% url 'cam53upload' %}">Upload member transactions</a></li>
+                      <li><a class="dropdown-item" href="{% url 'cam53upload' %}">Upload Triodos transactions</a></li>
                       <li><a class="dropdown-item" href="{% url 'mailinglists_subs' %}">Members mailing list subscriptions</a></li>
                     {% endif %}
                     {% if user.is_privileged or user|isMainsAdmin %}
@@ -118,6 +121,9 @@
 
                     {% if user.is_privileged or user|isPettycashAdmin or user|isTreasurer %}
                           <li><a class="dropdown-item" href="{% url 'unpaired' %}">Payment stations</a></li>
+                    {% endif %}
+                    {% if user.is_privileged or user|isNoderedAdmin %}
+                          <li><a class="dropdown-item" href="{% url 'nodered_proxy' '' %}">Node-Red editor</a></li>
                     {% endif %}
                     </ul>
                   </li>

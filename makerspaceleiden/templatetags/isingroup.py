@@ -29,6 +29,11 @@ def isDeveloper(user):
     return user.groups.filter(name=settings.DEVELOPERS_ADMIN_GROUP).exists()
 
 
+@register.filter(name="isNoderedAdmin")
+def isNoderedAdmin(user):
+    return user.groups.filter(name=settings.NODERED_ADMIN_GROUP).exists()
+
+
 @register.filter(name="isPettycashUser")
 def isPettycashUser(user):
     if "PETTYCASH_DEMO_USER_GROUP" in globals():

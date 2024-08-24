@@ -11,15 +11,17 @@
   Thanks for helping us grow the makerspace !
  <p/>
   <hr>
-  <a href="{% url 'personal_page' %}">Back to personal profile page</a>
+  <button type="button" onclick="window.location.href='{% url 'personal_page' %}'" class="btn btn-secondary me-1">Back</button>
 {% else %}
   <form method="post" enctype="multipart/form-data" novalidate>
     {% csrf_token %}
     <table>
         {{ form.as_table }}
     </table>
-    <button type="submit">Save</button>
-    <a href="{% url 'personal_page' %}">Cancel</a>
+    <button type="button" onclick="window.location.href='{% url cancel_button_url %}'" class="btn btn-secondary me-1">Cancel</button>
+    <button type="submit" class="btn btn-primary btn-primary-custom me-1">Save</button>
+
+
   </form>
 {% endif %}
 

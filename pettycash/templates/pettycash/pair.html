@@ -15,6 +15,6 @@
 </form>
 <hr>
 <p>
-<a href='{% url "unpaired" %}'>back</a> to the overview of unpaired devices.
+<a href="{% url 'unpaired' user.id %}">Back to unpaired devices overview</a>
 <p>
 {% endblock %}

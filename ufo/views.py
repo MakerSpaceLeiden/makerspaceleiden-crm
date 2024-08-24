@@ -8,7 +8,7 @@ import zipfile
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Q
+from django.db.models import Q, Case, When, Value, IntegerField
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
@@ -51,6 +51,15 @@ def index(request, days=30):
     if days > 0:
         tooOld = datetime.date.today() - datetime.timedelta(days=days)
         lst = lst.filter(Q(lastChange__gte=tooOld) | Q(state="UNK"))
+    
+    lst = lst.annotate(
+        priority=Case(
+            When(state='UNK', then=Value(1)),
+            default=Value(2),
+            output_field=IntegerField()
+        )
+    ).order_by('priority', 'created_at')
+
     context = {
         "title": "Unclaimed Floating Objects",
         "lst": lst,
@@ -76,7 +85,13 @@ def create(request):
             )
             item.save()
 
-            alertOwnersToChange(item, request.user, [item.owner.email])
+            # Try to alert owners, but don't give an error in the frontend if it doesn't work
+            try:
+                alertOwnersToChange(item, request.user, [item.owner.email])
+            except Exception as e:
+                logger.error("Failed to alert owners: {}".format(e))
+
+            # Redirect after successful save
             return ufo_redirect(item.id)
 
         except Exception as e:
@@ -168,7 +183,16 @@ def mine(request, pk):
         request.user
     )
     if item.owner != request.user:
-        alertOwnersToChange([item], request.user, [item.owner.email])
+        # Try to alert owners, but don't give an error in the frontend if it doesn't work
+        try:
+            alertOwnersToChange([item], request.user, [item.owner.email])
+        except Exception as e:
+            logger.error("Failed to alert owners: {}".format(e))
+
+    item.state = "OK"
+    item.claimed_by = request.user
+    item.claimed_at = datetime.datetime.now()  
+
     item.save()
 
     return ufo_redirect(pk)

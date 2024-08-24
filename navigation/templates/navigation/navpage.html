@@ -46,24 +46,27 @@
             <h2>Current Events</h2>
             <ul class="nav flex-column custom-nav-menu">
                 <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'space_state' %}">Who is there now</a></li>
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'space_state' %}">Machines in use</a></li>
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'agenda' %}">Agenda</a></li>
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'nodered_live_data_and_sensors' %}">Live data &amp; sensors</a></li>
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'nodered_space_climate' %}">Space climate</a></li>
                 <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'motd_messages' %}">Message of the day</a></li>
                 <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'ufo' %}">UFO lost and found</a></li>
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'camindex' %}">Live printer camera</a></li>
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="/crm/kwh">Power consumption of the space</a></li>
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'camindex' %}">Live 3D printer camera</a></li>
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'kwh_view' %}">Power consumption</a></li>
             </ul>
         </div>
         <div class="col-12 col-lg-2 me-3">
             <h2>Wiki & Public Info</h2>
             <ul class="nav flex-column custom-nav-menu">
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="https://wiki.makerspaceleiden.nl/">Wiki documentation</a></li>
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Categorie:Tool">Tools</a></li>
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Makerspace_Leiden#Veiligheid_en_geluidsproductie">Safety and noise production</a></li>
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Makerspace_Leiden#Procedures_en_Principes">Procedures and principles</a></li>
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Nieuw_artikel_aanmaken">Create a new wiki</a></li>
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Nieuweblog">Create a new blog article</a></li>
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="https://makerspaceleiden.nl">Members projects</a></li>
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="https://makerspaceleiden.nl">About Us</a></li>
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="https://wiki.makerspaceleiden.nl/" target="_blank">Wiki documentation</a></li>
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Categorie:Tool" target="_blank">Tools</a></li>
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Makerspace_Leiden#Veiligheid_en_geluidsproductie" target="_blank">Safety and noise production</a></li>
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Makerspace_Leiden#Procedures_en_Principes" target="_blank">Procedures and principles</a></li>
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Nieuw_artikel_aanmaken" target="_blank">Create a new wiki</a></li>
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Nieuweblog" target="_blank">Create a new blog article</a></li>
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="https://makerspaceleiden.nl" target="_blank">Members projects</a></li>
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="https://github.com/MakerSpaceLeiden" target="_blank">Github</a></li>
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="https://makerspaceleiden.nl" target="_blank">About Us</a></li>
             </ul>
         </div>
         {% if user.is_privileged or user|isPettycashAdmin or user|isTreasurer or user|isMainsAdmin %}
@@ -71,15 +74,15 @@
                 <h2>Trustee</h2>
                 <ul class="nav flex-column custom-nav-menu">
                 {% if user.is_privileged %}
+                    <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'admin:index' %}">Raw database access</a></li>
                     <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'newmember' %}">Add a new member</a></li>
                     <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'pending' %}">Instructions pending approval</a></li>
                     <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'missing_doors' %}">People with no doors or tags</a></li>
                     <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'missing_forms' %}">Missing waivers</a></li>
                     <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'filed_forms' %}">Filed waivers</a></li>
-                    <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'admin:index' %}">Raw database access</a></li>
                     <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'unknowntags' %}">Unknown tags</a></li>
                     <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'acl-index' %}">Permit use</a></li>
-                    <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'cam53upload' %}">Upload member transactions</a></li>
+                    <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'cam53upload' %}">Upload Triodos transactions</a></li>
                     <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'mailinglists_subs' %}">Members mailing list subscriptions</a></li>
                 {% endif %}
                 {% if user.is_privileged or user|isMainsAdmin %}
@@ -88,6 +91,9 @@
                 {% endif %}
                 {% if user.is_privileged or user|isPettycashAdmin or user|isTreasurer %}
                     <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'unpaired' %}">Payment stations</a></li>
+                {% endif %}
+                {% if user.is_privileged or user|isNoderedAdmin %}
+                    <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'nodered_proxy' '' %}">Node-Red editor</a></li>
                 {% endif %}
                 </ul>
             </div>

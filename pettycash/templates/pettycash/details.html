@@ -50,7 +50,7 @@ If you feel this is not correct - you can <a href="{% url 'delete' pk=tx.id  %}"
 
 </pre>
 <hr>
-Return to the <a href="{% url 'transactions' pk=tx.dst.id  %}">[transactions]</a>.
+<a href="{% url 'transactions' user.id %}">Back to Transactions</a>
 
 
 {% endblock %}

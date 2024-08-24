@@ -209,7 +209,7 @@ def transact(
 
     products = None
     if dst == settings.POT_ID:
-        products = PettycashSku.objects.all()
+        products = PettycashSku.objects.all().order_by('name') 
 
     context = {
         "title": label,
@@ -243,7 +243,8 @@ def index(request, days=30):
 
 @login_required
 def pricelist(request, days=30):
-    prices = PettycashSku.objects.all()
+    prices = PettycashSku.objects.all().order_by('name') 
+    
     context = {
         "title": "Pricelist",
         "settings": settings,

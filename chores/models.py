@@ -21,6 +21,7 @@ class Chore(models.Model):
     description = models.CharField(max_length=200)
     class_type = models.CharField(max_length=40)
     configuration = jsonfield.JSONField(validators=[validate_json])
+    wiki_url = models.URLField(blank=True, null=True)
     creator = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,

@@ -13,6 +13,7 @@ class ChoreAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
         "configuration",
         "creator",
         "created_at",
+        "wiki_url",
     )
 
 

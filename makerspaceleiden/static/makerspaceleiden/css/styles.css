@@ -44,20 +44,29 @@ blockquote {
 }
 
 a {
-    text-decoration: none;
+    text-decoration: none !important;
 }
 
 a:hover {
-    text-decoration: none;
+    text-decoration: none !important;
 }
 
 a:active {
-    text-decoration: none;
+    text-decoration: none !important;
 }
 
 a:visited {
-    text-decoration: none;
+    text-decoration: none !important;
 }
+
+a:focus {
+    text-decoration: none !important; 
+    outline: none; 
+}
+
+a:target {
+    text-decoration: none !important; 
+} 
 
 dt, dd {
     font-size: 1.0rem;
@@ -161,6 +170,21 @@ input, textarea, select, .form-row p, form .button {
 .paginator .this-page {
     font-size: 1.0rem;
 }
+.btn-primary-custom {
+    background-color: #417690 !important;
+    border-color: #417690 !important;
+    color: #fff !important;
+}
+
+.btn-primary-custom:hover {
+    background-color: #205067 !important;
+    border-color: #205067 !important;
+}
+
+.btn-primary-custom:focus, .btn-primary-custom:active {
+    background-color: #417690 !important; 
+    border-color: #417690 !important; 
+}
 
 #user-profile-button {
     padding-top: 2px;
@@ -222,9 +246,6 @@ ul.messagelist li {
 
 
 @media (max-width: 1024px) {
-    a {
-        font-size: 0.9rem ;
-    }
 
     #header {
         padding-top: 8px !important;

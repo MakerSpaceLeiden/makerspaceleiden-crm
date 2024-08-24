@@ -60,7 +60,7 @@ def index(request):
             floating.append(box)
 
     context = {
-        "title": "Storage",
+        "title": "Members boxes",
         "user": request.user,
         "has_permission": request.user.is_authenticated,
         "storages": list(storages.values()),

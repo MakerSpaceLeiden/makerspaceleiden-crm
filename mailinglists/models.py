@@ -36,6 +36,8 @@ class Mailinglist(models.Model):
     def path(self):
         return reverse("mailinglists_archive", kwargs={"mlist": self.name})
 
+    class Meta:
+        ordering = ['name']
 
 class Subscription(models.Model):
     mailinglist = models.ForeignKey(

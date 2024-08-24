@@ -107,6 +107,8 @@ class Memberbox(models.Model):
 
         super(Memberbox, self).delete()
 
+    class Meta:
+        ordering = ['location']
 
 # Handle image cleanup.
 # pre_delete.connect(pre_delete_delete_callback, sender=Memberbox)
