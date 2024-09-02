@@ -199,7 +199,6 @@ class User(AbstractUser):
         Entitlement.delete_issuer_leaving_breadcrum(self)
         return super(User, self).delete(*args, **kwargs)
 
-
 class Tag(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     tag = models.CharField(max_length=30, unique=True)  # , editable = False)

@@ -246,7 +246,6 @@ class PettycashTransaction(models.Model):
         try:
             adjust_balance_cache(self, self.src, -self.amount)
             adjust_balance_cache(self, self.dst, self.amount)
-            print(f"Cache Adjust: {self.src} -> {self.dst} = {self.amount}")
         except Exception as e:
             logger.error("Transaction cache failure: %s" % (e))
 
@@ -350,24 +349,24 @@ def pre_delete_user_callback(sender, instance, using, **kwargs):
     for tx in PettycashTransaction.objects.all().filter(Q(src=user)):
         amount -= tx.amount
 
-    msg = "Left donating"
+    msg = "donating"
     f = User.objects.get(id=settings.NONE_ID)
     t = User.objects.get(id=settings.POT_ID)
 
-    if amount.amount < 0:
-        msg = "Left with a debt"
+    if amount == 0:
+        msg = "with no debt or money in the pettycash"
+    if amount < 0:
+        msg = "with a debt"
         amount = -amount
         ff = t
         t = f
         f = ff
 
-    print(f"Transaction: {f.id} {t.id} user = {user.id}")
-
     tx = PettycashTransaction(
         src=f,
         dst=t,
         amount=amount,
-        description=f"Deleted participant {user}. {msg}",
+        description=f"Deleted participant {user} left {msg}",
     )
     tx._change_reason = "Participant was deleted"
     tx.save()

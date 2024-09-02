@@ -283,7 +283,7 @@ def _overview(request, member_id=None):
     user = request.user
     balance = 0
     try:
-        balance = PettycashBalanceCache.objects.get(owner=user)
+        balance = PettycashBalanceCache.objects.get(owner=member)
 
     except ObjectDoesNotExist:
         pass
