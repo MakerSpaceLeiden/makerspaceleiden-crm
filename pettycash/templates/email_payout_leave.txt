@@ -3,7 +3,7 @@ L.S.
 
 Just to let you know; the participant {{ user }} was deleted from the CRM.
 
-This person left a {{ msg }}: {{ amount }}
+{{ msg }}: {{ amount }}
 
 Your friendly makerbot.
 --
