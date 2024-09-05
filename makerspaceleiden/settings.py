@@ -131,7 +131,7 @@ TRUSTEES = "hetbestuur@lists.makerspaceleiden.nl"
 
 DEFAULT_FROM_EMAIL = "noc@makerspaceleiden.nl"
 # Leave it to FORCE_SCRPT do do the psotfix right
-BASE = "https://makerspaceleiden.nl"
+BASE = "https://mijn.makerspaceleiden.nl"
 
 MSL_USER = 63
 SETTINGS_EXPORT.append("MSL_USER")
