@@ -343,7 +343,9 @@ def pre_delete_user_callback(sender, instance, using, **kwargs):
     # account. In effect - we keep a PL in this account.
     #
     user = instance
-    amount = 0
+    name = str(user)
+
+    amount = 0.0
     for tx in PettycashTransaction.objects.all().filter(Q(dst=user)):
         amount += tx.amount
     for tx in PettycashTransaction.objects.all().filter(Q(src=user)):
@@ -353,29 +355,32 @@ def pre_delete_user_callback(sender, instance, using, **kwargs):
     f = User.objects.get(id=settings.NONE_ID)
     t = User.objects.get(id=settings.POT_ID)
 
+    logger.error(f"predelete f={f}, t={t}, a={amount}")
+
+    if amount < 0:
+         msg = "with a debt"
+         t,f = f,t
+         amount = -amount
+
+    logger.error(f"norm: f={f}, t={t}, a={amount}")
+
     if amount == 0:
         msg = "with no debt or money in the pettycash"
-    if amount < 0:
-        msg = "with a debt"
-        amount = -amount
-        ff = t
-        t = f
-        f = ff
-
-    tx = PettycashTransaction(
-        src=f,
-        dst=t,
-        amount=amount,
-        description=f"Deleted participant {user} left {msg}",
-    )
-    tx._change_reason = "Participant was deleted"
-    tx.save()
+    else:
+        tx = PettycashTransaction(
+            src=f,
+            dst=t,
+            amount=amount,
+            description=f"Deleted participant {name} left {msg}",
+        )
+        tx._change_reason = "Participant was deleted"
+        r = tx.save()
 
     emailPlain(
         "email_payout_leave.txt",
         toinform=pettycash_admin_emails(),
         context={
-            "user": user,
+            "user": name,
             "amount": amount,
             "msg": msg,
         },
