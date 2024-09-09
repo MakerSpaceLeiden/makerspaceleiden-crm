@@ -345,7 +345,7 @@ def pre_delete_user_callback(sender, instance, using, **kwargs):
     user = instance
     name = str(user)
 
-    amount = 0.0
+    amount = Money(0.0, EUR)
     for tx in PettycashTransaction.objects.all().filter(Q(dst=user)):
         amount += tx.amount
     for tx in PettycashTransaction.objects.all().filter(Q(src=user)):
@@ -355,16 +355,12 @@ def pre_delete_user_callback(sender, instance, using, **kwargs):
     f = User.objects.get(id=settings.NONE_ID)
     t = User.objects.get(id=settings.POT_ID)
 
-    logger.error(f"predelete f={f}, t={t}, a={amount}")
+    if amount < Money(0, EUR):
+        msg = "with a debt"
+        t, f = f, t
+        amount = -amount
 
-    if amount < 0:
-         msg = "with a debt"
-         t,f = f,t
-         amount = -amount
-
-    logger.error(f"norm: f={f}, t={t}, a={amount}")
-
-    if amount == 0:
+    if amount == Money(0, EUR):
         msg = "with no debt or money in the pettycash"
     else:
         tx = PettycashTransaction(
@@ -374,7 +370,7 @@ def pre_delete_user_callback(sender, instance, using, **kwargs):
             description=f"Deleted participant {name} left {msg}",
         )
         tx._change_reason = "Participant was deleted"
-        r = tx.save()
+        tx.save()
 
     emailPlain(
         "email_payout_leave.txt",
