@@ -79,5 +79,13 @@ curl --silent \
 	http://127.0.0.1:8000/acl/api/v1/gettags4machineCSV/${MACHINE} | sed -e 's/^/ *   /'
 echo " ."; echo
 
+echo Binary one:
+curl --silent \
+        -H "X-FORWARDED-FOR: ${IP}"  \
+        -H "SSL-CLIENT-CERT: $CLIENT_PEM" \
+        -H "SSL-SERVER-CERT: $SERVER_PEM" \
+        --cert client-$NAME.crt \
+	http://127.0.0.1:8000/acl/api/v1/gettags4machineBIN/${MACHINE} | hexdump -C
+
 echo "OK"
 exit 0
