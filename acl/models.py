@@ -91,7 +91,8 @@ class PermitType(models.Model):
         return False
 
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]
+
 
 class Location(models.Model):
     name = models.CharField(max_length=40, unique=True)
@@ -102,7 +103,8 @@ class Location(models.Model):
         return self.name
 
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]
+
 
 class NodeField(models.CharField):
     def get_prep_value(self, value):
@@ -209,7 +211,8 @@ class Machine(models.Model):
         return self.requires_permit.permit.hasThisPermit(user)
 
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]
+
 
 # Special sort of create/get - where we ignore the issuer when looking for it.
 # but add it in if we're creating it for the first time.
@@ -396,7 +399,6 @@ class Entitlement(models.Model):
         # should we check for duplicates here too ?
         #
         return super(Entitlement, self).save(*args, **kwargs)
-
 
 
 class RecentUse(models.Model):

@@ -4,14 +4,13 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('memberbox', '0004_auto_20230328_1839'),
+        ("memberbox", "0004_auto_20230328_1839"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='memberbox',
-            options={'ordering': ['location']},
+            name="memberbox",
+            options={"ordering": ["location"]},
         ),
     ]

@@ -51,8 +51,7 @@ def getall(current_user_id=None, subset=None):
             if subset is not None and not event["chore"]["name"] == subset:
                 continue
             this_user_volunteered = current_user_id in [
-                user.id for user in event["volunteers"]
-                if hasattr(user, 'id')
+                user.id for user in event["volunteers"] if hasattr(user, "id")
             ]
             if num_missing_volunteers > 0:
                 for idx in range(num_missing_volunteers):
@@ -138,7 +137,7 @@ def signup(request, chore_id, ts):
     except Exception as e:
         logger.error("Something else went wrong during mail sent: {0}".format(e))
 
-    redirect_to = request.GET.get('redirect_to', 'chores')
+    redirect_to = request.GET.get("redirect_to", "chores")
 
     return redirect(redirect_to)
 
@@ -171,6 +170,6 @@ def remove_signup(request, chore_id, ts):
     except Exception as e:
         logger.error("Something else went wrong during remove mail sent: {0}".format(e))
 
-    redirect_to = request.GET.get('redirect_to', 'chores')
+    redirect_to = request.GET.get("redirect_to", "chores")
 
     return redirect(redirect_to)

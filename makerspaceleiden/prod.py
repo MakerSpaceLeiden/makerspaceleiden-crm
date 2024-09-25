@@ -2,7 +2,7 @@ import os
 import sys
 
 USE_X_FORWARDED_HOST = True
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 FORCE_SCRIPT_NAME = os.environ.get("FORCE_SCRIPT_NAME", "/crm")
 LOGIN_URL = os.environ.get("LOGIN_URL", "/crm/login/")
 LOGIN_REDIRECT_URL = os.environ.get("LOGIN_REDIRECT_URL", "/crm/")

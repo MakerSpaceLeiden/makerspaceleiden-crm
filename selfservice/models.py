@@ -12,4 +12,4 @@ class WiFiNetwork(models.Model):
         return self.network
 
     class Meta:
-        ordering = ['network']
+        ordering = ["network"]

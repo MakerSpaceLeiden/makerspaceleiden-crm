@@ -45,12 +45,12 @@
         var dir = "asc";
         var switchCount = 0;
         var ths = table.getElementsByTagName("TH");
-        
+
         // Remove existing sort classes
         for (var i = 0; i < ths.length; i++) {
             ths[i].classList.remove('asc', 'desc');
         }
-        
+
         // Add sort class to the clicked header
         ths[n].classList.add(dir);
 
