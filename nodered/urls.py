@@ -12,12 +12,12 @@ urlpatterns = [
         name="nodered_dashboard_proxy",
     ),
     path(
-        "dashboard/nodered_live_data_and_sensors/",
+        "dashboard_intranet/nodered_live_data_and_sensors/",
         views.NoderedLiveDataAndSensorsView,
         name="nodered_live_data_and_sensors",
     ),
     path(
-        "dashboard/nodered_space_climate/",
+        "dashboard_intranet/nodered_space_climate/",
         views.NoderedSpaceClimateView,
         name="nodered_space_climate",
     ),
