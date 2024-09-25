@@ -1,22 +1,15 @@
 import logging
 
 from django.conf import settings
-from django.core.mail import EmailMessage
 from django.db import models
 from django.template.loader import render_to_string
 from django.urls import reverse
 from simple_history.models import HistoricalRecords
 from stdimage.models import StdImageField
 
-from django.urls import reverse
-from django.core.mail import EmailMessage
-from django.template.loader import render_to_string, get_template
-
 from makerspaceleiden.mail import emailPlain, emails_for_group
 from makerspaceleiden.utils import upload_to_pattern
 from members.models import User
-
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -63,7 +56,7 @@ class Memberbox(models.Model):
             )
         return "Box at " + self.location + " (owner unknown)"
 
-    def can_delete(user):
+    def can_delete(self, user):
         if self.owner == user:
             return True
         if user.is_privileged:
@@ -87,10 +80,8 @@ class Memberbox(models.Model):
             "user": user,
         }
         try:
-            body = render_to_string("memberbox/email_delete.txt", context)
-            subject = render_to_string(
-                "memberbox/email_delete_subject.txt", context
-            ).strip()
+            _ = render_to_string("memberbox/email_delete.txt", context)
+            render_to_string("memberbox/email_delete_subject.txt", context).strip()
 
             admins = emails_for_group(settings.MEMBERBOX_ADMIN_GROUP)
             if admins:
@@ -108,7 +99,8 @@ class Memberbox(models.Model):
         super(Memberbox, self).delete()
 
     class Meta:
-        ordering = ['location']
+        ordering = ["location"]
+
 
 # Handle image cleanup.
 # pre_delete.connect(pre_delete_delete_callback, sender=Memberbox)

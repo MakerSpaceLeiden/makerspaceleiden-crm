@@ -9,6 +9,8 @@ from django.conf import settings
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 
+from members.models import User
+
 logger = logging.getLogger(__name__)
 
 
@@ -29,7 +31,8 @@ def emails_for_group(group):
     return list(
         User.objects.all().filter(groups__name=group).values_list("email", flat=True)
     )
-  
+
+
 def emailPlain(
     template, subject=None, toinform=[], context={}, attachments=[], forreal=True
 ):

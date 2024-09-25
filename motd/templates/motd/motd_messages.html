@@ -9,9 +9,9 @@
 {% block content %}
 
 <div class="col-md-9 mb-3">
-    Here you can create a 'Message of the day' to share updates or announcements with everyone. 
+    Here you can create a 'Message of the day' to share updates or announcements with everyone.
     The message will be shown prominently at the top of the home page.
-    Click 'Create New' to add a message. 
+    Click 'Create New' to add a message.
     Feel free to create a message to keep everyone informed!
 </div>
 <div class="row mt-1">
@@ -27,7 +27,7 @@
                             {{ selected_message.motd|urlize }}
                         </div>
                     </div>
-                    
+
 
                     {% if object_list %}
                         <div class="row">
@@ -38,31 +38,31 @@
                         <div class="row row-sticky-bottom">
                             <div class="creation-info">
                                 <small>
-                                    Created: {{ creation_date|date:"l j M Y H:i" }} by 
+                                    Created: {{ creation_date|date:"l j M Y H:i" }} by
                                     <a href="{{created_by.path}}">
-                                        {{ created_by.first_name }} 
-                                    </a> 
+                                        {{ created_by.first_name }}
+                                    </a>
                                 </small>
                             </div>
-                            
+
                             {% if is_updated %}
                                 <div class="update-info">
                                     <small>
-                                        Last edited: {{ update_date|date:"l j M Y H:i" }} by 
+                                        Last edited: {{ update_date|date:"l j M Y H:i" }} by
                                         <a href="{{updated_by.path}}">
-                                            {{ updated_by.first_name }} 
-                                        </a> 
+                                            {{ updated_by.first_name }}
+                                        </a>
                                     </small>
                                 </div>
                             {% endif %}
-                            
+
                         </div>
                     {% endif %}
                 {% else %}
                     <small>There are no messages.</small>
                 {% endif %}
-           
-    
+
+
             </div>
         </div>
         <div>
@@ -134,10 +134,10 @@
     .update-info {
         margin-top: auto;
         }
-        
+
     .row-sticky-bottom {
             margin-top: auto;
-        }    
+        }
 </style>
 
 <script>

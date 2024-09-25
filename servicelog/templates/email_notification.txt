@@ -11,4 +11,3 @@ Description:	{{ item.description }}
 Reporter:	{{ item.reporter }}
 
 {% endautoescape %}
-

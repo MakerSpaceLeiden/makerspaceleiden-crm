@@ -8,7 +8,7 @@ import zipfile
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Q, Case, When, Value, IntegerField
+from django.db.models import Case, IntegerField, Q, Value, When
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
@@ -51,14 +51,14 @@ def index(request, days=30):
     if days > 0:
         tooOld = datetime.date.today() - datetime.timedelta(days=days)
         lst = lst.filter(Q(lastChange__gte=tooOld) | Q(state="UNK"))
-    
+
     lst = lst.annotate(
         priority=Case(
-            When(state='UNK', then=Value(1)),
+            When(state="UNK", then=Value(1)),
             default=Value(2),
-            output_field=IntegerField()
+            output_field=IntegerField(),
         )
-    ).order_by('priority', 'created_at')
+    ).order_by("priority", "created_at")
 
     context = {
         "title": "Unclaimed Floating Objects",
@@ -191,7 +191,7 @@ def mine(request, pk):
 
     item.state = "OK"
     item.claimed_by = request.user
-    item.claimed_at = datetime.datetime.now()  
+    item.claimed_at = datetime.datetime.now()
 
     item.save()
 

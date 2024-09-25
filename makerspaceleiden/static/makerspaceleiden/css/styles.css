@@ -60,13 +60,13 @@ a:visited {
 }
 
 a:focus {
-    text-decoration: none !important; 
-    outline: none; 
+    text-decoration: none !important;
+    outline: none;
 }
 
 a:target {
-    text-decoration: none !important; 
-} 
+    text-decoration: none !important;
+}
 
 dt, dd {
     font-size: 1.0rem;
@@ -182,8 +182,8 @@ input, textarea, select, .form-row p, form .button {
 }
 
 .btn-primary-custom:focus, .btn-primary-custom:active {
-    background-color: #417690 !important; 
-    border-color: #417690 !important; 
+    background-color: #417690 !important;
+    border-color: #417690 !important;
 }
 
 #user-profile-button {

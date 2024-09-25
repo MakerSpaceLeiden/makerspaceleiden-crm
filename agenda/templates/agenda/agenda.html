@@ -6,9 +6,9 @@
 
 
 <div class="col-md-9 mb-3">
-    This is the agenda to add and view events. To add new events, use 'Create New'. 
-    Click on an event in 'All events' to view details or 
-    toggle 'Include history' to see past events. Only the next 5 upcoming events will be 
+    This is the agenda to add and view events. To add new events, use 'Create New'.
+    Click on an event in 'All events' to view details or
+    toggle 'Include history' to see past events. Only the next 5 upcoming events will be
     shown on the home page. Feel free to create new events!
 </div>
 <div class="row mt-1">
@@ -44,31 +44,31 @@
 
                     {% if object_list %}
                         <div class="row">
-                            <div class="card-text mt-4 mb-4" style="word-wrap: break-word; white-space: pre-wrap;">{{ selected_item.item_details|urlize }} 
+                            <div class="card-text mt-4 mb-4" style="word-wrap: break-word; white-space: pre-wrap;">{{ selected_item.item_details|urlize }}
                             </div>
                             <br>
                         </div>
                         <div class="row row-sticky-bottom">
-                        
+
                             <div class="creation-info">
                                 <small>
-                                    Created: {{ creation_date|date:"l j M Y H:i" }} by 
+                                    Created: {{ creation_date|date:"l j M Y H:i" }} by
                                     <a href="{{created_by.path}}">
-                                        {{ created_by.first_name }} 
-                                    </a> 
+                                        {{ created_by.first_name }}
+                                    </a>
                                 </small>
                             </div>
                             {% if is_updated %}
                                 <div class="update-info">
                                     <small>
-                                        Last edited: {{ update_date|date:"l j M Y H:i" }} by 
+                                        Last edited: {{ update_date|date:"l j M Y H:i" }} by
                                         <a href="{{updated_by.path}}">
-                                            {{ updated_by.first_name }} 
-                                        </a> 
+                                            {{ updated_by.first_name }}
+                                        </a>
                                     </small>
                                 </div>
                             {% endif %}
-                        
+
                         </div>
                     {% endif %}
                 {% else %}
@@ -109,7 +109,7 @@
                 <ul class="list-group">
                     {% for agenda_item in object_list %}
                     <a class="list-group-item list-group-item-action pt-2 pb-1 " href="{% url 'agenda_detail' pk=agenda_item.pk %}?show_history={{ show_history }}" {% if selected_item.pk == agenda_item.pk %} style="border: 1px solid #606060; border-top-width: 1px; " {% endif %}>
-                              
+
                         <div class="row">
                                 <div class="col text-secondary" style="font-size: 14px;  ">
                                     {{ agenda_item.startdate|date:"d-m-Y" }} - {{ selected_item.starttime|time:"H:i"  }}
@@ -140,7 +140,7 @@
         display: flex;
         flex-direction: column;
         }
-    
+
     .creation-info,
     .update-info {
         margin-top: auto;
@@ -148,7 +148,7 @@
 
     .row-sticky-bottom {
         margin-top: auto;
-    }       
+    }
 </style>
 
 <script>

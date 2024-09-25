@@ -37,10 +37,10 @@ urlpatterns = [
     #
     path("acl/api/v1/getok/<str:machine>", views.api_getok, name="acl-v1-getok"),
     path(
-            "acl/api/v1/getok4node/<str:node>",
-            views.api_getok_by_node,
-            name="acl-v1-getok4-node",
-        ),
+        "acl/api/v1/getok4node/<str:node>",
+        views.api_getok_by_node,
+        name="acl-v1-getok4-node",
+    ),
     # Provide metadata on a tag, requires a valid tag and a bearer token.
     #
     # path("acl/api/v1/gettaginfo", views.api_gettaginfo, name="acl-v1-gettaginfo"),
