@@ -15,7 +15,6 @@ class NodeRedProxy(HttpProxy):
     base_url = settings.NODERED_URL
     reverse_urls = [
         (r"^nodered/(?P<url>.*)$", settings.NODERED_URL),
-        (r"^nodered/dashboard/(?P<url>.*)$", settings.NODERED_URL),
     ]
 
     @csrf_exempt
@@ -37,6 +36,26 @@ class NodeRedProxy(HttpProxy):
             else:
                 logger.warning("User is not logged in and cannot access nodered")
                 raise ObjectDoesNotExist()
+
+            return super().dispatch(request, *args, **kwargs)
+        except ObjectDoesNotExist:
+            return redirect("overview")
+        
+class NodeRedDashboardProxy(HttpProxy):
+    base_url = settings.NODERED_URL
+    reverse_urls = [
+        (r"^dashboard/(?P<url>.*)$", settings.NODERED_URL),
+    ]
+
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        #  Using rest auth outside of the rest framework requires a manual check
+        try:
+            if not request.user.is_authenticated:
+                logger.warning("User is not privileged to access nodered")
+                raise ObjectDoesNotExist()
+            else:
+                pass
 
             return super().dispatch(request, *args, **kwargs)
         except ObjectDoesNotExist:
