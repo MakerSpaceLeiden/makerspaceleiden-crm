@@ -85,6 +85,6 @@ curl --silent \
 	-H "SSL-CLIENT-CERT: $CLIENT_PEM" \
 	-H "SSL-SERVER-CERT: $SERVER_PEM" \
 	--cert client-$NAME.crt \
-        -d from=1 -d to=1 -d subject=foo -d msg="message" \
+        -d from=6 -d 'to=7' -d 'to=4' -d 'to=5' -d subject=foo -d msg="message" \
 	http://127.0.0.1:8000/terminal/api/v3/notify
 exit 0

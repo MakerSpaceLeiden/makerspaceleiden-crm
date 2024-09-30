@@ -226,44 +226,45 @@ def api2_register(request):
 def api3_notify(request, terminal):
     p = {}
     for f in "from", "to", "subject", "msg":
-        p[f] = request.POST.get(f)
+        p[f] = request.POST.getlist(f)
         if not p[f]:
             logger.error(f"api3_notify: param {f} missing")
             return HttpResponse("Missing param", status=422, content_type="text/plain")
     try:
-        sender = User.objects.get(pk=p["from"])
+        sender = User.objects.get(pk=p["from"][0])
     except User.DoesNotExist:
         logger.error(f"api3_notify: user {p['from']} not found")
         return HttpResponse("Not found", status=404, content_type="text/plain")
 
     dests = []
     for to in p["to"]:
-        print(f"to: {to}")
         try:
             g = (
                 User.objects.all()
                 .filter(groups__name=to)
                 .values_list("email", flat=True)
             )
-            if not g:
+            if g:
+                dests.append(g)
+            else:
                 d = User.objects.get(pk=to)
                 dests.append(d.email)
-                print(d)
-                print(d.email)
         except User.DoesNotExist:
             logger.error(f"api3_notify: dest {to} not found.")
-            return HttpResponse("Not found", status=404, content_type="text/plain")
+
+    if not dests:
+        logger.error(f"api3_notify: no destinations at all for <{p['to']}>, givign up.")
+        return HttpResponse("Not found", status=404, content_type="text/plain")
 
     emailPlain(
         "node_notify.txt",
-        subject=f"[{terminal.name}] {p['subject']}",
+        subject=f"[{terminal.name}] {p['subject'][0]}",
         toinform=dests,
         context={
             "terminal": terminal,
-            "subject": p["subject"],
-            "msg": p["msg"],
+            "subject": p["subject"][0],
+            "msg": p["msg"][0],
             "sender": sender,
         },
     )
-    print(dests)
     return HttpResponse("Sent", status=200, content_type="text/plain")
