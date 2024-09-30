@@ -614,7 +614,7 @@ def api_gettags4machine(request, terminal=None, machine=None):
     try:
         machine = Machine.objects.get(name=machine)
     except ObjectDoesNotExist:
-        logger.error(f"Machine {machine} not found, denied.")
+        logger.error(f"get4machine: Machine '{machine}' not found, denied.")
         return HttpResponse("Machine not found", status=404, content_type="text/plain")
 
     out = []
@@ -709,9 +709,10 @@ def byte_xor(ba1, ba2):
 #
 def tags4machineBIN(terminal=None, machine=None):
     try:
-        machine = Machine.objects.get(name=machine)
+        machine = Machine.objects.get(node_machine_name=machine)
         ctc = change_tracker_counter()
     except ObjectDoesNotExist:
+        logger.error(f"BIN request for an unknown machine: {machine} (node-machine-name)")
         raise ObjectDoesNotExist
 
     tl = []
@@ -802,7 +803,7 @@ def api_gettags4machineBIN(request, terminal=None, machine=None):
     try:
         out = tags4machineBIN(terminal, machine)
     except ObjectDoesNotExist:
-        logger.error(f"Machine {machine} not found, denied.")
+        logger.error(f"getBIN: Machine '{machine}' not found, denied.")
         return HttpResponse("Machine not found", status=404, content_type="text/plain")
     except Exception as e:
         logger.error(f"Exception: {e}")
@@ -818,7 +819,7 @@ def api_getok(request, machine=None, tag=None):
     try:
         machine = Machine.objects.get(node_machine_name=machine)
     except ObjectDoesNotExist:
-        logger.error("Machine '{}' not found, denied.".format(machine))
+        logger.error("getok: Machine '{}' not found, denied.".format(machine))
         return HttpResponse("Machine not found", status=404, content_type="text/plain")
     try:
         r = RecentUse(user=tag.owner, machine=machine)
