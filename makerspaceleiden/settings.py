@@ -308,6 +308,11 @@ MAX_PAY_TRUSTEE = Money(
 )  # as for Reimbursement; but now for 'is_priv' users.
 CURRENCIES = ["EUR"]
 
+# Minimal balance needed to be listed as `good for
+# your money' - not a real time thing; just a soft
+# indicator.
+MIN_BALANCE_FOR_CREDIT = Money(-25.00, EUR)
+
 # How long an admin has to accept a new terminal post
 # it booting up with a new key.
 #
@@ -324,6 +329,11 @@ PETTYCASH_TERMS_MIN_UNKNOWN = 1
 PETTYCASH_TERMS_MINS_CUTOFF = 10
 
 NODERED_URL = "http://localhost:1880"
+
+# Notification aliases
+NOTIFICATION_MAP = {
+    "noc": "noc@makerspaceleiden.nl",
+}
 
 try:
     from .local import *  # noqa: F403

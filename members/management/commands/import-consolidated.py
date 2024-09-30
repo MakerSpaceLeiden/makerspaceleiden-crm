@@ -93,7 +93,9 @@ class Command(BaseCommand):
 
                     machine, wasCreated = Machine.objects.get_or_create(name=w)
                     machine.description = "The " + w + " machine"
-                    # machine.location = loc
+                    # machine.location = lo
+                    machine.node_name = "Node" + machine.name.upper()
+                    machine.node_machine_name = machine.name.lower()
                     machine.requires_form = True
                     machine.requires_instruction = True
                     machine.requires_permit = permit
