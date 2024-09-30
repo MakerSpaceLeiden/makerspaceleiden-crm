@@ -230,14 +230,25 @@ def api3_notify(request, terminal):
         if not p[f]:
             logger.error(f"api3_notify: param {f} missing")
             return HttpResponse("Missing param", status=422, content_type="text/plain")
-    try:
-        sender = User.objects.get(pk=p["from"][0])
-    except User.DoesNotExist:
-        logger.error(f"api3_notify: user {p['from']} not found")
-        return HttpResponse("Not found", status=404, content_type="text/plain")
+
+    sender = None
+    if p["from"][0] != terminal.name:
+        try:
+            sender = User.objects.get(pk=p["from"][0])
+        except Exception:  # also catch invalid conversions, etc.
+            logger.error(f"api3_notify: user {p['from']} not found")
+            return HttpResponse("Not found", status=404, content_type="text/plain")
 
     dests = []
     for to in p["to"]:
+        if to in settings.NOTIFICATION_MAP:
+            # Allow the entry to be empty - as to effectively
+            # filter things (useful; as firmware is harder to change).
+            #
+            if settings.NOTIFICATION_MAP[to]:
+                dests.append(settings.NOTIFICATION_MAP[to])
+            continue
+
         try:
             g = (
                 User.objects.all()
@@ -246,11 +257,12 @@ def api3_notify(request, terminal):
             )
             if g:
                 dests.append(g)
-            else:
-                d = User.objects.get(pk=to)
-                dests.append(d.email)
-        except User.DoesNotExist:
-            logger.error(f"api3_notify: dest {to} not found.")
+                continue
+
+            d = User.objects.get(pk=to)
+            dests.append(d.email)
+        except Exception:
+            logger.error(f"api3_notify: dest {to} not found")
 
     if not dests:
         logger.error(f"api3_notify: no destinations at all for <{p['to']}>, givign up.")
@@ -264,6 +276,7 @@ def api3_notify(request, terminal):
             "terminal": terminal,
             "subject": p["subject"][0],
             "msg": p["msg"][0],
+            "to": p["to"],
             "sender": sender,
         },
     )

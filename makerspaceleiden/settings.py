@@ -330,6 +330,11 @@ PETTYCASH_TERMS_MINS_CUTOFF = 10
 
 NODERED_URL = "http://localhost:1880"
 
+# Notification aliases
+NOTIFICATION_MAP = {
+    "noc": "noc@makerspaceleiden.nl",
+}
+
 try:
     from .local import *  # noqa: F403
 except ImportError:
