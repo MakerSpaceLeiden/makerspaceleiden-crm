@@ -84,4 +84,9 @@ urlpatterns = [
         views.api_gettags4machineBIN,
         name="acl-v1-gettags-bin",
     ),
+    path(
+        "acl/api/v2/gettags4machineBIN/<str:machine>",
+        views.api2_gettags4machineBIN,
+        name="acl-v2-gettags-bin",
+    ),
 ]

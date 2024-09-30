@@ -2,10 +2,9 @@ import sys
 
 from django.core.management.base import BaseCommand
 
-from acl.views import tags4machineBIN
-
-from members.models import User
 from acl.models import Machine, useNeedsToStateStr
+from members.models import User
+
 
 class Command(BaseCommand):
     help = "Export binary tag/member file for a given machine."
@@ -17,7 +16,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         rc = 0
 
-        terminal = None
         machine = options["machine"]
         user = options["user"]
 
@@ -27,6 +25,6 @@ class Command(BaseCommand):
         (needs, has) = machine.useState(user)
         res = needs & has
         print(f"has({has:X}) & needs({needs:X}) = {res:X}")
-        print(useNeedsToStateStr(needs,has))
+        print(useNeedsToStateStr(needs, has))
 
         sys.exit(rc)

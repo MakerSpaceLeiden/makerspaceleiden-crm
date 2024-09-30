@@ -707,12 +707,18 @@ def byte_xor(ba1, ba2):
 #
 # 116+LT+LM                      EOF
 #
-def tags4machineBIN(terminal=None, machine=None):
+# MSL2 -- same as above; but the AES block no longer just contains
+# the name of the user; but also their unqiue user ID (for API
+# purposes) and their first/last name separate.
+#
+def tags4machineBIN(terminal=None, machine=None, v2=False):
     try:
         machine = Machine.objects.get(node_machine_name=machine)
         ctc = change_tracker_counter()
     except ObjectDoesNotExist:
-        logger.error(f"BIN request for an unknown machine: {machine} (node-machine-name)")
+        logger.error(
+            f"BIN request for an unknown machine: {machine} (node-machine-name)"
+        )
         raise ObjectDoesNotExist
 
     tl = []
@@ -738,9 +744,17 @@ def tags4machineBIN(terminal=None, machine=None):
         # by ESP32 anyway).
         #
         name = user.name()
-        clr = pad(name.encode("utf-8"), AES.block_size)
+        block = b""
+        if v2:
+            block += user.id.to_bytes(4, "big")
+            block += user.first_name.encode("utf-8") + b"\0"
+            block += user.last_name.encode("utf-8") + b"\0"
+        else:
+            block += name.encode("utf-8")
+
+        clr = pad(block, AES.block_size)
         if len(clr) > 128:
-            raise Exception("name too large")
+            raise Exception("information block too large")
 
         enc = AES.new(key, AES.MODE_CBC, iv=uiv).encrypt(clr)
 
@@ -780,7 +794,10 @@ def tags4machineBIN(terminal=None, machine=None):
         tlb += e["udx"].to_bytes(4, "big")
 
     hdr = b""
-    hdr += "MSL1".encode("ASCII")
+    if v2:
+        hdr += "MSL2".encode("ASCII")
+    else:
+        hdr += "MSL1".encode("ASCII")
     hdr += ctc.count.to_bytes(
         4, "big"
     )  # byte order not strictly needed - opaque 4 bytes.
@@ -802,6 +819,21 @@ def tags4machineBIN(terminal=None, machine=None):
 def api_gettags4machineBIN(request, terminal=None, machine=None):
     try:
         out = tags4machineBIN(terminal, machine)
+    except ObjectDoesNotExist:
+        logger.error(f"getBIN: Machine '{machine}' not found, denied.")
+        return HttpResponse("Machine not found", status=404, content_type="text/plain")
+    except Exception as e:
+        logger.error(f"Exception: {e}")
+        return HttpResponse("Internal Error", status=500, content_type="text/plain")
+
+    return HttpResponse(out, status=200, content_type="application/octet-stream")
+
+
+@csrf_exempt
+@is_paired_terminal
+def api2_gettags4machineBIN(request, terminal=None, machine=None):
+    try:
+        out = tags4machineBIN(terminal, machine, v2=True)
     except ObjectDoesNotExist:
         logger.error(f"getBIN: Machine '{machine}' not found, denied.")
         return HttpResponse("Machine not found", status=404, content_type="text/plain")
