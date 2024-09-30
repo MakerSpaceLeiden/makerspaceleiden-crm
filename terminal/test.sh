@@ -80,4 +80,11 @@ else
 	exit 1
 fi
 
+curl --silent \
+ 	-H "X-FORWARDED-FOR: ${IP}"  \
+	-H "SSL-CLIENT-CERT: $CLIENT_PEM" \
+	-H "SSL-SERVER-CERT: $SERVER_PEM" \
+	--cert client-$NAME.crt \
+        -d from=1 -d to=1 -d subject=foo -d msg="message" \
+	http://127.0.0.1:8000/terminal/api/v3/notify
 exit 0
