@@ -1,5 +1,6 @@
 import hashlib
 import logging
+import re
 import secrets
 from functools import wraps
 
@@ -679,6 +680,21 @@ def byte_xor(ba1, ba2):
     return bytes([_a ^ _b for _a, _b in zip(ba1, ba2)])
 
 
+def nameShorten(name, maxlen=10):
+    if len(name) <= maxlen:
+        return name
+    # parts = name.split(' ')
+    parts = re.split("[^a-zA-Z]", name)
+    name = parts.pop(0)
+    for i in parts:
+        if len(name) > maxlen - 1:
+            return name[0:maxlen]
+        if len(name) + len(i) > maxlen:
+            i = i[0]
+        name += i
+    return name
+
+
 # Note: we are not checking if this terminal is actually associated
 #       with this node or machine. I.e any valid terminal can ask
 #       anything about the others. We may not want that in the future.
@@ -734,6 +750,15 @@ def tags4machineBIN(terminal=None, machine=None, v2=False):
         key = secrets.token_bytes(32)
         uiv = hashlib.sha256(iv + udx.to_bytes(4, "big")).digest()[0:16]
 
+        name = user.name()
+        block = b""
+        if v2:
+            # The identifier is treated like an opaque string; i.e. it may well be a UUID, etc.
+            block += str(user.id).encode("ASCII") + b"\0"
+            # shorter, simplified name for very small display purposes.
+            block += nameShorten(user.first_name.encode("ASCII"), 12) + b"\0"
+        block += name.encode("utf-8")
+
         # This is a weak AES mode; with no protection against
         # bit flipping, clear text, etc. However it is integrity
         # protected during transport; and only protects a name
@@ -743,15 +768,6 @@ def tags4machineBIN(terminal=None, machine=None, v2=False):
         # modern mode such as CGM (which # is not supported yet
         # by ESP32 anyway).
         #
-        name = user.name()
-        block = b""
-        if v2:
-            block += user.id.to_bytes(4, "big")
-            block += user.first_name.encode("utf-8") + b"\0"
-            block += user.last_name.encode("utf-8") + b"\0"
-        else:
-            block += name.encode("utf-8")
-
         clr = pad(block, AES.block_size)
         if len(clr) > 128:
             raise Exception("information block too large")
