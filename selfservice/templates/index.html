@@ -13,7 +13,7 @@ function toggle() {
 </script>
 
 {% if is_logged_in %}
-<div class="row"> 
+<div class="row">
 	<div class="col-xl-9 col-lg-9 col-sm-12">
 	<!-- Agenda -->
 		<div class="pt-2 pb-2">
@@ -92,10 +92,10 @@ function toggle() {
 															{% elif volunteer is None %}
 																<i>Volunteer needed</i>
 															{% elif volunteer.id  %}
-																Volunteer: 
+																Volunteer:
 																<a href="{{volunteer.path}}">
-																	{{ volunteer.first_name }} 
-																</a> 
+																	{{ volunteer.first_name }}
+																</a>
 
 															{% endif %}
 														</div>
@@ -124,7 +124,7 @@ function toggle() {
 		</div>
 
 	<!-- Unclaimed Floating Objects -->
-		<div class="mt-4 pt-2 pb-2">	
+		<div class="mt-4 pt-2 pb-2">
 			<h2>Unclaimed Floating Objects</h2>
 			<div class="mb-3">
 				Free floating objects or projects spotted at the space (max 4). Add a newly spotted object <a href="{% url 'ufo' %}">here</a>.
@@ -264,7 +264,7 @@ function toggle() {
 					{% for activity in recent_activity %}
 						<div>
 							<div style="font-weight:700">
-								{{ activity.machine.name }} 
+								{{ activity.machine.name }}
 							</div>
 							<div  style="font-size:.85rem;margin-bottom:2px; margin-top:2px">
 								({{ activity.used|date:"D Y-n-j H:i:s" }})
@@ -389,11 +389,11 @@ function toggle() {
 
 	/* Style UFO rounded-image */
 	.rounded-image {
-		width: 100%; 
-		height: 220px; 
-		object-fit: cover; 
-		border-radius: 50%; 
-		border: 2px solid #ddd; 	
+		width: 100%;
+		height: 220px;
+		object-fit: cover;
+		border-radius: 50%;
+		border: 2px solid #ddd;
 	}
 
 	.balance-circle {
@@ -426,4 +426,3 @@ function toggle() {
 </style>
 
 {% endblock %}
-

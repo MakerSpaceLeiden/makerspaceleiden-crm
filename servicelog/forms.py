@@ -8,7 +8,7 @@ class ServicelogForm(forms.ModelForm):
     out_of_order = forms.BooleanField(
         required=False,
         initial=True,
-        help_text="<p>Is the machine currently broken and should not be used until it is fixed?</p> <p><strong>Check this box if:</strong></p> <ul> <li><small>The machine is dangerous to use (e.g., a broken safety feature, risk of injury, or potential damage to work) or,</small></li> <li><small>it is likely to damage the next person’s work (e.g., a knick in a blade).</small></li> </ul><p><strong>Uncheck this box if: </strong></p> <ul> <li><small>The machine is no longer out of order and is safe to use.</small></li></ul>"
+        help_text="<p>Is the machine currently broken and should not be used until it is fixed?</p> <p><strong>Check this box if:</strong></p> <ul> <li><small>The machine is dangerous to use (e.g., a broken safety feature, risk of injury, or potential damage to work) or,</small></li> <li><small>it is likely to damage the next person’s work (e.g., a knick in a blade).</small></li> </ul><p><strong>Uncheck this box if: </strong></p> <ul> <li><small>The machine is no longer out of order and is safe to use.</small></li></ul>",
     )
 
     def __init__(self, *args, **kwargs):

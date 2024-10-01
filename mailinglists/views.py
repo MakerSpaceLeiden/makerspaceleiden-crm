@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 @login_required
 def mailinglists_edit(request, user_id=None):
-    cancel_button_url = request.GET.get('redirect_to', 'index')
+    cancel_button_url = request.GET.get("redirect_to", "index")
     user = request.user
     if user_id:
         try:

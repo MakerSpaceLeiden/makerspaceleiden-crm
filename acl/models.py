@@ -13,6 +13,7 @@ from django.urls import reverse
 from django.utils import timezone
 from simple_history.models import HistoricalRecords
 
+# from pettycash.models import PettycashBalanceCache
 from members.models import Tag, User
 
 logger = logging.getLogger(__name__)
@@ -31,6 +32,8 @@ class MachineUseFlags(IntEnum):
     PERMIT = 2
     FORM = 4
     APPROVE = 8
+    INSTRUCT = 16
+    BUDGET = 32
 
 
 def bits2str(needs, has):
@@ -39,6 +42,9 @@ def bits2str(needs, has):
             return "ok"
         else:
             return "fail"
+    else:
+        if has:
+            return "NN"
     return "nn"
 
 
@@ -55,6 +61,15 @@ def useNeedsToStateStr(needs, has):
     out += ", approve:" + bits2str(
         needs & MachineUseFlags.APPROVE, has & MachineUseFlags.APPROVE
     )
+    if has & MachineUseFlags.INSTRUCT:
+        out += ", instructor=yes"
+    else:
+        out += ", instructor=no"
+    if has & MachineUseFlags.BUDGET:
+        out += ", budget=sufficient"
+    else:
+        out += ", budget=no"
+
     out += " = "
     if has & needs == needs:
         out += "ok"
@@ -91,7 +106,8 @@ class PermitType(models.Model):
         return False
 
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]
+
 
 class Location(models.Model):
     name = models.CharField(max_length=40, unique=True)
@@ -102,7 +118,8 @@ class Location(models.Model):
         return self.name
 
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]
+
 
 class NodeField(models.CharField):
     def get_prep_value(self, value):
@@ -188,6 +205,13 @@ class Machine(models.Model):
             flags |= MachineUseFlags.PERMIT
         if e and e.active:
             flags |= MachineUseFlags.APPROVE
+        if self.canInstruct(user):
+            flags |= MachineUseFlags.INSTRUCT
+        # ce = PettycashBalanceCache.objects.get(owner=user)
+        # if ce.balance > settings.MIN_BALANCE_FOR_CREDIT:
+        if user.pettycash_cache.first().balance > settings.MIN_BALANCE_FOR_CREDIT:
+            flags |= MachineUseFlags.BUDGET
+
         return [needs, flags]
 
     def canOperate(self, user):
@@ -209,7 +233,8 @@ class Machine(models.Model):
         return self.requires_permit.permit.hasThisPermit(user)
 
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]
+
 
 # Special sort of create/get - where we ignore the issuer when looking for it.
 # but add it in if we're creating it for the first time.
@@ -396,7 +421,6 @@ class Entitlement(models.Model):
         # should we check for duplicates here too ?
         #
         return super(Entitlement, self).save(*args, **kwargs)
-
 
 
 class RecentUse(models.Model):
