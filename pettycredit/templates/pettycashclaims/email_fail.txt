@@ -1,0 +1,19 @@
+{% autoescape off %}Subject: [Pettycredit @ {{ terminal }}]: {{ subject }}
+
+Unexpected failure with (pre)payments at terminal {{ terminal }}. Here is
+wwhat we know:
+
+ * Error: {{ error }}
+
+ * Arguments: {{ args }}
+
+ * Claim: {% if claim %} {{ claim.amount }}
+      {{ claim.description }}
+      {{ claim.date }} -- {{ claim.expires }}
+      Settled: {{ claim.settled }}
+{% else %}none yet{% endif %}
+
+And perhaps some more information at {% url 'claims' %}
+--
+Paybot
+{% endautoescape %}

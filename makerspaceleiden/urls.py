@@ -48,6 +48,7 @@ urlpatterns = [
     path("kwh/", include("kwh.urls")),
     path("ultimaker/", include("ultimaker.urls")),
     path("pettycash/", include("pettycash.urls")),
+    path("pettycredit/", include("pettycredit.urls")),
     path("spaceapi/", include("spaceapi.urls")),
     path("terminal/", include("terminal.urls")),
     path("", include("nodered.urls")),

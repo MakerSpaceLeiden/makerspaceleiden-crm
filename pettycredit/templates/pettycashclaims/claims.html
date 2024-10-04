@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load isingroup %}
+
+{% block content %}
+
+Claims; including recently settled claims:
+
+<ol>
+{% for e in claims %}
+      <li>
+      {% if e.claim.settled %}<strike><font color=gray>{% endif %}
+      <p> {{ e.claim.src }} {{ e.claim.description }} <br>
+          {{ e.claim.date }} expires {{ e.claim.end_date }} <br>
+          <ol>
+          {% for c in e.log %}
+               <li>{{ c.description }} {{ c.date }} <br>
+                <b>{{ c.amount }}</b>
+          {% endfor %}
+          </ol>
+          <b>{{ e.claim.amount}}</b>
+      </p>
+      {% if e.claim.settled %}</font></strike>This claim has been settled{% endif %}
+{% endfor %}
+</ol>
+
+<a href="{% url 'index' %}">Back to the main page</a>
+
+{% endblock %}
