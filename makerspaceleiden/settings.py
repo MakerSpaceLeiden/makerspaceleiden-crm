@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     "mainssensor.apps.MainssensorConfig",
     "kwh.apps.KwhConfig",
     "pettycash.apps.PettycashConfig",
+    "pettycredit.apps.PettycreditConfig",
     "ultimaker.apps.UltimakerConfig",
     "spaceapi.apps.SpaceapiConfig",
     "memberlist",
@@ -288,6 +289,11 @@ PETTYCASH_TNS = "Stichting Makerspace Leiden"
 PETTYCASH_IBAN = "NL18RABO0123459876"
 DEVELOPERS_ADMIN_GROUP = "developers"
 NODERED_ADMIN_GROUP = "node-red admin group"
+
+# Validity of any payment claims; e.g. when
+# we lose power or a node hangs.
+#
+CLAIM_EXPIRY_HOURS = 72
 
 # Assets of former participants; such as money or
 # boxes need to be caught somewhere. This user,
