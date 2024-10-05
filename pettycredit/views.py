@@ -3,7 +3,6 @@ from datetime import timedelta
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.db import transaction
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.utils import timezone
@@ -27,7 +26,6 @@ def email_fail(
     args=None,
     subject="Error in Pettycash credit",
 ):
-    return
     admins = emails_for_group(settings.PETTYCASH_ADMIN_GROUP)
     if user and user.email:
         admins.append(user.email)
@@ -43,16 +41,24 @@ def email_fail(
 
 @login_required
 def claims(request):
-    claims = PettycreditClaim.objects.order_by("pk")
+    claims = PettycreditClaim.objects.order_by("pk").reverse()
     out = []
+    settled = 0
+    pending = 0
     for c in claims:
         out.append(
             {"claim": c, "log": PettycreditClaimChange.objects.filter(claim_id=c)}
         )
+        if c.settled:
+            settled += 1
+        else:
+            pending += 1
     context = {
-        "title": "Spend",
+        "title": "Claims",
         "settings": settings,
         "claims": out,
+        "settled": settled,
+        "pending": pending,
     }
     return render(request, "pettycashclaims/claims.html", context)
 
@@ -94,10 +100,10 @@ def api1_claim(request, terminal):
             error=e,
             terminal=terminal,
             claim=claim,
-            args=p,
+            args=dict(request.POST.items()),
         )
 
-        return HttpResponse("Error", status=500, content_type="text/plain")
+        return HttpResponse("ERROR", status=500, content_type="text/plain")
 
     return HttpResponse(
         str(claim.pk).encode("ASCII"), status=200, content_type="text/plain"
@@ -113,23 +119,20 @@ def api1_updateclaim(request, terminal):
         if not p[f]:
             logger.error(f"api1_claim: param {f} missing")
             return HttpResponse("Missing param", status=422, content_type="text/plain")
-    hours = request.POST.get("hours")
-    amount = request.POST.get("amount")
+    hours = request.POST.get("hours") or 0
+    amount = request.POST.get("amount") or Money(0, EUR)
 
     p["desc"] = f"[{terminal.name} update]: {p['desc']}"
+    claim = None
     try:
         if amount:
             amount = Money(float(amount), EUR)
-        claim = PettycreditClaim.objects.get(pk=p["cid"])
+        if hours:
+            hours = float(hours)
 
-        with transaction.atomic():
-            PettycreditClaimChange(description=p["desc"], claim_id=claim).save()
-            if amount:
-                claim.amount = amount
-            if hours:
-                claim.end_date = timezone.now() + timedelta(hours=float(hours))
-            if hours or amount:
-                claim.save()
+        claim = PettycreditClaim.objects.get(pk=p["cid"])
+        claim.updateclaim(desc=p["desc"], amount=amount, hours=hours)
+
     except Exception as e:
         logger.error(f"api1_updateclaim: could complete updating claim: {e}")
         email_fail(
@@ -137,9 +140,9 @@ def api1_updateclaim(request, terminal):
             error=e,
             terminal=terminal,
             claim=claim,
-            args=p,
+            args=dict(request.POST.items()),
         )
-        return HttpResponse("Error", status=500, content_type="text/plain")
+        return HttpResponse("ERROR", status=500, content_type="text/plain")
 
     return HttpResponse("OK", status=200, content_type="text/plain")
 
@@ -163,7 +166,7 @@ def api1_settle(request, terminal):
         if not desc:
             desc = claim.desc
 
-        claim.settle(f"[{terminal.name}] settle: {desc}", amount)
+        claim.settle(f"{desc} (settled on { terminal.name })", amount)
     except Exception as e:
         logger.error(f"api1_updateclaim: could settle claim: {e}")
         email_fail(
@@ -171,8 +174,8 @@ def api1_settle(request, terminal):
             error=e,
             terminal=terminal,
             claim=claim,
-            args=p,
+            args=dict(request.POST.items()),
         )
-        return HttpResponse("Error", status=500, content_type="text/plain")
+        return HttpResponse("ERROR", status=500, content_type="text/plain")
 
     return HttpResponse("OK", status=200, content_type="text/plain")

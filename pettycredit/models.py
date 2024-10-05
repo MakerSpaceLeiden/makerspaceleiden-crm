@@ -42,6 +42,12 @@ class PettycreditClaim(models.Model):
         default=False,
         help_text="Wether or not the claim has been settled already",
     )
+    settled_tx = models.ForeignKey(
+        PettycashTransaction,
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+    )
     date = models.DateTimeField(
         default=timezone.now,
         help_text="Date of the claim",
@@ -72,16 +78,36 @@ class PettycreditClaim(models.Model):
             self.amount,
         )
 
-    def settle(self, desc, amount):
+    def updateclaim(self, desc=None, amount=None, hours=0):
+        if desc is None:
+            desc = f"{self.description} (update)"
         with transaction.atomic():
             PettycreditClaimChange(description=desc, claim_id=self).save()
+            if amount is None:
+                self.amount = amount
+            if hours > 0:
+                self.end_date = timezone.now() + timedelta(hours=float(hours))
+            self.save()
 
-            PettycashTransaction(
-                src=self.src,
-                dst=self.dst,
-                amount=amount,
-                description=self.description,
+    def settle(self, desc=None, amount=None):
+        if desc is None:
+            desc = self.description
+        if amount is None:
+            amount = self.amount
+        with transaction.atomic():
+            PettycreditClaimChange(
+                description=f"{desc} (final settling)", claim_id=self
             ).save()
+
+            if amount != Money(0, EUR):
+                tx = PettycashTransaction(
+                    src=self.src,
+                    dst=self.dst,
+                    amount=amount,
+                    description=desc,
+                )
+                tx.save()
+                self.settled_tx = tx
 
             self.amount = amount
             self.settled = True

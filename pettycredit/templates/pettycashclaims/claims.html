@@ -2,27 +2,55 @@
 {% load isingroup %}
 
 {% block content %}
+<script>
+function hideshow() {
+  const btn = document.getElementById('swapBtn');
+  const initialText = "Also show completed settlements"
+  btn.textContent = btn.textContent == initialText ? "Hide completed settlements" : initialText
+  var divs = document.getElementsByClassName('settled');
+  for(var i = 0; i < divs.length; i++) {
+    divs[i].style.display = divs[i].style.display == "block" ? "none" : "block";
+ }
+}
+</script>
 
-Claims; including recently settled claims:
-
-<ol>
+{% if pending == 0 %}There are no pending claims. All caims are settled.{% endif %}
+<ul>
 {% for e in claims %}
-      <li>
-      {% if e.claim.settled %}<strike><font color=gray>{% endif %}
-      <p> {{ e.claim.src }} {{ e.claim.description }} <br>
-          {{ e.claim.date }} expires {{ e.claim.end_date }} <br>
+      <div
+           class={% if e.claim.settled %}"settled"{% else %}"pending"{%endif%}
+           {% if e.claim.settled %}style="display: none"{%endif%}
+      >
+      {% if e.claim.settled %}<font color="lightgrey">{% endif %}
+      <li> {{ e.claim.src }} {{ e.claim.description }}<br>
+         {% if e.claim.settled %}<strike>{% endif %}
+          {{ e.claim.date }}
+            {% if e.claim.settled %}{% else %}
+                (<i>Will settle automatically {{ e.claim.end_date |date:"F j, Y" }}, just after midnight, if the transaction is not completed before</i>)
+            {% endif %}
+           <br>
           <ol>
           {% for c in e.log %}
                <li>{{ c.description }} {{ c.date }} <br>
-                <b>{{ c.amount }}</b>
           {% endfor %}
           </ol>
           <b>{{ e.claim.amount}}</b>
-      </p>
-      {% if e.claim.settled %}</font></strike>This claim has been settled{% endif %}
+      </br>
+      {% if e.claim.settled %}></strike></font>
+		This claim has been settled{% if e.claim.settled_tx %}
+                     (<a href="{% url 'transactiondetail' pk=e.claim.settled_tx.pk  %}">details on the transaction</a>)
+		{%endif%}.
+                <br>
+      {% endif %}
+      </div>
 {% endfor %}
-</ol>
+</ul>
 
+<button id=swapBtn onclick="hideshow()">Also show completed settlements</button>
+<pre>
+
+</pre>
+<hr>
 <a href="{% url 'index' %}">Back to the main page</a>
 
 {% endblock %}
