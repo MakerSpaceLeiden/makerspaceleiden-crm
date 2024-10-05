@@ -10,11 +10,22 @@ from pettycredit.models import PettycreditClaim
 class Command(BaseCommand):
     help = "Process any pending claims"
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--days",
+            dest="days",
+            action="store",
+            default=0,
+            type=int,
+            help="Run this as-if so many days into the future, useful for testing or a purge",
+        )
+
     def handle(self, *args, **options):
-        cutoff = datetime.date.today() + datetime.timedelta(days=0)
+        cutoff = datetime.date.today() + datetime.timedelta(days=options["days"])
         rc = 0
 
         for c in PettycreditClaim.objects.filter(Q(end_date__lt=cutoff)):
-            c.settle("Forced settlement due to claim expiring", c.amount)
+            c.description = f"{c.description} (settlement due to claim expiring)"
+            c.settle("Settlement due to claim expiring", c.amount)
 
         sys.exit(rc)
