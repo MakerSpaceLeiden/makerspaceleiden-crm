@@ -213,7 +213,7 @@ class PettycashTransaction(models.Model):
     def save(self, *args, **kwargs):
         bypass = False
 
-        max_val = settings.MAX_PAY_REIMBURSE.amount
+        max_val = settings.MAX_PAY_CRM.amount
         if kwargs is not None:
             if "bypass" in kwargs:
                 bypass = kwargs["bypass"]
