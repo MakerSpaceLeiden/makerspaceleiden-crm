@@ -2,43 +2,61 @@
 
 {% block content %}
 
-<a href="{% url 'addufo' %}">[ add one ]</a> or do a <a href="{% url 'uploadufo' %}">[ bulk upload ]</a> by means of a zip file of images.
+<div class="row mb-4">
+	<div class="col-12">
+	<p>
+		You can use this page to manage unclaimed items in the makerspace.
+		Found something without an owner?
+		Take a photo and upload it.
+		Members can then identify and claim their belongings.
+		Help us keep the makerspace tidy and efficient by using the UFO application
+		for any unclaimed objects you find!
+	</p>
+	</div>
+</div>
+
+<div class="mb-3">
+	<a href="{% url 'addufo' %}" >[ Add a New UFO ]</a>
+	{% comment %} or do a <a href="{% url 'uploadufo' %}" class="btn btn-secondary">[ Bulk Upload ]</a> by means of a zip file of images. {% endcomment %}
+</div>
 
 {% if lst %}
-<p/>
-<table>
-  {% for item in lst %}
-  <tr valign=top>
-        <td rowspan=2 valign=top><a label="item.id">{{ item.get_state_display }}</a></td>
-	<td rowspan=2 valign=top><a href="{{ item.image.url   }}"><img alt="" src="{{ item.image.medium.url   }}"/></a>
-  	<td>{{ item.description }}</td>
-	{%if item.owner %}
-  	<td>{{ item.owner }}</td>
-	{%endif%}
-  </tr><tr>
-	<td colspan=3>
-		<b><a href="{% url 'mine' pk=item.id %}">[Claim this]</a><b>
-		--
-		<a href="{% url 'showufo' pk=item.id %}">[view]</a>
-		<a href="{% url 'changeufo' pk=item.id %}">[modify]</a>
-		<a href="{% url 'deleteufo' pk=item.id %}">[delete]</a>
-	</td>
-  </tr>
-  {% endfor %}
-</table>
-{% if days %}
-<b>Note: Only showing the last {{ days }} day(s) for items that are already claimed.</b> (And all unclaimed items).
-{% endif %}
-<p/>
-Show only data relevant for
-<a href="7">last week</a>,
-<a href="30">last month</a> or
-<a href="0">all times</a>
-<p/>
+	<div class="row">
+	{% for item in lst %}
+		<div class="col-12 mb-4">
+		<div class="d-flex flex-column flex-sm-row align-items-start">
+			<div class="me-3 mb-2 mb-sm-0">
+			{{ item.get_state_display }}
+			</div>
+			<div class="me-3 mb-2 mb-sm-0">
+			<a href="{{ item.image.url }}">
+				<img alt="" src="{{ item.image.medium.url }}" class="img-thumbnail"/>
+			</a>
+			</div>
+			<div class="flex-grow-1">
+			<p>{{ item.description }} <br><br>
+			Spotted on: {{ item.created_at|date:"d-m @ H:i" }}</p>
+			{% if item.state == "OK" %}
+				<p>Claimed by: <a href="{{ item.claimed_by.path }}">{{ item.claimed_by.first_name }}</a></p>
+			{% endif %}
+			{% if item.owner %}
+				<p>Owner: {{ item.owner }}</p>
+			{% endif %}
+			</div>
+		</div>
+		<div class="mt-2">
+			<b><a href="{% url 'mine' pk=item.id %}">[Claim this item]</a></b> --
+			<a href="{% url 'showufo' pk=item.id %}">[View]</a>
+			<a href="{% url 'changeufo' pk=item.id %}">[Modify]</a>
+			<a href="{% url 'deleteufo' pk=item.id %}">[Delete]</a>
+		</div>
+		</div>
+	{% endfor %}
+	</div>
+
 {% else %}
-No free floating objects that need a home. At the moment.
+	<p>No free floating objects that need a home. At the moment.</p>
 {% endif %}
-<p/>
 
 
 {% endblock %}

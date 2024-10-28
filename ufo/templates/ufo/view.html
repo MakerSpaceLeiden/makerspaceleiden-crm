@@ -2,20 +2,32 @@
 
 {% block content %}
 
-<a href="{{ item.image.url   }}"><img alt="" src="{{ item.image.large.url   }}"/></a>
+<a href="{{ item.image.url }}"><img alt="" src="{{ item.image.large.url }}" /></a>
 <p>
-{{ item.description }}
-<br>
-Removal deadline: {{ item.deadline }}
-<br>
-Disposal date: {{ item.dispose_by_date }}
-<br>
-{%if item.owner %}
-Person now responsible: {{ item.owner }}
-{%endif%}
-<p/>
-Item can be claimed until {{ item.deadline }} - and it will be disposed if not claimed {{item.dispose_by_date}}.
-<p/>
+    {{ item.description }}
+    <br>
+
+    {% if item.state == "OK" %}
+        Claimed by: <a href={{ item.claimed_by.path }}>{{ item.claimed_by.first_name }}</a> <br>
+        Claimed on: {{ item.claimed_at|date:"m-d @ H:i" }} <br>
+    {% endif %}
+
+    Spotted on: {{ item.created_at|date:"m-d @ H:i" }}
+    <br><br>
+    Removal deadline: {{ item.deadline }}
+    <br>
+    Disposal date: {{ item.dispose_by_date }}
+    <br>
+
+    {% if item.owner %}
+        Person now responsible: {{ item.owner }}
+    {% endif %}
+</p>
+
+<p>
+    Item can be claimed until {{ item.deadline }} - and it will be disposed if not claimed {{ item.dispose_by_date }}.
+</p>
+
 <a href="{% url 'mine' pk=item.id %}">[claim as mine]</a>
 <a href="{% url 'changeufo' pk=item.id %}">[add more details or edit]</a>
 <a href="{% url 'deleteufo' pk=item.id %}">[delete]</a>

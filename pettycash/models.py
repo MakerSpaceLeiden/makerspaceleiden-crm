@@ -81,7 +81,13 @@ class PettycashStation(models.Model):
 
 
 class PettycashBalanceCache(models.Model):
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+    owner = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+        related_name="pettycash_cache",
+    )
 
     balance = MoneyField(
         max_digits=8, decimal_places=2, null=True, default_currency="EUR"
@@ -207,7 +213,7 @@ class PettycashTransaction(models.Model):
     def save(self, *args, **kwargs):
         bypass = False
 
-        max_val = settings.MAX_PAY_REIMBURSE.amount
+        max_val = settings.MAX_PAY_CRM.amount
         if kwargs is not None:
             if "bypass" in kwargs:
                 bypass = kwargs["bypass"]
@@ -246,7 +252,6 @@ class PettycashTransaction(models.Model):
         try:
             adjust_balance_cache(self, self.src, -self.amount)
             adjust_balance_cache(self, self.dst, self.amount)
-            print(f"Cache Adjust: {self.src} -> {self.dst} = {self.amount}")
         except Exception as e:
             logger.error("Transaction cache failure: %s" % (e))
 
@@ -344,39 +349,40 @@ def pre_delete_user_callback(sender, instance, using, **kwargs):
     # account. In effect - we keep a PL in this account.
     #
     user = instance
-    amount = 0
+    name = str(user)
+
+    amount = Money(0.0, EUR)
     for tx in PettycashTransaction.objects.all().filter(Q(dst=user)):
         amount += tx.amount
     for tx in PettycashTransaction.objects.all().filter(Q(src=user)):
         amount -= tx.amount
 
-    msg = "Left donating"
+    msg = "donating"
     f = User.objects.get(id=settings.NONE_ID)
     t = User.objects.get(id=settings.POT_ID)
 
-    if amount.amount < 0:
-        msg = "Left with a debt"
+    if amount < Money(0, EUR):
+        msg = "with a debt"
+        t, f = f, t
         amount = -amount
-        ff = t
-        t = f
-        f = ff
 
-    print(f"Transaction: {f.id} {t.id} user = {user.id}")
-
-    tx = PettycashTransaction(
-        src=f,
-        dst=t,
-        amount=amount,
-        description=f"Deleted participant {user}. {msg}",
-    )
-    tx._change_reason = "Participant was deleted"
-    tx.save()
+    if amount == Money(0, EUR):
+        msg = "with no debt or money in the pettycash"
+    else:
+        tx = PettycashTransaction(
+            src=f,
+            dst=t,
+            amount=amount,
+            description=f"Deleted participant {name} left {msg}",
+        )
+        tx._change_reason = "Participant was deleted"
+        tx.save()
 
     emailPlain(
         "email_payout_leave.txt",
         toinform=pettycash_admin_emails(),
         context={
-            "user": user,
+            "user": name,
             "amount": amount,
             "msg": msg,
         },

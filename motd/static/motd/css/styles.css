@@ -1,7 +1,7 @@
+
 #motd-bar {
     width: 100%;
-    background-color: #0d6efd;
-
+    background-color: hsl(56, 100%, 50%);
 }
 
 .custom-motd-bar {
@@ -16,18 +16,19 @@
     animation-timing-function: linear;
     animation-iteration-count: infinite;
     padding-left: 100%;
-    padding-top: 0.2rem;
-    padding-bottom: 0.2rem;
+    padding-top: 0.4rem;
+    padding-bottom: 0.4rem;
     font-family: "Inconsolata", monospace;
+    font-size: 1.05rem;
     font-weight: 600 !important;
 }
 
 .motd-message {
     margin-right: 10rem;
-    color: white;
-    background-color: #0d6efd;
+    color: #414141;
+    background-color: hsl(56, 100%, 50%);
     padding: 2px 4px;
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3), 0 1px 3px rgba(0, 0, 0, 0.5) !important;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3), 0 1px 1px rgba(0, 0, 0, 0.322) !important;
     text-decoration: none !important;
 }
 

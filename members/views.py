@@ -33,6 +33,7 @@ def index(request):
 
     context = {
         "agg": agg,
+        "title": "Entitlements",
         "perms": perms,
         "has_permission": request.user.is_authenticated,
     }

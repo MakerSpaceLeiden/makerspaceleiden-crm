@@ -48,7 +48,6 @@ INSTALLED_APPS = [
     "members.apps.UserConfig",
     "acl.apps.AclConfig",
     "selfservice.apps.SelfserviceConfig",
-    "kiosk.apps.KioskConfig",
     "ufo.apps.UfoConfig",
     "unknowntags.apps.UnknowntagsConfig",
     "servicelog.apps.ServicelogConfig",
@@ -77,6 +76,7 @@ INSTALLED_APPS = [
     "django_flatpickr",
     "rest_framework",
     "terminal.apps.TerminalConfig",
+    "macros",
 ]
 
 SITE_ID = 1
@@ -132,7 +132,7 @@ TRUSTEES = "hetbestuur@lists.makerspaceleiden.nl"
 
 DEFAULT_FROM_EMAIL = "noc@makerspaceleiden.nl"
 # Leave it to FORCE_SCRPT do do the psotfix right
-BASE = "https://makerspaceleiden.nl"
+BASE = "https://mijn.makerspaceleiden.nl"
 
 MSL_USER = 63
 SETTINGS_EXPORT.append("MSL_USER")
@@ -287,6 +287,7 @@ PETTYCASH_TOPUP = 15
 PETTYCASH_TNS = "Stichting Makerspace Leiden"
 PETTYCASH_IBAN = "NL18RABO0123459876"
 DEVELOPERS_ADMIN_GROUP = "developers"
+NODERED_ADMIN_GROUP = "node-red admin group"
 
 # Assets of former participants; such as money or
 # boxes need to be caught somewhere. This user,
@@ -300,13 +301,32 @@ NONE_ID = 2
 POT_LABEL = "Makerspace (de zwarte Pot)"
 POT_ID = 3
 
+# Amounts that can be paid through the boxes on the table.
+# Increased from 10 to 25 euro's as we now have the option
+# to pay for Filament in larger voulumes
+#
+# Note - PAY_API needs to be <= MAX_PAY_DEPOSITI -- as there
+# is a check in the model/raw transact on the latter. While
+#
+# the first just gets imposed on the API itself.
 MAX_PAY_API = Money(25.00, EUR)
+
+# Max that can be paid through automatic bank parsing
 MAX_PAY_DEPOSITI = Money(100.00, EUR)
-MAX_PAY_REIMBURSE = Money(250.00, EUR)
+
+# Max that can be paid through the CRM
+MAX_PAY_CRM = Money(100.00, EUR)
+
+# May for trustees (when they are in admin mode)
 MAX_PAY_TRUSTEE = Money(
     1000.00, EUR
 )  # as for Reimbursement; but now for 'is_priv' users.
 CURRENCIES = ["EUR"]
+
+# Minimal balance needed to be listed as `good for
+# your money' - not a real time thing; just a soft
+# indicator.
+MIN_BALANCE_FOR_CREDIT = Money(-25.00, EUR)
 
 # How long an admin has to accept a new terminal post
 # it booting up with a new key.
@@ -324,6 +344,11 @@ PETTYCASH_TERMS_MIN_UNKNOWN = 1
 PETTYCASH_TERMS_MINS_CUTOFF = 10
 
 NODERED_URL = "http://localhost:1880"
+
+# Notification aliases
+NOTIFICATION_MAP = {
+    "noc": "noc@makerspaceleiden.nl",
+}
 
 try:
     from .local import *  # noqa: F403

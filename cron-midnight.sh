@@ -20,4 +20,3 @@ fi
 ${POETRY_RUN}python manage.py pettycash-recache
 ${POETRY_RUN}python manage.py clean_duplicate_history --auto > /dev/null
 ${POETRY_RUN}python manage.py clean_old_history --days 1000 --auto > /dev/null
-${POETRY_RUN}python manage.py sent-ufo-reminders

@@ -4,53 +4,75 @@
 
 {% block content %}
 
-<style>
-    .list-group-item-secondary {
-        background-color: rgb(246, 246, 246) !important;
-    }
-</style>
 
-
+<div class="col-md-9 mb-3">
+    This is the agenda to add and view events. To add new events, use 'Create New'.
+    Click on an event in 'All events' to view details or
+    toggle 'Include history' to see past events. Only the next 5 upcoming events will be
+    shown on the home page. Feel free to create new events!
+</div>
 <div class="row mt-1">
 
     <!-- Agenda item text -->
     <div class="col-md-9 order-0 order-md-0 pt-2">
-        <div class="card scrollable pt-0 pb-3" id="item-text">
+        <div class="card scrollable pt-0 pb-1" id="item-text">
             <div class="card-body" style="max-height: 600px; min-height:250px; overflow-y: auto;">
 
                 {% if selected_item %}
-                <div class="row">
-                    <div class="col-xl-1 col-lg-2 col-12">
-                        <strong>From:</strong>
+                    <div class="row">
+                        <div class="col-md pb-2 pt-1" style="font-weight:600; font-size: 1.1em">
+                            {{ selected_item.item_title }}
+                        </div>
                     </div>
-                    <div class="col-md">
-                        {{ selected_item.startdate|date:"l j M Y" }} - {{ selected_item.starttime|time:"H:i"  }}
+                    <div class="row">
+                        <div class="col-xl-1 col-lg-2 col-12" style="font-weight:600;">
+                            From:
+                        </div>
+                        <div class="col-md">
+                            {{ selected_item.startdate|date:"l j M Y" }} - {{ selected_item.starttime|time:"H:i" }}
+                        </div>
                     </div>
-                </div>
 
-                <div class="row">
-                    <div class="col-xl-1 col-lg-2 col-12">
-                        <strong>To:</strong>
+                    <div class="row">
+                        <div class="col-xl-1 col-lg-2 col-12" style="font-weight:600;">
+                            To:
+                        </div>
+                        <div class="col-md">
+                            {{ selected_item.enddate|date:"l j M Y" }} - {{ selected_item.endtime|time:"H:i" }}
+                        </div>
                     </div>
-                    <div class="col-md">
-                        {{ selected_item.enddate|date:"l j M Y" }} - {{ selected_item.endtime|time:"H:i"  }}
-                    </div>
-                </div>
 
                     {% if object_list %}
-                        <div class="card-text mt-4 mb-4" style="word-wrap: break-word; white-space: pre-wrap;">{{ selected_item.item_details|urlize }}</div>
-                        <br>
+                        <div class="row">
+                            <div class="card-text mt-4 mb-4" style="word-wrap: break-word; white-space: pre-wrap;">{{ selected_item.item_details|urlize }}
+                            </div>
+                            <br>
+                        </div>
+                        <div class="row row-sticky-bottom">
+
                             <div class="creation-info">
-                                <small>This agenda item was created by {{ created_by }} at {{ creation_date|date:"l j M Y H:i" }}.</small>
+                                <small>
+                                    Created: {{ creation_date|date:"l j M Y H:i" }} by
+                                    <a href="{{created_by.path}}">
+                                        {{ created_by.first_name }}
+                                    </a>
+                                </small>
                             </div>
                             {% if is_updated %}
                                 <div class="update-info">
-                                    <small>This agenda item was updated by {{ updated_by }} at {{ update_date|date:"l j M Y H:i" }}.</small>
+                                    <small>
+                                        Last edited: {{ update_date|date:"l j M Y H:i" }} by
+                                        <a href="{{updated_by.path}}">
+                                            {{ updated_by.first_name }}
+                                        </a>
+                                    </small>
                                 </div>
                             {% endif %}
+
+                        </div>
                     {% endif %}
                 {% else %}
-                    <small>There are no agenda items.</small>
+                    <small>No upcoming events</small>
                 {% endif %}
             </div>
         </div>
@@ -61,21 +83,20 @@
                 </div>
                 {% if selected_item %}
                 <div class="col-auto pe-0">
-                    <button type="button" onclick="window.location.href='{% url 'agenda_update' selected_item.pk %}'" class="btn btn-primary">Edit</button>
+                    <button type="button" onclick="window.location.href='{% url 'agenda_update' selected_item.pk %}'" class="btn btn-primary btn-primary-custom">Edit</button>
                 </div>
                 {% endif %}
                 <div class="col-auto">
-                    <button type="button" onclick="window.location.href='{% url 'agenda_create' %}'" class="btn btn-primary">Create New</button>
+                    <button type="button" onclick="window.location.href='{% url 'agenda_create' %}'" class="btn btn-primary btn-primary-custom">Create New</button>
                 </div>
             </div>
         </div>
-
     </div>
 
     <!-- List of agenda items -->
     <div class="col-md-3 order-2 order-md-1 pt-1" id="list-of-agenda-items">
         <div>
-            <h2 style="margin-top:0 !important;">All agenda items</h2>
+            <h2 style="margin-top:0 !important;">All events</h2>
         </div>
         <div class="d-flex justify-content-between align-items-center">
             <label class="form-check-label mb-0" for="toggleHistory" align="center">Include history</label>
@@ -87,28 +108,48 @@
             <div class="scrollable rounded" style="max-height: 600px; overflow-y: auto;">
                 <ul class="list-group">
                     {% for agenda_item in object_list %}
-                    <a class="list-group-item list-group-item-action pt-2 pb-1 {% if selected_item.pk == agenda_item.pk %}list-group-item-secondary{% endif %}" href="{% url 'agenda_detail' pk=agenda_item.pk %}?show_history={{ show_history }}">
-                                <div class="row">
-                                    <div class="col text-secondary" align="center" style="font-size: 14px;  ">
-                                        {{ agenda_item.startdate|date:"d-m-Y" }}{% if agenda_item.startdate != agenda_item.enddate %} - {{ agenda_item.enddate|date:"d-m-Y" }}{% endif %}
-                                    </div>
+                    <a class="list-group-item list-group-item-action pt-2 pb-1 " href="{% url 'agenda_detail' pk=agenda_item.pk %}?show_history={{ show_history }}" {% if selected_item.pk == agenda_item.pk %} style="border: 1px solid #606060; border-top-width: 1px; " {% endif %}>
+
+                        <div class="row">
+                                <div class="col text-secondary" style="font-size: 14px;  ">
+                                    {{ agenda_item.startdate|date:"d-m-Y" }} - {{ selected_item.starttime|time:"H:i"  }}
                                 </div>
-                                <div class="row">
-                                    <div class="col">
-                                        {% if agenda_item.item_title|length > 30 %}{{ agenda_item.item_title|slice:":30" }}...{% else %}{{ agenda_item.item_title }}{% endif %}
-                                    </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    {% if agenda_item.item_title|length > 30 %}{{ agenda_item.item_title|slice:":30" }}...{% else %}{{ agenda_item.item_title }}{% endif %}
                                 </div>
-                            </a>
+                            </div>
+                        </a>
                     {% endfor %}
                 </ul>
             </div>
         {% else %}
         <div class="mt-3">
-            There are no agenda items.
+            No upcoming events
         </div>
         {% endif %}
     </div>
 </div>
+<style>
+    .list-group-item-secondary {
+            background-color: rgb(246, 246, 246) !important;
+        }
+
+    .card-body {
+        display: flex;
+        flex-direction: column;
+        }
+
+    .creation-info,
+    .update-info {
+        margin-top: auto;
+        }
+
+    .row-sticky-bottom {
+        margin-top: auto;
+    }
+</style>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {

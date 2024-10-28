@@ -10,3 +10,6 @@ class WiFiNetwork(models.Model):
 
     def __str__(self):
         return self.network
+
+    class Meta:
+        ordering = ["network"]

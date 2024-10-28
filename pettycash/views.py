@@ -171,11 +171,11 @@ def transact(
     if form.is_valid():
         item = form.save(commit=False)
 
-        if item.amount < Money(0, EUR) or item.amount > settings.MAX_PAY_REIMBURSE:
+        if item.amount < Money(0, EUR) or item.amount > settings.MAX_PAY_CRM:
             if not request.user.is_privileged:
                 return HttpResponse(
                     "Only transactions between %s and %s"
-                    % (Money(0, EUR), settings.MAX_PAY_REIMBURSE),
+                    % (Money(0, EUR), settings.MAX_PAY_CRM),
                     status=406,
                     content_type="text/plain",
                 )
@@ -209,7 +209,7 @@ def transact(
 
     products = None
     if dst == settings.POT_ID:
-        products = PettycashSku.objects.all()
+        products = PettycashSku.objects.all().order_by("name")
 
     context = {
         "title": label,
@@ -243,7 +243,8 @@ def index(request, days=30):
 
 @login_required
 def pricelist(request, days=30):
-    prices = PettycashSku.objects.all()
+    prices = PettycashSku.objects.all().order_by("name")
+
     context = {
         "title": "Pricelist",
         "settings": settings,

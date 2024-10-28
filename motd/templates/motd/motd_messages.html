@@ -2,34 +2,67 @@
 {% load django_bootstrap5 %}
 {% load static %}
 
+<head>
+    <link rel="stylesheet" type="text/css" href="{% block stylesheet_motd %}{% static "motd/css/styles.css" %}{% endblock %}">
+</head>
+
 {% block content %}
 
+<div class="col-md-9 mb-3">
+    Here you can create a 'Message of the day' to share updates or announcements with everyone.
+    The message will be shown prominently at the top of the home page.
+    Click 'Create New' to add a message.
+    Feel free to create a message to keep everyone informed!
+</div>
 <div class="row mt-1">
 
     <!-- Message text -->
     <div class="col-md-9 order-0 order-md-0 pt-2">
-        <div class="card scrollable pt-0 pb-3" id="message-text">
+        <div class="card scrollable pt-0 pb-1" id="message-text">
             <div class="card-body " style="max-height: 600px; min-height:250px; overflow-y: auto;">
 
                 {% if selected_message %}
-                    <div>
-                        <h1 class="card-title" >{{ selected_message.motd|urlize }}</h1>
+                    <div class="row">
+                        <div class="col-md pb-2 pt-1" style="font-weight:600; font-size: 1.1em">
+                            {{ selected_message.motd|urlize }}
+                        </div>
                     </div>
+
+
                     {% if object_list %}
-                        <div class="card-text mt-4 mb-4" style="word-wrap: break-word; white-space: pre-wrap;">{{ selected_message.motd_details|urlize }}</div>
-                        <br>
-                            <div class="creation-info">
-                                <small>This message was posted by {{ created_by }} at {{ creation_date|date:"l j M Y H:i" }}.</small>
+                        <div class="row">
+                            <div class="card-text mt-4 mb-4" style="word-wrap: break-word; white-space: pre-wrap;">{{ selected_message.motd_details|urlize }}
                             </div>
+                            <br>
+                        </div>
+                        <div class="row row-sticky-bottom">
+                            <div class="creation-info">
+                                <small>
+                                    Created: {{ creation_date|date:"l j M Y H:i" }} by
+                                    <a href="{{created_by.path}}">
+                                        {{ created_by.first_name }}
+                                    </a>
+                                </small>
+                            </div>
+
                             {% if is_updated %}
                                 <div class="update-info">
-                                    <small>This message was updated by {{ updated_by }} at {{ update_date|date:"l j M Y H:i" }}.</small>
+                                    <small>
+                                        Last edited: {{ update_date|date:"l j M Y H:i" }} by
+                                        <a href="{{updated_by.path}}">
+                                            {{ updated_by.first_name }}
+                                        </a>
+                                    </small>
                                 </div>
                             {% endif %}
+
+                        </div>
                     {% endif %}
                 {% else %}
                     <small>There are no messages.</small>
                 {% endif %}
+
+
             </div>
         </div>
         <div>
@@ -39,11 +72,11 @@
                 </div>
                 {% if selected_message %}
                 <div class="col-auto pe-0">
-                    <button type="button" onclick="window.location.href='{% url 'motd_update' selected_message.pk %}'" class="btn btn-primary">Edit</button>
+                    <button type="button" onclick="window.location.href='{% url 'motd_update' selected_message.pk %}'" class="btn btn-primary btn-primary-custom ">Edit</button>
                 </div>
                 {% endif %}
                 <div class="col-auto">
-                    <button type="button" onclick="window.location.href='{% url 'motd_create' %}'" class="btn btn-primary">Create New</button>
+                    <button type="button" onclick="window.location.href='{% url 'motd_create' %}'" class="btn btn-primary btn-primary-custom ">Create New</button>
                 </div>
             </div>
         </div>
@@ -64,7 +97,7 @@
             <div class="scrollable rounded" style="max-height: 600px; overflow-y: auto;">
                 <ul class="list-group">
                     {% for motd_item in object_list %}
-                    <a class="list-group-item list-group-item-action pt-2 pb-1 {% if selected_message.pk == motd_item.pk %}list-group-item-secondary{% endif %}" href="{% url 'motd_messages_detail' pk=motd_item.pk %}?show_history={{ show_history }}">
+                    <a class="list-group-item list-group-item-action pt-2 pb-1" href="{% url 'motd_messages_detail' pk=motd_item.pk %}?show_history={{ show_history }}" {% if selected_message.pk == motd_item.pk %} style="border: 1px solid #606060; border-top-width: 1px; " {% endif %}>
                                 <div class="row">
                                     <div class="col text-secondary" align="center" style="font-size: 14px;  ">
                                         {{ motd_item.startdate|date:"d-m-Y" }}{% if motd_item.startdate != motd_item.enddate %} - {{ motd_item.enddate|date:"d-m-Y" }}{% endif %}
@@ -86,6 +119,26 @@
         {% endif %}
     </div>
 </div>
+
+<style>
+    .list-group-item-secondary {
+            background-color: rgb(246, 246, 246) !important;
+        }
+
+    .card-body {
+        display: flex;
+        flex-direction: column;
+        }
+
+    .creation-info,
+    .update-info {
+        margin-top: auto;
+        }
+
+    .row-sticky-bottom {
+            margin-top: auto;
+        }
+</style>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {

@@ -17,13 +17,11 @@ digest changes to clear.
     {% comment %} <tr><td>Archive</td><td><a href="{{ list.path }}">historic archive for {{ list.name }}</a></td></tr> {% endcomment %}
     {{ form.as_table }}
     </table>
-    </td></tr>
 {% endfor %}
-    <tr><td></td><td>
-<p/>
-<a href="{% url 'personal_page' %}">cancel</a>  <button type="submit">{{ action }}</button></td></td>
-    </table>
-  </form>
-  </p>
+
+</table>
+<button type="button" onclick="window.location.href='{% url cancel_button_url %}'" class="btn btn-secondary me-1">Cancel</button>
+<button type="submit" class="btn btn-primary btn-primary-custom me-1">Save</button>
+</form>
 
 {% endblock %}

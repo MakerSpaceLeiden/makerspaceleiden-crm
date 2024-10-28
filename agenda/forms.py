@@ -43,7 +43,7 @@ class AgendaForm(forms.ModelForm):
             end_datetime = datetime.combine(enddate, endtime)
 
             # Check if start datetime is after end datetime
-            if start_datetime >= end_datetime:
+            if start_datetime > end_datetime:
                 raise ValidationError("The start time should be before the end time.")
 
     class Meta:

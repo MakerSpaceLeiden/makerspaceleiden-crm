@@ -2,15 +2,37 @@
 
 {% block content %}
 
-	<script>
-	setInterval(() => {
-        	const cam = document.getElementById("snapshot");
-		cam.src = "snapshot?cachebust=" + new Date().getTime();
-	},10*1000);
-	</script>
-<img src="snapshot" id="snapshot"/>
-<p/>
-<i>press reload to refresh -- should refresh every 10 seconds or so</i>
-<p>
+
+<div class="mb-4">
+    <p>
+	Below is the live video feed of the 3D printer Ultimaker 3 Extended, which is the 3D printer in the Makerspace that is positioned the farthest to the right among the 3D printers.
+    <br>For more info about the printer see the
+    <a href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/3D-printen" target="_blank" class="wiki-link" title="Open wiki page">
+        <i class="fas fa-external-link-alt" style="font-size: 0.7em;"></i> wiki.
+      </a>
+	</p>
+    <p>
+	Please note that the camera only works when the printer is on. If the printer is off, the video feed won't be available.
+	</p>
+    <p>
+	The video stills refresh every 10 seconds. If the video feed seems stuck, try reloading the page. For persistent issues, please notify via the email list.
+    </p>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <script>
+                setInterval(() => {
+                    const cam = document.getElementById("snapshot");
+                    cam.src = "snapshot?cachebust=" + new Date().getTime();
+                }, 10 * 1000);
+            </script>
+
+            <img src="snapshot" id="snapshot" class="img-fluid" style="max-width: 100%; height: auto;"/>
+        </div>
+    </div>
+</div>
+
 
 {% endblock %}

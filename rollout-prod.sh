@@ -34,6 +34,7 @@ python manage.py makemigrations
 python manage.py migrate
 
 sudo apachectl restart
+sudo systemctl restart crm-daphne.service
 )
 E=$?
 

@@ -29,6 +29,11 @@ def isDeveloper(user):
     return user.groups.filter(name=settings.DEVELOPERS_ADMIN_GROUP).exists()
 
 
+@register.filter(name="isNoderedAdmin")
+def isNoderedAdmin(user):
+    return user.groups.filter(name=settings.NODERED_ADMIN_GROUP).exists()
+
+
 @register.filter(name="isPettycashUser")
 def isPettycashUser(user):
     if "PETTYCASH_DEMO_USER_GROUP" in globals():
@@ -42,7 +47,7 @@ def isPettycashUser(user):
         if b.balance.amount != 0:
             return True
 
-        cutoff = datetime.now(tz=timezone.utc) - timedelta(
+        _ = datetime.now(tz=timezone.utc) - timedelta(
             days=settings.PETTYCASH_NOUSE_DAYS
         )
         # Needs to be replaced by actual tx check.

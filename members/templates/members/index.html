@@ -1,25 +1,149 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
 {% if agg %}
-<table>
-<th>
-    {% for n in perms %}
-       <td>{{ n }}</td>
-    {% endfor %}
-</th>
-    {% for u,ps in agg.items %}
-    <tr>
-	    <td><b><a href="{{ u.path }}">{{ u }}</a></b></td>
-       {% for p in perms %}
-        <td>
-           {% if p in ps %}
-              yes
-           {% else %}
-              -
-           {% endif %}
-       </td>
-       {% endfor %}
-    </tr>
-    {% endfor %}
-</table>
+<div class="container-fluid">
+    <div class="table-container">
+        <table class="table table-bordered table-striped" id="sortable-table">
+            <thead class="thead-dark">
+                <tr>
+                    <th class="sortable sticky-col" onclick="sortTable(0)">Holder</th>
+                    {% for n in perms %}
+                    <th class="sortable" onclick="sortTable({{ forloop.counter }})">{{ n }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for u, ps in agg.items %}
+                <tr>
+                    <td class="sticky-col"><b><a href="{{ u.path }}">{{ u }}</a></b></td>
+                    {% for p in perms %}
+                    <td>
+                        {% if p in ps %}
+                        <span>Yes</span>
+                        {% else %}
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 {% else %}
-    <p>No Entitlements .</p>
+<p>No Entitlements.</p>
 {% endif %}
+
+<script>
+    function sortTable(n) {
+        var table = document.getElementById("sortable-table");
+        var rows = table.rows;
+        var switching = true;
+        var shouldSwitch;
+        var dir = "asc";
+        var switchCount = 0;
+        var ths = table.getElementsByTagName("TH");
+
+        // Remove existing sort classes
+        for (var i = 0; i < ths.length; i++) {
+            ths[i].classList.remove('asc', 'desc');
+        }
+
+        // Add sort class to the clicked header
+        ths[n].classList.add(dir);
+
+        while (switching) {
+            switching = false;
+            var i;
+            for (i = 1; i < (rows.length - 1); i++) {
+                shouldSwitch = false;
+                var x = rows[i].getElementsByTagName("TD")[n];
+                var y = rows[i + 1].getElementsByTagName("TD")[n];
+                if (dir == "asc") {
+                    if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                        shouldSwitch = true;
+                        break;
+                    }
+                } else if (dir === "desc") {
+                    if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                        shouldSwitch = true;
+                        break;
+                    }
+                }
+            }
+            if (shouldSwitch) {
+                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                switching = true;
+                switchCount++;
+            } else {
+                if (switchCount === 0 && dir === "asc") {
+                    dir = "desc";
+                    switching = true;
+                    // Update the class to indicate descending order
+                    ths[n].classList.remove('asc');
+                    ths[n].classList.add('desc');
+                }
+            }
+        }
+    }
+</script>
+
+<style>
+   /* Container to handle horizontal scrolling */
+   .table-container {
+       position: relative;
+       overflow-x: auto;
+   }
+
+   /* Make the table take up the full width */
+   .table {
+       width: 100%;
+       border-collapse: collapse;
+   }
+
+   /* Sticky column style */
+   th.sticky-col, td.sticky-col {
+       position: sticky;
+       left: 0;
+       z-index: 2; /* Ensure it's above other content */
+       border-right: 2px solid #dee2e6; /* Optional border to separate from other columns */
+   }
+
+   /* Optional: Adjust the table header for a cleaner look */
+   th.sticky-col {
+       z-index: 3; /* Ensure header is above data cells */
+   }
+
+   /* Style for sortable column headers */
+   th.sortable {
+       cursor: pointer;
+       position: relative;
+   }
+
+   /* Add arrows for sorting icons */
+   th.sortable::after {
+       content: "\25B2 \25BC"; /* Up and down arrows */
+       position: absolute;
+       right: 10px;
+       top: 50%;
+       transform: translateY(-50%);
+       font-size: 0.75rem;
+       color: #007bff; /* Bootstrap primary color */
+       visibility: visible;
+       opacity: 0.5; /* Slightly faded */
+   }
+
+   /* Style for sorted columns */
+   th.sortable.asc::after {
+       content: "\25B2"; /* Up arrow */
+       opacity: 1;
+   }
+
+   th.sortable.desc::after {
+       content: "\25BC"; /* Down arrow */
+       opacity: 1;
+   }
+</style>
+{% endblock %}

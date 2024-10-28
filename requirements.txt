@@ -22,6 +22,7 @@ django-settings-export
 django-simple-history
 django-six
 django-stdimage
+django-templates-macros
 django-versatileimagefield
 
 # Bootstrap
@@ -43,6 +44,9 @@ lxml
 # We're also including Pillow  as otherwise QR will fall back
 # to SVG - which is not as supported.
 Pillow
+
+# IoT packaged format
+pycryptodome
 PyPDF2
 python-dateutil
 pytz
