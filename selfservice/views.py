@@ -55,6 +55,7 @@ def send_email_verification(
 ):
     current_site = get_current_site(request)
     subject = "Confirm your email adddress ({})".format(current_site.domain)
+    uid = urlsafe_base64_encode(force_bytes(user.pk))
     context = {
         "has_permission": request.user.is_authenticated,
         "request": request,
@@ -64,19 +65,19 @@ def send_email_verification(
         "domain": current_site.domain,
         # possibly changed with Django 2.2
         # 'uid': urlsafe_base64_encode(force_bytes(user.pk)).decode(),
-        "uid": urlsafe_base64_encode(force_bytes(user.pk)),
+        "uid": uid,
         "token": email_check_token.make_token(user),
         "noc_email": settings.DEFAULT_FROM_EMAIL,
         "trustees_email": settings.TRUSTEES,
     }
-
-    msg = render_to_string(template_user, context)
-    EmailMessage(
-        subject, msg, to=[user.email], from_email=settings.DEFAULT_FROM_EMAIL
-    ).send()
+    if template_user:
+        msg = render_to_string(template_user, context)
+        EmailMessage(
+            subject, msg, to=[new_email], from_email=settings.DEFAULT_FROM_EMAIL
+        ).send()
 
     if old_email:
-        subject = "[spacebot] User {} {} is changing their email address".format(
+        subject = "[spacebot] User {} {} - new email address".format(
             user.first_name, user.last_name
         )
         msg = render_to_string(template_trustee, context)
@@ -807,6 +808,22 @@ def space_checkout(request):
 
 
 @login_required
+@superuser_required
+def userdetails_admin_edit(request, user_id):
+    try:
+        user = User.objects.get(pk=user_id)
+        old_email = "{}".format(user.email)
+    except ObjectDoesNotExist:
+        logger.error("Edit RQ by admin for unknown user id={}".format(user_id))
+        return HttpResponse(
+            "User not found",
+            status=404,
+            content_type="text/plain",
+        )
+    return userdetails_edit(request, user, old_email, verify=False)
+
+
+@login_required
 def userdetails(request):
     cancel_button_url = request.GET.get("redirect_to", "index")
     try:
@@ -818,13 +835,16 @@ def userdetails(request):
             status=500,
             content_type="text/plain",
         )
+    return userdetails_edit(request, member, old_email)
 
+
+def userdetails_edit(request, member, old_email, verify=True):
     if request.method == "POST":
         try:
-            user = UserForm(request.POST, request.FILES, instance=request.user)
-            save_user = user.save(commit=False)
-            if user.is_valid():
-                new_email = "{}".format(user.cleaned_data["email"])
+            user_asis = UserForm(request.POST, request.FILES, instance=member)
+            save_user = user_asis.save(commit=False)
+            if user_asis.is_valid():
+                new_email = "{}".format(user_asis.cleaned_data["email"])
 
                 save_user.email = old_email
                 save_user.changeReason = (
@@ -839,14 +859,30 @@ def userdetails(request):
                     user.fields[f].disabled = True
 
                 if old_email != new_email:
-                    member.email_confirmed = False
-                    member.changeReason = "Reset email validation, email changed."
-                    member.save()
-                    send_email_verification(request, save_user, new_email, old_email)
-                    return render(request, "email_verification_email.html")
+                    if verify:
+                        member.email_confirmed = False
+                        member.changeReason = "Reset email validation, email changed."
+                        member.save()
+                        send_email_verification(request, member, new_email, old_email)
+
+                        return render(request, "email_verification_email.html")
+                    else:
+                        member.email = new_email
+                        member.email_confirmed = True
+                        member.save()
+                        send_email_verification(
+                            request,
+                            member,
+                            new_email,
+                            old_email,
+                            template_user="email_confirm_email_inform.txt",
+                            template_trustee="email_confirm_email_inform.txt",
+                        )
 
                 return render(
-                    request, "userdetails.html", {"form": user, "saved": True}
+                    request,
+                    "userdetails.html",
+                    {"form": user_asis, "saved": True, "user_id": member.id},
                 )
         except Exception as e:
             exc_type, exc_obj, tb = sys.exc_info()
@@ -855,8 +891,8 @@ def userdetails(request):
             filename = f.f_code.co_filename
 
             logger.error(
-                "Unexpected error during save of user '{}' : {} at {}:{}".format(
-                    request.user, filename, lineno, e
+                "Unexpected error during save of user '{}' by {}: {} at {}:{}".format(
+                    member, request.user, filename, lineno, e
                 )
             )
             return HttpResponse(
@@ -865,13 +901,14 @@ def userdetails(request):
                 content_type="text/plain",
             )
 
-    form = UserForm(instance=request.user)
+    form = UserForm(instance=member)
     context = {
         "title": "Selfservice - update details",
         "is_logged_in": request.user.is_authenticated,
-        "user": request.user,
+        "user": member,
         "form": form,
         "has_permission": True,
+        "user_id": member.id,
         "cancel_button_url": cancel_button_url,
     }
     return render(request, "userdetails.html", context)
