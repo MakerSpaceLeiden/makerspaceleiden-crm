@@ -221,7 +221,7 @@ class Machine(models.Model):
         # machines by doing something special here. So hence
         # we do not set the OVERRIDE bit here.
         #
-        if user.admin or self.canInstruct(user):
+        if user.is_privileged or self.canInstruct(user):
             flags |= MachineUseFlags.OVERRIDE
 
         return [needs, flags]
