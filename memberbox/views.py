@@ -50,7 +50,7 @@ def index(request):
     # Construct something special here.
     #
     ibl = {}
-    for i in range(1, 26):
+    for i in range(1, 27):
         loc = "M{:0=2}".format(i)
         ibl[loc] = {"location": loc, "box": None}
 
