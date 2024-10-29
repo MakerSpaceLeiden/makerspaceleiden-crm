@@ -1,6 +1,6 @@
 #!/bin/sh
 set -e
-source .env
+est -f .env && source .env
 
 VERSION=${VERSION:-3}
 POETRY=${POETRY:-false}

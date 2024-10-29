@@ -2,7 +2,7 @@ import sys
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
-from mail import emailPlain
+from makespaceleiden.mail import emailPlain
 
 from acl.models import Entitlement
 

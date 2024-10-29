@@ -9,20 +9,23 @@ cleanup () {
 		echo "          Or you can do it earlier yourself."
 		echo
 		at now + ${DAYS} days <<EOM
-rm -rf /tmp/*.$UK
+rm -f /tmp/backup.$UK /tmp/backup-static.$UK
 EOM
 	fi
 }
 
 (
-test -d makerspaceleiden/settings.py
-
 set -e
+
+test -e makerspaceleiden/settings.py
+test -e makerspaceleiden/local.py
+
 sudo chgrp -R crmadmin .
 sudo chmod -R g+rw .
 
 . ./venv/bin/activate
 
+pip install --upgrade pip --quiet
 pip install -r requirements.txt  --quiet
 
 python manage.py dumpdata | gzip -c > /tmp/backup.$UK
