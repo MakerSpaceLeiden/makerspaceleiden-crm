@@ -47,7 +47,7 @@ def isPettycashUser(user):
         if b.balance.amount != 0:
             return True
 
-        cutoff = datetime.now(tz=timezone.utc) - timedelta(
+        _ = datetime.now(tz=timezone.utc) - timedelta(
             days=settings.PETTYCASH_NOUSE_DAYS
         )
         # Needs to be replaced by actual tx check.

@@ -4,14 +4,13 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('selfservice', '0003_auto_20230328_1839'),
+        ("selfservice", "0003_auto_20230328_1839"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='wifinetwork',
-            options={'ordering': ['network']},
+            name="wifinetwork",
+            options={"ordering": ["network"]},
         ),
     ]

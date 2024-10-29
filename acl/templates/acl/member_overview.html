@@ -42,11 +42,12 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
                     {% endif %}
                 </dl>
                 <div>
-                {% if user.is_privileged or member == user %}
-                <button type="button" class="btn btn-primary btn-primary-custom" onclick="window.location.href='{% url 'userdetails' %}?redirect_to=personal_page'">Edit</button>
+                {% if member == user %}
+                  <button type="button" class="btn btn-primary btn-primary-custom" onclick="window.location.href='{% url 'userdetails' %}?redirect_to=personal_page'">Edit</button>
                 {% endif %}
                 {% if user.is_privileged %}
-                <button type="button" class="btn btn-danger" onclick="window.location.href='{% url 'userdelete' member.id %}'">Delete</button>
+                  <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'userdetails_admin_edit' member.id %}'">Edit</button>
+                  <button type="button" class="btn btn-danger" onclick="window.location.href='{% url 'userdelete' member.id %}'">Delete</button>
                 {% endif %}
                 </div>
             </div>

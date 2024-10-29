@@ -20,7 +20,7 @@
         {% for event in event_group.events %}
             <div class="mb-4">
                 <div class="text-break">
-                    {{ event.time_str }} - 
+                    {{ event.time_str }} -
                     {{ event.chore.description }}&nbsp;
                     {% if event.wiki_url %}
                         <a href="{{ event.wiki_url }}" target="_blank" class="wiki-link" title="Open wiki page">

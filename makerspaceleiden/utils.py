@@ -5,6 +5,7 @@ import json
 import logging
 import sys
 
+import cryptography
 from django.http import HttpResponse
 from dynamic_filenames import FilePattern
 from jsonschema import validate
@@ -48,14 +49,18 @@ def validate_kv(payload):
     return {}
 
 
-def pemToSHA256Fingerprint(pem):
+def pemToSHA256Fingerprint(pem, justkey=False):
     try:
         pem = pem[27:-25]
         der = base64.b64decode(pem.encode("ascii"))
+        if justkey:
+            cert = cryptography.x509.load_pem_x509_certificate(pem)
+            public_key = cert.public_key()
+            der = public_key.public_bytes()
         return hashlib.sha256(der).hexdigest()
     except Exception:
         pass
-    logger.error("Cloud not parse pem for finrprint: {}".format(pem))
+    logger.error("Could not parse pem for finrprint: {}".format(pem))
     # raise ValueError("pem decoding did not yield  fingerprint")
     return None
 
@@ -76,15 +81,15 @@ def client_ip(request):
     return request.META.get("REMOTE_ADDR")
 
 
-def client_cert(request):
-    return cert_sha("SSL_CLIENT_CERT", request)
+def client_cert(request, justkey=False):
+    return cert_sha("SSL_CLIENT_CERT", request, justkey=justkey)
 
 
-def server_cert(request):
-    return cert_sha("SSL_SERVER_CERT", request)
+def server_cert(request, justkey=False):
+    return cert_sha("SSL_SERVER_CERT", request, justkey=justkey)
 
 
-def cert_sha(src, request):
+def cert_sha(src, request, justkey=False):
     if "runserver" in sys.argv:
         src = "HTTP_" + src
         logger.warn(
@@ -101,7 +106,7 @@ def cert_sha(src, request):
             "No client identifier, rejecting", status=400, content_type="text/plain"
         )
 
-    sha = pemToSHA256Fingerprint(cert)
+    sha = pemToSHA256Fingerprint(cert, justkey=justkey)
     if sha is None:
         logger.error("Bad request, cannot derive sha from {}".format(src))
         return HttpResponse(

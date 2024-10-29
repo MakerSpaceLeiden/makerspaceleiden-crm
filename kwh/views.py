@@ -28,15 +28,16 @@ def kwh_proxy(request, path):
     logger.error("Rejecting '/crm/kwh/{}'.".format(path))
     return HttpResponse("XS denied", status=403, content_type="text/plain")
 
+
 @login_required
 def kwh_view(request):
-    html_path = os.path.join(WWWROOT, 'index.html')
+    html_path = os.path.join(WWWROOT, "index.html")
     file_exists = os.path.isfile(html_path) and not os.path.islink(html_path)
-    
+
     context = {
         "file_exists": file_exists,
         "title": "Power consumption",
         "has_permission": request.user.is_authenticated,
     }
-    
-    return render(request, 'kwh/kwh.html', context)
+
+    return render(request, "kwh/kwh.html", context)

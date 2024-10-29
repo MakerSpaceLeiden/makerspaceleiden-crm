@@ -10,7 +10,10 @@ logger = logging.getLogger(__name__)
 
 @login_required
 def index(request):
-    context = {"has_permission": request.user.is_authenticated, "title": "Live 3D printer camera"}
+    context = {
+        "has_permission": request.user.is_authenticated,
+        "title": "Live 3D printer camera",
+    }
     return render(request, "ultimaker/index.html", context)
 
 

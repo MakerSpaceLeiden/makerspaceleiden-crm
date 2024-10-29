@@ -1,5 +1,6 @@
 import hashlib
 import logging
+import re
 import secrets
 from functools import wraps
 
@@ -614,7 +615,7 @@ def api_gettags4machine(request, terminal=None, machine=None):
     try:
         machine = Machine.objects.get(name=machine)
     except ObjectDoesNotExist:
-        logger.error(f"Machine {machine} not found, denied.")
+        logger.error(f"get4machine: Machine '{machine}' not found, denied.")
         return HttpResponse("Machine not found", status=404, content_type="text/plain")
 
     out = []
@@ -679,6 +680,21 @@ def byte_xor(ba1, ba2):
     return bytes([_a ^ _b for _a, _b in zip(ba1, ba2)])
 
 
+def nameShorten(name, maxlen=10):
+    if len(name) <= maxlen:
+        return name
+    # parts = name.split(' ')
+    parts = re.split("[^a-zA-Z]", name)
+    name = parts.pop(0)
+    for i in parts:
+        if len(name) > maxlen - 1:
+            return name[0:maxlen]
+        if len(name) + len(i) > maxlen:
+            i = i[0]
+        name += i
+    return name
+
+
 # Note: we are not checking if this terminal is actually associated
 #       with this node or machine. I.e any valid terminal can ask
 #       anything about the others. We may not want that in the future.
@@ -707,11 +723,18 @@ def byte_xor(ba1, ba2):
 #
 # 116+LT+LM                      EOF
 #
-def tags4machineBIN(terminal=None, machine=None):
+# MSL2 -- same as above; but the AES block no longer just contains
+# the name of the user; but also their unqiue user ID (for API
+# purposes) and their first/last name separate.
+#
+def tags4machineBIN(terminal=None, machine=None, v2=False):
     try:
-        machine = Machine.objects.get(name=machine)
+        machine = Machine.objects.get(node_machine_name=machine)
         ctc = change_tracker_counter()
     except ObjectDoesNotExist:
+        logger.error(
+            f"BIN request for an unknown machine: {machine} (node-machine-name)"
+        )
         raise ObjectDoesNotExist
 
     tl = []
@@ -727,6 +750,15 @@ def tags4machineBIN(terminal=None, machine=None):
         key = secrets.token_bytes(32)
         uiv = hashlib.sha256(iv + udx.to_bytes(4, "big")).digest()[0:16]
 
+        name = user.name()
+        block = b""
+        if v2:
+            # The identifier is treated like an opaque string; i.e. it may well be a UUID, etc.
+            block += str(user.id).encode("ASCII") + b"\0"
+            # shorter, simplified name for very small display purposes.
+            block += nameShorten(user.first_name.encode("ASCII"), 12) + b"\0"
+        block += name.encode("utf-8")
+
         # This is a weak AES mode; with no protection against
         # bit flipping, clear text, etc. However it is integrity
         # protected during transport; and only protects a name
@@ -736,10 +768,9 @@ def tags4machineBIN(terminal=None, machine=None):
         # modern mode such as CGM (which # is not supported yet
         # by ESP32 anyway).
         #
-        name = user.name()
-        clr = pad(name.encode("utf-8"), AES.block_size)
+        clr = pad(block, AES.block_size)
         if len(clr) > 128:
-            raise Exception("name too large")
+            raise Exception("information block too large")
 
         enc = AES.new(key, AES.MODE_CBC, iv=uiv).encrypt(clr)
 
@@ -779,7 +810,10 @@ def tags4machineBIN(terminal=None, machine=None):
         tlb += e["udx"].to_bytes(4, "big")
 
     hdr = b""
-    hdr += "MSL1".encode("ASCII")
+    if v2:
+        hdr += "MSL2".encode("ASCII")
+    else:
+        hdr += "MSL1".encode("ASCII")
     hdr += ctc.count.to_bytes(
         4, "big"
     )  # byte order not strictly needed - opaque 4 bytes.
@@ -802,7 +836,22 @@ def api_gettags4machineBIN(request, terminal=None, machine=None):
     try:
         out = tags4machineBIN(terminal, machine)
     except ObjectDoesNotExist:
-        logger.error(f"Machine {machine} not found, denied.")
+        logger.error(f"getBIN: Machine '{machine}' not found, denied.")
+        return HttpResponse("Machine not found", status=404, content_type="text/plain")
+    except Exception as e:
+        logger.error(f"Exception: {e}")
+        return HttpResponse("Internal Error", status=500, content_type="text/plain")
+
+    return HttpResponse(out, status=200, content_type="application/octet-stream")
+
+
+@csrf_exempt
+@is_paired_terminal
+def api2_gettags4machineBIN(request, terminal=None, machine=None):
+    try:
+        out = tags4machineBIN(terminal, machine, v2=True)
+    except ObjectDoesNotExist:
+        logger.error(f"getBIN: Machine '{machine}' not found, denied.")
         return HttpResponse("Machine not found", status=404, content_type="text/plain")
     except Exception as e:
         logger.error(f"Exception: {e}")
@@ -818,7 +867,7 @@ def api_getok(request, machine=None, tag=None):
     try:
         machine = Machine.objects.get(node_machine_name=machine)
     except ObjectDoesNotExist:
-        logger.error("Machine '{}' not found, denied.".format(machine))
+        logger.error("getok: Machine '{}' not found, denied.".format(machine))
         return HttpResponse("Machine not found", status=404, content_type="text/plain")
     try:
         r = RecentUse(user=tag.owner, machine=machine)

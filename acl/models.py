@@ -13,6 +13,7 @@ from django.urls import reverse
 from django.utils import timezone
 from simple_history.models import HistoricalRecords
 
+# from pettycash.models import PettycashBalanceCache
 from members.models import Tag, User
 
 logger = logging.getLogger(__name__)
@@ -31,15 +32,21 @@ class MachineUseFlags(IntEnum):
     PERMIT = 2
     FORM = 4
     APPROVE = 8
+    INSTRUCT = 16
+    BUDGET = 32
+    OVERRIDE = 64
 
 
 def bits2str(needs, has):
     if needs:
         if has:
-            return "ok"
+            return "yes"
         else:
             return "fail"
-    return "nn"
+    else:
+        if has:
+            return "NN"
+    return "n/a"
 
 
 def useNeedsToStateStr(needs, has):
@@ -54,6 +61,18 @@ def useNeedsToStateStr(needs, has):
     )
     out += ", approve:" + bits2str(
         needs & MachineUseFlags.APPROVE, has & MachineUseFlags.APPROVE
+    )
+
+    if has & MachineUseFlags.INSTRUCT:
+        out += ", instructor=yes"
+    else:
+        out += ", instructor=no"
+    if has & MachineUseFlags.BUDGET:
+        out += ", budget=sufficient"
+    else:
+        out += ", budget=no"
+    out += ", override:" + bits2str(
+        needs & MachineUseFlags.OVERRIDE, has & MachineUseFlags.OVERRIDE
     )
     out += " = "
     if has & needs == needs:
@@ -91,7 +110,8 @@ class PermitType(models.Model):
         return False
 
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]
+
 
 class Location(models.Model):
     name = models.CharField(max_length=40, unique=True)
@@ -102,7 +122,8 @@ class Location(models.Model):
         return self.name
 
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]
+
 
 class NodeField(models.CharField):
     def get_prep_value(self, value):
@@ -178,6 +199,8 @@ class Machine(models.Model):
             needs |= MachineUseFlags.FORM
         if self.requires_permit and self.requires_permit.require_ok_trustee:
             needs |= MachineUseFlags.APPROVE
+        if self.out_of_order:
+            needs |= MachineUseFlags.OVERRIDE
 
         flags = 0
         if user.is_active:
@@ -188,6 +211,19 @@ class Machine(models.Model):
             flags |= MachineUseFlags.PERMIT
         if e and e.active:
             flags |= MachineUseFlags.APPROVE
+        if self.canInstruct(user):
+            flags |= MachineUseFlags.INSTRUCT
+        if user.pettycash_cache.first().balance > settings.MIN_BALANCE_FOR_CREDIT:
+            flags |= MachineUseFlags.BUDGET
+
+        # Normal users can only operate machines that are unlocked.
+        # We may allow admins/some group to also operate unsafe
+        # machines by doing something special here. So hence
+        # we do not set the OVERRIDE bit here.
+        #
+        if user.admin or self.canInstruct(user):
+            flags |= MachineUseFlags.OVERRIDE
+
         return [needs, flags]
 
     def canOperate(self, user):
@@ -209,7 +245,8 @@ class Machine(models.Model):
         return self.requires_permit.permit.hasThisPermit(user)
 
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]
+
 
 # Special sort of create/get - where we ignore the issuer when looking for it.
 # but add it in if we're creating it for the first time.
@@ -396,7 +433,6 @@ class Entitlement(models.Model):
         # should we check for duplicates here too ?
         #
         return super(Entitlement, self).save(*args, **kwargs)
-
 
 
 class RecentUse(models.Model):

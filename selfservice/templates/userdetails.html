@@ -11,7 +11,7 @@
   Thanks for helping us grow the makerspace !
  <p/>
   <hr>
-  <button type="button" onclick="window.location.href='{% url 'personal_page' %}'" class="btn btn-secondary me-1">Back</button>
+  <button type="button" onclick="window.location.href='{% url 'overview' user_id %}'" class="btn btn-secondary me-1">Back</button>
 {% else %}
   <form method="post" enctype="multipart/form-data" novalidate>
     {% csrf_token %}

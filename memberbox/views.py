@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
+from django.template.defaulttags import register
 
 from storage.definitions import STORAGES, parse_box_location
 
@@ -11,6 +12,11 @@ from .forms import MemberboxForm, NewMemberboxForm
 from .models import Memberbox
 
 logger = logging.getLogger(__name__)
+
+
+@register.filter(name="get_item")
+def get_item(dictionary, key):
+    return dictionary.get(key)
 
 
 @login_required
@@ -40,11 +46,19 @@ def index(request):
         )
         for storage_key, storage_data in STORAGES.items()
     )
+    # The storage in the frontroom is funny - so we cannot really use above.
+    # Construct something special here.
+    #
+    ibl = {}
+    for i in range(1, 27):
+        loc = "M{:0=2}".format(i)
+        ibl[loc] = {"location": loc, "box": None}
 
     # Fill up data structures; and do a count/owner on the side
     count = {}
     morethanone = {}
     for box in Memberbox.objects.order_by("location"):
+        ibl[box.location] = {"location": box.location, "box": box}
         if box.owner.id in count:
             count[box.owner.id] = count[box.owner.id] + 1
             morethanone[box.owner] = count[box.owner.id]
@@ -59,11 +73,17 @@ def index(request):
         else:
             floating.append(box)
 
+    # The storage in the frontroom is funny - so we cannot really use
+    # above; so we delete it and have some custom code in the
+    # template to show this.
+    del storages["M"]
+
     context = {
         "title": "Members boxes",
         "user": request.user,
         "has_permission": request.user.is_authenticated,
         "storages": list(storages.values()),
+        "items_by_location": ibl,
         "floating": floating,
         "yours": yours,
         "morethanone": morethanone,

@@ -1,0 +1,6 @@
+{{ msg }}
+
+--
+This message was sent by the ACNode {{ terminal.name }}{% if sender.name %};where MSL participant
+{{ sender.name }} was tagged in at that time.
+{% endif %}

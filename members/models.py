@@ -144,7 +144,7 @@ class User(AbstractUser):
             return "No images uploaded yet."
 
     @property
-    def in_group(group):
+    def in_group(request, group):
         return request.user.groups.filter(name=group).exists()
 
     @property
@@ -198,6 +198,7 @@ class User(AbstractUser):
 
         Entitlement.delete_issuer_leaving_breadcrum(self)
         return super(User, self).delete(*args, **kwargs)
+
 
 class Tag(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)

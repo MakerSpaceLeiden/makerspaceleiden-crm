@@ -1,10 +1,13 @@
 {% autoescape off %}
-Trustees,
+L.S.,
 
-This is to let you know that {{ user.name }} has completed the change of
-their email address from {{ old_email }} to {{ new_email }}.
+This is to let you know that the change for user {{ user.name }} of the
+email address from {{ old_email }} to {{ new_email }} is
+now complete.
 
 A copy of this message has been sent to {{ user.name }}'s old email address as well.
+
+This change was initiated by {{ request.user }}.
 
 Your friendly spacebot.
 

@@ -81,7 +81,13 @@ class PettycashStation(models.Model):
 
 
 class PettycashBalanceCache(models.Model):
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+    owner = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+        related_name="pettycash_cache",
+    )
 
     balance = MoneyField(
         max_digits=8, decimal_places=2, null=True, default_currency="EUR"
@@ -207,7 +213,7 @@ class PettycashTransaction(models.Model):
     def save(self, *args, **kwargs):
         bypass = False
 
-        max_val = settings.MAX_PAY_REIMBURSE.amount
+        max_val = settings.MAX_PAY_CRM.amount
         if kwargs is not None:
             if "bypass" in kwargs:
                 bypass = kwargs["bypass"]

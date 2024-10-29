@@ -4,20 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('chores', '0003_auto_20230328_1839'),
+        ("chores", "0003_auto_20230328_1839"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='chore',
-            name='wiki_url',
+            model_name="chore",
+            name="wiki_url",
             field=models.URLField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='historicalchore',
-            name='wiki_url',
+            model_name="historicalchore",
+            name="wiki_url",
             field=models.URLField(blank=True, null=True),
         ),
     ]
