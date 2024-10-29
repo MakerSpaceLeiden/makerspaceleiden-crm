@@ -23,6 +23,7 @@ sudo chmod -R g+rw .
 
 . ./venv/bin/activate
 
+pip install --upgrade pip
 pip install -r requirements.txt  --quiet
 
 python manage.py dumpdata | gzip -c > /tmp/backup.$UK
