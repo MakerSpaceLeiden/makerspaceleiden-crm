@@ -71,9 +71,16 @@ def useNeedsToStateStr(needs, has):
         out += ", budget=sufficient"
     else:
         out += ", budget=no"
-    out += ", override:" + bits2str(
-        needs & MachineUseFlags.OVERRIDE, has & MachineUseFlags.OVERRIDE
-    )
+    if needs &  MachineUseFlags.OVERRIDE:
+        out += ", override: "
+        if has &  MachineUseFlags.OVERRIDE:
+            out += "yes (and needed, machine locked)"
+        else:
+            out += "machine is locked out"
+    else:
+        out += ", override:" + bits2str(
+            needs & MachineUseFlags.OVERRIDE, has & MachineUseFlags.OVERRIDE
+        )
     out += " = "
     if has & needs == needs:
         out += "ok"

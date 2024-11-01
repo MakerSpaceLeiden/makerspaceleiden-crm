@@ -756,7 +756,7 @@ def tags4machineBIN(terminal=None, machine=None, v2=False):
             # The identifier is treated like an opaque string; i.e. it may well be a UUID, etc.
             block += str(user.id).encode("ASCII") + b"\0"
             # shorter, simplified name for very small display purposes.
-            block += nameShorten(user.first_name.encode("ASCII"), 12) + b"\0"
+            block += nameShorten(user.first_name.encode("ASCII",errors='ignore'), 12) + b"\0"
         block += name.encode("utf-8")
 
         # This is a weak AES mode; with no protection against
