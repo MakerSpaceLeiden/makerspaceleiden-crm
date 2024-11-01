@@ -20,4 +20,4 @@ fi
 ${POETRY_RUN}python manage.py pettycash-recache $*
 ${POETRY_RUN}python manage.py pettycash-sent-reminders $*
 ${POETRY_RUN}python manage.py pettycash-sent-balances $*
-${POETRY_RUN}python manage.py pettycash-consolidate $* 30
+${POETRY_RUN}python manage.py pettycash-consolidate 30 $*
