@@ -3,12 +3,15 @@ import logging
 
 from dateutil import parser
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 from selfservice.aggregator_adapter import get_aggregator_adapter
 
 logger = logging.getLogger(__name__)
 
+def redir(request):
+    # We currently only support version 0.13 - so explictly redirect.
+    return redirect("spaceapi013")
 
 # No access restrictions
 def index(request):
