@@ -29,7 +29,8 @@ def parse_box_location(text):
         location = BoxLocation(m.group(1), int(m.group(2)), int(m.group(3)))
     else:
         m = re.search(r"^M(\d+)$", text.upper())
-        location = BoxLocation("M", 1, int(m.group(1)))
+        if m:
+            location = BoxLocation("M", 1, int(m.group(1)))
     if location and location.storage in STORAGES:
         num_rows = STORAGES[location.storage]["num_rows"]
         num_cols = STORAGES[location.storage]["num_cols"]

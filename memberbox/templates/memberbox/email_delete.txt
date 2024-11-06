@@ -2,7 +2,7 @@ Membersbox {{location}} of {{ name }} put up for re-use; any contents left in it
 
 Dear {{ owner }},
 
-The storage location {{ location }} was marked for re-use {% if owner != user %} by {{ user }}{% endif %}.
+The storage location {{ location }} was marked for re-use {% if owner %}{% if owner != user %} by {{ user }}{% endif %}{% endif %}.
 
 If there is any junk left in it; be sure to get, or ask for, it within a few days - as otherwise it wil be thrown away or recycled soon.
 
