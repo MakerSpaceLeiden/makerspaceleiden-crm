@@ -74,7 +74,7 @@ class Memberbox(models.Model):
 
         return self.delete(user)
 
-    def delete(self, user = None)
+    def delete(self, user = None):
         dst = self.owner.email
         context = {
             "email": self.owner.email,
