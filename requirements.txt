@@ -58,6 +58,7 @@ reportlab
 # Reverse proxy for the 3D printers
 requests
 six
+unidecode
 websockets
 wheel
 

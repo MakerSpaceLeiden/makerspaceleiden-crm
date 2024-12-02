@@ -1,10 +1,12 @@
 import logging
 from datetime import date, datetime
 from email.mime.image import MIMEImage
+from functools import wraps
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import transaction
 from django.db.models import Q
 from django.forms import widgets
 from django.http import HttpResponse, JsonResponse
@@ -40,6 +42,7 @@ from .forms import (
 from .models import (
     PettycashBalanceCache,
     PettycashImportRecord,
+    PettycashPendingClaim,
     PettycashReimbursementRequest,
     PettycashSku,
     PettycashStation,
@@ -71,6 +74,22 @@ def image2mime(img):
 
 def pettycash_treasurer_emails():
     return pettycash_admin_emails()
+
+
+def is_known_station(function):
+    @wraps(function)
+    def wrap(request, terminal, *args, **kwargs):
+        try:
+            station = PettycashStation.objects.get(terminal=terminal)
+        except ObjectDoesNotExist:
+            logger.error("No station for terminal %s" % terminal)
+            return HttpResponse(
+                "Terminal not paired, rejecting", status=400, content_type="text/plain"
+            )
+
+        return function(request, terminal, station, *args, **kwargs)
+
+    return wrap
 
 
 # Note - we do this here; rather than in the model its save() - as this
@@ -136,7 +155,7 @@ def transact_raw(
 ):
     if None in [src, dst, description, amount, reason, user]:
         logger.error("Transact raw called with missing arguments. bug.")
-        return 0
+        return None
 
     try:
         tx = PettycashTransaction(
@@ -155,9 +174,9 @@ def transact_raw(
         logger.error(
             "Unexpected error during initial (raw) save of new pettycash: {}".format(e)
         )
-        return 0
+        return None
 
-    return 1
+    return tx
 
 
 def transact(
@@ -1134,15 +1153,8 @@ def api_get_sku(request, sku):
 
 @csrf_exempt
 @is_paired_terminal
-def api2_pay(request, terminal):
-    try:
-        station = PettycashStation.objects.get(terminal=terminal)
-    except ObjectDoesNotExist:
-        logger.error("No station for terminal %s" % terminal)
-        return HttpResponse(
-            "Terminal not paired, rejecting", status=400, content_type="text/plain"
-        )
-
+@is_known_station
+def api2_pay(request, terminal, station):
     try:
         rq = request.GET
         if request.method == "POST":
@@ -1208,3 +1220,111 @@ def api2_pay(request, terminal):
         return JsonResponse({"result": True, "amount": amount.amount, "user": label})
 
     return HttpResponse("FAIL", status=500, content_type="text/plain")
+
+
+@csrf_exempt
+@is_paired_terminal
+@is_known_station
+def api2_claim(request, terminal, station):
+    try:
+        rq = request.GET
+        if request.method == "POST":
+            rq = request.POST
+
+        uid_str = rq.get("uid", None)
+
+        src = User.objects.get(pk=int(uid_str))
+        dst = (User.objects.get(id=settings.POT_ID),)
+
+        amount_str = rq.get("amount", None)
+        amount = Money(amount_str, EUR)
+
+        description = rq.get("description", None)
+    except Exception as e:
+        logger.error(
+            "Param issue for terminal %s@%s: %s"
+            % (terminal.name, station.description, e)
+        )
+        return HttpResponse("Params problems", status=400, content_type="text/plain")
+
+    try:
+        claim = PettycashPendingClaim(
+            src=src, dst=dst, amount=amount, description=description
+        )
+        claim._change_reason = "Claim created at {}, {}".format(terminal, station)
+        claim.save()
+    except Exception as e:
+        logger.error(
+            "Claim creation issue {}/{}, {} {}: {}".format(
+                src, dst, description, amount, e
+            )
+        )
+        return HttpResponse(
+            "Claim creation failed", status=500, content_type="text/plain"
+        )
+    return HttpResponse(claim.nonce, status=200, content_type="text/plain")
+
+
+@csrf_exempt
+@is_paired_terminal
+@is_known_station
+def api2_settle(request, terminal, station):
+    try:
+        rq = request.GET
+        if request.method == "POST":
+            rq = request.POST
+
+        nonce_str = rq.get("nonce", None)
+        claim = PettycashPendingClaim.objects.get(nonce=nonce_str)
+
+        amount_str = rq.get("amount", None)
+        description = rq.get("description", None)
+        if amount_str:
+            claim.amount = Money(amount_str, EUR)
+        if description:
+            claim.description = description
+
+    except Exception as e:
+        logger.error(
+            "Param issue for terminal %s@%s: %s"
+            % (terminal.name, station.description, e)
+        )
+        return HttpResponse("Params problems", status=400, content_type="text/plain")
+
+    try:
+        with transaction.atomic():
+            claim.settled = True
+            if claim.amount == Money(0, EUR):
+                claim._change_reason = (
+                    "Claim settled with the amount set to 0, so no resulting payment"
+                )
+                claim.save()
+                return HttpResponse(
+                    "Claim dropped", status=200, content_type="text/plain"
+                )
+
+            claim.settled_by = transact_raw(
+                request,
+                src=claim.src,
+                dst=claim.dst,
+                description="{} [Settled]".format(claim.description),
+                amount=claim.amount,
+                reason="Claim settled with by a final payment on {}: {}".format(
+                    terminal, station
+                ),
+                user=claim.src,
+            )
+            claim._change_reason = "Claim settled with a final payment"
+            claim.save()
+
+    except Exception as e:
+        logger.error(
+            "Claim settling ssue {}/{}, {} {}: {}".format(
+                claim.src, claim.dst, claim.description, claim.amount, e
+            )
+        )
+        return HttpResponse(
+            "Claim settling failed", status=500, content_type="text/plain"
+        )
+
+    return HttpResponse("Settled", status=200, content_type="text/plain")

@@ -1,4 +1,6 @@
+import base64
 import logging
+import secrets
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
@@ -329,6 +331,94 @@ class PettycashImportRecord(models.Model):
         blank=True,
         null=True,
     )
+
+
+class PettycashPendingClaim(models.Model):
+    src = models.ForeignKey(
+        User,
+        help_text="Party that is liable to pay the claim",
+        on_delete=models.CASCADE,
+        related_name="isPromisedBy",
+        default=settings.POT_ID,
+    )
+
+    dst = models.ForeignKey(
+        User,
+        help_text="Party that is to promised to be paid to (usually %s)"
+        % (settings.POT_LABEL),
+        on_delete=models.CASCADE,
+        related_name="isPromsiedTo",
+    )
+
+    description = models.CharField(
+        max_length=300,
+        help_text="Description / omschrijving van waarvoor deze betaling is",
+    )
+
+    amount = MoneyField(
+        max_digits=8,
+        decimal_places=2,
+        default_currency="EUR",
+    )
+
+    submitted_date = models.DateTimeField(
+        help_text="Date the claim was made",
+        default=timezone.now,
+    )
+
+    last_update = models.DateTimeField(
+        help_text="Date the request was last updated",
+        default=timezone.now,
+    )
+
+    def generate_nonce():
+        for tries in range(1, 25):
+            nonce = base64.b64encode(secrets.token_bytes(64))[0:48].decode("ascii")
+            r = PettycashPendingClaim.objects.filter(nonce=nonce)
+            if not r.exits():
+                return nonce
+        raise Exception(
+            "Could not generate a sufficeintly unique Nonce after 25 tries."
+        )
+
+    nonce = models.CharField(
+        min_length=48,
+        max_length=48,
+        help_text="Unique (cryptographic) nonce",
+        default=generate_nonce,
+        unique=True,
+        primary_key=True,
+    )
+
+    history = HistoricalRecords()
+
+    settled = models.BooleanField(
+        default=False,
+        help_text="Wether or not this claim has been settled",
+    )
+
+    settled_as = models.ForeignKey(
+        PettycashTransaction,
+        help_text="Transacion that settled this claim",
+        on_delete=models.CASCADE,
+        related_name="isSettledBy",
+        blank=True,
+        null=True,
+    )
+
+    def __str__(self):
+        return "%s: Claim made on %s for %s (%s/%s) for: %s" % (
+            self.nonce,
+            self.date,
+            self.amount,
+            self.dst,
+            self.src,
+            self.description,
+        )
+
+    def save(self):
+        self.last_update = timezone.now
+        return super(PettycashPendingClaim, self).save()
 
 
 # See above note/comment near delete_callback(). We need

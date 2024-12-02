@@ -44,7 +44,12 @@ urlpatterns = [
     # Client-cert based auth variation.
     #
     path("api/v2/register", views.api2_register, name="acl-v2-register"),
+    # simple payments
     path("api/v2/pay", views.api2_pay, name="acl-v1-pay"),
+    # Claim and later (auto/manually) settle.
+    #
+    path("api/v2/claim", views.api2_claim, name="acl-v1-claim"),
+    path("api/v2/settle", views.api2_settle, name="acl-v1-claim"),
     # Calls with no security (yet)
     #
     path("api/v1/skus", views.api_get_skus, name="acl-v1-get-skus"),

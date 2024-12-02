@@ -16,6 +16,7 @@ from django.shortcuts import redirect, render
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from ipware import get_client_ip
+from unidecode import unidecode
 
 from mailinglists.models import Subscription
 from makerspaceleiden.decorators import superuser_or_bearer_required, superuser_required
@@ -680,7 +681,8 @@ def byte_xor(ba1, ba2):
     return bytes([_a ^ _b for _a, _b in zip(ba1, ba2)])
 
 
-def nameShorten(name, maxlen=10):
+def nameASCIIShorten(name, maxlen=10):
+    name - unidecode(name)
     if len(name) <= maxlen:
         return name
     # parts = name.split(' ')
@@ -755,8 +757,10 @@ def tags4machineBIN(terminal=None, machine=None, v2=False):
         if v2:
             # The identifier is treated like an opaque string; i.e. it may well be a UUID, etc.
             block += str(user.id).encode("ASCII") + b"\0"
-            # shorter, simplified name for very small display purposes.
-            block += nameShorten(user.first_name.encode("ASCII"), 12) + b"\0"
+            # shorter, simplified name for very small display purposes. Also
+            # limits the charset to ASCII; as the embedded devices do not have
+            # a full UTF8 font at this time.
+            block += nameASCIIShorten(user.first_name, 12) + b"\0"
         block += name.encode("utf-8")
 
         # This is a weak AES mode; with no protection against
