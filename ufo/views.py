@@ -183,9 +183,12 @@ def mine(request, pk):
         request.user
     )
     if item.owner != request.user:
-        # Try to alert owners, but don't give an error in the frontend if it doesn't work
+        dst = []
+        if item.owner and item.owner.email:
+            dst.append(item.owner.email)
+        # Try to alert any owners, but$ don't give an error in the frontend if it doesn't work
         try:
-            alertOwnersToChange([item], request.user, [item.owner.email])
+            alertOwnersToChange([item], request.user, dst)
         except Exception as e:
             logger.error("Failed to alert owners: {}".format(e))
 
