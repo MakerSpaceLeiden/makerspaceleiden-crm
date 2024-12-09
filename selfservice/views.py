@@ -628,7 +628,8 @@ def save_signal_notification_settings(request):
             uses_signal = bool(user_form.data.get("uses_signal"))
             if uses_signal:
                 aggregator_adapter.onboard_signal(user.id)
-            return redirect("overview", member_id=user.id)
+
+    return redirect("overview", member_id=user.id)
 
 
 @login_required
