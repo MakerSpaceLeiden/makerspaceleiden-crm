@@ -18,3 +18,4 @@ else
 fi
 
 ${POETRY_RUN}python manage.py sent-ufo-reminders
+${POETRY_RUN}python manage.py clean_old_history --days 120 members.Tag
