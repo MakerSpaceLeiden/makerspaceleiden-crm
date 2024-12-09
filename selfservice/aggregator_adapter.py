@@ -24,7 +24,6 @@ class AggregatorAdapter(object):
             "Authorization", "Basic %s" % self.encoded_credentials.decode("ascii")
         )
         logger.debug("Fetching {} {}".format(req, url))
-        print("Fetching {} {}".format(req, url))
         return json.loads(urllib.request.urlopen(req).read())
 
     def _request_with_user_id(self, url, user_id=None):
