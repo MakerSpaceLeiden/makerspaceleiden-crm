@@ -502,7 +502,25 @@ def change_tracker_counter():
     return ChangeTracker.objects.first()
 
 
-def tagacl_change_tracker(sender, *args, **kwargs):
+def tagacl_change_tracker(sender, instance, **kwargs):
+    # Avoid triggering on a last-login change; which is
+    # generally done with (just) the last_login set
+    # in the fields updated. See update_last_login() in
+    # django.contrib.auth.models.
+    #
+    if 'update_fields' in kwargs and kwargs['update_fields'] != None:
+         # Only skip if it is exactly this change. Other wise
+         # err on the side of caution. E.g. for a new record
+         # or some single REST change.
+         #
+        if len(kwargs['update_fields']) == 1:
+          if sender == User and  'last_login' in  kwargs['update_fields']:
+              return
+          if sender == Tag and 'last_used' in  kwargs['update_fields']:
+              return
+
+    logger.critical("tagacl_change_tracker({},{},{})".format(sender,instance,kwargs))
+
     c = ChangeTracker.objects.first()
     if c is None:
         c = ChangeTracker()
