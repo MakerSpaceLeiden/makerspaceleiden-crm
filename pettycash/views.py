@@ -143,7 +143,7 @@ def transact_raw(
             src=src, dst=dst, description=description, amount=amount
         )
         logger.info("payment: %s" % reason)
-        tx._change_reason = reason[:100]
+        tx._change_reason = reason[:99]
         priv = False
         if request.user.is_authenticated:
             priv = request.user.is_privileged
@@ -497,7 +497,7 @@ def cam53process(request):
                     src=User.objects.get(id=settings.POT_ID), dst=user, amount=amount
                 )
                 tx.description = vals["description_%d" % i]
-                tx._change_reason = vals["change_reason_%d" % i][:100]
+                tx._change_reason = vals["change_reason_%d" % i][:99]
                 tx.save()
                 alertOwnersToChange(
                     tx,
@@ -573,11 +573,11 @@ def pair(request, pk):
         )
 
         tx.accepted = True
-        tx._change_reason = reason[:100]
+        tx._change_reason = reason[:99]
         tx.save()
 
         station.terminal = tx
-        station._change_reason = reason[:100]
+        station._change_reason = reason[:99]
         station.save()
 
         return redirect("unpaired")
@@ -818,7 +818,7 @@ def delete(request, pk):
     form = PettycashDeleteForm(request.POST or None)
     if form.is_valid():
         reason = "%s (by %s)" % (form.cleaned_data["reason"], request.user)
-        tx._change_reason = reason[:100]
+        tx._change_reason = reason[:99]
         # tx.delete();
         tx.refund_booking()
         alertOwnersToChange(

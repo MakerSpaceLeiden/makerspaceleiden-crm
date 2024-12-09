@@ -176,7 +176,7 @@ class ImportProcessForm(forms.Form):
                 label="",
                 disabled=True,
                 help_text="<p>",
-                widget=forms.TextInput(attrs={"size": 120}),
+                widget=forms.TextInput(attrs={"size": 99}),
             )
 
             self.fields["amount_%d" % i] = forms.CharField(
