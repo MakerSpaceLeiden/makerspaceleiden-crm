@@ -544,7 +544,7 @@ def checktag(function):
             )
         try:
             tag.last_used = timezone.now()
-            tag.save()
+            tag.save(update_fields=["last_used"])
         except Exception as e:
             logger.error(
                 "Unexpected error when recording tag use on {}: {}".format(tag, e)
