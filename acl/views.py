@@ -153,7 +153,11 @@ def api_index_legacy2(request):
 
 @login_required
 def machine_list(request):
-    machines = Machine.objects.annotate(upper_name=Upper("name")).order_by("upper_name")
+    machines = (
+        Machine.objects.filter(do_not_show=False)
+        .annotate(upper_name=Upper("name"))
+        .order_by("upper_name")
+    )
     members = User.objects.all().filter(is_active=True).order_by("first_name")
 
     machines_category = {
@@ -177,15 +181,16 @@ def machine_list(request):
 def machine_overview(request, machine_id=None):
     instructors = []
     used = []
-    machines = Machine.objects.order_by("name")
+    machines = Machine.objects.filter(do_not_show=False).order_by("name")
     if machine_id:
         try:
-            machines = machines.filter(pk=machine_id)
+            machines = Machine.objects.filter(pk=machine_id)
         except ObjectDoesNotExist:
             return HttpResponse(
                 "Machine not found", status=404, content_type="text/plain"
             )
         machine = machines.first()
+        print(machine)
         permit = machine.requires_permit
         if permit:
             permit = PermitType.objects.get(pk=permit.id)
@@ -245,7 +250,11 @@ def _overview(request, member_id=None):
             "User not found or access denied", status=404, content_type="text/plain"
         )
 
-    machines = Machine.objects.annotate(upper_name=Upper("name")).order_by("upper_name")
+    machines = (
+        Machine.objects.filter(do_not_show=False)
+        .annotate(upper_name=Upper("name"))
+        .order_by("upper_name")
+    )
     boxes = Memberbox.objects.all().filter(owner=member)
     storage = Storage.objects.all().filter(owner=member)
     subscriptions = Subscription.objects.all().filter(member=member)
@@ -610,6 +619,7 @@ def api_gettags4node(request, terminal=None, node=None):
 
     return JsonResponse(out)
 
+
 @csrf_exempt
 @is_paired_terminal
 def api_gettags4machine(request, terminal=None, machine=None):
@@ -757,7 +767,10 @@ def tags4machineBIN(terminal=None, machine=None, v2=False):
             # The identifier is treated like an opaque string; i.e. it may well be a UUID, etc.
             block += str(user.id).encode("ASCII") + b"\0"
             # shorter, simplified name for very small display purposes.
-            block += nameShorten(user.first_name.encode("ASCII",errors='ignore'), 12) + b"\0"
+            block += (
+                nameShorten(user.first_name.encode("ASCII", errors="ignore"), 12)
+                + b"\0"
+            )
         block += name.encode("utf-8")
 
         # This is a weak AES mode; with no protection against

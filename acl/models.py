@@ -71,9 +71,9 @@ def useNeedsToStateStr(needs, has):
         out += ", budget=sufficient"
     else:
         out += ", budget=no"
-    if needs &  MachineUseFlags.OVERRIDE:
+    if needs & MachineUseFlags.OVERRIDE:
         out += ", override: "
-        if has &  MachineUseFlags.OVERRIDE:
+        if has & MachineUseFlags.OVERRIDE:
             out += "yes (and needed, machine locked)"
         else:
             out += "machine is locked out"
@@ -168,6 +168,10 @@ class Machine(models.Model):
     )
 
     out_of_order = models.BooleanField(default=False)
+    do_not_show = models.BooleanField(
+        default=False,
+        help_text="Do not show this machine in CRM browse/listings (but it will be in API and other automatic lists). Useful for test machines or machines that are a hidden node of a larger machine",
+    )
 
     CATEGORY_CHOICES = [
         ("machine", "Machine"),
@@ -222,7 +226,7 @@ class Machine(models.Model):
             flags |= MachineUseFlags.INSTRUCT
         if user.pettycash_cache.first():
             if user.pettycash_cache.first().balance > settings.MIN_BALANCE_FOR_CREDIT:
-                 flags |= MachineUseFlags.BUDGET
+                flags |= MachineUseFlags.BUDGET
 
         # Normal users can only operate machines that are unlocked.
         # We may allow admins/some group to also operate unsafe
@@ -509,20 +513,20 @@ def tagacl_change_tracker(sender, instance, **kwargs):
     # in the fields updated. See update_last_login() in
     # django.contrib.auth.models.
     #
-    if 'update_fields' in kwargs and kwargs['update_fields'] != None:
-         # Only skip if it is exactly this change. Other wise
-         # err on the side of caution. E.g. for a new record
-         # or some single REST change.
-         #
-        if len(kwargs['update_fields']) == 1:
-          if sender == User and  'last_login' in  kwargs['update_fields']:
-              return
-          if sender == User and  'password' in  kwargs['update_fields']:
-              return
-          if sender == Tag and 'last_used' in  kwargs['update_fields']:
-              return
+    if "update_fields" in kwargs and kwargs["update_fields"] is not None:
+        # Only skip if it is exactly this change. Other wise
+        # err on the side of caution. E.g. for a new record
+        # or some single REST change.
+        #
+        if len(kwargs["update_fields"]) == 1:
+            if sender == User and "last_login" in kwargs["update_fields"]:
+                return
+            if sender == User and "password" in kwargs["update_fields"]:
+                return
+            if sender == Tag and "last_used" in kwargs["update_fields"]:
+                return
 
-    logger.critical("tagacl_change_tracker({},{},{})".format(sender,instance,kwargs))
+    logger.critical("tagacl_change_tracker({},{},{})".format(sender, instance, kwargs))
 
     c = ChangeTracker.objects.first()
     if c is None:
