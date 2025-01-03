@@ -610,7 +610,8 @@ def api_gettags4node(request, terminal=None, node=None):
 
     return JsonResponse(out)
 
-
+@csrf_exempt
+@is_paired_terminal
 def api_gettags4machine(request, terminal=None, machine=None):
     try:
         machine = Machine.objects.get(name=machine)
@@ -839,7 +840,7 @@ def api_gettags4machineBIN(request, terminal=None, machine=None):
         logger.error(f"getBIN: Machine '{machine}' not found, denied.")
         return HttpResponse("Machine not found", status=404, content_type="text/plain")
     except Exception as e:
-        logger.error(f"Exception: {e}")
+        logger.error(f"api_gettags4machineBIN::Exception: {e}")
         return HttpResponse("Internal Error", status=500, content_type="text/plain")
 
     return HttpResponse(out, status=200, content_type="application/octet-stream")
@@ -854,7 +855,7 @@ def api2_gettags4machineBIN(request, terminal=None, machine=None):
         logger.error(f"getBIN: Machine '{machine}' not found, denied.")
         return HttpResponse("Machine not found", status=404, content_type="text/plain")
     except Exception as e:
-        logger.error(f"Exception: {e}")
+        logger.error(f"Exception: api2_gettags4machineBIN {e}")
         return HttpResponse("Internal Error", status=500, content_type="text/plain")
 
     return HttpResponse(out, status=200, content_type="application/octet-stream")
