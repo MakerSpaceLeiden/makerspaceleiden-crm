@@ -220,8 +220,9 @@ class Machine(models.Model):
             flags |= MachineUseFlags.APPROVE
         if self.canInstruct(user):
             flags |= MachineUseFlags.INSTRUCT
-        if user.pettycash_cache.first().balance > settings.MIN_BALANCE_FOR_CREDIT:
-            flags |= MachineUseFlags.BUDGET
+        if user.pettycash_cache.first():
+            if user.pettycash_cache.first().balance > settings.MIN_BALANCE_FOR_CREDIT:
+                 flags |= MachineUseFlags.BUDGET
 
         # Normal users can only operate machines that are unlocked.
         # We may allow admins/some group to also operate unsafe
@@ -515,6 +516,8 @@ def tagacl_change_tracker(sender, instance, **kwargs):
          #
         if len(kwargs['update_fields']) == 1:
           if sender == User and  'last_login' in  kwargs['update_fields']:
+              return
+          if sender == User and  'password' in  kwargs['update_fields']:
               return
           if sender == Tag and 'last_used' in  kwargs['update_fields']:
               return
