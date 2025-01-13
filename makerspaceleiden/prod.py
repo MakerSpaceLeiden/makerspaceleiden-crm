@@ -63,45 +63,45 @@ LOGGING = {
     "loggers": {
         "django": {
             "handlers": ["file"],
-            "propagate": True,
+            "propagate": False,
         },
         "daphne": {
             "handlers": ["file"],
-            "propagate": True,
+            "propagate": False,
         },
         "django.server": {
             "handlers": ["file"],
-            "propagate": True,
+            "propagate": False,
         },
         "django.request": {
             "handlers": ["file"],
-            "propagate": True,
+            "propagate": False,
         },
         "django.security": {
             "handlers": ["file"],
-            "propagate": True,
+            "propagate": False,
         },
         "django.db": {
             "handlers": ["file"],
-            "propagate": True,
+            "propagate": False,
         },
         "django.template": {
             "handlers": ["file"],
-            "propagate": True,
+            "propagate": False,
         },
         "commands": {
             "handlers": ["log_to_stdout"],
             "level": "DEBUG",
-            "propagate": True,
+            "propagate": False,
         },
         "mailinglists": {
             "handlers": ["file"],
             "level": "DEBUG",
-            "propagate": True,
+            "propagate": False,
         },
         "": {
             "handlers": ["file"],
-            "propagate": True,
+            "propagate": False,
         },
     },
 }
