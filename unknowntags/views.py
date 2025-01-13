@@ -89,7 +89,8 @@ def addmembertounknowntag(request, user_id=None):
             try:
                 user = User.objects.get(pk=user_id)
                 tag = form.cleaned_data.get("tag")
-            except Exception:
+            except Exception as e:
+                logger.warning("addmembertounknowntag: {}".format(str(e)))
                 return HttpResponse(
                     "Unknown tag or user gone awol. Drat.",
                     status=404,
@@ -118,7 +119,8 @@ def addunknowntagtomember(request, tag_id=None):
         return HttpResponse("XS denied", status=403, content_type="text/plain")
     try:
         tag = Unknowntag.objects.get(pk=tag_id)
-    except Exception:
+    except Exception as e:
+        logger.warning("addunknowntagtomember: {}".format(str(e)))
         return HttpResponse(
             "Unknown tag gone awol. Drat.", status=500, content_type="text/plain"
         )
@@ -127,7 +129,6 @@ def addunknowntagtomember(request, tag_id=None):
         _ = Tag.objects.get(tag=tag["tag"])
         return HttpResponse("Tag already in use", status=500, content_type="text/plain")
     except Exception:
-        # logger.warning("Tag not in use: {}".format(str(e)))
         pass
 
     if request.POST:
@@ -177,7 +178,7 @@ def link_tag_user(request, form, tag, user):
                 e.save()
 
     except Exception as e:
-        logger.error("Failed to link tag: {}".format(e))
+        logger.error("link_tag_user: Failed to link tag, {}".format(e))
         return HttpResponse(
             "Save tag gone awol. Drat.", status=500, content_type="text/plain"
         )
