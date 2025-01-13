@@ -128,6 +128,20 @@ SETTINGS_EXPORT = [
 # WSGI_APPLICATION = "makerspaceleiden.wsgi.application"
 ASGI_APPLICATION = "makerspaceleiden.asgi.application"
 
+
+BOOTSTRAP5 = {
+    "css_url": {
+        "url": "static/bootstrap/bootstrap.min.css",
+        "integrity": "sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH",
+        "crossorigin": "anonymous",
+    },
+    "avascript_url": {
+        "url": "static/bootstrap/bootstrap.bundle.min.js",
+        "integrity": "sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz",
+        "crossorigin": "anonymous",
+    },
+}
+
 MAILINGLIST = "deelnemers@lists.makerspaceleiden.nl"
 TRUSTEES = "hetbestuur@lists.makerspaceleiden.nl"
 
