@@ -137,7 +137,7 @@ BOOTSTRAP5 = {
     },
     "javascript_url": {
         "url": "/static/bootstrap/bootstrap.bundle.min.js",
-        "integrity": "sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz",
+        "integrity": "sha384-WfVzX9hAUBOBjMptWY54rUnWRI1Tn/ZCUAT52D/05VTiszOwsM+TM5o0sB4Kv44M",
         "crossorigin": "anonymous",
     },
 }
