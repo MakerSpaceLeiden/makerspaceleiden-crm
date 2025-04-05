@@ -825,7 +825,6 @@ def userdetails_admin_edit(request, user_id):
 
 @login_required
 def userdetails(request):
-    cancel_button_url = request.GET.get("redirect_to", "index")
     try:
         member = request.user
         old_email = "{}".format(member.email)
@@ -901,6 +900,7 @@ def userdetails_edit(request, member, old_email, verify=True):
                 content_type="text/plain",
             )
 
+    cancel_button_url = request.GET.get("redirect_to", "index")
     form = UserForm(instance=member)
     context = {
         "title": "Selfservice - update details",
