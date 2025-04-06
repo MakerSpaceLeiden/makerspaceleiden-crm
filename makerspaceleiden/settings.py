@@ -80,6 +80,7 @@ INSTALLED_APPS = [
 ]
 
 SITE_ID = 1
+SITE_NAME = "Makerspace Leiden"
 
 MIDDLEWARE = [
     "simple_history.middleware.HistoryRequestMiddleware",
@@ -122,6 +123,7 @@ SETTINGS_EXPORT = [
     "NONE_ID",
     "NONE_LABEL",
     "TRUSTEES",
+    "SITE_NAME",
 ]
 
 # WSGI_APPLICATION = "makerspaceleiden.wsgi.application"

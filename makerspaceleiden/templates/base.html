@@ -8,7 +8,7 @@
 <html lang="{{ LANGUAGE_CODE|default:"en-us" }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
 
 <head>
-    <title>{% block title %}{% endblock %}</title>
+    <title>{% block title %}Intranet{% endblock %} – {{ settings.SITE_NAME }}</title>
 
     <link rel="stylesheet" type="text/css" href="{% block stylesheet_base %}{% static "admin/css/base.css" %}{% endblock %}">
     <link rel="stylesheet" type="text/css" href="{% block stylesheet_custom %}{% static "makerspaceleiden/css/styles.css" %}{% endblock %}">
@@ -41,7 +41,7 @@
                         <div class="col">
                             {% block branding %}
                             <div class= "branding makerspace-name-div">
-                                <a class="makerspace-name" href="{% url 'index' %}">Makerspace Leiden</a>
+                                <a class="makerspace-name" href="{% url 'index' %}">{{ settings.SITE_NAME }}</a>
                                 <div class="d-block d-md-none">
                                     <b>INTRANET</b>
                                 </div>
