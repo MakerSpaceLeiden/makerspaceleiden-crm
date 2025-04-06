@@ -30,7 +30,7 @@ Welcome to the Makerspace Leiden !
         and `spacelog'.
 
 	The first, `deelnemers' is used for all communication between participants.
-	For example when someone wants help (or instrucition) with a machine.
+	For example when someone wants help (or instruction) with a machine.
 
  	It can be high volume at times - so you may want to use a filter in your
 	mailtool to send it to a certain folder; or follow the link under each
@@ -46,7 +46,7 @@ Welcome to the Makerspace Leiden !
 
 5)	If you want to use category 1 and 2 machines (the two most dangerous classes,
  	these include the large three phase powered woodworking machines) - then
-	be sure to ask & arrange for instrucitons on the deelnemers@ mailing list.
+	be sure to ask & arrange for instructions on the deelnemers@ mailing list.
 
 	And also go to {{ protocol }}://{{ domain }}{% url 'index' %},
 	navigate to `your data'; sign and print out the waiver form and
