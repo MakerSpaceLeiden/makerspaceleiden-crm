@@ -4,7 +4,6 @@ Django
 django-dynamic-filenames
 django-flatpickr
 django-import-export
-django-import-export
 
 # When using Postgress as the backing DB
 # psycopg2-binary
