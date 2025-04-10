@@ -235,12 +235,8 @@ def recordinstructions(request):
     # Only show machine we are entitled for ourselves.
     #
     if not request.user.is_privileged:
-        machines = []
-        for m in all_machines:
-            if m.canInstruct(member):
-                machines.append(m)
-
-        members = members.exclude(id=member.id)  # .order_by('first_name')
+        machines = [m for m in all_machines if m.canInstruct(member)]
+        members = members.exclude(id=member.id)
 
     ps = []
     for m in members:
