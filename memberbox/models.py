@@ -63,7 +63,7 @@ class Memberbox(models.Model):
             return True
         return user.in_group(settings.MEMBERBOX_ADMIN_GROUP)
 
-    def ui_delete(self, user = None):
+    def ui_delete(self, user=None):
         if not self.can_delete(user):
             logger.critical(
                 "User {} tried to delete box {} owned by {}. Denied".format(
@@ -74,7 +74,7 @@ class Memberbox(models.Model):
 
         return self.delete(user)
 
-    def delete(self, user = None):
+    def delete(self, user=None):
         dst = self.owner.email
         context = {
             "email": self.owner.email,

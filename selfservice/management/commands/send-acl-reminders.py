@@ -2,9 +2,9 @@ import sys
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
-from makerspaceleiden.mail import emailPlain
 
 from acl.models import Entitlement
+from makerspaceleiden.mail import emailPlain
 
 
 class Command(BaseCommand):

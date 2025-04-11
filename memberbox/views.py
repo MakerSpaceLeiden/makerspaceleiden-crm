@@ -198,7 +198,7 @@ def delete(request, pk):
         )
 
     try:
-        box.ui_delete(user = request.user)
+        box.ui_delete(user=request.user)
     except Exception as e:
         logger.error("Unexpected error during delete of box: {0}".format(e))
         return HttpResponse("Box fail", status=400, content_type="text/plain")

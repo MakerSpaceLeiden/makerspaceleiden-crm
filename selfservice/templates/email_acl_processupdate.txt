@@ -7,7 +7,7 @@ by {{ instructor }} for {{ machine }} is waiting for:
 {% if not waiver %}  * the waiver to be filed by you.
     see {% url 'waiverform' user_id=user.id %}
 
-{% endif %}{% if not trustees %}  * approval by the trustees. 
+{% endif %}{% if not trustees %}  * approval by the trustees.
 
 {% endif %}If you have questionsl you can contact the Trustees directly in person, via
 {{ trustees_email }} or by phone.
