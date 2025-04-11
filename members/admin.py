@@ -3,13 +3,13 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import gettext_lazy as _
 from import_export import fields, resources
 from import_export.admin import ImportExportModelAdmin
-
 from simple_history.admin import SimpleHistoryAdmin
-from makerspaceleiden.admin import SimpleHistoryWithDeletedAdmin
 
+from makerspaceleiden.admin import SimpleHistoryWithDeletedAdmin
 from search_admin_autocomplete.admin import SearchAutoCompleteAdmin
 
 from .models import AuditRecord, Tag, User
+
 
 class UserResource(resources.ModelResource):
     full_name = fields.Field(column_name="Full Name")
@@ -41,7 +41,10 @@ class TagResource(resources.ModelResource):
 
 
 class UserAdmin(
-    ImportExportModelAdmin, SearchAutoCompleteAdmin, BaseUserAdmin, SimpleHistoryWithDeletedAdmin,
+    ImportExportModelAdmin,
+    SearchAutoCompleteAdmin,
+    BaseUserAdmin,
+    SimpleHistoryWithDeletedAdmin,
 ):
     resource_class = UserResource
     fieldsets = (
