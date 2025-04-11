@@ -14,6 +14,12 @@ EOM
 	fi
 }
 
+. ./venv/bin/activate
+if !  python manage.py version > /dev/null; then
+	echo Check with manage.py first - some compile errors.
+	exit 1
+fi
+
 (
 set -e
 
@@ -30,6 +36,11 @@ pip install -r requirements.txt  --quiet
 
 python manage.py dumpdata | gzip -c > /tmp/backup.$UK
 test -d static && tar zcf /tmp/backup-static.$UK static
+
+# Mickey-mouse lock - we should pub-key encrypt this.
+#
+cmod 000 /tmp/backup-static.$UK /tmp/backup.$UK
+chown root /tmp/backup-static.$UK /tmp/backup.$UK
 
 python manage.py collectstatic --no-input
 
