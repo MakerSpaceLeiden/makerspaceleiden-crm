@@ -24,7 +24,7 @@ urlpatterns = [
     ),
     path("acl/machine/", views.machine_overview, name="machine_overview"),
     path("acl/machines", views.machine_list, name="machine_list"),
-    # For the trusteeds - to ease admin.
+    # For the trustees - to ease admin.
     path("acl/missing_forms/", views.missing_forms, name="missing_forms"),
     path("acl/missing_doors/", views.missing_doors, name="missing_doors"),
     path("acl/filed_forms/", views.filed_forms, name="filed_forms"),
