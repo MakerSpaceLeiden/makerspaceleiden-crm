@@ -121,3 +121,10 @@ PETTYCASH_IBAN = "NL30TRIO0197694519"
 
 POT_ID = 63
 NONE_ID = 217
+
+# Increased; As per discussion with treasurer 2025-04-02
+#
+MAX_PAY_API = Money(35.00, EUR)
+MAX_PAY_CRM = Money(300.00, EUR)
+
+
