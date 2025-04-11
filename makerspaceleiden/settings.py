@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     "mainssensor.apps.MainssensorConfig",
     "kwh.apps.KwhConfig",
     "pettycash.apps.PettycashConfig",
+    "pettycredit.apps.PettycreditConfig",
     "ultimaker.apps.UltimakerConfig",
     "spaceapi.apps.SpaceapiConfig",
     "memberlist",
@@ -128,6 +129,20 @@ SETTINGS_EXPORT = [
 
 # WSGI_APPLICATION = "makerspaceleiden.wsgi.application"
 ASGI_APPLICATION = "makerspaceleiden.asgi.application"
+
+
+BOOTSTRAP5 = {
+    "css_url": {
+        "url": "/static/bootstrap/bootstrap.min.css",
+        "integrity": "sha384-jqywZHoaJM3rqT5K49NunuMR2it7x/Et8c3jFm7z9Xg4j4GI5MplcXdoCUnz2B0t",
+        "crossorigin": "anonymous",
+    },
+    "javascript_url": {
+        "url": "/static/bootstrap/bootstrap.bundle.min.js",
+        "integrity": "sha384-WfVzX9hAUBOBjMptWY54rUnWRI1Tn/ZCUAT52D/05VTiszOwsM+TM5o0sB4Kv44M",
+        "crossorigin": "anonymous",
+    },
+}
 
 MAILINGLIST = "deelnemers@lists.makerspaceleiden.nl"
 TRUSTEES = "hetbestuur@lists.makerspaceleiden.nl"
@@ -290,6 +305,11 @@ PETTYCASH_TNS = "Stichting Makerspace Leiden"
 PETTYCASH_IBAN = "NL18RABO0123459876"
 DEVELOPERS_ADMIN_GROUP = "developers"
 NODERED_ADMIN_GROUP = "node-red admin group"
+
+# Validity of any payment claims; e.g. when
+# we lose power or a node hangs.
+#
+CLAIM_EXPIRY_HOURS = 72
 
 # Assets of former participants; such as money or
 # boxes need to be caught somewhere. This user,

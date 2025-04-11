@@ -28,7 +28,7 @@ class Command(BaseCommand):
         for user in User.objects.all():
             balance = PettycashBalanceCache(owner=user, balance=Money(0, EUR))
             old_balance = Money(0, EUR)
-            act = "correction"
+            act = "cache fault/correction"
             try:
                 balance = PettycashBalanceCache.objects.get(owner=user)
                 old_balance = balance.balance

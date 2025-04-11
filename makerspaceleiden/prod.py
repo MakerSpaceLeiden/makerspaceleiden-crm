@@ -3,10 +3,10 @@ import sys
 
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-FORCE_SCRIPT_NAME = os.environ.get("FORCE_SCRIPT_NAME", "/crm")
+FORCE_SCRIPT_NAME = os.environ.get("FORCE_SCRIPT_NAME", "/")
 LOGIN_URL = os.environ.get("LOGIN_URL", "/crm/login/")
-LOGIN_REDIRECT_URL = os.environ.get("LOGIN_REDIRECT_URL", "/crm/")
-LOGOUT_REDIRECT_URL = os.environ.get("LOGOUT_REDIRECT_URL", "/crm/")
+LOGIN_REDIRECT_URL = os.environ.get("LOGIN_REDIRECT_URL", "/")
+LOGOUT_REDIRECT_URL = os.environ.get("LOGOUT_REDIRECT_URL", "/")
 STATIC_URL = os.environ.get("STATIC_URL", "/crm-static/")
 MEDIA_ROOT = os.environ.get("MEDIA_ROOT", "/usr/local/makerspaceleiden-crm/var/media")
 DEBUG = False
@@ -63,45 +63,45 @@ LOGGING = {
     "loggers": {
         "django": {
             "handlers": ["file"],
-            "propagate": True,
+            "propagate": False,
         },
         "daphne": {
             "handlers": ["file"],
-            "propagate": True,
+            "propagate": False,
         },
         "django.server": {
             "handlers": ["file"],
-            "propagate": True,
+            "propagate": False,
         },
         "django.request": {
             "handlers": ["file"],
-            "propagate": True,
+            "propagate": False,
         },
         "django.security": {
             "handlers": ["file"],
-            "propagate": True,
+            "propagate": False,
         },
         "django.db": {
             "handlers": ["file"],
-            "propagate": True,
+            "propagate": False,
         },
         "django.template": {
             "handlers": ["file"],
-            "propagate": True,
+            "propagate": False,
         },
         "commands": {
             "handlers": ["log_to_stdout"],
             "level": "DEBUG",
-            "propagate": True,
+            "propagate": False,
         },
         "mailinglists": {
             "handlers": ["file"],
             "level": "DEBUG",
-            "propagate": True,
+            "propagate": False,
         },
         "": {
             "handlers": ["file"],
-            "propagate": True,
+            "propagate": False,
         },
     },
 }

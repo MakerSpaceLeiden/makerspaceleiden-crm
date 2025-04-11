@@ -6,6 +6,8 @@ from django.forms import CheckboxSelectMultiple
 from import_export.admin import ImportExportModelAdmin
 from simple_history.admin import SimpleHistoryAdmin
 
+from makerspaceleiden.admin import SimpleHistoryWithDeletedAdmin
+
 from .forms import PettycashSkuForm
 from .models import (
     PettycashBalanceCache,
@@ -55,17 +57,35 @@ class PettycashStationAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
             form.instance.available_skus.add(form.cleaned_data["default_sku"])
 
 
-class PettycashTransactionAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
+class PettycashTransactionAdmin(ImportExportModelAdmin, SimpleHistoryWithDeletedAdmin):
     list_display = ("date", "dst", "src", "amount", "description")
+    search_fields = [
+        "description",
+        "src__first_name",
+        "src__last_name",
+        "dst__first_name",
+        "dst__last_name",
+    ]
     pass
 
 
-class PettycashBalanceCacheAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
+class PettycashBalanceCacheAdmin(ImportExportModelAdmin, SimpleHistoryWithDeletedAdmin):
     list_display = ("owner", "balance", "lasttxdate")
+    search_fields = ["owner__first_name", "owner__last_name"]
     pass
 
 
-class PettycashReimbursementRequestAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
+class PettycashReimbursementRequestAdmin(
+    ImportExportModelAdmin, SimpleHistoryWithDeletedAdmin
+):
+    search_fields = [
+        "description",
+        "src__first_name",
+        "src__last_name",
+        "dst__first_name",
+        "dst__last_name",
+    ]
+    list_display = ("date", "amount", "description", "dst")
     pass
 
 

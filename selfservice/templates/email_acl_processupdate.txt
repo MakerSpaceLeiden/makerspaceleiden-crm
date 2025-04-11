@@ -4,15 +4,12 @@ Hi {{ user.first_name }},
 This is a (regular) update that one of the permissions that was filed after instruction
 by {{ instructor }} for {{ machine }} is waiting for:
 
-{% if waiver %}
-  * the waiver to be filed by you.
-    See {% url 'waiverform' user_id=user.id %}
-{% fi %}
-{% if trustees %}
-  * approval by the trustees.
-{% fi %}
+{% if not waiver %}  * the waiver to be filed by you.
+    see {% url 'waiverform' user_id=user.id %}
 
-If you have questionsl you can contact the Trustees directly in person, via
+{% endif %}{% if not trustees %}  * approval by the trustees.
+
+{% endif %}If you have questionsl you can contact the Trustees directly in person, via
 {{ trustees_email }} or by phone.
 
 With kind regards,

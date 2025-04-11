@@ -5,6 +5,7 @@ from import_export import fields, resources
 from import_export.admin import ImportExportModelAdmin
 from simple_history.admin import SimpleHistoryAdmin
 
+from makerspaceleiden.admin import SimpleHistoryWithDeletedAdmin
 from search_admin_autocomplete.admin import SearchAutoCompleteAdmin
 
 from .models import AuditRecord, Tag, User
@@ -40,7 +41,10 @@ class TagResource(resources.ModelResource):
 
 
 class UserAdmin(
-    ImportExportModelAdmin, SearchAutoCompleteAdmin, BaseUserAdmin, SimpleHistoryAdmin
+    ImportExportModelAdmin,
+    SearchAutoCompleteAdmin,
+    BaseUserAdmin,
+    SimpleHistoryWithDeletedAdmin,
 ):
     resource_class = UserResource
     fieldsets = (

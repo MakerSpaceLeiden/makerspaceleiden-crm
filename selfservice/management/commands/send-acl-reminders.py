@@ -36,15 +36,15 @@ class Command(BaseCommand):
             .filter(active=False)
             .filter(holder__is_active=True)
         ):
-            dests = [e.owner.email]
+            dests = [e.holder.email]
             if options["to"]:
                 dests = [options["to"]]
 
             context = {
-                "user": e.owner,
+                "user": e.holder,
                 "instructor": e.issuer,
                 "machine": e.permit,
-                "waiver": e.owner.form_on_file,
+                "waiver": e.holder.form_on_file,
                 "trustees": e.active,
                 "trustees_email": settings.TRUSTEES,
             }
