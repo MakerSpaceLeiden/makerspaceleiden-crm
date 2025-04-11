@@ -10,6 +10,7 @@ from .forms import PettycashSkuForm
 from .models import (
     PettycashBalanceCache,
     PettycashImportRecord,
+    PettycashPendingClaim,
     PettycashReimbursementRequest,
     PettycashSku,
     PettycashStation,
@@ -69,6 +70,29 @@ class PettycashReimbursementRequestAdmin(ImportExportModelAdmin, SimpleHistoryAd
     pass
 
 
+class PettycashPendingClaimAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
+    list_display = (
+        "short_nonce",
+        "src",
+        "amount",
+        "settled",
+        "description",
+        "submitted_date",
+        "last_update",
+        "last_settle_date",
+    )
+    pass
+
+    def short_nonce(self, obj):
+        return obj.nonce[0:4] + "..." + obj.nonce[-4:]
+
+    def get_ordering(self, request):
+        return ["-submitted_date"]
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+
 class PettycashImportRecordAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     list_display = ("date", "by")
     pass
@@ -81,3 +105,4 @@ admin.site.register(PettycashTransaction, PettycashTransactionAdmin)
 admin.site.register(PettycashBalanceCache, PettycashBalanceCacheAdmin)
 admin.site.register(PettycashReimbursementRequest, PettycashReimbursementRequestAdmin)
 admin.site.register(PettycashImportRecord, PettycashImportRecordAdmin)
+admin.site.register(PettycashPendingClaim, PettycashPendingClaimAdmin)

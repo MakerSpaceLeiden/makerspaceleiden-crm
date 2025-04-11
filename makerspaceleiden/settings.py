@@ -343,6 +343,13 @@ PETTYCASH_TERMS_MAX_UNKNOWN = 4
 PETTYCASH_TERMS_MIN_UNKNOWN = 1
 PETTYCASH_TERMS_MINS_CUTOFF = 10
 
+# Auto settle in 100 hours; i.e. a firing of
+# can take quite long; and build in some
+# network is down, etc.
+#
+DEFAULT_SETTLE_IN_SECONDS = 100 * 3600
+DEFAULT_SETTLED_PURGE_DAYS = 60
+
 NODERED_URL = "http://localhost:1880"
 
 # Notification aliases

@@ -4,7 +4,7 @@ import secrets
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from django.db import models
+from django.db import models, transaction
 from django.db.models import Q
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
@@ -371,18 +371,26 @@ class PettycashPendingClaim(models.Model):
         default=timezone.now,
     )
 
+    last_settle_date = models.DateTimeField(
+        help_text="Date to settle by (or 0 if not to settle automatically",
+        default=timezone.now,
+        blank=True,
+        null=True,
+    )
+
     def generate_nonce():
         for tries in range(1, 25):
-            nonce = base64.b64encode(secrets.token_bytes(64))[0:48].decode("ascii")
+            nonce = base64.b64encode(secrets.token_bytes(64), altchars=b":.")[
+                0:48
+            ].decode("ascii")
             r = PettycashPendingClaim.objects.filter(nonce=nonce)
-            if not r.exits():
+            if not r.exists():
                 return nonce
         raise Exception(
             "Could not generate a sufficeintly unique Nonce after 25 tries."
         )
 
     nonce = models.CharField(
-        min_length=48,
         max_length=48,
         help_text="Unique (cryptographic) nonce",
         default=generate_nonce,
@@ -406,10 +414,13 @@ class PettycashPendingClaim(models.Model):
         null=True,
     )
 
+    def short_nonce(self):
+        return self.nonce[0:4] + "..." + self.nonce[-4:]
+
     def __str__(self):
         return "%s: Claim made on %s for %s (%s/%s) for: %s" % (
-            self.nonce,
-            self.date,
+            self.short_nonce(),
+            self.submitted_date,
             self.amount,
             self.dst,
             self.src,
@@ -417,8 +428,37 @@ class PettycashPendingClaim(models.Model):
         )
 
     def save(self):
-        self.last_update = timezone.now
+        self.last_update = timezone.now()
         return super(PettycashPendingClaim, self).save()
+
+    def settle(self, comment):
+        if self.settled:
+            raise Exception("Claim {} already settled.".format(self))
+
+        with transaction.atomic():
+            self.settled = True
+            if self.amount == Money(0, EUR):
+                self._change_reason = (
+                    "Claim settled with the amount set to 0, so no resulting payment"
+                    + comment
+                )
+                self.save()
+                return None
+
+            tx = PettycashTransaction(
+                src=self.src,
+                dst=self.dst,
+                description="{} [Settled]".format(self.description),
+                amount=self.amount,
+            )
+            tx._change_reason = "Claim settled with by a final payment"
+            tx.save()
+
+            self.settled_as = tx
+            self._change_reason = "Claim settled with a final payment" + comment
+            self.save()
+
+        return tx
 
 
 # See above note/comment near delete_callback(). We need

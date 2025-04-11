@@ -48,8 +48,9 @@ urlpatterns = [
     path("api/v2/pay", views.api2_pay, name="acl-v1-pay"),
     # Claim and later (auto/manually) settle.
     #
-    path("api/v2/claim", views.api2_claim, name="acl-v1-claim"),
-    path("api/v2/settle", views.api2_settle, name="acl-v1-claim"),
+    path("api/v2/claim_create", views.api2_claim, name="acl-v1-claim"),
+    path("api/v2/claim_update", views.api2_update_claim, name="acl-v1-claim"),
+    path("api/v2/claim_settle", views.api2_settle, name="acl-v1-claim"),
     # Calls with no security (yet)
     #
     path("api/v1/skus", views.api_get_skus, name="acl-v1-get-skus"),

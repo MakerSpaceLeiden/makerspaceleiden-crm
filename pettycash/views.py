@@ -1,12 +1,11 @@
 import logging
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from email.mime.image import MIMEImage
 from functools import wraps
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
-from django.db import transaction
 from django.db.models import Q
 from django.forms import widgets
 from django.http import HttpResponse, JsonResponse
@@ -134,6 +133,17 @@ def alertOwnersToChange(
             "settings": settings,
         },
     )
+
+
+def alertOwnersToClaimIssue(msg, context={}):
+    context["subject"] = msg
+
+    toinform = pettycash_admin_emails()
+
+    if settings.ALSO_INFORM_EMAIL_ADDRESSES:
+        toinform.extend(settings.ALSO_INFORM_EMAIL_ADDRESSES)
+
+    return emailPlain("claim_issue_admin_alert.txt", toinform=toinform, context=context)
 
 
 def pettycash_redirect(pk=None):
@@ -1234,10 +1244,18 @@ def api2_claim(request, terminal, station):
         uid_str = rq.get("uid", None)
 
         src = User.objects.get(pk=int(uid_str))
-        dst = (User.objects.get(id=settings.POT_ID),)
+        dst = User.objects.get(id=settings.POT_ID)
 
         amount_str = rq.get("amount", None)
         amount = Money(amount_str, EUR)
+
+        last_settle_date = int(
+            rq.get("settleInSeconds", settings.DEFAULT_SETTLE_IN_SECONDS)
+        )
+        if last_settle_date:
+            last_settle_date = datetime.now() + timedelta(seconds=last_settle_date)
+        else:
+            last_settle_date = None  # Blank is allowed / marks a non-settler
 
         description = rq.get("description", None)
     except Exception as e:
@@ -1249,7 +1267,11 @@ def api2_claim(request, terminal, station):
 
     try:
         claim = PettycashPendingClaim(
-            src=src, dst=dst, amount=amount, description=description
+            src=src,
+            dst=dst,
+            amount=amount,
+            description=description,
+            last_settle_date=last_settle_date,
         )
         claim._change_reason = "Claim created at {}, {}".format(terminal, station)
         claim.save()
@@ -1268,17 +1290,137 @@ def api2_claim(request, terminal, station):
 @csrf_exempt
 @is_paired_terminal
 @is_known_station
-def api2_settle(request, terminal, station):
+def api2_update_claim(request, terminal, station):
+    context = {
+        "request": request,
+        "terminal": terminal,
+        "station": station,
+    }
     try:
         rq = request.GET
         if request.method == "POST":
             rq = request.POST
 
-        nonce_str = rq.get("nonce", None)
-        claim = PettycashPendingClaim.objects.get(nonce=nonce_str)
+        nonce_str = rq.get("claim", None)
+
+        context["rq"] = rq
+        context["nonce_str"] = nonce_str
+
+        try:
+            claim = PettycashPendingClaim.objects.get(pk=nonce_str)
+        except ObjectDoesNotExist:
+            logger.error(
+                "Could not find claim {} from {}/{}: {} to update".format(
+                    nonce_str, terminal, station, rq
+                )
+            )
+            alertOwnersToClaimIssue("Could not find claim to update", context=context)
+            return HttpResponse("Claim problem", status=404, content_type="text/plain")
+
+        if claim.settled:
+            logger.error(
+                "Claim {} from {}/{} - could not be updated; as it was already settled: {} ".format(
+                    nonce_str, terminal, station, rq
+                )
+            )
+            alertOwnersToClaimIssue(
+                "Attempt to update an alreqady settled claim", context=context
+            )
+            return HttpResponse(
+                "Claim already settled", status=404, content_type="text/plain"
+            )
+
+        comment = rq.get("comment", None)
+        if comment:
+            comment = ", " + comment
+
+        amount_str = rq.get("amount", None)
+        if amount_str:
+            claim.amount = Money(amount_str, EUR)
+
+        last_settle_date_str = rq.get("settleInSeconds", None)
+        if last_settle_date_str:
+            last_settle_date = int(last_settle_date_str)
+            if last_settle_date:
+                last_settle_date += datetime.now
+            claim.last_settle_date = last_settle_date
+
+    except Exception as e:
+        logger.error(
+            "Param issue for claim update at terminal %s@%s: %s"
+            % (terminal.name, station.description, e)
+        )
+        alertOwnersToClaimIssue("Param issue during claim update", context=context)
+        return HttpResponse("Params problems", status=400, content_type="text/plain")
+
+    try:
+        claim._change_reason = "Claim updated at {}, {}{}".format(
+            terminal, station, comment
+        )
+        claim.save()
+    except Exception:
+        logger.error(
+            "Claim update issue {} on {}/{}: {}".format(
+                nonce_str, terminal, station, rq
+            )
+        )
+        alertOwnersToClaimIssue("Update to a claim failed", context=context)
+        return HttpResponse(
+            "Claim update failed", status=500, content_type="text/plain"
+        )
+    return HttpResponse(claim.nonce, status=200, content_type="text/plain")
+
+
+@csrf_exempt
+@is_paired_terminal
+@is_known_station
+def api2_settle(request, terminal, station):
+    context = {
+        "request": request,
+        "terminal": terminal,
+        "station": station,
+    }
+
+    try:
+        rq = request.GET
+        if request.method == "POST":
+            rq = request.POST
+
+        nonce_str = rq.get("claim", None)
+
+        context["rq"] = rq
+        context["nonce_str"] = nonce_str
+
+        try:
+            claim = PettycashPendingClaim.objects.get(nonce=nonce_str)
+        except ObjectDoesNotExist:
+            logger.error(
+                "Could not find claim {} from {}/{} to settle: {}".format(
+                    nonce_str, terminal, station, rq
+                )
+            )
+            alertOwnersToClaimIssue("Could not find claim", context=context)
+            return HttpResponse("Claim problem", status=404, content_type="text/plain")
+
+        if claim.settled:
+            logger.error(
+                "Claim {} from {}/{} - could not be settled; as it was already settled: {}".format(
+                    nonce_str, terminal, station, rq
+                )
+            )
+            alertOwnersToClaimIssue(
+                "Attempt to settle an alreqady paid claim again", context=context
+            )
+            return HttpResponse(
+                "Claim already settled", status=404, content_type="text/plain"
+            )
 
         amount_str = rq.get("amount", None)
         description = rq.get("description", None)
+        comment = rq.get("comment", None)
+        if comment:
+            comment = ", " + comment
+
         if amount_str:
             claim.amount = Money(amount_str, EUR)
         if description:
@@ -1289,42 +1431,22 @@ def api2_settle(request, terminal, station):
             "Param issue for terminal %s@%s: %s"
             % (terminal.name, station.description, e)
         )
+        context["e"] = e
+        alertOwnersToClaimIssue("Param error handling claim settling", context=context)
         return HttpResponse("Params problems", status=400, content_type="text/plain")
 
     try:
-        with transaction.atomic():
-            claim.settled = True
-            if claim.amount == Money(0, EUR):
-                claim._change_reason = (
-                    "Claim settled with the amount set to 0, so no resulting payment"
-                )
-                claim.save()
-                return HttpResponse(
-                    "Claim dropped", status=200, content_type="text/plain"
-                )
-
-            claim.settled_by = transact_raw(
-                request,
-                src=claim.src,
-                dst=claim.dst,
-                description="{} [Settled]".format(claim.description),
-                amount=claim.amount,
-                reason="Claim settled with by a final payment on {}: {}".format(
-                    terminal, station
-                ),
-                user=claim.src,
-            )
-            claim._change_reason = "Claim settled with a final payment"
-            claim.save()
+        tx = claim.settle(comment)
 
     except Exception as e:
-        logger.error(
-            "Claim settling ssue {}/{}, {} {}: {}".format(
-                claim.src, claim.dst, claim.description, claim.amount, e
-            )
-        )
+        logger.error("Claim settling issue {}: {}".format(claim, e))
+        context["e"] = e
+        alertOwnersToClaimIssue("Could not settle claim", context=context)
         return HttpResponse(
             "Claim settling failed", status=500, content_type="text/plain"
         )
 
+    # We do not sent an email if the settling was for 0 euro's.
+    if tx:
+        alertOwnersToChange(tx, tx.src, [])
     return HttpResponse("Settled", status=200, content_type="text/plain")

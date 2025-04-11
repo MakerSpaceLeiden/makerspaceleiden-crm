@@ -53,8 +53,8 @@ class Terminal(models.Model):
         return "%s@%s %s...%s" % (
             self.name,
             self.date.strftime("%Y/%m/%d %H:%M"),
-            self.fingerprint[:3],
-            self.fingerprint[-3:],
+            self.fingerprint[:4],
+            self.fingerprint[-4:],
         )
 
     def save(self, *args, **kwargs):

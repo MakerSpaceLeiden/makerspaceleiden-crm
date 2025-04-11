@@ -1,0 +1,23 @@
+Subject:  "[pettycash/claims] {{ subject }} @ MSL
+
+This is to notify you that there was an unexpected issue with a
+deferred payment at terminal {{ terminal.name }}, {{ station.description }}.
+{% if e %}
+The error/exception was:
+      {{ e }}
+{% else %}
+      {{ subject }}
+{% endif %}
+The main data is:
+
+    Claim:    {{ nonce_str }}
+    POST/GET: {% for key, value in rq.items %}
+              {{ key }} : {{ value }}{% endfor %}
+
+This happened during settling - and as it failed - won't be visible
+in the log of claims/payments. Any remedy will need to be done as
+a manual payment via the web interface.
+
+Your,
+
+Makerbot

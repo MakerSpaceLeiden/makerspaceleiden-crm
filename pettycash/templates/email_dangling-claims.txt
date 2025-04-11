@@ -1,0 +1,20 @@
+Subject: Dangling claims (cuttoff date {{ cutoff }})
+
+{% load admin_urls %}
+L.S.,
+
+There are a number of dangling claims post the {{ cutoff}} date ({{ days }}) that need attention:
+
+{% for c in dangling %}
+ -  {{ c }}
+    Record: {{ base }}{% url 'admin:pettycash_pettycashpendingclaim_changelist' %}{{ c.pk }}
+    History: {{ base }}{% url 'admin:pettycash_pettycashpendingclaim_history' c.pk %}
+{% endfor %}
+
+Or consult
+
+    {{ base }}{% url 'admin:pettycash_pettycashpendingclaim_changelist'  %}
+
+for an overview.
+
+Your spacebot.
