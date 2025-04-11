@@ -127,5 +127,3 @@ NONE_ID = 217
 #
 MAX_PAY_API = Money(35.00, EUR)
 MAX_PAY_CRM = Money(300.00, EUR)
-
-
