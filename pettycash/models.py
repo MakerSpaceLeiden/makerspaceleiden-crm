@@ -114,9 +114,10 @@ class PettycashBalanceCache(models.Model):
         return super(PettycashBalanceCache, self).save()
 
     def __str__(self):
-        return "{} {}".format(self.balance,self.owner)
+        return "{} {}".format(self.balance, self.owner)
 
-def adjust_balance_cache(last, dst, amount, comment = None, isreal=True):
+
+def adjust_balance_cache(last, dst, amount, comment=None, isreal=True):
     try:
         balance = PettycashBalanceCache.objects.get(owner=dst)
     except ObjectDoesNotExist:
@@ -130,7 +131,7 @@ def adjust_balance_cache(last, dst, amount, comment = None, isreal=True):
     if isreal:
         balance.lasttxdate = timezone.now()
 
-    if comment == None:
+    if comment is None:
         comment = "Change {} : {}".format(amount, dst)
     balance._change_reason = comment[:99]
     balance.save()
@@ -201,8 +202,12 @@ class PettycashTransaction(models.Model):
         try:
             # Essentially roll the transaction back from the cache.
             if self.src != self.dst:
-                adjust_balance_cache(self, self.src, self.amount, comment = "Deleted tx {}".format(self))
-                adjust_balance_cache(self, self.dst, -self.amount, comment = "Deleted tx {}".format(self))
+                adjust_balance_cache(
+                    self, self.src, self.amount, comment="Deleted tx {}".format(self)
+                )
+                adjust_balance_cache(
+                    self, self.dst, -self.amount, comment="Deleted tx {}".format(self)
+                )
         except Exception as e:
             logger.error("Transaction cache failure on update post delete: %s" % (e))
 

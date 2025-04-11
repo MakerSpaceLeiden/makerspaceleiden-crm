@@ -1,15 +1,13 @@
 from functools import update_wrapper
 
-from django.urls import reverse
-
+from django.contrib import admin
+from django.contrib.admin.utils import quote
+from django.contrib.admin.views.main import ChangeList
 from django.http import Http404, HttpResponse
 from django.shortcuts import redirect
+from django.urls import reverse
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
-
-from django.contrib import admin
-from django.contrib.admin.views.main import ChangeList
-from django.contrib.admin.utils import quote
 from simple_history.admin import SimpleHistoryAdmin
 
 from acl.models import EntitlementViolation
@@ -45,19 +43,19 @@ def admin_view(view, cacheable=False):
 
     return update_wrapper(inner, view)
 
+
 class SimpleHistoryShowDeletedFilter(admin.SimpleListFilter):
     title = "Entries"
     parameter_name = "entries"
 
     def lookups(self, request, model_admin):
-        return (
-            ("deleted_only", "Only Deleted"),
-        )
+        return (("deleted_only", "Only Deleted"),)
 
     def queryset(self, request, queryset):
         if self.value():
-            return queryset.model.history.filter(history_type='-').distinct()
+            return queryset.model.history.filter(history_type="-").distinct()
         return queryset
+
 
 class SimpleHistoryChangeList(ChangeList):
     def apply_select_related(self, qs):
@@ -79,6 +77,7 @@ class SimpleHistoryChangeList(ChangeList):
             current_app=self.model_admin.admin_site.name,
         )
 
+
 class SimpleHistoryWithDeletedAdmin(SimpleHistoryAdmin):
     def get_changelist(self, request, **kwargs):
         return SimpleHistoryChangeList
@@ -89,4 +88,3 @@ class SimpleHistoryWithDeletedAdmin(SimpleHistoryAdmin):
         return [SimpleHistoryShowDeletedFilter] + [
             f for f in super().get_list_filter(request)
         ]
-
