@@ -1,0 +1,11 @@
+Subject: [makerbot] SKU/consumables
+
+General spend during the last month; the attachment 
+is an excel spreadsheet with the same data.
+
+Yours,
+
+Spacebot.
+
+{% for e in per_sku %}
+{{ e.name|rjust:36 }} {{ e.count|rjust:10 }} @ {{ e.price|rjust:10 }} =  {{ e.amount|rjust:12 }}{% endfor %}
