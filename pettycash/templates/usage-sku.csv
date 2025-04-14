@@ -1,0 +1,3 @@
+{% load l10n %}{% localize off %}Name, Count, Price, Total
+{% for e in per_sku %}{{ e.name }},{{ e.count }},{{ e.price.amount }},{{ e.amount.amount }}
+{% endfor %}{% endlocalize %}
