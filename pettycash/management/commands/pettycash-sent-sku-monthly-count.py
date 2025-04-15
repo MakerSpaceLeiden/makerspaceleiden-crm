@@ -1,23 +1,15 @@
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime
+from email.mime.application import MIMEApplication
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
-from django.db.models import Q
+from django.template.loader import render_to_string
 from django.utils import timezone
 from moneyed import EUR, Money
 
-from email.mime.multipart import MIMEMultipart
-from email.mime.application import MIMEApplication
-
 from makerspaceleiden.mail import emailPlain, emails_for_group
-from pettycash.models import (
-    PettycashBalanceCache,
-    PettycashImportRecord,
-    PettycashSku,
-    PettycashTransaction,
-)
-from django.template.loader import render_to_string
+from pettycash.models import PettycashSku, PettycashTransaction
 
 default_to = emails_for_group(settings.PETTYCASH_TREASURER_GROUP)
 
