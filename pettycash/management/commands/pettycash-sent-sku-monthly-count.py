@@ -21,11 +21,12 @@ from django.template.loader import render_to_string
 
 default_to = emails_for_group(settings.PETTYCASH_TREASURER_GROUP)
 
+
 def sendEmail(
     skus,
     per_sku,
     toinform,
-    attachments = [],
+    attachments=[],
     template="usage-sku-overview-email.txt",
     forreal=True,
 ):
@@ -40,7 +41,7 @@ def sendEmail(
                 "base": settings.BASE,
             },
             forreal=forreal,
-            attachments = attachments,
+            attachments=attachments,
         )
 
 
@@ -112,16 +113,18 @@ class Command(BaseCommand):
         if options["to"]:
             dest = options["to"]
 
-        csv = render_to_string('usage-sku.csv',
+        csv = render_to_string(
+            "usage-sku.csv",
             context={
                 "per_sku": per_sku,
                 "skus": skus,
                 "base": settings.BASE,
-            })
+            },
+        )
 
-        attachment = MIMEApplication(csv, name = 'usage-sku.csv')
+        attachment = MIMEApplication(csv, name="usage-sku.csv")
         attachment.add_header("Content-Disposition", 'inline; filename="usage-sku.csv"')
 
-        sendEmail(skus, per_sku, dest, [ attachment ], forreal=(not options["dryrun"]))
+        sendEmail(skus, per_sku, dest, [attachment], forreal=(not options["dryrun"]))
 
         sys.exit(rc)
