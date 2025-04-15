@@ -70,11 +70,12 @@ class PettycashRequestFormBase(ModelForm):
 
         super(PettycashRequestFormBase, self).__init__(*args, **kwargs)
 
-        self.fields[
-            "amount"
-        ].help_text = "This system will only accept amounts up to %s. %s" % (
-            self.max_val,
-            alternative_text,
+        self.fields["amount"].help_text = (
+            "This system will only accept amounts up to %s. %s"
+            % (
+                self.max_val,
+                alternative_text,
+            )
         )
         self.fields["amount"].validators = [
             MinMoneyValidator(0),
