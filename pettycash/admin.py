@@ -6,6 +6,8 @@ from django.forms import CheckboxSelectMultiple
 from import_export.admin import ImportExportModelAdmin
 from simple_history.admin import SimpleHistoryAdmin
 
+from makerspaceleiden.admin import SimpleHistoryWithDeletedAdmin
+
 from .forms import PettycashSkuForm
 from .models import (
     PettycashBalanceCache,
@@ -18,12 +20,6 @@ from .models import (
 
 logger = logging.getLogger(__name__)
 
-from django.contrib import admin
-from django.contrib.admin.utils import quote
-from django.contrib.admin.views.main import ChangeList
-from django.urls import reverse
-from simple_history.admin import SimpleHistoryAdmin
-from makerspaceleiden.admin import SimpleHistoryWithDeletedAdmin
 
 class PettycashSkuAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     list_display = ("pk", "name", "amount", "description")
@@ -63,17 +59,33 @@ class PettycashStationAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
 
 class PettycashTransactionAdmin(ImportExportModelAdmin, SimpleHistoryWithDeletedAdmin):
     list_display = ("date", "dst", "src", "amount", "description")
-    search_fields = ["description", "src__first_name", "src__last_name", "dst__first_name", "dst__last_name"]
+    search_fields = [
+        "description",
+        "src__first_name",
+        "src__last_name",
+        "dst__first_name",
+        "dst__last_name",
+    ]
     pass
+
 
 class PettycashBalanceCacheAdmin(ImportExportModelAdmin, SimpleHistoryWithDeletedAdmin):
     list_display = ("owner", "balance", "lasttxdate")
     search_fields = ["owner__first_name", "owner__last_name"]
     pass
 
-class PettycashReimbursementRequestAdmin(ImportExportModelAdmin, SimpleHistoryWithDeletedAdmin):
-    search_fields = ["description", "src__first_name", "src__last_name", "dst__first_name", "dst__last_name"]
-    list_display = ("date", "amount", "description","dst")
+
+class PettycashReimbursementRequestAdmin(
+    ImportExportModelAdmin, SimpleHistoryWithDeletedAdmin
+):
+    search_fields = [
+        "description",
+        "src__first_name",
+        "src__last_name",
+        "dst__first_name",
+        "dst__last_name",
+    ]
+    list_display = ("date", "amount", "description", "dst")
     pass
 
 

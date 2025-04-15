@@ -81,6 +81,7 @@ INSTALLED_APPS = [
 ]
 
 SITE_ID = 1
+SITE_NAME = "Makerspace Leiden"
 
 MIDDLEWARE = [
     "simple_history.middleware.HistoryRequestMiddleware",
@@ -123,6 +124,7 @@ SETTINGS_EXPORT = [
     "NONE_ID",
     "NONE_LABEL",
     "TRUSTEES",
+    "SITE_NAME",
 ]
 
 # WSGI_APPLICATION = "makerspaceleiden.wsgi.application"
@@ -131,13 +133,13 @@ ASGI_APPLICATION = "makerspaceleiden.asgi.application"
 
 BOOTSTRAP5 = {
     "css_url": {
-        "url": "static/bootstrap/bootstrap.min.css",
-        "integrity": "sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH",
+        "url": "/static/bootstrap/bootstrap.min.css",
+        "integrity": "sha384-jqywZHoaJM3rqT5K49NunuMR2it7x/Et8c3jFm7z9Xg4j4GI5MplcXdoCUnz2B0t",
         "crossorigin": "anonymous",
     },
-    "avascript_url": {
-        "url": "static/bootstrap/bootstrap.bundle.min.js",
-        "integrity": "sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz",
+    "javascript_url": {
+        "url": "/static/bootstrap/bootstrap.bundle.min.js",
+        "integrity": "sha384-WfVzX9hAUBOBjMptWY54rUnWRI1Tn/ZCUAT52D/05VTiszOwsM+TM5o0sB4Kv44M",
         "crossorigin": "anonymous",
     },
 }
@@ -297,7 +299,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 # PETTYCASH_DEMO_USER_GROUP = "pettycash demo group"
 PETTYCASH_NOUSE_DAYS = 60
 PETTYCASH_ADMIN_GROUP = "pettycash admin group"
-PETTYCASH_TREASURER_GROUP = "pettycash admin group"
+PETTYCASH_TREASURER_GROUP = "treasurer admin group"
 PETTYCASH_TOPUP = 15
 PETTYCASH_TNS = "Stichting Makerspace Leiden"
 PETTYCASH_IBAN = "NL18RABO0123459876"

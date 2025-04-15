@@ -12,7 +12,6 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import EmailMessage
-from django.db.models import Q
 from django.forms import widgets
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
@@ -230,23 +229,21 @@ def recordinstructions(request):
 
     # keep the option open to `do bulk adds
     members = User.objects.filter(is_active=True)
-    machines = Machine.objects.all().exclude(requires_permit=None)
+    all_machines = Machine.objects.all().exclude(requires_permit=None).order_by("name")
 
+    machines = all_machines
     # Only show machine we are entitled for ourselves.
     #
     if not request.user.is_privileged:
-        machines = machines.filter(
-            Q(requires_permit__permit=None)
-            | Q(requires_permit__permit__isRequiredToOperate__holder=member)
-        )
-        members = members.exclude(id=member.id)  # .order_by('first_name')
+        machines = [m for m in all_machines if m.canInstruct(member)]
+        members = members.exclude(id=member.id)
 
     ps = []
     for m in members:
         ps.append((m.id, m.first_name + " " + m.last_name))
 
     ms = []
-    for m in machines.order_by("name"):
+    for m in machines:
         ms.append((m.id, m.name))
 
     form = forms.Form(request.POST)  # machines, members)
@@ -828,7 +825,7 @@ def userdetails_admin_edit(request, user_id):
 def userdetails(request):
     cancel_button_url = request.GET.get("redirect_to", "index")
     if not cancel_button_url:
-        cancel_button_url = '/'
+        cancel_button_url = "/"
     try:
         member = request.user
         old_email = "{}".format(member.email)
@@ -844,7 +841,7 @@ def userdetails(request):
 def userdetails_edit(request, member, old_email, verify=True):
     cancel_button_url = request.GET.get("redirect_to", "index")
     if not cancel_button_url:
-        cancel_button_url = '/'
+        cancel_button_url = "/"
     if request.method == "POST":
         try:
             user_asis = UserForm(request.POST, request.FILES, instance=member)
@@ -907,6 +904,7 @@ def userdetails_edit(request, member, old_email, verify=True):
                 content_type="text/plain",
             )
 
+    cancel_button_url = request.GET.get("redirect_to", "index")
     form = UserForm(instance=member)
     context = {
         "title": "Selfservice - update details",

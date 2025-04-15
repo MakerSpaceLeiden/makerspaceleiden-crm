@@ -1,118 +1,141 @@
-# Quick test/install
+# Makerspace Leiden CRM
 
--	Make sure you have a somewhat recent python version
+Welcome to our Makerspace Management System. This software helps our community manage member access, equipment permissions, storage, and more.
 
--   [OPTIONAL] If you want to use `poetry` instead, install [poetry](https://python-poetry.org/docs/#installation)
-    - Add environment variable `POETRY` with the value true. Can be done by running: `cp example.env .env`
+## Table of Contents
 
--	sh loaddemo.sh
+- [Quick Start Guide](#quick-start-guide)
+	- [System Requirements](#system-requirements)
+	- [Installation Options](#installation-options)
+	- [Accessing the System](#accessing-the-system)
+	- [Testing the API](#testing-the-api)
+- [For Developers](#for-developers)
+- [Functional Requirements](#functional-requirements)
+	- [For Trustees (Administrators)](#for-trustees-administrators)
+	- [API Features](#api-features)
+	- [Self-Service Features](#self-service-features)
+	- [Self-Service Bonus](#self-service-bonus)
+	- [Email Notifications](#email-notifications)
+	- [Operational](#operational)
+- [System Design](#system-design)
+	- [User Structure](#user-structure)
+	- [Key Components](#key-components)
 
-Then go to
+## Quick Start Guide
 
-	http://localhost:8000/
+### System Requirements
+- Python (recent version)
 
-and login using the accounts created & shown to you during the loaddemo.sh script.
+### Installation Options
 
-Or use URLs such as
+**Option 1: Standard Setup**
+1. Make sure you have Python installed on your computer
+2. Run the demo script: `sh loaddemo.sh`
 
-	curl -H "X-Bearer: Foo" -F tag=1-2-4 http://127.0.0.1:8000/acl/api/v1/getok4node/foonode
+**Option 2: Using Poetry**
+1. Install [Poetry](https://python-poetry.org/docs/#installation)
+2. Create environment file: `cp example.env .env`
+3. Run the demo script: `sh loaddemo.sh`
 
-to check  the API (this assumes local.py to contain the Foo password; see debug.py) and some machine
-given a node name.
+### Accessing the System
+After installation, visit:
+```
+http://localhost:8000/
+```
 
-# Committing
+You can log in using the test accounts created during installation. The loaddemo script will output these login details.
 
-Make sure `pre-commit` is installed when committing. This can be done by installing using poetry (pre-commit is a dev dependency) or manually installing pre-commit with the instructions found [here](https://pre-commit.com/#install).
+### Testing the API
+You can test the API with commands like:
+```
+curl -H "X-Bearer: Foo" -F tag=1-2-4 http://localhost:8000/acl/api/v1/getok4node/foonode
+```
+(This assumes your local settings contain the "Foo" password - see debug.py)
 
-Once `pre-commit` is installed, you can run `pre-commit install` to install the necessary git hooks. After this you're set to commit!
+## For Developers
 
-There are pipelines running pre-commit is as well to check whether pre-commit was run successfully. If any issues arise in the pipeline, first try to run pre-commit locally using `pre-commit run --all-files`.
+Please see [CONTRIBUTING.md](CONTRIBUTING.md) for detailed information on how to contribute to this project, including code style, pre-commit setup, and submission guidelines.
 
-# Requirements
+## Functional Requirements
 
-## Trustees
--	Create member, progress status from initial to full (i.e. with 24x7 key)
+### For Trustees (Administrators)
+- Manage member progression (from new members to full access with 24/7 key)
+- Track member status (forms completed, standing in community)
+- Manage instruction groups (who can teach others)
+- Create and manage equipment/machines
+- Manage RFID cards
+- Generate reports on storage and permits
 
--	Checkboxes for things such as 'form on file', member-in-good-standing
+### API Features
+- Check permissions based on RFID tags
+- Verify basic membership
+- Verify equipment training status
+- Verify specific permits
 
--	Management of groups (e.g. people that can give instruction)
+### Self-Service Features
+- New membership requests (no login required)
+- Password reset
+- Manage RFID cards (activate new cards, deactivate old ones)
+- Record when you've given instruction to another member
 
--	Creation of new machines and groups
+### Self-Service Bonus
+- Report accidents
+- Report equipment problems or activate lockouts
+- Find member storage bins
+- Request storage permits for larger items
+- Track spare parts ordering
 
--	Overview rfid cards
+### Email Notifications
+The system automatically sends emails in these situations:
 
--	Reports on bins & (big/overdue) storage permits.
+1. **User Detail Changes**
+   - When users update their personal information
+   - Email sent to: Trustees
 
-## API
+2. **Training Records**
+   - When someone adds instruction/training records
+   - Email sent to: Trustees and possibly members ("deelnemers")
 
--	lists or OK/deny on tag's.
-		based on just being a member
-		based on having had instructions
-		based on an actual permit
+3. **Storage Space Changes**
+   - When any changes are made to storage space
+   - Email sent to: All members ("deelnemers")
+   - Separate email to owner if the change was made by someone else
+   - Email to trustees if duration > 30 days or if extending an auto-approved 30-day permit
 
-## Self service
+4. **Storage Box Changes**
+   - When any changes are made to storage boxes
+   - Email sent to: Trustees
+   - Separate email to owner if the change was made by someone else
 
--	Initial contact / request membership (no auth)
+### Operational
+In addition to the above, the system is designed to be easy to maintain and scale.
 
--	password reset.
+- Standard Django setup for easy maintenance
+- Supports dozens of machines/equipment
+- Handles hundreds of users
 
--	activate (new) card, retire old.
+## System Design
 
--	record whom you have given instruction to.
+Outline of the current system design.
 
+### User Structure
+- Standard Django user system
+- Additional member-specific information (forms on file, emergency contacts)
+- Possible to add more information
 
-## Self service (bonus)
+### Key Components
+1. **Machines**
+   - Equipment and access points (like doors)
+   - May require specific training
+   - May require signed waivers
+   - May require special permits
 
--	report accident
+2. **Permits**
+   - Access categories (like door access)
+   - May build on other permits
 
-- 	report outages
-	activate lockout
-
--	location members bin
-		visible to all
-
--	storage permits & durations for things that do not fit in the members bin.
-		request
-		visible to all
-
--	track ordering of spares.
-
-## Non functional requirements
-
-- Very 'standard' approach - so ops and code evolving does not rely on a few skilled people.
-- Some 10's of machines
-- Low 100's of users
-
-## Email 'rules'
-
-- User changes his/her details -> email trustees
-- Someone adds instructions -> email trustees ? deelnemers ?
-- Any mutations on storage space - email deelnemers
-  Email owner separare if the change is made by someone else but the owner.
-  Email trusteeds if > 30 days or extension on a auto-approve 30 days.
-- Box changes - email trusteeds
-  Email owner separare if the change is made by someone else but the owner.
-
-# Current design
-
-- Normal Django users; Members adds a field to that (form on file). May
-	add more in the future (e.g. emergency contact).
-
-- Machines
-	Machines or things that you can interact with (like doors).
-	May require instructions
-	May require the waiver to be on file.
-	May require a 'permit' of a specific type.
-
-- Permits
-	E.g. allowed to open doors.
-	May require a permit to be issued (one deep)
-
-- Entitlements
-	of a specific permi
-	Assigned to a user (owner) by an issuer.
-	issuer must have the entitlement himself.
-	issuer must ALSO have the permit specified in the permit,
-	i.e. the instruction permit, if so specified (one deep)
-
-## issues with the current design
+3. **Entitlements**
+   - Specific permissions assigned to users
+   - Assigned by authorized members
+   - Issuers must have the entitlement themselves
+   - Instructors need appropriate permits to grant entitlements

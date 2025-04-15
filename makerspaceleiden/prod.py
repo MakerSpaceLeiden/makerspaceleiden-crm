@@ -1,5 +1,6 @@
 import os
 import sys
+from moneyed import EUR, Money
 
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
@@ -63,45 +64,45 @@ LOGGING = {
     "loggers": {
         "django": {
             "handlers": ["file"],
-            "propagate": True,
+            "propagate": False,
         },
         "daphne": {
             "handlers": ["file"],
-            "propagate": True,
+            "propagate": False,
         },
         "django.server": {
             "handlers": ["file"],
-            "propagate": True,
+            "propagate": False,
         },
         "django.request": {
             "handlers": ["file"],
-            "propagate": True,
+            "propagate": False,
         },
         "django.security": {
             "handlers": ["file"],
-            "propagate": True,
+            "propagate": False,
         },
         "django.db": {
             "handlers": ["file"],
-            "propagate": True,
+            "propagate": False,
         },
         "django.template": {
             "handlers": ["file"],
-            "propagate": True,
+            "propagate": False,
         },
         "commands": {
             "handlers": ["log_to_stdout"],
             "level": "DEBUG",
-            "propagate": True,
+            "propagate": False,
         },
         "mailinglists": {
             "handlers": ["file"],
             "level": "DEBUG",
-            "propagate": True,
+            "propagate": False,
         },
         "": {
             "handlers": ["file"],
-            "propagate": True,
+            "propagate": False,
         },
     },
 }
@@ -121,3 +122,8 @@ PETTYCASH_IBAN = "NL30TRIO0197694519"
 
 POT_ID = 63
 NONE_ID = 217
+
+# Increased; As per discussion with treasurer 2025-04-02
+#
+MAX_PAY_API = Money(35.00, EUR)
+MAX_PAY_CRM = Money(300.00, EUR)
