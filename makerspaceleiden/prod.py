@@ -1,5 +1,6 @@
 import os
 import sys
+
 from moneyed import EUR, Money
 
 USE_X_FORWARDED_HOST = True
