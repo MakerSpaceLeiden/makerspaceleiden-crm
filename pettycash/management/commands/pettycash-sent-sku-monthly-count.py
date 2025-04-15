@@ -10,7 +10,7 @@ from moneyed import EUR, Money
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 
-from makerspaceleiden.mail import emailPlain
+from makerspaceleiden.mail import emailPlain, emails_for_group
 from pettycash.models import (
     PettycashBalanceCache,
     PettycashImportRecord,
@@ -19,7 +19,7 @@ from pettycash.models import (
 )
 from django.template.loader import render_to_string
 
-
+default_to = emails_for_group(settings.PETTYCASH_TREASURER_GROUP)
 
 def sendEmail(
     skus,
@@ -52,8 +52,9 @@ class Command(BaseCommand):
             "--to",
             dest="to",
             type=str,
+            default=default_to,
             help="Sent the message to a different addres (default is to %s)"
-            % (settings.MAILINGLIST),
+            % (default_to),
         )
 
         parser.add_argument(
