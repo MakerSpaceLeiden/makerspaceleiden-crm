@@ -1,4 +1,4 @@
-Subject:  "[makerbot] Account balance {{ user}} {{ balance.balance }}
+Subject:  [makerbot] Account balance {{ user}} {{ balance.balance }}
 
 Dear {{ user }},
 
