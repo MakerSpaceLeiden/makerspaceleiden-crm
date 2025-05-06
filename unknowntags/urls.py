@@ -15,4 +15,8 @@ urlpatterns = [
         views.addmembertounknowntag,
         name="addmembertounknowntag",
     ),
+    # Temporary hack to work around https://github.com/openssl/openssl/issues/6933
+    # in master.py until we've either upgrade, retired this code; or simplified
+    # our URL routing further.
+    path("api-int/v1/unknowntag", views.unknowntag, name="unknowntag-int"),
 ]
