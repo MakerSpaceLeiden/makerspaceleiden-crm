@@ -204,7 +204,9 @@ class User(AbstractUser):
 
 
 class Tag(models.Model):
-    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    owner = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="tagIsIssuedTo"
+    )
     tag = models.CharField(max_length=30, unique=True)  # , editable = False)
     description = models.CharField(max_length=300, blank=True, null=True)
 

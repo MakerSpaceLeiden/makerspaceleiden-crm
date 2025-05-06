@@ -18,3 +18,18 @@ peter.wood@makerspaceleiden.nl
 	Peter Wood
  	tablesaw doors
 	+31715149999
+tagless.theo@makerspaceleiden.nl
+
+	Theo Tagless
+	tablesaw doors
+	+31711234567
+doorless.dora@makerspaceleiden.nl
+	12-12-12-12
+	Dora Doorless
+	tablesaw
+	+31711234566
+skint.shara@makerspaceleiden.nl
+
+        Shara Skint
+
+        +31711234568
