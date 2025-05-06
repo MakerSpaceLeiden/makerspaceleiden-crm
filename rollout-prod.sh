@@ -39,8 +39,8 @@ test -d static && tar zcf /tmp/backup-static.$UK static
 
 # Mickey-mouse lock - we should pub-key encrypt this.
 #
-cmod 000 /tmp/backup-static.$UK /tmp/backup.$UK
-chown root /tmp/backup-static.$UK /tmp/backup.$UK
+sudo chmod 000 /tmp/backup-static.$UK /tmp/backup.$UK
+sudo chown root /tmp/backup-static.$UK /tmp/backup.$UK
 
 python manage.py collectstatic --no-input
 
