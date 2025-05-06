@@ -5,10 +5,13 @@
 
 <table>
 <tr>
-<th>member</th></tr>
-{% for member in amiss %}
+<th>member</th><th>Door</th><th>Tag(s)</th><th>Joined</th></tr>
+{% for p in amiss %}
 <tr>
-	<td><a href="{{ member.path }}"> {{ member.name }}</a></td>
+	<td><a href="{{ p.user.path }}">{{ p.user.name }}</a></td>
+	<td>{% if p.hasNoDoor %}<font color=red>not yet</font>{% else %}granted{% endif %}
+	<td>{% if p.hasNoTag %}<font color=red>not yet</font>{% else %}issued{% endif %}
+	<td>{{ p.user.date_joined|timesince }} ago ({{ p.user.date_joined }})</td>
 </tr>
 {% endfor %}
 </table>
