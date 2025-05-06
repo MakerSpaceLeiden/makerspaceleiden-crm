@@ -10,6 +10,7 @@ from dateutil.tz.tz import EPOCH
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q
 from django.db.models.functions import Upper
 from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
@@ -391,17 +392,30 @@ def missing_forms(request):
 
 @login_required
 def missing_doors(request):
-    missing = (
+    missing_doors = (
         User.objects.all()
         .filter(is_active=True)
-        .exclude(isGivenTo__permit=settings.DOORS)
+        .exclude(Q(isGivenTo__permit=settings.DOORS))
         .order_by("-id")
     )
-
+    missing_tags = (
+        User.objects.all()
+        .filter(is_active=True)
+        .exclude(Q(tagIsIssuedTo__tag__contains="-"))
+        .order_by("-id")
+    )
+    missing = {}
+    for user in missing_doors:
+        missing[user.id] = {"hasNoDoor": True, "user": user}
+    for user in missing_tags:
+        if user.id not in missing:
+            missing[user.id] = {"user": user}
+        missing[user.id]["hasNoTag"] = True
+    print(missing.values())
     context = {
         "title": "No doors or tags",
-        "desc": "People with no doors and/or tags",
-        "amiss": missing,
+        "desc": "People with no door permissions and/or tags issues",
+        "amiss": missing.values(),
         "has_permission": request.user.is_authenticated,
     }
     return render(request, "acl/missing.html", context)
