@@ -120,14 +120,20 @@ class PettycashBalanceCache(models.Model):
 def adjust_balance_cache(last, dst, amount, comment=None, isreal=True):
     try:
         balance = PettycashBalanceCache.objects.get(owner=dst)
-    except ObjectDoesNotExist:
-        logger.info("Warning - creating petty cache entry for dst=%s" % (dst))
+        balance.balance += amount
 
+    except ObjectDoesNotExist:
         balance = PettycashBalanceCache(owner=dst, balance=Money(0, EUR))
         for tx in PettycashTransaction.objects.all().filter(Q(dst=dst)):
             balance.balance += tx.amount
+        for tx in PettycashTransaction.objects.all().filter(Q(src=dst)):
+            balance.balance -= tx.amount
 
-    balance.balance += amount
+        logger.info(
+            "Warning - creating petty cache entry for dst=%s - filled with %s"
+            % (dst, balance.balance)
+        )
+
     if isreal:
         balance.lasttxdate = timezone.now()
 
@@ -266,8 +272,10 @@ class PettycashTransaction(models.Model):
         rc = super(PettycashTransaction, self).save(*args, **kwargs)
         try:
             if self.src != self.dst:
-                adjust_balance_cache(self, self.src, -self.amount)
                 adjust_balance_cache(self, self.dst, self.amount)
+                adjust_balance_cache(self, self.src, -self.amount)
+            else:
+                logger.critical("ODD: transfer from %s to %s of %s".format())
         except Exception as e:
             logger.error("Transaction cache failure: %s" % (e))
 
