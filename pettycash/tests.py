@@ -36,26 +36,31 @@ def check():
 def dump(title):
     print(title)
     print(
-        "{:28}: {:8} - {:8} = {:8} == {:8}".format(
+        "{:28}: {:>8} - {:>8} = {:>8} == {:>8}".format(
             "participant", "in", "out", "balance", "cached"
         )
     )
     balance = Money(0, EUR)
+    cbalance = Money(0, EUR)
     for user in User.objects.all().order_by("id"):
         out = Money(0, EUR)
         for tx in PettycashTransaction.objects.all().filter(src=user):
             out = out + tx.amount
+            balance = balance + tx.amount
 
         inc = Money(0, EUR)
         for tx in PettycashTransaction.objects.all().filter(dst=user):
             inc = inc + tx.amount
+            balance = balance - tx.amount
 
         r = inc - out
 
         ce = " not cached"
         exen = PettycashBalanceCache.objects.all().filter(owner=user)
         if exen:
-            ce = exen[0].balance.amount
+            ce = exen[0].balance
+            cbalance += ce
+            ce = ce.amount
 
         name = "{}".format(user.name())
         out = out.amount
@@ -69,7 +74,8 @@ def dump(title):
         print(f"{name:28}: {inc:8.2f} - {out:8.2f} = {r:8.2f} == {ce:8} {err}")
 
     balance = balance.amount
-    print(f"{balance:72.2f}")
+    cbalance = cbalance.amount
+    print(f"{balance:60.2f} == {cbalance:8.2f} (should be zero)")
 
 
 class PettycashTest(TestCase):
