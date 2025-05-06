@@ -375,7 +375,7 @@ class Entitlement(models.Model):
             if "bypass_user" in kwargs:
                 user = kwargs["bypass_user"]
                 del kwargs["bypass_user"]
-                logger.critical("Warning - bypass in operation.")
+                logger.info("Warning - bypass in operation.")
 
         # rely on the contraints to bomb out if there is nothing in kwargs and self. and self.
         #
@@ -396,7 +396,7 @@ class Entitlement(models.Model):
                 )
                 logger.critical(erm)
                 raise EntitlementViolation(erm)
-            logger.critical(
+            logger.info(
                 f"Entitlement.save(): STAFFF bypass of rule 'holder {self.issuer} cannot issue {self.permit} to {self.holder} as the holder lacks {issuer_permit}'"
             )
 
@@ -411,7 +411,7 @@ class Entitlement(models.Model):
                     "Failed to fetch an older entitlement: {}".format(str(e))
                 )
 
-        logger.error(
+        logger.debug(
             f"Entitlement: saving {self} -- with active:{self.active} and permit:{self.permit} ({self.permit.permit})"
         )
         # Current rule for pending is:
@@ -526,7 +526,7 @@ def tagacl_change_tracker(sender, instance, **kwargs):
             if sender == Tag and "last_used" in kwargs["update_fields"]:
                 return
 
-    logger.critical("tagacl_change_tracker({},{},{})".format(sender, instance, kwargs))
+    logger.debug("tagacl_change_tracker({},{},{})".format(sender, instance, kwargs))
 
     c = ChangeTracker.objects.first()
     if c is None:
