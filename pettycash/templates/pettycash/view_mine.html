@@ -13,9 +13,9 @@ Your balance is
 	<i>&nbsp;(Your balance is positive, so you have money left to spend)</i>.
 {% else %}
 {% if balance.balance.amount >= 0 %}
-&nbsp;So there little, if any, left in your acount.
-Thererfore you may want to make a <a href="{% url 'manual_deposit' %}">deposit</a>
-before this runs out. As it takes a few days (or more) before the monies wired will show up in your account.
+&nbsp;So there is little, if any, money left in your acount.
+Therefore you may want to make a <a href="{% url 'manual_deposit' %}">deposit</a>
+before this runs out. <i>Note: It will take a few days (or more) before deposits will show up in your account.</i>
 {%else%}
 
 <div class="text-danger">
