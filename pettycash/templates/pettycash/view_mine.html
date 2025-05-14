@@ -18,9 +18,9 @@ Thererfore you may want to make a <a href="{% url 'manual_deposit' %}">deposit</
 before this runs out. As it takes a few days (or more) before the monies wired will show up in your account.
 {%else%}
 
-<span class="text-danger">
-	&nbsp;<b>Your balance is negative, so you owe the space money; and should make a <a href="{% url 'manual_deposit' %}">deposit</a> as soon as possible.</b>
-</span>
+<div class="text-danger">
+	&nbsp;<b>Your balance is negative, so you owe the space money; and should make a <a href="{% url 'manual_deposit' %}">deposit</a> as soon as possible.</b></p>
+</div>
 {% endif %}
 {% endif %}
 {% if last_import %}
