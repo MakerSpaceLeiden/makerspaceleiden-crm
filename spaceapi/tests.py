@@ -3,7 +3,7 @@ from unittest import TestCase
 from django.apps import apps
 from django.test import Client
 
-from selfservice.tests.mocks import MockAggregatorAdapter
+from selfservice.test_helpers.mocks import MockAggregatorAdapter
 
 
 class SpaceApiTest(TestCase):
