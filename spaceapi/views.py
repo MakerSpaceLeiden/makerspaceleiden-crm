@@ -19,6 +19,7 @@ def redir(request):
 def index(request):
     aggregator_adapter = get_aggregator_adapter()
     if not aggregator_adapter:
+        print("No aggregator configuration found")
         return HttpResponse(
             "No aggregator configuration found", status=500, content_type="text/plain"
         )
