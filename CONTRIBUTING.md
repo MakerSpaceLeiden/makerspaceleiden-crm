@@ -6,7 +6,7 @@ This document outlines the workflow for contributors and maintainers when submit
 
 ### Pre-commit
 
-In order to install pre-commit, either use it via the created environment in Poetry, or install it globally using either `pip` or `pipx`.
+In order to install pre-commit, either use it via the created environment in `uv`
 
 Then run `pre-commit install` in order to install the hooks.
 
