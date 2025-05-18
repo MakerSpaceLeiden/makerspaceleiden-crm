@@ -11,7 +11,7 @@ if ! test -f pyproject.toml; then
 fi
 if ! [ -x "$(command -v uv)" ]
 then
-	echo "uv could not be found. Please install uv: https://docs.astral.sh/uv/#installation" 
+	echo "uv could not be found. Please install uv: https://docs.astral.sh/uv/#installation"
 	exit 1
 fi
 
