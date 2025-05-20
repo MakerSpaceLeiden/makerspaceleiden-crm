@@ -19,12 +19,24 @@ class Command(BaseCommand):
         machine = options["machine"]
         user = options["user"]
 
-        machine = Machine.objects.get(node_machine_name=machine)
-        user = User.objects.get(last_name=user)
+        try:
+            machine = Machine.objects.get(node_machine_name=machine)
+        except Exception:
+            try:
+                machine = Machine.objects.get(name=machine)
+            except Exception:
+                machine = Machine.objects.filter(name__icontains=machine)
+
+        try:
+            user = User.objects.get(last_name=user)
+        except Exception:
+            user = User.objects.filter(name__icontains=user)
 
         (needs, has) = machine.useState(user)
         res = needs & has
-        print(f"has({has:X}) & needs({needs:X}) = {res:X}")
+        print(
+            f"User {user} has({has:X}) & needs({needs:X}) = {res:X} for machine {machine}"
+        )
         print(useNeedsToStateStr(needs, has))
 
         sys.exit(rc)
