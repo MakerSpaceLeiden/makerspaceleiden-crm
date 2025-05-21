@@ -823,6 +823,9 @@ def userdetails_admin_edit(request, user_id):
 
 @login_required
 def userdetails(request):
+    cancel_button_url = request.GET.get("redirect_to", "index")
+    if not cancel_button_url:
+        cancel_button_url = "/"
     try:
         member = request.user
         old_email = "{}".format(member.email)
@@ -838,7 +841,7 @@ def userdetails(request):
 def userdetails_edit(request, member, old_email, verify=True):
     cancel_button_url = request.GET.get("redirect_to", "index")
     if not cancel_button_url:
-        cancel_button_url = '/'
+        cancel_button_url = "/"
     if request.method == "POST":
         try:
             user_asis = UserForm(request.POST, request.FILES, instance=member)
