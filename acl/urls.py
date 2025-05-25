@@ -44,7 +44,11 @@ urlpatterns = [
     # Hack - this bypasses the optional_CA to work around this
     # https://github.com/openssl/openssl/issues/6933 bug in python
     # until the moment we've retired this master agent.
-    path("acl/api-int/v1/getok/<str:machine>", views.api_getok, name="acl-v1-getok-internal"),
+    path(
+        "acl/api-int/v1/getok/<str:machine>",
+        views.api_getok,
+        name="acl-v1-getok-internal",
+    ),
     # Provide metadata on a tag, requires a valid tag and a bearer token.
     #
     # path("acl/api/v1/gettaginfo", views.api_gettaginfo, name="acl-v1-gettaginfo"),
@@ -92,5 +96,10 @@ urlpatterns = [
         "acl/api/v2/gettags4machineBIN/<str:machine>",
         views.api2_gettags4machineBIN,
         name="acl-v2-gettags-bin",
+    ),
+    path(
+        "acl/api/v2/recorduse/<str:machine>",
+        views.api_recorduse,
+        name="acl-v2-recorduse",
     ),
 ]
