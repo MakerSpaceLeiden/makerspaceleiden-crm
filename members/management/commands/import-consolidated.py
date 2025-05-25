@@ -9,6 +9,7 @@ from members.models import Tag, User
 
 logger = logging.getLogger(__name__)
 
+
 def import_consolidated(inputfiles):
     try:
         admin = User.objects.get(email="admin@admin.nl")
