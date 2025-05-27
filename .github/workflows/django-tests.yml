@@ -6,9 +6,12 @@ jobs:
   tests:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-python@v3
-    - name: Run tests
-      run: |
-        pip install -r requirements.txt
-        python manage.py test
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v3
+      - name: Run tests
+        run: |
+          pip install -r requirements.txt
+          pip install coverage
+          coverage run --source='.' --omit=*/migrations/* manage.py test
+      - name: Coverage report
+        run: coverage report
