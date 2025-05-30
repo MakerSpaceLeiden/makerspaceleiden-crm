@@ -1,1 +1,1 @@
-{% autoescape off %}[makerbot] {{ volunteer }} has volunteerd for {{ chore.description }}{% endautoescape %}
+{% autoescape off %}[makerbot] {{ volunteer }} has volunteered for {{ chore.description }}{% endautoescape %}
