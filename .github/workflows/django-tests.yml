@@ -19,6 +19,6 @@ jobs:
         run: |
           uv run python manage.py check
           uv tool install coverage
-          coverage run --source='.' --omit=*/migrations/* manage.py test
+          uv run coverage run --source='.' --omit=*/migrations/* manage.py test
       - name: Coverage report
         run: coverage report
