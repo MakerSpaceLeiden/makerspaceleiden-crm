@@ -1,0 +1,34 @@
+name: Merge Pull Request to Prod
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  create-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          base: prod
+          branch: chore/auto-pr-master-to-prod
+          title: "🤖 Merge master to prod"
+          body: |
+            ## Automated Pull Request
+
+            This PR contains all changes from [master](https://github.com/MakerSpaceLeiden/makerspaceleiden-crm/tree/master/) that are not yet in [prod](https://github.com/MakerSpaceLeiden/makerspaceleiden-crm/tree/prod).
+            Please review the changes before merging.
+
+            **Source Branch:** `master`
+            **Target Branch:** `prod`
+            **Commit SHA:** ${{ github.sha }}
+            **Triggered by:** ${{ github.actor }}
+          delete-branch: true
