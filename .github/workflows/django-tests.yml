@@ -17,8 +17,9 @@ jobs:
         run: uv sync
       - name: Run tests
         run: |
+          source .venv/bin/activate
           uv run python manage.py check
-          uv tool install coverage
+          uv pip install coverage
           uv run coverage run --source='.' --omit=*/migrations/* manage.py test
       - name: Coverage report
-        run: coverage report
+        run: uv run coverage report
