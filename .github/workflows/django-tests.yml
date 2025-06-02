@@ -7,11 +7,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-python@v3
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: 0.7.5
+      - name: Setup python
+        run: uv python install
+      - name: Install dependencies
+        run: uv sync
       - name: Run tests
         run: |
-          pip install -r requirements.txt
-          pip install coverage
+          uv run python manage.py check
+          uv tool install coverage
           coverage run --source='.' --omit=*/migrations/* manage.py test
       - name: Coverage report
         run: coverage report
