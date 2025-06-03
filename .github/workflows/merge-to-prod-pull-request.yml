@@ -14,11 +14,15 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Reset prod branch
+        run: |
+          git fetch origin prod:prod
+          git reset --hard prod
+
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          base: prod
           branch: chore/auto-pr-master-to-prod
           title: "🤖 Merge master to prod"
           body: |
