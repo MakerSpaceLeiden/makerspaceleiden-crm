@@ -3,8 +3,7 @@
 {% block content %}
   <h2>{{ label }}</h2>
 Note that due to the store-and-forward nature of queued email delivery - changing settings here may not have an immediate
-effect. It is normaly to have emails `en-route' as the change takes hold. Likewise - it can take up to 72hrs for all the
-digest changes to clear.
+effect. It is normaly to have emails `en-route' as the change takes hold. 
 <h3>Mailing list  subscriptions {{ member }} </h3>
 
   <form method="post" enctype="multipart/form-data">
@@ -17,10 +16,11 @@ digest changes to clear.
     {% comment %} <tr><td>Archive</td><td><a href="{{ list.path }}">historic archive for {{ list.name }}</a></td></tr> {% endcomment %}
     {{ form.as_table }}
     </table>
+    * Note: The digest feature is temporarily unavailable.
 {% endfor %}
 
 </table>
-<button type="button" onclick="window.location.href='{% url cancel_button_url %}'" class="btn btn-secondary me-1">Cancel</button>
+<button type="button" onclick="window.location.href='{% url cancel_button_url %}'" class="btn btn-secondary me-1">Back</button>
 <button type="submit" class="btn btn-primary btn-primary-custom me-1">Save</button>
 </form>
 

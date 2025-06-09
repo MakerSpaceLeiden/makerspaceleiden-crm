@@ -2,7 +2,7 @@
 
 {% block content %}
 
-<p>
+{% comment %} <p>
   <h3>Signal – {% if uses_signal %} <b style="color: green;">ACTIVE</b> {% else %} inactive {% endif %}</h3>
     {% if uses_signal %}
     <p style="margin-top: 10px;">
@@ -39,7 +39,7 @@
     <a style="background-color: #CCCCCC; border-radius: 3px; font-size: 12px; border: 1px solid #003366; padding: 5px; color: black;" href="{% url 'telegram_disconnect' %}">Deactivate Telegram</a>
   </p>
   {% endif %}
-</p>
+</p> {% endcomment %}
 
 <p style="margin-top: 30px;">
   <h3>Email – {% if uses_email %} <b style="color: green;">ACTIVE</b> {% else %} inactive {% endif %}</h3>
