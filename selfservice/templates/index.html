@@ -33,7 +33,12 @@ function toggle() {
 							<div class="pt-1 pb-1 agenda-item-part border-end d-none d-sm-block" style="width:70px">
 								{{ agenda_item.starttime|time:"G:i" }}
 							</div>
-							<div class="col pt-1 pb-1 agenda-item-part" style="font-weight:600;">
+							<div class="d-block d-sm-none w-100 pt-1 pb-1 agenda-item-part" style="font-weight:600;">
+								<a href="{% url 'agenda_detail' pk=agenda_item.pk %}">
+									{{ agenda_item.item_title }}
+								</a>
+							</div>
+							<div class="col pt-1 pb-1 agenda-item-part d-none d-sm-block" style="font-weight:600;">
 								<a href="{% url 'agenda_detail' pk=agenda_item.pk %}">
 									{{ agenda_item.item_title }}
 								</a>
