@@ -59,25 +59,20 @@ function toggle() {
 			{% if event_groups %}
 				Upcoming tasks next 2 weeks, view all upcoming chores <a href="{% url 'chores' %}" class="chores-link">here</a>.
 				<div class="card mt-2 mb-2">
-					<ul class="list-group list-group-flush pt-0 pb-0">
+					<ul class="list-group list-group-flush pt-0 pb-1">
 						{% for group in event_groups %}
-							<!-- Date Row -->
+							<!-- Week Header -->
 							<li class="list-group-item col-sm-12 pt-0 pb-0" style="background-color: rgb(248, 248, 248)">
 								<div class="row">
 									<div class="col-12 mt-2 mb-2" style="font-weight: 600 !important;">
-										{{ group.ts_str }}
+										{{ group.0 }}
 									</div>
 								</div>
 							</li>
 							<!-- Chore Rows -->
-							{% for event in group.events %}
+							{% for event in group.1.events %}
 								<li class="list-group-item pt-2 pb-2">
 									<div class="row">
-										<!-- Fixed width for time column -->
-										<div class="chore-time-column pt-1 pb-1" style="width:80px;">
-											{{ event.time_str }}
-										</div>
-										<!-- Middle column takes the remaining space -->
 										<div class="chore-description-column mt-1 mb-1 ">
 											{{ event.chore.description }}&nbsp;
 											{% if event.wiki_url %}
@@ -124,7 +119,7 @@ function toggle() {
 					</ul>
 				</div>
 			{% else %}
-				No upcoming tasks for the next 4 weeks, view all upcoming chores <a href="{% url 'chores' %}" class="chores-link">here</a>.
+				No upcoming tasks for the next 2 weeks, view all upcoming chores <a href="{% url 'chores' %}" class="chores-link">here</a>.
 			{% endif %}
 		</div>
 

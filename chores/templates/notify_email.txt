@@ -1,12 +1,9 @@
 {% autoescape off %}
 L.S.
 
-This is to let you know that {{ volunteer }} was so kind to volunteer
-for the {{ chore.description }}.
+This is to let you know that {{ volunteer }} was so kind to volunteer for the {{ chore.description }}.
 
-Also - as a gentle reminder - should you beat this person to this particular
-chore - then be so kind to let him or her know. So there are no unnecessary
-late night trips to the space.
+Also - as a gentle reminder - should you beat this person to this particular chore - then be so kind to let him or her know. So there are no unnecessary late night trips to the space.
 
 Sb.
 --
