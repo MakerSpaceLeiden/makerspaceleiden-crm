@@ -128,8 +128,8 @@ def index(request):
 
         # Fetch Ufo items
         ufo_items = Ufo.objects.filter(
-            state="UNK", deadline__gte=timezone.now()
-        ).order_by("created_at")[:4]
+            state="UNK", dispose_by_date__gte=timezone.now()
+        ).order_by("created_at")[:8]
 
         # Get chores data using the chores/utils/get_chores_data function
         chores_data, error_message = get_chores_data(current_user_id=request.user.id)

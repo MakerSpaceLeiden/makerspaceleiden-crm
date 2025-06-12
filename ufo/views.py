@@ -45,7 +45,7 @@ def ufo_redirect(pk=None):
         url = "{}#{}".format(url, pk)
     return redirect(url)
 
-
+@login_required
 def index(request, days=30):
     lst = Ufo.objects.all()
     if days > 0:
