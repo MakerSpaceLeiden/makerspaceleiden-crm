@@ -7,15 +7,15 @@ test -f .env && source .env
 DIR=${DIR:-/usr/local/makerspaceleiden-crm}
 cd $DIR || exit 1
 
-POETRY=${POETRY:=false}
+uv venv
+source .venv/bin/activate
 
-unset POETRY_RUN
+DJANGO_RUN="uv run python manage.py"
 
-if $POETRY ; then
-    export POETRY_RUN="poetry run "
-else
-    . ./venv/bin/activate
+if !  ${DJANGO_RUN} version > /dev/null; then
+	echo Check with manage.py first - some compile errors.
+	exit 1
 fi
 
-${POETRY_RUN}python manage.py sent-ufo-reminders
-${POETRY_RUN}python manage.py clean_old_history --days 120 members.Tag
+${DJANGO_RUN} sent-ufo-reminders
+${DJANGO_RUN} clean_old_history --days 120 members.Tag

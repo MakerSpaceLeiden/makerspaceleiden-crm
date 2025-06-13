@@ -14,8 +14,12 @@ EOM
 	fi
 }
 
-. ./venv/bin/activate
-if !  python manage.py version > /dev/null; then
+uv venv
+source .venv/bin/activate
+
+DJANGO_RUN="uv run python manage.py"
+
+if !  ${DJANGO_RUN} version > /dev/null; then
 	echo Check with manage.py first - some compile errors.
 	exit 1
 fi
@@ -29,12 +33,10 @@ test -e makerspaceleiden/local.py
 sudo chgrp -R crmadmin .
 sudo chmod -R g+rw .
 
-. ./venv/bin/activate
+uv sync
 
-pip install --upgrade pip --quiet
-pip install -r requirements.txt  --quiet
-
-python manage.py dumpdata | gzip -c > /tmp/backup.$UK
+# Outputs all data in the database associated with installed applications
+${DJANGO_RUN} dumpdata | gzip -c > /tmp/backup.$UK
 test -d static && tar zcf /tmp/backup-static.$UK static
 
 # Mickey-mouse lock - we should pub-key encrypt this.
@@ -42,10 +44,10 @@ test -d static && tar zcf /tmp/backup-static.$UK static
 sudo chmod 000 /tmp/backup-static.$UK /tmp/backup.$UK
 sudo chown root /tmp/backup-static.$UK /tmp/backup.$UK
 
-python manage.py collectstatic --no-input
 
-python manage.py makemigrations
-python manage.py migrate
+${DJANGO_RUN} collectstatic --no-input
+${DJANGO_RUN} makemigrations
+${DJANGO_RUN} migrate
 
 sudo apachectl restart
 sudo systemctl restart crm-daphne.service
