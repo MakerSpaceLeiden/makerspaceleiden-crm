@@ -4,38 +4,33 @@ Welcome to our Makerspace Management System. This software helps our community m
 
 ## Table of Contents
 
+- [Table of Contents](#table-of-contents)
 - [Quick Start Guide](#quick-start-guide)
-	- [System Requirements](#system-requirements)
-	- [Installation Options](#installation-options)
-	- [Accessing the System](#accessing-the-system)
-	- [Testing the API](#testing-the-api)
+  - [System Requirements](#system-requirements)
+  - [Installation Options](#installation-options)
+  - [Accessing the System](#accessing-the-system)
+  - [Testing the API](#testing-the-api)
 - [For Developers](#for-developers)
 - [Functional Requirements](#functional-requirements)
-	- [For Trustees (Administrators)](#for-trustees-administrators)
-	- [API Features](#api-features)
-	- [Self-Service Features](#self-service-features)
-	- [Self-Service Bonus](#self-service-bonus)
-	- [Email Notifications](#email-notifications)
-	- [Operational](#operational)
+  - [For Trustees (Administrators)](#for-trustees-administrators)
+  - [API Features](#api-features)
+  - [Self-Service Features](#self-service-features)
+  - [Self-Service Bonus](#self-service-bonus)
+  - [Email Notifications](#email-notifications)
+  - [Operational](#operational)
 - [System Design](#system-design)
-	- [User Structure](#user-structure)
-	- [Key Components](#key-components)
+  - [User Structure](#user-structure)
+  - [Key Components](#key-components)
 
 ## Quick Start Guide
 
 ### System Requirements
-- Python (recent version)
+- uv https://docs.astral.sh/uv/
 
 ### Installation Options
 
-**Option 1: Standard Setup**
-1. Make sure you have Python installed on your computer
+1. Create environment file: `cp example.env .env`
 2. Run the demo script: `sh loaddemo.sh`
-
-**Option 2: Using Poetry**
-1. Install [Poetry](https://python-poetry.org/docs/#installation)
-2. Create environment file: `cp example.env .env`
-3. Run the demo script: `sh loaddemo.sh`
 
 ### Accessing the System
 After installation, visit:

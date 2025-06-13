@@ -17,17 +17,17 @@ function RunWithErrorCheck ([string]$command)
 
 Write-Host "Loading demo for Makerspace CRM/CMS"
 
-RunWithErrorCheck "python -m venv ./venv/bin/activate" #create virtual environment for crm
+RunWithErrorCheck "uv run python -m venv ./venv/bin/activate" #create virtual environment for crm
 RunWithErrorCheck ".\venv\bin\activate\Scripts\Activate.ps1"
-RunWithErrorCheck "pip install -r requirements.txt"
+RunWithErrorCheck "uv sync"
 
 if(Test-Path .\db.sqlite3) #rebuild db using migrations
 {
     Remove-Item -Force db.sqlite3
 }
 
-RunWithErrorCheck "python manage.py makemigrations"
-RunWithErrorCheck "python manage.py migrate"
+RunWithErrorCheck "uv run python manage.py makemigrations"
+RunWithErrorCheck "uv run python manage.py migrate"
 
 Write-Host "Importing Data"
 if(Test-Path .\demo\example.json)
@@ -36,15 +36,15 @@ if(Test-Path .\demo\example.json)
 }
 else
 {
-    RunWithErrorCheck "python manage.py import-wifi demo/wifi.csv"
-    RunWithErrorCheck "python manage.py import-machines demo/mac.csv "
-    RunWithErrorCheck "python manage.py import-consolidated demo/consolidated.txt"
-    RunWithErrorCheck "python manage.py pettycash-activate-all-users"
+    RunWithErrorCheck "uv run python manage.py import-wifi demo/wifi.csv"
+    RunWithErrorCheck "uv run python manage.py import-machines demo/mac.csv "
+    RunWithErrorCheck "uv run python manage.py import-consolidated demo/consolidated.txt"
+    RunWithErrorCheck "uv run python manage.py pettycash-activate-all-users"
 
     $I = Read-Host "Reset all passwords and generate invites? (Y/N Default: N)"
     if($I -eq "Y")
     {
-        RunWithErrorCheck "python manage.py sent-invite --reset --all #typo: send-invite"
+        RunWithErrorCheck "uv run python manage.py sent-invite --reset --all #typo: send-invite"
     }
     else
     {
@@ -53,4 +53,4 @@ else
     }
 }
 
-RunWithErrorCheck "python manage.py runserver"
+RunWithErrorCheck "uv run python manage.py runserver"

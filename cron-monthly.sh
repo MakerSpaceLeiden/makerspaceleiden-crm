@@ -7,18 +7,18 @@ test -f .env && source .env
 DIR=${DIR:-/usr/local/makerspaceleiden-crm}
 cd $DIR || exit 1
 
-POETRY=${POETRY:=false}
+uv venv
+source .venv/bin/activate
 
-unset POETRY_RUN
+DJANGO_RUN="uv run python manage.py"
 
-if $POETRY ; then
-    export POETRY_RUN="poetry run "
-else
-    . ./venv/bin/activate
+if !  ${DJANGO_RUN} version > /dev/null; then
+	echo Check with manage.py first - some compile errors.
+	exit 1
 fi
 
-${POETRY_RUN}python manage.py pettycash-recache $*
-${POETRY_RUN}python manage.py pettycash-sent-reminders $*
-${POETRY_RUN}python manage.py pettycash-sent-balances $*
-${POETRY_RUN}python manage.py pettycash-sent-sku-monthly-count $*
-${POETRY_RUN}python manage.py pettycash-consolidate 30 $*
+${DJANGO_RUN} pettycash-recache $*
+${DJANGO_RUN} pettycash-sent-reminders $*
+${DJANGO_RUN} pettycash-sent-balances $*
+${DJANGO_RUN} pettycash-sent-sku-monthly-count $*
+${DJANGO_RUN} pettycash-consolidate 30 $*
