@@ -123,6 +123,7 @@ PETTYCASH_IBAN = "NL30TRIO0197694519"
 
 POT_ID = 63
 NONE_ID = 217
+BYEBYE_ID = 51
 
 # Increased; As per discussion with treasurer 2025-04-02
 #
