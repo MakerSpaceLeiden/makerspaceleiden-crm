@@ -3,7 +3,7 @@ name = "makerspaceleiden-crm"
 version = "0.1.0"
 description = ""
 authors = [{ name = "Your Name", email = "you@example.com" }]
-requires-python = "~=3.12"
+requires-python = "~=3.13"
 readme = "README.md"
 dependencies = [
     "django>=4.2.17,<5",
@@ -23,7 +23,7 @@ dependencies = [
     "django-ipware>=6.0.0,<7",
     "reportlab>=4.0.7,<5",
     "pypdf2>=3.0.1,<4",
-    "lxml>=4.9.3,<5",
+    "lxml>=5.0.0,<6",
     "jsonfield2>=4.0.0.post0,<5",
     "django-money>=3.4.0,<4",
     "requests>=2.32.2,<3",
