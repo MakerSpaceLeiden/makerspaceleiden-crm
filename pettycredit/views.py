@@ -166,7 +166,7 @@ def api1_settle(request, terminal):
         if not desc:
             desc = claim.desc
 
-        claim.settle(f"{desc} (settled on { terminal.name })", amount)
+        claim.settle(f"{desc} (settled on {terminal.name})", amount)
     except Exception as e:
         logger.error(f"api1_updateclaim: could settle claim: {e}")
         email_fail(

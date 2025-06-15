@@ -431,9 +431,9 @@ def waiverform(request, user_id=None):
     fd = generate_waiverform_fd(member.id, name, confirmation_url)
 
     response = HttpResponse(fd.getvalue(), status=200, content_type="application/pdf")
-    response[
-        "Content-Disposition"
-    ] = f'attachment; filename="MSL-Waiver-{safename}.pdf"'
+    response["Content-Disposition"] = (
+        f'attachment; filename="MSL-Waiver-{safename}.pdf"'
+    )
 
     return response
 
