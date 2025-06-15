@@ -41,6 +41,7 @@ dependencies = [
     "python-magic>=0.4.27",
     "cryptography>=44.0.3",
     "pycryptodome>=3.22.0",
+    "django-sendmail-backend>=0.1.2",
 ]
 
 [dependency-groups]
@@ -51,6 +52,7 @@ dev = [
 
 [tool.uv]
 package = false
+python-preference = "only-managed"
 
 [build-system]
 requires = ["hatchling"]

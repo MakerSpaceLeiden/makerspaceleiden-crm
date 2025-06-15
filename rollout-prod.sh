@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 UK=$$
 DAYS=30
 
@@ -13,6 +13,31 @@ rm -f /tmp/backup.$UK /tmp/backup-static.$UK
 EOM
 	fi
 }
+
+# Set uv environment variables to use the system-wide cache and install directory
+# the default behaviour is to use the user's home directory for these.
+export UV_CACHE_DIR=/usr/local/.uv
+export UV_PYTHON_INSTALL_DIR=/usr/local/.uv
+
+# Validate that directories exist and are writable
+check_dir() {
+    local dir="$1"
+    local name="$2"
+    if [ ! -d "$dir" ]; then
+        echo "ERROR: $name does not exist: $dir"
+        exit 1
+    fi
+    if [ ! -w "$dir" ]; then
+        echo "ERROR: $name is not writable: $dir"
+        exit 1
+    fi
+}
+
+check_dir "$UV_CACHE_DIR" "UV_CACHE_DIR"
+check_dir "$UV_PYTHON_INSTALL_DIR" "UV_PYTHON_INSTALL_DIR"
+
+echo "Using UV_CACHE_DIR: $UV_CACHE_DIR"
+echo "Using UV_PYTHON_INSTALL_DIR: $UV_PYTHON_INSTALL_DIR"
 
 uv venv
 source .venv/bin/activate
@@ -41,8 +66,8 @@ test -d static && tar zcf /tmp/backup-static.$UK static
 
 # Mickey-mouse lock - we should pub-key encrypt this.
 #
-cmod 000 /tmp/backup-static.$UK /tmp/backup.$UK
-chown root /tmp/backup-static.$UK /tmp/backup.$UK
+sudo chmod 000 /tmp/backup-static.$UK /tmp/backup.$UK
+sudo chown root /tmp/backup-static.$UK /tmp/backup.$UK
 
 
 ${DJANGO_RUN} collectstatic --no-input

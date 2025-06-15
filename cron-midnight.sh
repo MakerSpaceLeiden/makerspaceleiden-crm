@@ -17,6 +17,12 @@ if !  ${DJANGO_RUN} version > /dev/null; then
 	exit 1
 fi
 
+{
+	date
+	${DJANGO_RUN}python manage.py pettycash-balance-check
+	${DJANGO_RUN}python manage.py pettycash-transactions --days 1
+} >> /tmp/balance-debugging-dirkx.txt
+
 ${DJANGO_RUN} pettycash-recache
 ${DJANGO_RUN} clean_duplicate_history --auto > /dev/null
 ${DJANGO_RUN} clean_old_history --days 1000 --auto > /dev/null

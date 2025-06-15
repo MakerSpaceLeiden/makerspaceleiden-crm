@@ -523,6 +523,15 @@ wheels = [
 ]
 
 [[package]]
+name = "django-sendmail-backend"
+version = "0.1.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/8d/02/923777c2c311ab5dfc3bdf8762cded1fdf69569803bea7c4ff11503c5a73/django_sendmail_backend-0.1.2.tar.gz", hash = "sha256:2d077f602aaa37633acdbf35f28f5799d6b57c8bc2122d193762d70c7d92b3ad", size = 2333, upload-time = "2014-03-14T04:00:56.203Z" }
+
+[[package]]
 name = "django-settings-export"
 version = "1.2.1"
 source = { registry = "https://pypi.org/simple" }
@@ -788,6 +797,7 @@ dependencies = [
     { name = "django-money" },
     { name = "django-qr-code" },
     { name = "django-revproxy" },
+    { name = "django-sendmail-backend" },
     { name = "django-settings-export" },
     { name = "django-simple-history" },
     { name = "django-six" },
@@ -833,6 +843,7 @@ requires-dist = [
     { name = "django-money", specifier = ">=3.4.0,<4" },
     { name = "django-qr-code", specifier = ">=3.1.1,<4" },
     { name = "django-revproxy", specifier = ">=0.12.0,<0.13" },
+    { name = "django-sendmail-backend", specifier = ">=0.1.2" },
     { name = "django-settings-export", specifier = ">=1.2.1,<2" },
     { name = "django-simple-history", specifier = ">=3.4.0,<4" },
     { name = "django-six", specifier = ">=1.0.5,<2" },
