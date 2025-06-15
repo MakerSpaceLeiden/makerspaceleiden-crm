@@ -39,6 +39,8 @@ check_dir "$UV_PYTHON_INSTALL_DIR" "UV_PYTHON_INSTALL_DIR"
 echo "Using UV_CACHE_DIR: $UV_CACHE_DIR"
 echo "Using UV_PYTHON_INSTALL_DIR: $UV_PYTHON_INSTALL_DIR"
 
+sudo rm -rf .venv/
+
 uv venv
 source .venv/bin/activate
 
