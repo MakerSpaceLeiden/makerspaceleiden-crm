@@ -23,13 +23,7 @@ def index(request):
             "No aggregator configuration found", status=500, content_type="text/plain"
         )
 
-    try:
-        state = aggregator_adapter.fetch_state_space()
-    except Exception as e:
-        return HttpResponse(
-            "Agregator unhappy", status=500, content_type="text/plain"
-        )
-
+    state = aggregator_adapter.fetch_state_space()
     context = {"open": "false"}
 
     if state["lights_on"]:

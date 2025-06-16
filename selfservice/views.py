@@ -20,8 +20,6 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
-from datetime import datetime, timedelta
-
 
 from acl.models import Entitlement, Machine, PermitType, RecentUse
 from agenda.models import Agenda
@@ -706,19 +704,6 @@ def space_state(request):
         context = aggregator_adapter.fetch_state_space()
     except Exception as e:
         logger.error("No data available, exception: {0}".format(str(e)))
-
-        # Fallback until we fix the aggregator
-        last24hrs = RecentUse.objects.filter(used__gte=timezone.now()-timedelta(days=1)).order_by( "used")
-        users = {}
-        for e in last24hrs:
-            if e.machine == 51:
-                del users[e.user]
-            users[e.user] = e.used
-
-        context["users_in_space"] =[]
-        for u in users.keys():
-            context["users_in_space"].append({ 'member_id': u })
-
         context["no_data_available"] = True
 
     # Sort 'machines' by machine name alphabetically
@@ -741,10 +726,7 @@ def space_state_api(request):
         return HttpResponse(
             "No aggregator configuration found", status=500, content_type="text/plain"
         )
-    try:
-        context = aggregator_adapter.fetch_state_space()
-    except Exception as e:
-        return HttpResponse("Problem with the aggregator. Sorry", status=500, content_type="text/plain")
+    context = aggregator_adapter.fetch_state_space()
 
     payload = {}
     l = 0
@@ -1002,22 +984,3 @@ def send_reset_email(request, uid):
         form.save(email_template_name=template)
 
     return redirect("overview", member_id=uid)
-
-@login_required
-def space_state2(request):
-    context = {}
-
-    last24hrs = RecentUse.objects.filter(used__gte=timezone.now()-timedelta(days=1)).order_by("used")
-    users = {}
-    for e in last24hrs:
-        users[e.user] = e
-        if e.machine == Machine.objects.get(id=settings.BYEBYE_ID) and e.user in users:
-            del users[e.user]
-
-    context["users_in_space"] = users
-
-    context["user"] = users
-    context["title"] = "State of the Space"
-
-    return render(request, "space_state2.html", context)
-
