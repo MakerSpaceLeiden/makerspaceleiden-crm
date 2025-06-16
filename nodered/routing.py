@@ -5,11 +5,9 @@ from . import consumers
 websocket_urlpatterns = [
     re_path(r"/comms", consumers.NodeREDWebsocketProxyConsumer.as_asgi()),
     re_path(
-        r"/dashboard/dashboard/socket\.io/",
-        consumers.NodeREDDashboardSocketIOConsumer.as_asgi(),
-    ),
-    re_path(
-        r"/dashboard/dashboard/socket\.io/(?P<path>.*)",
+        r"/dashboard/dashboard/socket\.io/?.*",
         consumers.NodeREDDashboardSocketIOConsumer.as_asgi(),
     ),
 ]
+
+print(f"NODERED: Loaded {len(websocket_urlpatterns)} websocket patterns")
