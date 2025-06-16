@@ -334,15 +334,6 @@ wheels = [
 ]
 
 [[package]]
-name = "django-macros"
-version = "0.4.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "django" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/fd/be/9f6fcc55259c6b536d19d571dbec1577966c7c82f273f9dad157996f681c/django-macros-0.4.0.zip", hash = "sha256:2724c6dd99d4061945b92130fa857eaf3d9762f0aa175e1809479a5d7e13c1c9", size = 25045, upload-time = "2015-06-02T02:14:57.316Z" }
-
-[[package]]
 name = "django-money"
 version = "3.5.4"
 source = { registry = "https://pypi.org/simple" }
@@ -603,7 +594,6 @@ dependencies = [
     { name = "django-flatpickr" },
     { name = "django-import-export" },
     { name = "django-ipware" },
-    { name = "django-macros" },
     { name = "django-money" },
     { name = "django-qr-code" },
     { name = "django-revproxy" },
@@ -648,7 +638,6 @@ requires-dist = [
     { name = "django-flatpickr", specifier = ">=2.0.3,<3" },
     { name = "django-import-export", specifier = ">=3.3.3,<4" },
     { name = "django-ipware", specifier = ">=6.0.0,<7" },
-    { name = "django-macros", specifier = ">=0.4.0" },
     { name = "django-money", specifier = ">=3.4.0,<4" },
     { name = "django-qr-code", specifier = ">=3.1.1,<4" },
     { name = "django-revproxy", specifier = ">=0.12.0,<0.13" },
