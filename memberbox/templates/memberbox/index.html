@@ -1,37 +1,8 @@
 {% extends 'base.html' %}
+
+{% load memberbox_tags %}
+
 {% block content %}
-{% load macros %}
-{% macro box_macro item %}
-   {% if item.box %}
-        <div class="box full">
-           <div class="hashover">
-              {% if item.box.owner %}
-                        <a href="{{ item.box.owner.path }}"><b>{{ item.box.owner.first_name }}</b></a>
-              {% else %}
-                          <i><a href="{% url 'changebox' pk=item.box.id %}">[unk]</a></i>
-              {% endif %}
-              <div class="showhover">
-                  {% if item.box.owner %}
-                    {{item.box.owner }}<br>
-                  {% else %}
-                  <i>owner unknown</i><br>
-                  {% endif %}
-                    {{ item.box.location }}<br>
-                    {{item.box.extra_info}} {%if item.box.image %}<br>
-                    <a href="{{ item.box.image.url  }}"><img alt="" src="{{ item.box.image.thumbnail.url   }}"></a>{%endif%}
-             </div>
-           </div>
-   {% else %}
-           <div class="box">
-           {% if item.location %}
-                      <a href="{% url 'claim' location=item.location %}"><i class="free">free</i></a>
-	   {% else %}
-                      N/A
-           {% endif %}
-    {% endif %}
-    <div class="box-location">{{ item.location }}</div>
-    </div>
-{% endmacro %}
 
 <style type="text/css" media="print">
   .dontprint {
@@ -147,7 +118,7 @@ The contents of the two main member cabinets along the long wall (on your left a
   <tr>
     {% for item in row %}
        <td width=100px>
-            {% usemacro box_macro item %}
+            {% box_item item %}
        </td>
     {% endfor %}
   </tr>
@@ -162,18 +133,18 @@ Boxes that are around the 3D printers. Note that the area above and left to the 
 
 <table class="box_table">
 	<tr>
-		<td>{% usemacro box_macro items_by_location|get_item:"M19" %}</td>
-		<td>{% usemacro box_macro items_by_location|get_item:"M20" %}</td>
-		<td>{% usemacro box_macro items_by_location|get_item:"M21" %}</td>
-		<td>{% usemacro box_macro items_by_location|get_item:"M22" %}</td>
-		<td>{% usemacro box_macro items_by_location|get_item:"M23" %}</td>
-		<td>{% usemacro box_macro items_by_location|get_item:"M24" %}</td>
-		<td>{% usemacro box_macro items_by_location|get_item:"M25" %}</td>
-		<td>{% usemacro box_macro items_by_location|get_item:"M26" %}</td>
+		<td>{% box_item items_by_location|get_item:"M19" %}</td>
+		<td>{% box_item items_by_location|get_item:"M20" %}</td>
+		<td>{% box_item items_by_location|get_item:"M21" %}</td>
+		<td>{% box_item items_by_location|get_item:"M22" %}</td>
+		<td>{% box_item items_by_location|get_item:"M23" %}</td>
+		<td>{% box_item items_by_location|get_item:"M24" %}</td>
+		<td>{% box_item items_by_location|get_item:"M25" %}</td>
+		<td>{% box_item items_by_location|get_item:"M26" %}</td>
 	</tr>
 	<tr>
-		<td>{% usemacro box_macro items_by_location|get_item:"M17" %}</td>
-		<td>{% usemacro box_macro items_by_location|get_item:"M18" %}</td>
+		<td>{% box_item items_by_location|get_item:"M17" %}</td>
+		<td>{% box_item items_by_location|get_item:"M18" %}</td>
 		<td colspan="2" rowspan="4" class=box_nouse>3d printing</td>
 		<td colspan="2" rowspan="4" class=box_nouse>3d printing</td>
 		<td colspan="2" rowspan="4" class=box_nouse>3d printing</td>
@@ -188,24 +159,24 @@ Boxes that are around the 3D printers. Note that the area above and left to the 
 		<td colspan="2" class=box_nouse>makerspace<br>storage</td>
 	</tr>
 	<tr>
-		<td>{% usemacro box_macro items_by_location|get_item:"M09" %}</td>
-		<td>{% usemacro box_macro items_by_location|get_item:"M10" %}</td>
-		<td>{% usemacro box_macro items_by_location|get_item:"M11" %}</td>
-		<td>{% usemacro box_macro items_by_location|get_item:"M12" %}</td>
-		<td>{% usemacro box_macro items_by_location|get_item:"M13" %}</td>
-		<td>{% usemacro box_macro items_by_location|get_item:"M14" %}</td>
-		<td>{% usemacro box_macro items_by_location|get_item:"M15" %}</td>
-		<td>{% usemacro box_macro items_by_location|get_item:"M16" %}</td>
+		<td>{% box_item items_by_location|get_item:"M09" %}</td>
+		<td>{% box_item items_by_location|get_item:"M10" %}</td>
+		<td>{% box_item items_by_location|get_item:"M11" %}</td>
+		<td>{% box_item items_by_location|get_item:"M12" %}</td>
+		<td>{% box_item items_by_location|get_item:"M13" %}</td>
+		<td>{% box_item items_by_location|get_item:"M14" %}</td>
+		<td>{% box_item items_by_location|get_item:"M15" %}</td>
+		<td>{% box_item items_by_location|get_item:"M16" %}</td>
 	</tr>
 	<tr>
-		<td>{% usemacro box_macro items_by_location|get_item:"M01" %}</td>
-		<td>{% usemacro box_macro items_by_location|get_item:"M02" %}</td>
-		<td>{% usemacro box_macro items_by_location|get_item:"M03" %}</td>
-		<td>{% usemacro box_macro items_by_location|get_item:"M04" %}</td>
-		<td>{% usemacro box_macro items_by_location|get_item:"M05" %}</td>
-		<td>{% usemacro box_macro items_by_location|get_item:"M06" %}</td>
-		<td>{% usemacro box_macro items_by_location|get_item:"M07" %}</td>
-		<td>{% usemacro box_macro items_by_location|get_item:"M08" %}</td>
+		<td>{% box_item items_by_location|get_item:"M01" %}</td>
+		<td>{% box_item items_by_location|get_item:"M02" %}</td>
+		<td>{% box_item items_by_location|get_item:"M03" %}</td>
+		<td>{% box_item items_by_location|get_item:"M04" %}</td>
+		<td>{% box_item items_by_location|get_item:"M05" %}</td>
+		<td>{% box_item items_by_location|get_item:"M06" %}</td>
+		<td>{% box_item items_by_location|get_item:"M07" %}</td>
+		<td>{% box_item items_by_location|get_item:"M08" %}</td>
 	</tr>
 </table>
 
@@ -239,11 +210,14 @@ In a few <i>exceptional</i> cases - there is permission for a member to store th
 {% if morethanone|length %}
 <h2>People having more than one storage box or item</h2>
 
+<p>
+The following people have more than one storage box or item:
+</p>
 <table>
-  <tr><th>person</th><th>number of items</th><th></th></tr>
-  {% for person,count in morethanone.items %}
+  <tr><th>member</th><th>count</th></tr>
+  {% for member, count in morethanone.items %}
   <tr>
-	  <td><a href="{{ person.path  }}">{{ person }}</a></td>
+	  <td><a href="{{ member.path  }}">{{ member }}</a></td>
 	  <td>{{ count }}</td>
   </tr>
   {% endfor %}
