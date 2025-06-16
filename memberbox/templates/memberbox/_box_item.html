@@ -1,0 +1,31 @@
+{% if item.box %}
+    <div class="box full">
+        <div class="hashover">
+            {% if item.box.owner %}
+                <a href="{{ item.box.owner.path }}"><b>{{ item.box.owner.first_name }}</b></a>
+            {% else %}
+                <i><a href="{% url 'changebox' pk=item.box.id %}">[unk]</a></i>
+            {% endif %}
+            <div class="showhover">
+                {% if item.box.owner %}
+                    {{item.box.owner }}<br>
+                {% else %}
+                    <i>owner unknown</i><br>
+                {% endif %}
+                {{ item.box.location }}<br>
+                {{item.box.extra_info}}
+                {%if item.box.image %}<br>
+                    <a href="{{ item.box.image.url  }}"><img alt="" src="{{ item.box.image.thumbnail.url   }}"></a>
+                {%endif%}
+            </div>
+        </div>
+{% else %}
+    <div class="box">
+        {% if item.location %}
+            <a href="{% url 'claim' location=item.location %}"><i class="free">free</i></a>
+        {% else %}
+            N/A
+        {% endif %}
+{% endif %}
+<div class="box-location">{{ item.location }}</div>
+</div>
