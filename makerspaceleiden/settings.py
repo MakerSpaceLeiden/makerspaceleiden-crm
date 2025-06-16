@@ -130,6 +130,12 @@ SETTINGS_EXPORT = [
 # WSGI_APPLICATION = "makerspaceleiden.wsgi.application"
 ASGI_APPLICATION = "makerspaceleiden.asgi.application"
 
+# Channels configuration for WebSocket support
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
+}
 
 BOOTSTRAP5 = {
     "css_url": {
