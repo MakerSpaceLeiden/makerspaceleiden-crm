@@ -123,3 +123,11 @@ class NodeREDWebsocketProxyConsumer(AsyncWebsocketConsumer):
             # The target probably closed the connection.
             logger.exception("The outgoing connection was closed by the target.")
             await self.close()
+
+
+class NodeREDDashboardSocketIOConsumer(NodeREDWebsocketProxyConsumer):
+    """Consumer for proxying dashboard socket.io connections to Node-RED."""
+
+    async def get_target_url(self):
+        """Return the target URL for dashboard socket.io connections."""
+        return "ws://localhost:1880/dashboard/socket.io/"
