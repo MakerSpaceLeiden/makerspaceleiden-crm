@@ -41,7 +41,7 @@ echo "Using UV_PYTHON_INSTALL_DIR: $UV_PYTHON_INSTALL_DIR"
 
 sudo rm -rf .venv/
 
-uv venv
+uv venv --allow-existing
 source .venv/bin/activate
 
 DJANGO_RUN="uv run python manage.py"
