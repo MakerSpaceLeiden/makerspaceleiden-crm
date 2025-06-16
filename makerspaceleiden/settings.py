@@ -77,7 +77,6 @@ INSTALLED_APPS = [
     "django_flatpickr",
     "rest_framework",
     "terminal.apps.TerminalConfig",
-    "macros",
 ]
 
 SITE_ID = 1
