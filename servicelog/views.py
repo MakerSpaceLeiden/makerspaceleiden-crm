@@ -179,7 +179,7 @@ def servicelog_crud(request, machine_id=None, servicelog_id=None):
         )
 
     context["form"] = form
-    context[
-        "back"
-    ] = "machine_list"  # reverse("machine_overview", kwargs={"machine_id": machine.id})
+    context["back"] = (
+        "machine_list"  # reverse("machine_overview", kwargs={"machine_id": machine.id})
+    )
     return render(request, "crud.html", context)
