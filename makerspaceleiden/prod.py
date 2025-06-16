@@ -35,6 +35,12 @@ DATABASES = {
 
 EMAIL_BACKEND = "django_sendmail_backend.backends.EmailBackend"
 
+# Channels configuration for WebSocket support
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
+}
 
 LOGGING = {
     "version": 1,
