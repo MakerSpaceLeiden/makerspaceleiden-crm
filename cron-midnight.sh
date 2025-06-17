@@ -19,8 +19,8 @@ fi
 
 {
 	date
-	${DJANGO_RUN}python manage.py pettycash-balance-check
-	${DJANGO_RUN}python manage.py pettycash-transactions --days 1
+	${DJANGO_RUN} pettycash-balance-check
+	${DJANGO_RUN} pettycash-transactions --days 1
 } >> /tmp/balance-debugging-dirkx.txt
 
 ${DJANGO_RUN} pettycash-recache
