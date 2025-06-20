@@ -1,0 +1,14 @@
+[Unit]
+Description=Daphne Webserver for CRM
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=crmadmin
+EnvironmentFile=/usr/local/makerspaceleiden-crm/.env
+WorkingDirectory=/usr/local/makerspaceleiden-crm
+ExecStart=/usr/local/bin/uv run daphne --access-log /var/log/crm//daphne-access.log -b 127.0.0.1 -p 8000 -v 3 makerspaceleiden.asgi:application
+
+[Install]
+WantedBy=multi-user.target
