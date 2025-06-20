@@ -40,6 +40,7 @@ dependencies = [
     "python-magic>=0.4.27",
     "cryptography>=44.0.3",
     "pycryptodome>=3.22.0",
+    "django-oauth-toolkit>=3.0.1",
 ]
 
 [dependency-groups]
