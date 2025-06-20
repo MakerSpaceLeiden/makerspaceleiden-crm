@@ -130,8 +130,7 @@ MAX_PAY_API = Money(35.00, EUR)
 MAX_PAY_CRM = Money(300.00, EUR)
 
 
-
-# OAuth2 
+# OAuth2
 OAUTH2_PROVIDER = {
     "PKCE_REQUIRED": False,
     "OAUTH2_VALIDATOR_CLASS": "makerspaceleiden.oauth_validators.CustomOAuth2Validator",
@@ -142,4 +141,3 @@ OAUTH2_PROVIDER = {
     },
     "OIDC_RSA_PRIVATE_KEY": os.environ.get("OIDC_RSA_PRIVATE_KEY"),
 }
-

@@ -24,7 +24,6 @@ class MakerspaceleidenTest(TestCase):
             response.content.decode("utf-8"),
         )
 
-
     def test_oauth2_openid_configuration_available(self):
         with override_settings(
             OAUTH2_PROVIDER={
