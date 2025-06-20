@@ -128,3 +128,18 @@ NONE_ID = 217
 #
 MAX_PAY_API = Money(35.00, EUR)
 MAX_PAY_CRM = Money(300.00, EUR)
+
+
+
+# OAuth2 
+OAUTH2_PROVIDER = {
+    "PKCE_REQUIRED": False,
+    "OAUTH2_VALIDATOR_CLASS": "makerspaceleiden.oauth_validators.CustomOAuth2Validator",
+    "OIDC_ENABLED": True,
+    "SCOPES": {
+        "openid": "OpenID Connect scope",
+        "email": "Access to your email address",
+    },
+    "OIDC_RSA_PRIVATE_KEY": os.environ.get("OIDC_RSA_PRIVATE_KEY"),
+}
+
