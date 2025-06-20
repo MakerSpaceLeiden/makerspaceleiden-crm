@@ -52,6 +52,7 @@ dev = [
 
 [tool.uv]
 package = false
+python-preference = "only-managed"
 
 [build-system]
 requires = ["hatchling"]
