@@ -53,7 +53,7 @@ urlpatterns = [
     path("spaceapi/", include("spaceapi.urls")),
     path("terminal/", include("terminal.urls")),
     path("", include("nodered.urls")),
-    path("o/", include(oauth2_urls)),
+    path("oauth2/", include(oauth2_urls)),
 ]
 
 urlpatterns += static(r"/favicon.ico", document_root="static/favicon.ico")
