@@ -31,7 +31,7 @@ before this runs out. <i>Note: It will take a few days (or more) before deposits
 <h2>Payments</h2>
 <ul>
 	<li>
-		<a href="{% url 'invoice' src=who.id %}">Pay for a product to the space</a>
+		<a href="{% url 'invoice' src=who.id %}">Pay for a product</a>
 	</li>
 	<li>
 		<a href="{% url 'manual_deposit' %}">Deposit money into your space account</a>
@@ -41,7 +41,7 @@ before this runs out. <i>Note: It will take a few days (or more) before deposits
 		<a href="{% url 'reimburseform' %}">Get reimbursed by the space for something you paid for</a>
 	</li>
 	<li>
-		<a href="{% url 'transfer_to_member' src=who.id %}">Transfer SpaceTegoed to other member</a>
+		<a href="{% url 'transfer_to_member' src=who.id %}">Transfer your SpaceTegoed to other member</a>
 	</li>
 	{% if balance.balance.amount > 25 %}
 	<li>
@@ -58,14 +58,14 @@ before this runs out. <i>Note: It will take a few days (or more) before deposits
 		<a href="{% url 'balances' %}">View everyone else's transactions</a>
 	</li>
 	<li>
-		<a href="{% url 'spends' %}">Our spending this month</a>
+		<a href="{% url 'spends' %}">Makerspace spending this month</a>
 	</li>
 </ul>
 
 <h2>More info</h2>
 <ul>
 	<li>
-		<a href="{% url 'pricelist' %}">See the current pricelist</a>
+		<a href="{% url 'pricelist' %}">Pricelist</a>
 	</li>
 	<li>
 		<a href="{% url 'claims' %}">Pending claims</a> (i.e. incomplete transactions; such as for welding, the pottery oven, etc that are not yet reported as complete. Usually as the person is still welding, the oven is still firing, etc, etc.)

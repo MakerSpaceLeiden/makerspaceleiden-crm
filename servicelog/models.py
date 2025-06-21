@@ -55,7 +55,7 @@ class Servicelog(models.Model):
         return settings.BASE + self.path()
 
     def path(self):
-        return reverse("service_log_view", kwargs={"machine_id": self.id})
+        return reverse("service_log_view", kwargs={"machine_id": self.machine.id})
 
 
 # Handle image cleanup.

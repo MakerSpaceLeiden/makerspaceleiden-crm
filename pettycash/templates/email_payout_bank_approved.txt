@@ -11,5 +11,5 @@ Details:
 Date:        {{ item.date }}
 To pay to:   {{ item.src }} by manual bank transfer.
 Amount:      {{ item.amount }}
-Deascription:{{ item.description }}
+Description: {{ item.description }}
 Submitted:   {{ item.submitted }}

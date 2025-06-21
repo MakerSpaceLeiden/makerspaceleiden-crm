@@ -17,7 +17,7 @@ Details:
 Date:        {{ item.date }}
 To pay to:   {{ item.dst }}
 Amount:      {{ item.amount }}
-Deascription:{{ item.description }}
+Description: {{ item.description }}
 Submitted:   {{ item.submitted }}
 
 Requested to be paid into {% if item.viaTheBank %}the bank account{% else %}the {{ settings.POT_LABEL }}{%endif %}.

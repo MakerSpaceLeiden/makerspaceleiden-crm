@@ -52,9 +52,9 @@ Welcome to the Makerspace Leiden !
 	navigate to `your data'; sign and print out the waiver form and
 	(hand) deliver it to the address on the form.
 
-6)	Most people write a short introduction email to deelnemers@ (see
-	the archive -- link at the bottom of each deelnemers@ email
-	if you are curious as to what others wrote).
+6)	Most people write a short introduction email to deelnemers@. Please do so too. 
+	Tell us a bit about yourself, what you like to make, what machines you are 
+	interested in, and what you hope to get out of the Makerspace.
 
 7)	It is likely that you will want to claim some storage space; a 'box'. On
 	the page  {{ protocol }}://{{ domain }}{% url 'index' %} -> Members
@@ -67,7 +67,7 @@ Welcome to the Makerspace Leiden !
 	always needs help.
 
 	We have a `ask anyone anything' evening every Tuesday evening from about
-	19:00. Here you can get help with a new machine; meet other people and
+	20:00. Here you can get help with a new machine; meet other people and
 	sometimes someone will show how to use a new machine or a trick
 	recently discovered.
 

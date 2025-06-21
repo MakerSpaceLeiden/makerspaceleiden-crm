@@ -5,7 +5,7 @@ Hello All,
 We have currently {{num}} makers united at the makerspace in Leiden; as
 listed below.
 
-Or consult {{ base }}{% url 'members-index'%} for mugshots.
+Or consult {{ base }}{% url 'overview'%} for mugshots.
 
 mbot
 --
