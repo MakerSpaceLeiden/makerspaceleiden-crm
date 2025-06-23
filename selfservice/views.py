@@ -2,6 +2,7 @@ import json
 import logging
 import re
 import sys
+from datetime import timedelta
 
 import six
 from django import forms
@@ -113,15 +114,18 @@ def index(request):
     title = "Welcome"
 
     if request.user.is_authenticated:
-        # Fetch items with dates from today and later, and fetch maximum 5 items
-        agenda_items = Agenda.objects.filter(enddate__gte=timezone.now()).order_by(
-            "startdate"
-        )[:5]
+        today = timezone.now().date()
+        three_months_later = today + timedelta(days=90)
+
+        # Fetch items with dates from today in the next three months, and fetch maximum 5 items
+        agenda_items = Agenda.objects.filter(
+            enddate__gte=today, startdate__lte=three_months_later
+        ).order_by("startdate", "starttime", "item_title")[:5]
 
         # Fetch Ufo items
         ufo_items = Ufo.objects.filter(
-            state="UNK", deadline__gte=timezone.now()
-        ).order_by("created_at")[:4]
+            state="UNK", dispose_by_date__gte=timezone.now()
+        ).order_by("created_at")[:8]
 
         # Get chores data using the chores/utils/get_chores_data function
         chores_data, error_message = get_chores_data(current_user_id=request.user.id)

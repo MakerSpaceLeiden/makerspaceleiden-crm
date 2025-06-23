@@ -13,10 +13,10 @@ claim, and if not claimed quick enough, be disposed.
 By the way - if something is yours - and you do not want it anymore; then do feel to
 mark it as 'can be disposed'. {%endif%}
 {%if postDisposeline %}
-Know that the items listed below are now past their 'dispose by' deadline - or have
+Know that the items listed below are now past their 'claim by' deadline - or have
 already been marked 'to be disposed'. So if you have some time; be so kind to dump
-them in the container or drop them off at the Kringloop next door. And then mark
-them 'gone' in the CRM.
+the items marked 'to be disposed' in the container or drop them off at the Kringloop
+next door. And then mark them 'gone' in the UFO application.
 
 {%for item in postDisposeline %}-  {{ item.description }}
      Will be disposed {{ item.dispose_by_date }}

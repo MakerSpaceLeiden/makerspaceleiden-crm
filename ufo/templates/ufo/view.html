@@ -2,7 +2,7 @@
 
 {% block content %}
 
-<a href="{{ item.image.url }}"><img alt="" src="{{ item.image.large.url }}" /></a>
+<a href="{{ item.image.url }}"><img alt="" src="{{ item.image.large.url }}" style="max-width: 100%; height: auto; display: block;"/></a>
 <p>
     {{ item.description }}
     <br>
@@ -12,7 +12,7 @@
         Claimed on: {{ item.claimed_at|date:"m-d @ H:i" }} <br>
     {% endif %}
 
-    Spotted on: {{ item.created_at|date:"m-d @ H:i" }}
+    Spotted on: {{ item.created_at|date:"D Y-m-d @ H:i" }}
     <br><br>
     Removal deadline: {{ item.deadline }}
     <br>

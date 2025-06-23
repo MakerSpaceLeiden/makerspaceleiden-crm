@@ -46,7 +46,7 @@ class EntitlementResource(resources.ModelResource):
 
 
 class EntitlementAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
-    list_display = ("permit", "holder", "issuer", "active")
+    list_display = ("permit", "holder", "issuer", "active", "issue_date")
     resource_class = EntitlementResource
     search_fields = [
         "permit__name",
@@ -54,6 +54,14 @@ class EntitlementAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
         "holder__last_name",
         "holder__email",
     ]
+
+    def issue_date(self, obj):
+        first_history = obj.history.order_by("history_date").first()
+        if first_history:
+            return first_history.history_date
+        return None
+
+    issue_date.short_description = "Issue Date"
 
     def get_changeform_initial_data(self, request):
         defaults = {"active": True, "issuer": request.user, "permit": settings.DOORS}

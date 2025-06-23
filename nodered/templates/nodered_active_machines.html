@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+
+    {% if node_red_available %}
+        <iframe id="iframe-nodered" src="{% url 'nodered_dashboard_proxy' url='dashboard/active_machines' %}" scrolling="no" width="100%" height="2000px" frameborder="0" style="background-color: white; overflow: hidden;"></iframe>
+    {% else %}
+        <div class="mt-3">Data not available.</div>
+    {% endif %}
+
+{% endblock %}

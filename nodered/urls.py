@@ -17,8 +17,8 @@ urlpatterns = [
         name="nodered_live_data_and_sensors",
     ),
     path(
-        "dashboard_intranet/nodered_space_climate/",
-        views.NoderedSpaceClimateView,
-        name="nodered_space_climate",
+        "dashboard_intranet/nodered_active_machines/",
+        views.NoderedActiveMachinesView,
+        name="nodered_active_machines",
     ),
 ]

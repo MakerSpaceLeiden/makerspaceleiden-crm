@@ -6,7 +6,7 @@ Unfortunately, {{ volunteer }} can no longer volunteer for
 
 So if you have a second - would you be able to sign up at
 
-    {{ request.scheme  }}://{{ domain }}{% url 'chores' %}
+    {{ BASE }}{% url 'chores' %}
 
 as we do really need some kind person to do this. To help
 keep the Space a happy and happening place.

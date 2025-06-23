@@ -33,7 +33,7 @@ class MemberboxSanityTest(TestCase):
 
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
-        self.assertIn("Members boxes", response.content.decode("utf-8"))
+        self.assertIn("Member boxes", response.content.decode("utf-8"))
         self.assertIn("user", response.context)
 
     def test_boxes_index_unauthenticated(self):
