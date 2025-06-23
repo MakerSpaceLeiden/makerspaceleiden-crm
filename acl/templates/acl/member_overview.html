@@ -204,10 +204,6 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
                 <dl class="row mb-2" >
                     <dt class="col-sm-3">Email:</dt>
                     <dd class="col-sm-9">{% if uses_email %} <b style="color: green;">ACTIVE</b> {% else %} inactive {% endif %}</dd>
-                    <!-- <dt class="col-sm-3">Telegram:</dt> -->
-                    <!-- <dd class="col-sm-9">{% if uses_telegram %} <b style="color: green;">ACTIVE</b> {% else %} inactive {% endif %}</dd> -->
-                    <!-- <dt class="col-sm-3">Signal:</dt> -->
-                    <!-- <dd class="col-sm-9">{% if uses_signal %} <b style="color: green;">ACTIVE</b> {% else %} inactive {% endif %}</dd> -->
                 </dl>
                 <div>
                     {% if member == user %}
