@@ -2,6 +2,7 @@ import json
 import logging
 import re
 import sys
+from datetime import timedelta
 
 import six
 from django import forms
@@ -21,7 +22,6 @@ from django.utils import timezone
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 
-from datetime import timedelta
 from acl.models import Entitlement, Machine, PermitType, RecentUse
 from agenda.models import Agenda
 from chores.utils import get_chores_data
@@ -114,17 +114,13 @@ def index(request):
     title = "Welcome"
 
     if request.user.is_authenticated:
+        today = timezone.now().date()
+        three_months_later = today + timedelta(days=90)
 
-        today = timezone.now().date() 
-        three_months_later = today + timedelta(days=90) 
-        
         # Fetch items with dates from today in the next three months, and fetch maximum 5 items
         agenda_items = Agenda.objects.filter(
-            enddate__gte=today,
-            startdate__lte=three_months_later
-        ).order_by(
-        "startdate", "starttime", "item_title"
-        )[:5]
+            enddate__gte=today, startdate__lte=three_months_later
+        ).order_by("startdate", "starttime", "item_title")[:5]
 
         # Fetch Ufo items
         ufo_items = Ufo.objects.filter(

@@ -113,7 +113,8 @@ def index(request):
     }
     return render(request, "chores.html", context)
 
-def get_chores_overview(current_user_id=None, subset=None):   
+
+def get_chores_overview(current_user_id=None, subset=None):
     aggregator_adapter = get_aggregator_adapter()
     if not aggregator_adapter:
         return None, "No aggregator configuration found"
@@ -126,7 +127,7 @@ def get_chores_overview(current_user_id=None, subset=None):
 
     data = aggregator_adapter.get_chores()
     if data is None:
-        return None, "No data available"  
+        return None, "No data available"
 
     event_groups = {}
 
@@ -145,7 +146,7 @@ def get_chores_overview(current_user_id=None, subset=None):
             event_groups[week_label] = {
                 "start_date": None,
                 "end_date": None,
-                "events": []
+                "events": [],
             }
 
         if not event_groups[week_label]["start_date"]:
@@ -195,6 +196,7 @@ def get_chores_overview(current_user_id=None, subset=None):
     sorted_weeks = sorted(event_groups.items(), key=lambda x: x[1]["start_date"])
 
     return sorted_weeks, None
+
 
 @login_required
 def signup(request, chore_id, ts):

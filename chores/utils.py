@@ -14,13 +14,12 @@ def get_chores_data(current_user_id=None, subset=None):
         return None, "No aggregator configuration found"
 
     now = datetime.now()
-    
+
     # Determine the start of the current week (Monday) and the end of the 2nd week
     start_of_week = now - timedelta(days=now.weekday())  # Monday
     end_of_second_week = start_of_week + timedelta(weeks=2)
 
     start_of_week_timestamp = start_of_week.timestamp()
-    end_of_second_week_timestamp = end_of_second_week.timestamp()
 
     volunteers_turns = ChoreVolunteer.objects.filter(
         timestamp__gte=start_of_week_timestamp
@@ -35,7 +34,6 @@ def get_chores_data(current_user_id=None, subset=None):
         return None, "No data available"
 
     event_groups = {}
-    ts = None
     for event in data["events"]:
         event_ts = datetime.fromtimestamp(event["when"]["timestamp"])
 
@@ -43,7 +41,6 @@ def get_chores_data(current_user_id=None, subset=None):
             continue  # Skip events outside this 2-week range
 
         event["time_str"] = event_ts.strftime("%H:%M")
-
 
         # Determine the start of the week (Monday)
         start_of_week = event_ts - timedelta(days=event_ts.weekday())
@@ -55,7 +52,7 @@ def get_chores_data(current_user_id=None, subset=None):
             event_groups[week_label] = {
                 "start_date": None,
                 "end_date": None,
-                "events": []
+                "events": [],
             }
 
         if not event_groups[week_label]["start_date"]:
@@ -103,6 +100,5 @@ def get_chores_data(current_user_id=None, subset=None):
 
     # Sort weeks chronologically
     sorted_weeks = sorted(event_groups.items(), key=lambda x: x[1]["start_date"])
-
 
     return sorted_weeks, None

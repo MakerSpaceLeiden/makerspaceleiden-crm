@@ -15,7 +15,7 @@ mark it as 'can be disposed'. {%endif%}
 {%if postDisposeline %}
 Know that the items listed below are now past their 'claim by' deadline - or have
 already been marked 'to be disposed'. So if you have some time; be so kind to dump
-the items marked 'to be disposed' in the container or drop them off at the Kringloop 
+the items marked 'to be disposed' in the container or drop them off at the Kringloop
 next door. And then mark them 'gone' in the UFO application.
 
 {%for item in postDisposeline %}-  {{ item.description }}

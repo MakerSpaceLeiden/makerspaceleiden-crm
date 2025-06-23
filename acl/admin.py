@@ -60,6 +60,7 @@ class EntitlementAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
         if first_history:
             return first_history.history_date
         return None
+
     issue_date.short_description = "Issue Date"
 
     def get_changeform_initial_data(self, request):

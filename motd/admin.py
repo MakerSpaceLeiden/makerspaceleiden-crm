@@ -1,5 +1,7 @@
 from django.contrib import admin
+
 from .models import Motd
+
 
 @admin.register(Motd)
 class MotdAdmin(admin.ModelAdmin):
