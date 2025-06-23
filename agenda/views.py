@@ -114,13 +114,13 @@ def AgendaItemsView(request, pk=None):
     if selected_item:
         history = selected_item.history.all()
         if history.exists():
-            if history.first().history_date != history.last().history_date:
+            if history.earliest().history_date != history.latest().history_date:
                 is_updated = True
 
-            creation_date = history.first().history_date
-            created_by = history.first().history_user
-            update_date = history.last().history_date
-            updated_by = history.last().history_user
+            creation_date = history.earliest().history_date
+            created_by = history.earliest().history_user
+            update_date = history.latest().history_date
+            updated_by = history.latest().history_user
 
     context = {
         "object_list": agenda_list,

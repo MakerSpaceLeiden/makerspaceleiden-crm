@@ -79,7 +79,7 @@ def index(request):
     del storages["M"]
 
     context = {
-        "title": "Members boxes",
+        "title": "Member boxes",
         "user": request.user,
         "has_permission": request.user.is_authenticated,
         "storages": list(storages.values()),

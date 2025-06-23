@@ -29,11 +29,11 @@
             <ul class="nav flex-column custom-nav-menu">
                 <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'overview' %}">All members</a></li>
                 <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'machine_list' %}">Machines</a></li>
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'chores' %}">Chore volunteer registration </a></li>
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'chores' %}">Chores</a></li>
                 <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'add_instruction' %}">Record instructions</a></li>
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'mytransactions' %}">Manage SpaceTegoed</a></li>
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'mytransactions' %}">SpaceTegoed</a></li>
                 <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'invoice' src=user.id %}">Pay for a product</a></li>
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'boxes' %}">Members boxes</a></li>
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'boxes' %}">Member boxes</a></li>
                 {%  if settings.STORAGE %}
                 <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'storage' %}">Storage management</a></li>
                 {% endif %}
@@ -46,9 +46,9 @@
             <h2>Current Events</h2>
             <ul class="nav flex-column custom-nav-menu">
                 <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'space_state' %}">Who is there now</a></li>
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'agenda' %}">Agenda</a></li>
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'nodered_active_machines' %}">Active machines</a></li>
                 <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'nodered_live_data_and_sensors' %}">Live data &amp; sensors</a></li>
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'nodered_space_climate' %}">Space climate</a></li>
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'agenda' %}">Agenda</a></li>
                 <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'motd_messages' %}">Message of the day</a></li>
                 <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'ufo' %}">UFO lost and found</a></li>
                 <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'camindex' %}">Live 3D printer camera</a></li>
@@ -59,14 +59,15 @@
             <h2>Wiki & Public Info</h2>
             <ul class="nav flex-column custom-nav-menu">
                 <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="https://wiki.makerspaceleiden.nl/" target="_blank">Wiki documentation</a></li>
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Categorie:Tool" target="_blank">Tools</a></li>
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Categorie:Tools" target="_blank">Tools</a></li>
                 <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Makerspace_Leiden#Veiligheid_en_geluidsproductie" target="_blank">Safety and noise production</a></li>
                 <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Makerspace_Leiden#Procedures_en_Principes" target="_blank">Procedures and principles</a></li>
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Nieuw_artikel_aanmaken" target="_blank">Create a new wiki</a></li>
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Create_a_new_wiki_page" target="_blank">Create a new wiki</a></li>
                 <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="https://github.com/MakerSpaceLeiden" target="_blank">Github</a></li>
+                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/About_Makerspace" target="_blank">About Us</a></li>
             </ul>
         </div>
-        {% if user.is_privileged or user|isPettycashAdmin or user|isTreasurer or user|isMainsAdmin %}
+        {% if user.is_privileged or user|isPettycashAdmin or user|isTreasurer or user|isMainsAdmin or user|isNoderedAdmin %}
             <div class="col-12 col-lg-2 me-0">
                 <h2>Trustee</h2>
                 <ul class="nav flex-column custom-nav-menu">
@@ -84,7 +85,7 @@
                 {% endif %}
                 {% if user.is_privileged or user|isMainsAdmin %}
                     <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'mainsindex' %}">Lucas MainsSensors</a></li>
-                    <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="/api/v1/mainssensor/resolve">Sensor descriptions</a></li>
+                    <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="/api/v1/mainssensor/resolve">Lucas MainsSensors resolved</a></li>
                 {% endif %}
                 {% if user.is_privileged or user|isPettycashAdmin or user|isTreasurer %}
                     <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'unpaired' %}">Payment stations</a></li>

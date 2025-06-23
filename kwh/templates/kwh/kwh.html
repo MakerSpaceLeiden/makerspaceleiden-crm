@@ -1,9 +1,14 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<p>The live data of the power consumption of the space. For more info about the kWh meter see the
+    <a href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/KWh_meter" target="_blank" class="wiki-link" title="Open wiki page">
+        <i class="fas fa-external-link-alt" style="font-size: 0.7em;"></i> wiki.
+      </a>
+</p>
 <p>The live data of the power consumption of the space:</p>
     {% if file_exists %}
-        <iframe src="{% url 'kwh_proxy' path='index.html' %}" scrolling="no" width="100%" height="1000px" frameborder="0" style="background-color: white; overflow: hidden;"></iframe>
+        <iframe src="{% url 'kwh_proxy' path='index.html' %}" scrolling="no" width="100%" height="2000px" frameborder="0" style="background-color: white; overflow: hidden;"></iframe>
     {% else %}
         <p>No data available.</p>
     {% endif %}

@@ -79,7 +79,7 @@ def NoderedLiveDataAndSensorsView(request):
 
 
 @login_required
-def NoderedSpaceClimateView(request):
+def NoderedActiveMachinesView(request):
     try:
         response = requests.get(settings.NODERED_URL)
         if response.status_code == 200:
@@ -92,4 +92,4 @@ def NoderedSpaceClimateView(request):
         "node_red_available": node_red_available,
         "has_permission": request.user.is_authenticated,
     }
-    return render(request, "nodered_space_climate.html", context)
+    return render(request, "nodered_active_machines.html", context)

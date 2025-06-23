@@ -172,8 +172,6 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
                     <dd class="col-sm-9">{{ sub.mailinglist.description }}</dd>
                     <dt class="col-sm-3">Subscribed:</dt>
                     <dd class="col-sm-9">{% if sub.active %}yes{% else %}no{% endif %}</dd>
-                    <dt class="col-sm-3">Digest:</dt>
-                    <dd class="col-sm-9">{% if sub.digest %}yes{% else %}no, receive in real time{% endif %}</dd>
                 </dl>
                 {% endfor %}
                 <div>
@@ -203,13 +201,9 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
                 <div class="mb-3">
                     Currently using:
                 </div>
-                <dl class="row mb-1" >
+                <dl class="row mb-2" >
                     <dt class="col-sm-3">Email:</dt>
                     <dd class="col-sm-9">{% if uses_email %} <b style="color: green;">ACTIVE</b> {% else %} inactive {% endif %}</dd>
-                    <dt class="col-sm-3">Telegram:</dt>
-                    <dd class="col-sm-9">{% if uses_telegram %} <b style="color: green;">ACTIVE</b> {% else %} inactive {% endif %}</dd>
-                    <dt class="col-sm-3">Signal:</dt>
-                    <dd class="col-sm-9">{% if uses_signal %} <b style="color: green;">ACTIVE</b> {% else %} inactive {% endif %}</dd>
                 </dl>
                 <div>
                     {% if member == user %}
@@ -288,7 +282,7 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
                 </div>
                 <dl class="row mb-2">
                     {% for category, machines in machines.items %}
-                        <dt class="col-sm-12 mb-0 mt-1"><h3>{{ category }}</h3></dt>
+                        <dt class="col-sm-12 mb-0 mt-2"><h3>{{ category }}</h3></dt>
                         {% for info in machines %}
                             <dt class="col-sm-3 mb-1 mt-1"><a href="{{ info.path }}">{{ info.name }}:</a></dt>
                             <dd class="col-sm-9">

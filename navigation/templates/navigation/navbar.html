@@ -52,11 +52,11 @@
                     <ul class="dropdown-menu">
                       <li><a class="dropdown-item" href="{% url 'overview' %}">All members</a></li>
                       <li><a class="dropdown-item" href="{% url 'machine_list' %}">Machines</a></li>
-                      <li><a class="dropdown-item" href="{% url 'chores' %}">Chore volunteer registration </a></li>
+                      <li><a class="dropdown-item" href="{% url 'chores' %}">Chores</a></li>
                       <li><a class="dropdown-item" href="{% url 'add_instruction' %}">Record instructions</a></li>
-                      <li><a class="dropdown-item" href="{% url 'mytransactions' %}">Manage SpaceTegoed</a></li>
+                      <li><a class="dropdown-item" href="{% url 'mytransactions' %}">SpaceTegoed</a></li>
                       <li><a class="dropdown-item" href="{% url 'invoice' src=user.id %}">Pay for a product</a></li>
-                      <li><a class="dropdown-item" href="{% url 'boxes' %}">Members boxes</a></li>
+                      <li><a class="dropdown-item" href="{% url 'boxes' %}">Member boxes</a></li>
                       {%  if settings.STORAGE %}
                       <li><a class="dropdown-item" href="{% url 'storage' %}">Storage management</a></li>
                       {% endif %}
@@ -71,9 +71,9 @@
                     </a>
                     <ul class="dropdown-menu">
                       <li><a class="dropdown-item" href="{% url 'space_state' %}">Who is there now</a></li>
-                      <li><a class="dropdown-item" href="{% url 'agenda' %}">Agenda</a></li>
+                      <li><a class="dropdown-item" href="{% url 'nodered_active_machines' %}">Active machines</a></li>
                       <li><a class="dropdown-item" href="{% url 'nodered_live_data_and_sensors' %}">Live data &amp; sensors</a></li>
-                      <li><a class="dropdown-item" href="{% url 'nodered_space_climate' %}">Space climate</a></li>
+                      <li><a class="dropdown-item" href="{% url 'agenda' %}">Agenda</a></li>
                       <li><a class="dropdown-item" href="{% url 'motd_messages' %}">Message of the day</a></li>
                       <li><a class="dropdown-item" href="{% url 'ufo' %}">UFO lost and found</a></li>
                       <li><a class="dropdown-item" href="{% url 'camindex' %}">Live 3D printer camera</a></li>
@@ -86,14 +86,15 @@
                     </a>
                     <ul class="dropdown-menu">
                       <li><a class="dropdown-item" href="https://wiki.makerspaceleiden.nl/" target="_blank">Wiki documentation</a></li>
-                      <li><a class="dropdown-item" href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Categorie:Tool" target="_blank">Tools</a></li>
+                      <li><a class="dropdown-item" href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Categorie:Tools" target="_blank">Tools</a></li>
                       <li><a class="dropdown-item" href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Makerspace_Leiden#Veiligheid_en_geluidsproductie" target="_blank">Safety and noise production</a></li>
                       <li><a class="dropdown-item" href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Makerspace_Leiden#Procedures_en_Principes" target="_blank">Procedures and principles</a></li>
-                      <li><a class="dropdown-item" href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Nieuw_artikel_aanmaken" target="_blank">Create a new wiki</a></li>
+                      <li><a class="dropdown-item" href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Create_a_new_wiki_page" target="_blank">Create a new wiki</a></li>
                       <li><a class="dropdown-item" href="https://github.com/MakerSpaceLeiden" target="_blank">Github</a></li>
+                      <li><a class="dropdown-item" href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/About_Makerspace" target="_blank">About Us</a></li>
                     </ul>
                   </li>
-                  {% if user.is_privileged or user|isPettycashAdmin or user|isTreasurer or user|isMainsAdmin %}
+                  {% if user.is_privileged or user|isPettycashAdmin or user|isTreasurer or user|isMainsAdmin or user|isNoderedAdmin %}
                   <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                       Trustee
@@ -113,7 +114,7 @@
                     {% endif %}
                     {% if user.is_privileged or user|isMainsAdmin %}
                       <li><a class="dropdown-item" href="{% url 'mainsindex' %}">Lucas MainsSensors</a></li>
-                      <li><a class="dropdown-item" href="/api/v1/mainssensor/resolve">Sensor descriptions</a></li>
+                      <li><a class="dropdown-item" href="/api/v1/mainssensor/resolve">Lucas MainsSensors resolved</a></li>
                     {% endif %}
 
                     {% if user.is_privileged or user|isPettycashAdmin or user|isTreasurer %}
