@@ -5,7 +5,7 @@ After=network.target
 [Service]
 EnvironmentFile=/usr/local/makerspaceleiden-crm/.env
 Environment=SECURE_SSL_REDIRECT=False
-Environment=CRM_DEBUG=True
+Environment=CRM_DEBUG=False
 Environment=LOG_FILE_NAME=/var/log/crm/crm-gunicorn-debug.log
 Environment=LOGIN_REDIRECT_URL=/crm
 Environment=LOGIN_URL=/crm
