@@ -93,8 +93,7 @@ echo "Reloading systemd services"
 systemctl daemon-reload
 
 echo "Restarting Gunicorn (WSGI) and Daphne (ASGI) services"
-sudo systemctl restart crm-daphne.service
-sudo systemctl restart crm-gunicorn.service
+sudo systemctl restart crm-*.service
 )
 E=$?
 
