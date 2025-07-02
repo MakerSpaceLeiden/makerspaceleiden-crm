@@ -1,6 +1,6 @@
 {
   "api": "0.13",
-  "api_compatibility": ["14", "15"],
+  "api_compatibility": ["14"],
   "space": "Makerspace Leiden",
   "open": {{ open }},
   "lastchange": {{ lastSinceEpoch }},

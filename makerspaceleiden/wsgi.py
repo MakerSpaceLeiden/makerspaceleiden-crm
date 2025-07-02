@@ -9,7 +9,6 @@ https://docs.djangoproject.com/en/2.1/howto/deployment/wsgi/
 
 import os
 
-from django.apps import apps
 from django.core.wsgi import get_wsgi_application
 
 from selfservice.aggregator_adapter import initialize_aggregator_adapter
@@ -25,5 +24,4 @@ def application(environ, start_response):
         os.environ.get("AGGREGATOR_USERNAME", "user"),
         os.environ.get("AGGREGATOR_PASSWORD", "pass"),
     )
-    apps.get_app_config("selfservice").aggregator_adapter = adapter
     return _application(environ, start_response)
