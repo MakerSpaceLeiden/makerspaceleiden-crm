@@ -34,7 +34,6 @@ def is_paired_terminal(function):
             )
         # if not request.user.is_anonymous and request.user.is_privileged:
         #  return function(request, *args, **kwargs)
-
         return function(request, terminal, *args, **kwargs)
 
     return wrap

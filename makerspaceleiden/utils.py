@@ -90,6 +90,13 @@ def server_cert(request, justkey=False):
 
 
 def cert_sha(src, request, justkey=False):
+    cert = request.META.get(src)
+    if not cert:
+        # Fall back to the HTTP header if the WSGI environment variable is not set.
+        # This is common for reverse proxy setups.
+        src = "HTTP_" + src
+        cert = request.META.get(src)
+
     if "runserver" in sys.argv:
         src = "HTTP_" + src
         logger.warn(
@@ -97,8 +104,6 @@ def cert_sha(src, request, justkey=False):
                 src
             )
         )
-
-    cert = request.META.get(src, None)
 
     if cert is None:
         logger.error("Bad request, missing {}".format(src))
