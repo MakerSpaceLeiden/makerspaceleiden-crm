@@ -3,9 +3,12 @@ import json
 import logging
 import urllib.request
 
-from django.apps import apps
-
 logger = logging.getLogger(__name__)
+
+
+handle = {
+    "aggregator_adapter": None,
+}
 
 
 class AggregatorAdapter(object):
@@ -70,8 +73,8 @@ class AggregatorAdapter(object):
 
 
 def initialize_aggregator_adapter(base_url, username, password):
-    return AggregatorAdapter(base_url, username, password)
+    handle["aggregator_adapter"] = AggregatorAdapter(base_url, username, password)
 
 
 def get_aggregator_adapter():
-    return apps.get_app_config("selfservice").aggregator_adapter
+    return handle["aggregator_adapter"]
