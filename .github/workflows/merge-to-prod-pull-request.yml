@@ -1,9 +1,11 @@
 name: Merge Pull Request to Prod
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master
+
 
 jobs:
   create-pr:
