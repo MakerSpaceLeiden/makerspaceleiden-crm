@@ -18,12 +18,13 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "makerspaceleiden.settings")
 
 _application = get_wsgi_application()
 
+adapter = initialize_aggregator_adapter(
+    os.environ.get("AGGREGATOR_URL", "http://localhost:8000"),
+    os.environ.get("AGGREGATOR_USERNAME", "user"),
+    os.environ.get("AGGREGATOR_PASSWORD", "pass"),
+)
+apps.get_app_config("selfservice").aggregator_adapter = adapter
+
 
 def application(environ, start_response):
-    initialize_aggregator_adapter(
-        os.environ.get("AGGREGATOR_BASE_URL", "http://127.0.0.1:5000"),
-        os.environ.get("AGGREGATOR_USERNAME", "user"),
-        os.environ.get("AGGREGATOR_PASSWORD", "pass"),
-    )
-    apps.get_app_config("selfservice").aggregator_adapter = adapter
     return _application(environ, start_response)
