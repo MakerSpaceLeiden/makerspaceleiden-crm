@@ -92,9 +92,8 @@ ${DJANGO_RUN} migrate
 echo "Reloading systemd services"
 systemctl daemon-reload
 
-echo "Restarting Apache and Daphne services"
-sudo apachectl restart
-sudo systemctl restart crm-daphne.service
+echo "Restarting Gunicorn (WSGI) and Daphne (ASGI) services"
+sudo systemctl restart crm-*.service
 )
 E=$?
 
