@@ -1,14 +1,15 @@
 
 :root {
-    --brand-core: #be1908;
-    --brand-dark: #7d0e02;
-    
+    --brand-core: #d62410;
+    --brand-dark: #a91c09;
+
     --header-color: #fff;
     --header-link-color: #fff;
     --header-bg: var(--brand-core);
     --link-fg: var(--brand-core);
 
     --button-bg: var(--brand-core);
+    --button-hover-bg: var(--brand-dark);
 
     --body-quiet-color: #111;
     --bs-link-hover-color: var(--brand-dark);
@@ -232,6 +233,8 @@ input, textarea, select, .form-row p, form .button {
     background-repeat: no-repeat;
     color: transparent !important;
     padding: .2rem;
+    min-width: 10rem;
+    display: inline-block;
 }
 
 .makerspace-name-div {
