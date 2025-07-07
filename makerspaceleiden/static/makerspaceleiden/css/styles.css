@@ -1,4 +1,34 @@
 
+:root {
+    --brand-core: #be1908;
+    --brand-dark: #7d0e02;
+    
+    --header-color: #fff;
+    --header-link-color: #fff;
+    --header-bg: var(--brand-core);
+    --link-fg: var(--brand-core);
+
+    --button-bg: var(--brand-core);
+
+    --body-quiet-color: #111;
+    --bs-link-hover-color: var(--brand-dark);
+}
+
+/* Override Bootstrap variables */
+.btn-primary {
+    --bs-btn-bg: var(--button-bg);
+    --bs-btn-border-color: var(--button-bg);
+    --bs-btn-hover-bg: var(--brand-dark);
+    --bs-btn-hover-border-color: var(--button-bg);
+    --bs-btn-active-bg: var(--brand-dark);
+    --bs-btn-active-border-color: var(--brand-dark);
+}
+
+.dropdown-menu {
+    --bs-dropdown-link-active-bg: yellow;
+    --bs-dropdown-link-active-color: #111;
+}
+
 body {
     font-size: 1.0rem;
 }
@@ -170,21 +200,6 @@ input, textarea, select, .form-row p, form .button {
 .paginator .this-page {
     font-size: 1.0rem;
 }
-.btn-primary-custom {
-    background-color: #417690 !important;
-    border-color: #417690 !important;
-    color: #fff !important;
-}
-
-.btn-primary-custom:hover {
-    background-color: #205067 !important;
-    border-color: #205067 !important;
-}
-
-.btn-primary-custom:focus, .btn-primary-custom:active {
-    background-color: #417690 !important;
-    border-color: #417690 !important;
-}
 
 #user-profile-button {
     padding-top: 2px;
@@ -212,9 +227,11 @@ input, textarea, select, .form-row p, form .button {
 }
 
 .makerspace-name {
-    color: #ffc !important;
-    font-size: 1rem;
-    text-decoration: none !important;
+    background: url("/static/logomark.svg") no-repeat;
+    background-size: contain;
+    background-repeat: no-repeat;
+    color: transparent !important;
+    padding: .2rem;
 }
 
 .makerspace-name-div {
@@ -241,7 +258,7 @@ ul.messagelist li {
 }
 
 .dark-color-bar {
-    background-color: rgb(121, 174, 200);
+    background-color: var(--brand-dark);
 }
 
 

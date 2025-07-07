@@ -15,10 +15,10 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png" />
     <link rel="manifest" href="/static/site.webmanifest" />
 
+    {% bootstrap_css %}
     <link rel="stylesheet" type="text/css" href="{% block stylesheet_base %}{% static "admin/css/base.css" %}{% endblock %}">
     <link rel="stylesheet" type="text/css" href="{% block stylesheet_custom %}{% static "makerspaceleiden/css/styles.css" %}{% endblock %}">
     <link rel="stylesheet" type="text/css" href="{% block stylesheet_fontawesome %}{% static "fontawesome/css/all.min.css" %}{% endblock %}">
-    {% bootstrap_css %}
 
     {% block extrastyle %}{% endblock %}
     {% if LANGUAGE_BIDI %}
@@ -48,13 +48,13 @@
                             <div class= "branding makerspace-name-div">
                                 <a class="makerspace-name" href="{% url 'index' %}">{{ settings.SITE_NAME }}</a>
                                 <div class="d-block d-md-none">
-                                    <b>INTRANET</b>
+                                    <b>Intranet</b>
                                 </div>
                             </div>
                             {% endblock %}
                         </div>
                         <div class="col d-none d-md-block ps-5 ms-5">
-                            <b>INTRANET</b>
+                            <b>Intranet</b>
                         </div>
                         {% if has_permission %}
                         <div class="col">
@@ -79,12 +79,12 @@
                                 {% endblock %}
                                 <div class="user-profile-icon">
                                     <button class="btn btn-light rounded-circle" id="user-profile-button" onclick="window.location.href='{% url 'personal_page' %}'" title="Personal profile">
-                                        <i class="fa-solid fa-user ms-0" style="color: #417690;"></i>
+                                        <i class="fa-solid fa-user ms-0"></i>
                                     </button>
                                 </div>
                                 <div class="log-out-icon">
                                     <button class="btn btn-light rounded-circle" id="log-out-button" onclick="window.location.href='{% url 'logout' %}'" title="Logout">
-                                        <i class="fas fa-right-from-bracket ms-0" style="color: #417690;"></i>
+                                        <i class="fas fa-right-from-bracket ms-0"></i>
                                     </button>
                                 </div>
                             </div>
