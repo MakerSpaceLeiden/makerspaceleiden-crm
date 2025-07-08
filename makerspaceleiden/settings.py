@@ -70,7 +70,6 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    #    'autocomplete_light',
     "django.contrib.sites",
     "revproxy",
     "django_bootstrap5",
