@@ -51,7 +51,6 @@ urlpatterns = [
     ),
     # Provide metadata on a tag, requires a valid tag and a bearer token.
     #
-    # path("acl/api/v1/gettaginfo", views.api_gettaginfo, name="acl-v1-gettaginfo"),
     # Provide metadata on a machine - propably no longer used. Requires
     # a bearer token.
     #

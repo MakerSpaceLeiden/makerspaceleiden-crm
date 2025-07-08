@@ -42,7 +42,6 @@ class EntitlementResource(resources.ModelResource):
         model = Entitlement
         fields = ["permit", "holder", "issuer", "active"]
         import_id_fields = ["permit", "holder", "issuer"]
-        # import_id_fields = [ 'permit', 'holder', 'issuer' ]
 
 
 class EntitlementAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):

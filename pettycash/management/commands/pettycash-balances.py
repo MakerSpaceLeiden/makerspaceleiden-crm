@@ -11,7 +11,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         rc = 0
 
-        #        print("# Member,Balance,lastchange")
         print("# Member,Balance")
 
         for balance in PettycashBalanceCache.objects.all():

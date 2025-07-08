@@ -4,16 +4,11 @@ import logging
 from django.conf import settings
 from django.db import models
 from django.urls import reverse
-
-# frmm django.contrib.auth import get_user_model
 from simple_history.models import HistoricalRecords
 from stdimage.models import StdImageField
 
 from makerspaceleiden.utils import upload_to_pattern
 from members.models import User
-
-# from stdimage.utils import pre_delete_delete_callback, pre_save_delete_callback
-
 
 logger = logging.getLogger(__name__)
 
@@ -83,8 +78,3 @@ class Ufo(models.Model):
             self.dispose_by_date = self.deadline + datetime.timedelta(1)
 
         return super(Ufo, self).save(*args, **kwargs)
-
-
-# Handle image cleanup.
-# pre_delete.connect(pre_delete_delete_callback, sender=Ufo)
-# pre_save.connect(pre_save_delete_callback, sender=Ufo)

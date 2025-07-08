@@ -30,7 +30,6 @@ class PettycashSkuForm(forms.ModelForm):
         )
 
     #       # for some reason - below does not work. Not does doing this in Model.
-    #       self.fields["amount"].fields[0].max_value = settings.MAX_PAY_API
 
     # Can only give a error by raising an exception; so cap the
     # value for now.

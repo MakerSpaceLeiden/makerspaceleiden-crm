@@ -27,20 +27,8 @@ class PettycashSkuAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     pass
 
 
-# class PettycashTerminalAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
-#    list_display = ("accepted", "date", "get_station", "name", "fingerprint")
-#    readonly_fields = ["fingerprint", "nonce"]
-#
-#    def get_station(self, terminal):
-#        try:
-#            station = PettycashStation.objects.get(terminal=terminal)
-#            return station.description
-#        except ObjectDoesNotExist:
 #            pass
-#        return "-"
 #
-#    get_station.short_description = "Station"
-#    get_station.admin_order_field = "station__name"
 
 
 class PettycashStationAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
@@ -95,7 +83,6 @@ class PettycashImportRecordAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
 
 
 admin.site.register(PettycashSku, PettycashSkuAdmin)
-# admin.site.register(PettycashTerminal, PettycashTerminalAdmin)
 admin.site.register(PettycashStation, PettycashStationAdmin)
 admin.site.register(PettycashTransaction, PettycashTransactionAdmin)
 admin.site.register(PettycashBalanceCache, PettycashBalanceCacheAdmin)

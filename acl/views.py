@@ -423,7 +423,6 @@ def missing_doors(request):
 
 @login_required
 def filed_forms(request):
-    # people_with_forms = User.objects.all().filter(form_on_file = True)
     context = {
         "title": "Filed waivers",
         "desc": "Waiver forms on file for people that also had instruction on something",
@@ -708,7 +707,6 @@ def byte_xor(ba1, ba2):
 def nameShorten(name, maxlen=10):
     if len(name) <= maxlen:
         return name
-    # parts = name.split(' ')
     parts = re.split("[^a-zA-Z]", name)
     name = parts.pop(0)
     for i in parts:

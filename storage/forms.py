@@ -32,9 +32,6 @@ class StorageForm(ModelForm):
         if kwargs is not None and "instance" in kwargs:
             storage = kwargs["instance"]
 
-        # if storageOrFormOrNone and isinstance(storageOrFormOrNone,Storage):
-        #   storage = storageOrFormOrNone
-
         if not storage:
             return
 
