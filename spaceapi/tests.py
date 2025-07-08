@@ -31,7 +31,33 @@ class SpaceApiTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
         schema = load_schema(
-            os.path.join(os.path.dirname(__file__), "./fixtures/spaceapi-schema.json")
+            os.path.join(
+                os.path.dirname(__file__), "./fixtures/spaceapi-schema.v13.json"
+            )
+        )
+
+        jsonschema.validate(json.loads(response.content), schema)
+
+    def test_basic_v14(self):
+        response = self.client.get("/spaceapi/0.14")
+        self.assertEqual(response.status_code, 200)
+
+        schema = load_schema(
+            os.path.join(
+                os.path.dirname(__file__), "./fixtures/spaceapi-schema.v14.json"
+            )
+        )
+
+        jsonschema.validate(json.loads(response.content), schema)
+
+    def test_basic_v15(self):
+        response = self.client.get("/spaceapi/0.15")
+        self.assertEqual(response.status_code, 200)
+
+        schema = load_schema(
+            os.path.join(
+                os.path.dirname(__file__), "./fixtures/spaceapi-schema.v15.json"
+            )
         )
 
         jsonschema.validate(json.loads(response.content), schema)

@@ -1,7 +1,7 @@
 {
-  "$id": "https://schema.spaceapi.io/14.json",
+  "$id": "https://schema.spaceapi.io/15.json",
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "description": "SpaceAPI v14",
+  "description": "SpaceAPI v15",
   "type": "object",
   "properties": {
     "api_compatibility": {
@@ -11,7 +11,7 @@
         "type": "string"
       },
       "contains": {
-        "const": "14"
+        "const": "15"
       }
     },
     "space": {
@@ -27,7 +27,7 @@
       "type": "string"
     },
     "location": {
-      "description": "Position data such as a postal address or geographic coordinates",
+      "description": "Position data such as a postal address or geographic coordinates. May be omitted for spaces without a fixed physical location.",
       "type": "object",
       "properties": {
         "address": {
@@ -49,12 +49,72 @@
             "Europe/Kyiv",
             "Antarctica/Palmer"
           ]
+        },
+        "country_code": {
+          "description": "Country code in ISO 3166 alpha-2 format",
+          "type": "string",
+          "examples": [
+            "CH",
+            "DE",
+            "UA"
+          ]
+        },
+        "hint": {
+          "description": "Information that can be used to describe how to access your space, if it is not trivial to find when standing at the address",
+          "type": "string",
+          "examples": [
+            "Ring the doorbell marked with HACKSPACE",
+            "Knock three times, say Shibboleet and follow the white rabbit"
+          ]
+        },
+        "areas": {
+          "description": "A list of areas in your space. Must include at least 1 area if defined.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "The name of this area",
+                "examples": [
+                  "Hackerspace",
+                  "Kitchen",
+                  "Workshop"
+                ]
+              },
+              "description": {
+                "type": "string",
+                "description": "A description of this area",
+                "examples": [
+                  "Our hackerspace area",
+                  "Woodworking machines and power tools"
+                ]
+              },
+              "square_meters": {
+                "type": "number",
+                "description": "The size of this area in square meters",
+                "examples": [
+                  23.23,
+                  42
+                ]
+              }
+            },
+            "required": [
+              "square_meters"
+            ]
+          },
+          "minItems": 1
         }
       },
-      "required": [
-        "lat",
-        "lon"
-      ]
+      "minProperties": 1,
+      "dependentRequired": {
+        "lat": [
+          "lon"
+        ],
+        "lon": [
+          "lat"
+        ]
+      }
     },
     "spacefed": {
       "description": "A flag indicating if the hackerspace uses SpaceFED, a federated login scheme so that visiting hackers can use the space WiFi with their home space credentials.",
@@ -87,18 +147,15 @@
       "type": "object",
       "properties": {
         "open": {
-          "description": "A flag which indicates whether the space is currently open or closed. The state 'undefined' can be achieved by omitting this field. A missing 'open' property carries the semantics of a temporary unavailability of the state, whereas the absence of the 'state' property itself means the state is generally not implemented for this space. This field is also allowed to explicitly have the value null for backwards compatibility with older schema versions, but this is deprecated and will be removed in a future version.",
-          "type": [
-            "boolean",
-            "null"
-          ]
+          "description": "A flag which indicates whether the space is currently open or closed. The state 'undefined' can be achieved by omitting this field. A missing 'open' property carries the semantics of a temporary unavailability of the state, whereas the absence of the 'state' property itself means the state is generally not implemented for this space.",
+          "type": "boolean"
         },
         "lastchange": {
-          "description": "The Unix timestamp when the space status changed most recently",
+          "description": "The Unix timestamp (in seconds) when the space status changed most recently",
           "type": "number"
         },
         "trigger_person": {
-          "description": "The person who lastly changed the state e.g. opened or closed the space",
+          "description": "The person who lastly changed the state e.g. opened or closed the space.",
           "type": "string"
         },
         "message": {
@@ -145,7 +202,7 @@
             "type": "string"
           },
           "timestamp": {
-            "description": "Unix timestamp when the event occurred",
+            "description": "The Unix timestamp (in seconds) when the event occurred.",
             "type": "number"
           },
           "extra": {
@@ -198,7 +255,7 @@
                 ]
               },
               "email": {
-                "description": "Email address which can be base64 encoded",
+                "description": "Email address which can be base64 encoded.",
                 "type": "string"
               },
               "twitter": {
@@ -251,7 +308,7 @@
           ]
         },
         "facebook": {
-          "description": "Facebook account URL",
+          "description": "Facebook account URL.",
           "type": "string"
         },
         "identica": {
@@ -259,7 +316,7 @@
           "type": "string"
         },
         "foursquare": {
-          "description": "Foursquare ID, in the form <samp>4d8a9114d85f3704eab301dc</samp>",
+          "description": "Foursquare ID, in the form <samp>4d8a9114d85f3704eab301dc</samp>.",
           "type": "string"
         },
         "email": {
@@ -317,7 +374,7 @@
                 "type": "number"
               },
               "unit": {
-                "description": "The unit of the sensor value",
+                "description": "The unit of the sensor value.",
                 "type": "string",
                 "enum": [
                   "°C",
@@ -347,6 +404,58 @@
               "description": {
                 "description": "An extra field that you can use to attach some additional information to this sensor instance",
                 "type": "string"
+              },
+              "lastchange": {
+                "description": "The Unix timestamp (in seconds) when the sensor value changed most recently",
+                "type": "number"
+              }
+            },
+            "required": [
+              "value",
+              "unit",
+              "location"
+            ]
+          }
+        },
+        "carbondioxide": {
+          "description": "CO2 sensor",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "value": {
+                "description": "The sensor value",
+                "type": "number"
+              },
+              "unit": {
+                "description": "The unit of the sensor value.",
+                "type": "string",
+                "enum": [
+                  "ppm",
+                  "vol%"
+                ]
+              },
+              "location": {
+                "description": "The location of your sensor",
+                "type": "string",
+                "examples": [
+                  "Outside",
+                  "Inside",
+                  "Ceiling",
+                  "Room 1"
+                ]
+              },
+              "name": {
+                "description": "This field is an additional field to give your sensor a name. This can be useful if you have multiple sensors in the same location.",
+                "type": "string"
+              },
+              "description": {
+                "description": "An extra field that you can use to attach some additional information to this sensor instance",
+                "type": "string"
+              },
+              "lastchange": {
+                "description": "The Unix timestamp (in seconds) when the sensor value changed most recently",
+                "type": "number"
               }
             },
             "required": [
@@ -357,7 +466,7 @@
           }
         },
         "door_locked": {
-          "description": "Sensor type to indicate if a certain door is locked",
+          "description": "Sensor type to indicate if a certain door is locked.",
           "type": "array",
           "items": {
             "type": "object",
@@ -382,6 +491,10 @@
               "description": {
                 "description": "An extra field that you can use to attach some additional information to this sensor instance",
                 "type": "string"
+              },
+              "lastchange": {
+                "description": "The Unix timestamp (in seconds) when the sensor value changed most recently",
+                "type": "number"
               }
             },
             "required": [
@@ -401,11 +514,10 @@
                 "type": "number"
               },
               "unit": {
-                "description": "The unit of pressure used by your sensor<br>Note: The <code>hPA</code> unit is deprecated and should not be used anymore. Use the correct <code>hPa</code> unit instead.",
+                "description": "The unit of pressure used by your sensor",
                 "type": "string",
                 "enum": [
-                  "hPa",
-                  "hPA"
+                  "hPa"
                 ]
               },
               "location": {
@@ -424,6 +536,10 @@
               "description": {
                 "description": "An extra field that you can use to attach some additional information to this sensor instance",
                 "type": "string"
+              },
+              "lastchange": {
+                "description": "The Unix timestamp (in seconds) when the sensor value changed most recently",
+                "type": "number"
               }
             },
             "required": [
@@ -434,7 +550,7 @@
           }
         },
         "radiation": {
-          "description": "Compound radiation sensor. Check this <a rel=\"nofollow\" href=\"https://sites.google.com/site/diygeigercounter/gm-tubes-supported\" target=\"_blank\">resource</a>.",
+          "description": "Compound radiation sensor. Check this <a rel=\"nofollow\" href=\"https://sites.google.com/site/diygeigercounter/technical/gm-tubes-supported\" target=\"_blank\">resource</a>.",
           "type": "object",
           "properties": {
             "alpha": {
@@ -482,6 +598,10 @@
                   "description": {
                     "description": "An extra field that you can use to attach some additional information to this sensor instance",
                     "type": "string"
+                  },
+                  "lastchange": {
+                    "description": "The Unix timestamp (in seconds) when the sensor value changed most recently",
+                    "type": "number"
                   }
                 },
                 "required": [
@@ -535,6 +655,10 @@
                   "description": {
                     "description": "An extra field that you can use to attach some additional information to this sensor instance",
                     "type": "string"
+                  },
+                  "lastchange": {
+                    "description": "The Unix timestamp (in seconds) when the sensor value changed most recently",
+                    "type": "number"
                   }
                 },
                 "required": [
@@ -588,6 +712,10 @@
                   "description": {
                     "description": "An extra field that you can use to attach some additional information to this sensor instance",
                     "type": "string"
+                  },
+                  "lastchange": {
+                    "description": "The Unix timestamp (in seconds) when the sensor value changed most recently",
+                    "type": "number"
                   }
                 },
                 "required": [
@@ -641,6 +769,10 @@
                   "description": {
                     "description": "An extra field that you can use to attach some additional information to this sensor instance",
                     "type": "string"
+                  },
+                  "lastchange": {
+                    "description": "The Unix timestamp (in seconds) when the sensor value changed most recently",
+                    "type": "number"
                   }
                 },
                 "required": [
@@ -662,7 +794,7 @@
                 "type": "number"
               },
               "unit": {
-                "description": "The unit of the sensor value. You should always define the unit though if the sensor is a flag of a boolean type then you can of course omit it.",
+                "description": "The humidity unit",
                 "type": "string",
                 "enum": [
                   "%"
@@ -684,6 +816,10 @@
               "description": {
                 "description": "An extra field that you can use to attach some additional information to this sensor instance",
                 "type": "string"
+              },
+              "lastchange": {
+                "description": "The Unix timestamp (in seconds) when the sensor value changed most recently",
+                "type": "number"
               }
             },
             "required": [
@@ -728,6 +864,10 @@
               "description": {
                 "description": "An extra field that you can use to attach some additional information to this sensor instance",
                 "type": "string"
+              },
+              "lastchange": {
+                "description": "The Unix timestamp (in seconds) when the sensor value changed most recently",
+                "type": "number"
               }
             },
             "required": [
@@ -747,10 +887,9 @@
                 "type": "number"
               },
               "unit": {
-                "description": "The unit of the sensor value. You should always define the unit though if the sensor is a flag of a boolean type then you can of course omit it.",
+                "description": "The power unit",
                 "type": "string",
                 "enum": [
-                  "mW",
                   "W",
                   "VA"
                 ]
@@ -770,6 +909,56 @@
               "description": {
                 "description": "An extra field that you can use to attach some additional information to this sensor instance",
                 "type": "string"
+              },
+              "lastchange": {
+                "description": "The Unix timestamp (in seconds) when the sensor value changed most recently",
+                "type": "number"
+              }
+            },
+            "required": [
+              "value",
+              "unit",
+              "location"
+            ]
+          }
+        },
+        "power_generation": {
+          "description": "The power generation of a specific device or of your whole space",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "value": {
+                "description": "The sensor value",
+                "type": "number"
+              },
+              "unit": {
+                "description": "The unit of the sensor value.",
+                "type": "string",
+                "enum": [
+                  "W",
+                  "VA"
+                ]
+              },
+              "location": {
+                "description": "The location of your sensor",
+                "type": "string",
+                "examples": [
+                  "Room 1",
+                  "Lab"
+                ]
+              },
+              "name": {
+                "description": "This field is an additional field to give your sensor a name. This can be useful if you have multiple sensors in the same location.",
+                "type": "string"
+              },
+              "description": {
+                "description": "An extra field that you can use to attach some additional information to this sensor instance",
+                "type": "string"
+              },
+              "lastchange": {
+                "description": "The Unix timestamp (in seconds) when the sensor value changed most recently",
+                "type": "number"
               }
             },
             "required": [
@@ -798,7 +987,7 @@
                         "type": "number"
                       },
                       "unit": {
-                        "description": "The unit of the sensor value. You should always define the unit though if the sensor is a flag of a boolean type then you can of course omit it.",
+                        "description": "The wind speed unit",
                         "type": "string",
                         "enum": [
                           "m/s",
@@ -821,7 +1010,7 @@
                         "type": "number"
                       },
                       "unit": {
-                        "description": "The unit of the sensor value. You should always define the unit though if the sensor is a flag of a boolean type then you can of course omit it.",
+                        "description": "The gust speed unit",
                         "type": "string",
                         "enum": [
                           "m/s",
@@ -844,7 +1033,7 @@
                         "type": "number"
                       },
                       "unit": {
-                        "description": "The unit of the sensor value. You should always define the unit though if the sensor is a flag of a boolean type then you can of course omit it.",
+                        "description": "The direction unit",
                         "type": "string",
                         "enum": [
                           "°"
@@ -865,7 +1054,7 @@
                         "type": "number"
                       },
                       "unit": {
-                        "description": "The unit of the sensor value. You should always define the unit though if the sensor is a flag of a boolean type then you can of course omit it.",
+                        "description": "The elevation unit",
                         "type": "string",
                         "enum": [
                           "m"
@@ -900,6 +1089,10 @@
               "description": {
                 "description": "An extra field that you can use to attach some additional information to this sensor instance",
                 "type": "string"
+              },
+              "lastchange": {
+                "description": "The Unix timestamp (in seconds) when the sensor value changed most recently",
+                "type": "number"
               }
             },
             "required": [
@@ -962,6 +1155,10 @@
               "description": {
                 "description": "An extra field that you can use to attach some additional information to this sensor instance",
                 "type": "string"
+              },
+              "lastchange": {
+                "description": "The Unix timestamp (in seconds) when the sensor value changed most recently",
+                "type": "number"
               }
             },
             "required": [
@@ -994,6 +1191,10 @@
               "description": {
                 "description": "An extra field that you can use to attach some additional information to this sensor instance",
                 "type": "string"
+              },
+              "lastchange": {
+                "description": "The Unix timestamp (in seconds) when the sensor value changed most recently",
+                "type": "number"
               }
             },
             "required": [
@@ -1023,6 +1224,10 @@
               "description": {
                 "description": "An extra field that you can use to attach some additional information to this sensor instance",
                 "type": "string"
+              },
+              "lastchange": {
+                "description": "The Unix timestamp (in seconds) when the sensor value changed most recently",
+                "type": "number"
               }
             },
             "required": [
@@ -1059,6 +1264,10 @@
               "description": {
                 "description": "An extra field that you can use to attach some additional information to this sensor instance",
                 "type": "string"
+              },
+              "lastchange": {
+                "description": "The Unix timestamp (in seconds) when the sensor value changed most recently",
+                "type": "number"
               }
             },
             "required": [
@@ -1121,6 +1330,10 @@
               "description": {
                 "description": "An extra field that you can use to attach some additional information to this sensor instance",
                 "type": "string"
+              },
+              "lastchange": {
+                "description": "The Unix timestamp (in seconds) when the sensor value changed most recently",
+                "type": "number"
               }
             },
             "required": [
@@ -1239,7 +1452,7 @@
         "type": "object",
         "properties": {
           "name": {
-            "description": "The link name",
+            "description": "The link name.",
             "type": "string"
           },
           "description": {
@@ -1247,7 +1460,7 @@
             "type": "string"
           },
           "url": {
-            "description": "The URL",
+            "description": "The URL.",
             "type": "string"
           }
         },
@@ -1289,6 +1502,7 @@
             "type": "string",
             "enum": [
               "yearly",
+              "quarterly",
               "monthly",
               "weekly",
               "daily",
@@ -1297,7 +1511,7 @@
             ]
           },
           "description": {
-            "description": "A free form string",
+            "description": "A free form string.",
             "type": "string"
           }
         },
@@ -1308,6 +1522,35 @@
           "billing_interval"
         ]
       }
+    },
+    "linked_spaces": {
+      "description": "A list of spaces you know and feel connected too.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "endpoint": {
+            "description": "The SpaceAPI endpoint of the space",
+            "type": "string"
+          },
+          "website": {
+            "description": "The website of the space",
+            "type": "string"
+          }
+        },
+        "anyOf": [
+          {
+            "required": [
+              "endpoint"
+            ]
+          },
+          {
+            "required": [
+              "website"
+            ]
+          }
+        ]
+      }
     }
   },
   "required": [
@@ -1315,7 +1558,6 @@
     "space",
     "logo",
     "url",
-    "location",
     "contact"
   ]
 }
