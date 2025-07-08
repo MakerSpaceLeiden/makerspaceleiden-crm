@@ -64,7 +64,6 @@ def newmember(request):
 
                 # Do not set this - it silently blocks the invite mails deep in PasswordResetForm.
                 #
-                # newmember.set_unusable_password()
                 #
                 newmember.set_password(User.objects.make_random_password())
 
@@ -97,7 +96,6 @@ def newmember(request):
                             digest=False,
                         )
                         s.subscribe()
-                        # s.changeReason("Subscribed during form based new user create")
                         s.save()
                     except Exception as e:
                         logger.error(
@@ -165,7 +163,6 @@ def sudo(request):
                 record.save()
 
                 return redirect(form.cleaned_data.get("return_to"))
-                # return redirect('index')
 
             except Exception as e:
                 logger.error("Failed to create uudit recordser : {}".format(e))

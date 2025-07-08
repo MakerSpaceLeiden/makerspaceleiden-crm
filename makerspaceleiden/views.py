@@ -46,7 +46,6 @@ def showhistory(request, aClass, pk, rev=None):
             "has_permission": request.user.is_authenticated,
         }
         return render(request, "crud.html", context)
-        # return historyAdmin.history_form_view(request,str(pk),str(rev), context)
 
     historyAdmin = MySimpleHistoryAdmin(Storage, AdminSite())
     return historyAdmin.history_view(request, str(pk), context)

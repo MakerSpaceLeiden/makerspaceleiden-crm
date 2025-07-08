@@ -113,7 +113,6 @@ def servicelog_crud(request, machine_id=None, servicelog_id=None):
     else:
         context["title"] = "Report as broken or report a problem"
         context["action"] = "File report"
-    # context['action'] = context['title']
 
     if request.POST:
         form = ServicelogForm(

@@ -114,8 +114,6 @@ def process(e, namespaces, triggerwords, uidmapping, nouidcheck=False, maskiban=
     try:
         valdigits = int(iban_str[2:4])
     except Exception as e:
-        # out["msg"] = "Skipping - could not convert/parse IBAN for check digits."
-        # return out
         valdigits = 0
 
     iban_raw = iban_str

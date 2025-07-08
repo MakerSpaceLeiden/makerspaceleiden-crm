@@ -64,7 +64,6 @@ def send_email_verification(
         "old_email": old_email,
         "domain": current_site.domain,
         # possibly changed with Django 2.2
-        # 'uid': urlsafe_base64_encode(force_bytes(user.pk)).decode(),
         "uid": uid,
         "token": email_check_token.make_token(user),
         "noc_email": settings.DEFAULT_FROM_EMAIL,
@@ -349,7 +348,6 @@ def recordinstructions(request):
                 )  # Using set() to remove duplicates
 
                 saved = True
-            # except Exception as e:
             except Entitlement.DoesNotExist as e:
                 exc_type, exc_obj, tb = sys.exc_info()
                 f = tb.tb_frame
@@ -965,7 +963,6 @@ def amnesty(request):
                 e.active = True
                 e.save()
                 context["saved"] = True
-            # return redirect('userdetails')
 
     for m in machines_entitled:
         form.fields["machine_%s" % m.id].initial = True

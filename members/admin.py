@@ -99,7 +99,6 @@ class UserAdmin(
     import_id_fields = ()  # 'email', 'first_name', 'last_name', 'is_staff', 'form_on_file', 'last_login','date_joined')
 
 
-# admin.site.register(User,ImportExportModelAdmin)
 admin.site.register(User, UserAdmin)
 
 

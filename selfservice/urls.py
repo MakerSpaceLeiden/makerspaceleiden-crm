@@ -44,7 +44,6 @@ urlpatterns = [
     # For the trutee's -- to ease admin
     path("pending/", views.pending, name="pending"),
     path("send_reset_email/<int:uid>", views.send_reset_email, name="send_reset_email"),
-    # path('confirm_email/', views.userdetails, name='confirm_email'),
     path(
         "confirm_email/<uidb64>/<token>/<new_email>",
         views.confirmemail,

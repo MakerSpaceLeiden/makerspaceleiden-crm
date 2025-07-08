@@ -19,9 +19,7 @@ admin.site.register(Mailinglist, MailinglistAdmin)
 def subscribe_selected(modeladmin, request, queryset):
     for sub in queryset:
         sub.active = True
-        # sub.changeReason("Bulk subscribe through admin portal")
         sub.save()
-        # sub.sync_activate()
 
 
 subscribe_selected.short_description = "Activate selected"
@@ -30,7 +28,6 @@ subscribe_selected.short_description = "Activate selected"
 def unsubscribe_selected(modeladmin, request, queryset):
     for sub in queryset:
         sub.active = False
-        # sub.changeReason("Bulk subscribe through admin portal")
         sub.save()
 
 

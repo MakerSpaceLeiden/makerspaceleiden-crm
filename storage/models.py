@@ -6,7 +6,6 @@ from django.urls import reverse
 from simple_history.models import HistoricalRecords
 from stdimage.models import StdImageField
 
-# from stdimage.utils import pre_delete_delete_callback, pre_save_delete_callback
 from makerspaceleiden.utils import upload_to_pattern
 from members.models import User
 
@@ -128,8 +127,3 @@ class Storage(models.Model):
             self.save()
 
         return
-
-
-# Handle image cleanup.
-# pre_delete.connect(pre_delete_delete_callback, sender=Storage)
-# pre_save.connect(pre_save_delete_callback, sender=Storage)

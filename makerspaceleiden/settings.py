@@ -70,7 +70,6 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    #    'autocomplete_light',
     "django.contrib.sites",
     "revproxy",
     "django_bootstrap5",
@@ -127,7 +126,6 @@ SETTINGS_EXPORT = [
     "SITE_NAME",
 ]
 
-# WSGI_APPLICATION = "makerspaceleiden.wsgi.application"
 ASGI_APPLICATION = "makerspaceleiden.asgi.application"
 
 
@@ -191,7 +189,6 @@ LANGUAGE_CODE = "en-us"
 if not os.getenv("LANG"):
     LANG = "en_US.UTF-8"
     os.environ["LANG"] = LANG
-    # locale.setlocale(locale.LANG, LANG)
 
 TIME_ZONE = "Europe/Amsterdam"
 
@@ -219,8 +216,6 @@ NUMBER_GROUPING = 3
 
 
 LOGIN_URL = "/login/"
-# LOGIN_REDIRECT_URL = '/'
-# LOGOUT_REDIRECT_URL = '/'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
@@ -288,7 +283,6 @@ NETADMIN_USER_GROUP = "network admins"
 # Membership boxes; delegation
 MEMBERBOX_ADMIN_GROUP = "memberbox admin group"
 
-# REGISTRATION_OPEN = False
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 # Payment system
@@ -296,7 +290,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 # When not defined - available all; but listings limited
 # will not show people with 0-balance and no transactions
 # for PETTYCASH_NOUSE_DAYS
-# PETTYCASH_DEMO_USER_GROUP = "pettycash demo group"
 PETTYCASH_NOUSE_DAYS = 60
 PETTYCASH_ADMIN_GROUP = "pettycash admin group"
 PETTYCASH_TREASURER_GROUP = "treasurer admin group"

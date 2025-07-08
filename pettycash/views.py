@@ -98,9 +98,6 @@ def alertOwnersToChange(
     if userThatMadeTheChange.email not in toinform:
         toinform.append(userThatMadeTheChange.email)
 
-    # if settings.ALSO_INFORM_EMAIL_ADDRESSES:
-    #    toinform.extend(settings.ALSO_INFORM_EMAIL_ADDRESSES)
-
     return emailPlain(
         template,
         toinform=toinform,
@@ -480,10 +477,6 @@ def cam53process(request):
     if request.method != "POST":
         return HttpResponse("Unknown FAIL", status=400, content_type="text/plain")
 
-    #    reason = CsrfViewMiddleware().process_view(request, None, (), {})
-    #    if reason:
-    ##        return HttpResponse("CSRF FAIL", status=400, content_type="text/plain")
-
     ok = []
     failed = []
     skipped = []
@@ -819,7 +812,6 @@ def delete(request, pk):
     if form.is_valid():
         reason = "%s (by %s)" % (form.cleaned_data["reason"], request.user)
         tx._change_reason = reason[:99]
-        # tx.delete();
         tx.refund_booking()
         alertOwnersToChange(
             tx, request.user, [tx.src.email, tx.dst.email], reason, "delete_tx.txt"

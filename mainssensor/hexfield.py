@@ -56,7 +56,6 @@ class HexField(models.Field):
 
     def formfield(self, **kwargs):
         kwargs["widget"] = forms.TextInput
-        # return super().formfield(form_class = HexFormField, **kwargs)
         kwargs["form_class"] = HexFormField
         kwargs["max_length"] = 4
         return models.fields.Field.formfield(self, **kwargs)

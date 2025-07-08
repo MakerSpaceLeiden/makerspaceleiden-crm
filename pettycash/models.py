@@ -35,7 +35,6 @@ class PettycashSku(models.Model):
     name = models.CharField(max_length=300, blank=False, null=True)
     description = models.CharField(max_length=300, blank=False, null=True)
     amount = MoneyField(
-        # max_value = settings.MAX_PAY_API,
         max_digits=8,
         decimal_places=2,
         default_currency="EUR",
@@ -204,7 +203,6 @@ class PettycashTransaction(models.Model):
     # trnsaction.
     #
     def delete_callback(self, *args, **kwargs):
-        # rc = super(PettycashTransaction, self).delete(*args, **kwargs)
         try:
             # Essentially roll the transaction back from the cache.
             if self.src != self.dst:
