@@ -61,7 +61,6 @@ def pemToSHA256Fingerprint(pem, justkey=False):
     except Exception:
         pass
     logger.error("Could not parse pem for finrprint: {}".format(pem))
-    # raise ValueError("pem decoding did not yield  fingerprint")
     return None
 
 

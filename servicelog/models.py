@@ -7,11 +7,8 @@ from acl.models import Machine
 from makerspaceleiden.utils import upload_to_pattern
 from members.models import User
 
-# from stdimage.utils import pre_delete_delete_callback, pre_save_delete_callback
-
 
 class Servicelog(models.Model):
-    # UNKNOWN = 'UKNOWN'
     FOUND_BROKEN = "FOUND_BROKEN"
     FOUND_FIX_BROKEN = "FOUND_FIX_BROKEN"
     BROKEN = "BROKEN"
@@ -59,5 +56,3 @@ class Servicelog(models.Model):
 
 
 # Handle image cleanup.
-# pre_delete.connect(pre_delete_delete_callback, sender=Servicelog)
-# pre_save.connect(pre_save_delete_callback, sender=Servicelog)

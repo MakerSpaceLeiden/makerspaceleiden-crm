@@ -64,7 +64,6 @@ def import_consolidated(inputfiles):
                 entit.save(bypass_user=admin)
 
             for w in what.split(" "):
-                # loc = Location(name = 'At the usual spot')
                 permit = None
                 permit, wasCreated = PermitType.objects.get_or_create(name=w)
                 permit.description = "The " + w + " permit"
@@ -73,26 +72,19 @@ def import_consolidated(inputfiles):
 
                 machine, wasCreated = Machine.objects.get_or_create(name=w)
                 machine.description = "The " + w + " machine"
-                # machine.location = lo
                 machine.node_name = "Node" + machine.name.upper()
                 machine.node_machine_name = machine.name.lower()
                 machine.requires_form = True
                 machine.requires_instruction = True
                 machine.requires_permit = permit
-                # loc.save()
                 machine.save()
 
-                #               try:
-                #                 entit,wasCreated = Entitlement.objects.get_or_create(permit = permit, holder = member, issuer = user0)
-                #               except Entitlement.DoesNotExist
-                #               except DoesNotExist:
                 entit = Entitlement()
                 entit.permit = permit
                 entit.holder = member
                 entit.issuer = user0
                 entit.active = True
                 entit.save(bypass_user=admin)
-            #               except Exception as e:
             #                 raise e
 
             col = cup % 6
@@ -118,5 +110,4 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         """Do your work here"""
-        # self.stdout.write('There are {} things!'.format(User.objects.count()))
         import_consolidated(options["inputfile"])

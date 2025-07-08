@@ -13,7 +13,6 @@ from django.urls import reverse
 from django.utils import timezone
 from simple_history.models import HistoricalRecords
 
-# from pettycash.models import PettycashBalanceCache
 from members.models import Tag, User
 
 logger = logging.getLogger(__name__)
@@ -287,7 +286,6 @@ class EntitlementManager(models.Manager):
                             e.count(), kwargs.get("permit"), kwargs.get("holder")
                         )
                     )
-                    # raise DoubleEntitlemenException("Two or more indentical entitlements found. Blocking creation of a third")
                 else:
                     logger.debug("Entity - trapped double create attempt: {}", existing)
 
@@ -330,7 +328,6 @@ class Entitlement(models.Model):
     objects = EntitlementManager()
 
     def __str__(self):
-        # return str(self.holder) + '@' + self.permit.name +'(Active:'+str(self.active)+')'
         return (
             str(self.holder)
             + "@"
@@ -415,7 +412,6 @@ class Entitlement(models.Model):
             f"Entitlement: saving {self} -- with active:{self.active} and permit:{self.permit} ({self.permit.permit})"
         )
         # Current rule for pending is:
-        #      Entitlement.objects.all().filter(active=False).filter(holder__is_active=True)
         if not self.active and self.permit.permit:
             try:
                 context = {

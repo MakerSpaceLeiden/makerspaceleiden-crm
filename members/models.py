@@ -296,5 +296,3 @@ def none_user():
 
 
 # Handle image cleanup.
-# pre_delete.connect(pre_delete_delete_callback, sender=User)
-# pre_save.connect(pre_save_delete_callback, sender=User)

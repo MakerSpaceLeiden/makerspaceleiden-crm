@@ -106,5 +106,3 @@ class Memberbox(models.Model):
 
 
 # Handle image cleanup.
-# pre_delete.connect(pre_delete_delete_callback, sender=Memberbox)
-# pre_save.connect(pre_save_delete_callback, sender=Memberbox)

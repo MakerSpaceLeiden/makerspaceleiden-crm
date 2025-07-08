@@ -51,7 +51,6 @@ urlpatterns = [
     ),
     # Provide metadata on a tag, requires a valid tag and a bearer token.
     #
-    # path("acl/api/v1/gettaginfo", views.api_gettaginfo, name="acl-v1-gettaginfo"),
     # Provide metadata on a machine - propably no longer used. Requires
     # a bearer token.
     #
@@ -66,27 +65,6 @@ urlpatterns = [
         views.api_getchangecounterJSON,
         name="acl-v1-getchangecounterJSON",
     ),
-    # calls to provide all tags for a given node/machine. Requires a valid
-    # terminal cert.
-    #
-    # Plaintext versions disabled; binary/encrypted version appears to work
-    # will. Will likely be removed.
-    #
-    #    path(
-    #        "acl/api/v1/gettags4node/<str:node>",
-    #        views.api_gettags4node,
-    #        name="acl-v1-gettags",
-    #    ),
-    #    path(
-    #        "acl/api/v1/gettags4machineJSON/<str:machine>",
-    #        views.api_gettags4machineJSON,
-    #        name="acl-v1-gettags-json",
-    #    ),
-    #    path(
-    #        "acl/api/v1/gettags4machineCSV/<str:machine>",
-    #        views.api_gettags4machineCSV,
-    #        name="acl-v1-gettags-csv",
-    #    ),
     path(
         "acl/api/v1/gettags4machineBIN/<str:machine>",
         views.api_gettags4machineBIN,

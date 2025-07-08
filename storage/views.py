@@ -265,7 +265,6 @@ def delete(request, pk):
 
 class MySimpleHistoryAdmin(SimpleHistoryAdmin):
     object_history_template = "storage/object_history.html"
-    # object_history_form_template = "storage/object_history_form.html"
 
     # Bit risky - routes in to bypass for naughtyness in below showhistory.
     def has_change_permission(self, request, obj):
@@ -302,7 +301,6 @@ def showhistory(request, pk, rev=None):
             "back": "storage",
         }
         return render(request, "storage/crud.html", context)
-        # return historyAdmin.history_form_view(request,str(pk),str(rev), context)
 
     historyAdmin = MySimpleHistoryAdmin(Storage, AdminSite())
     return historyAdmin.history_view(request, str(pk), context)

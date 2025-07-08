@@ -6,7 +6,6 @@ from .models import Subscription
 class SubscriptionForm(ModelForm):
     class Meta:
         model = Subscription
-        # labels = {"active": "Subcribed", "digest": "Receive in digest form"}
         labels = {"active": "Subcribed"}
         fields = [
             "active",
