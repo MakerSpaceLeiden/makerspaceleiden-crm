@@ -8,10 +8,10 @@ from django.shortcuts import render
 from django.views.static import serve as static_serve
 from simple_history.admin import SimpleHistoryAdmin
 
-from .decorators import login_or_bearer_required
-
 from storage.forms import StorageForm
 from storage.models import Storage
+
+from .decorators import login_or_bearer_required
 
 logger = logging.getLogger(__name__)
 
@@ -24,9 +24,11 @@ class MySimpleHistoryAdmin(SimpleHistoryAdmin):
     def has_change_permission(self, request, obj):
         return True
 
+
 @login_or_bearer_required
-def protected_media(request,path):
-    return static_serve(request,path,settings.MEDIA_ROOT)
+def protected_media(request, path):
+    return static_serve(request, path, settings.MEDIA_ROOT)
+
 
 @login_required
 def showhistory(request, aClass, pk, rev=None):
