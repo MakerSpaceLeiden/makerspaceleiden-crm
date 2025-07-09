@@ -18,15 +18,17 @@
                             <img alt="" src="{{ m.image.thumbnail.url }}" class="img-fluid avatar rounded-1" style="width: 45px; height: 45px; object-fit: cover;"/>
                         </a>
                     {% else %}
-                        <div class="avatar rounded-1 bg-secondary bg-gradient text-bg-secondary d-flex align-items-center justify-content-center" 
+                        <span class="avatar rounded-1 bg-secondary bg-gradient text-bg-secondary d-flex align-items-center justify-content-center" 
 				style="display: grid; width: 45px; height: 45px; object-fit: cover;">
-			    <div style="grid-area: 1 / 1;">
-                              <img alt="" src="{{ m.image_url }}" class="img-fluid avatar rounded-1" style="width: 45px; height: 45px; object-fit: cover;"/>
-			    </div>
-			    <div style="grid-area: 1 / 1;">
+                          <div style="display: grid;">
+			    <div style="grid-area: 1 / 1; padding: 5px 5px;">
                               {{ m.initials }}
 			    </div>
-                        </div >
+			    <div style="grid-area: 1 / 1;">
+                              <img alt="" src="{{ m.image_url }}" class="img-fluid avatar rounded-1" style="width: 45px; height: 45px; object-fit: cover;"/> 
+			    </div>
+			  </div>
+                        </span>
                     {% endif %}
                 </div>
                 <div class="flex-grow-1 d-flex align-items-center h-100" style="min-height: 45px;">
