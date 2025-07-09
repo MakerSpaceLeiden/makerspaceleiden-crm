@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>Total: {{ num_active }} active members</h2>
+{%if user.is_privileged %}
+{{ num_members }} accounts in the database, of which {{ num_inactive }} set to inactive.
+{% endif %}
+
+<ul class="row list-unstyled">
+    {% for m in members %}
+    <li class="col-8 col-sm-6 col-md-4 col-lg-3 mb-2 d-flex align-items-stretch">
+        <div class="card w-100 h-100">
+            <div class="d-flex align-items-center h-100 p-2">
+                <div class="flex-shrink-0 me-3 d-flex align-items-center" style="height: 45px;">
+                    {% if m.image %}
+                        <a href="{{ m.image.url }}">
+                            <img alt="" src="{{ m.image.thumbnail.url }}" class="img-fluid avatar rounded-1" style="width: 45px; height: 45px; object-fit: cover;"/>
+                        </a>
+                    {% else %}
+                        <span class="avatar rounded-1 bg-secondary bg-gradient text-bg-secondary d-flex align-items-center justify-content-center" style="display: block; width: 45px; height: 45px; object-fit: cover;">
+                            {{ m.initials }}
+                        </span>
+                    {% endif %}
+                </div>
+                <div class="flex-grow-1 d-flex align-items-center h-100" style="min-height: 45px;">
+                    <a href="{{ m.path }}">
+                    {% if m.is_active %}
+                    {{ m }}
+                    {% else %}
+                    <i><s>{{ m }}</s></i> Deactivated.<br>Last record change: {{ m.history.first.history_date }} {{ m.history.first.changeReason }}
+                    {% endif %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </li>
+    {% endfor %}
+</ul>
+
+
+{% endblock %}
