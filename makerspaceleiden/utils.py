@@ -3,6 +3,7 @@ import binascii
 import hashlib
 import json
 import logging
+import re
 import sys
 
 import cryptography
@@ -117,3 +118,11 @@ def cert_sha(src, request, justkey=False):
             "No client sha, rejecting", status=400, content_type="text/plain"
         )
     return sha
+
+
+pattern = re.compile("^(a|e)l( |-)|van der|van|de|ten", re.IGNORECASE)
+
+
+def derive_initials(first_name, last_name):
+    normalized_last_name = re.sub(pattern, "", last_name).strip()
+    return (first_name[:1] + normalized_last_name[:1]).upper()

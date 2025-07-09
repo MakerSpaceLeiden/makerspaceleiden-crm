@@ -20,6 +20,7 @@ from ipware import get_client_ip
 
 from mailinglists.models import Subscription
 from makerspaceleiden.decorators import superuser_or_bearer_required, superuser_required
+from makerspaceleiden.utils import derive_initials
 from memberbox.models import Memberbox
 from members.forms import TagForm
 from members.models import Tag, User, clean_tag_string
@@ -220,8 +221,14 @@ def machine_overview(request, machine_id=None):
     return render(request, "acl/matrix.html", context)
 
 
+# Add initials as an attribute
+def with_initials(member):
+    member.initials = derive_initials(member.first_name, member.last_name)
+    return member
+
+
 @login_required
-def members(request):
+def members_list(request):
     members = User.objects.order_by("first_name")
     active = members.filter(is_active=True)
     if not request.user.is_privileged:
@@ -229,13 +236,13 @@ def members(request):
 
     context = {
         "title": "Members list",
-        "members": members,
+        "members": map(with_initials, members),
         "num_active": len(active),
         "num_members": len(members),
         "num_inactive": len(members) - len(active),
         "has_permission": request.user.is_authenticated,
     }
-    return render(request, "acl/members.html", context)
+    return render(request, "acl/members_list.html", context)
 
 
 def _overview(request, member_id=None):

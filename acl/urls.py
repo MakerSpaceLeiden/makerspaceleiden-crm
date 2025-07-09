@@ -16,7 +16,7 @@ urlpatterns = [
         views.member_delete,
         name="userdelete_confirm",
     ),
-    path("acl/member/", views.members, name="overview"),
+    path("acl/member/", views.members_list, name="overview"),
     path("acl/tag/edit/<int:tag_id>", views.tag_edit, name="tag_edit"),
     path("acl/tag/delete/<int:tag_id>", views.tag_delete, name="tag_delete"),
     path(
