@@ -20,6 +20,7 @@ from django.contrib import admin
 from django.urls import include, path
 from oauth2_provider import urls as oauth2_urls
 
+from . import views
 from .admin import admin_view
 
 admin.site.admin_view = admin_view
@@ -48,11 +49,15 @@ urlpatterns = [
     path("spaceapi/", include("spaceapi.urls")),
     path("terminal/", include("terminal.urls")),
     path("avatar/", include("avatar.urls")),
+    # We strip the leading / to supress a warning.
+    path(
+        settings.MEDIA_URL[1:] + "<path:path>",
+        views.protected_media,
+        name="protected-media",
+    ),
     path("", include("nodered.urls")),
     path("oauth2/", include(oauth2_urls)),
     path("api/", include("api.urls")),
 ]
 
 urlpatterns += static(r"/favicon.ico", document_root="static/favicon.ico")
-
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

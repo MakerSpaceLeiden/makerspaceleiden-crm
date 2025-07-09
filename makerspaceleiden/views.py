@@ -1,11 +1,17 @@
+import logging
+
+from django.conf import settings
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import render
+from django.views.static import serve as static_serve
 from simple_history.admin import SimpleHistoryAdmin
 
 from storage.forms import StorageForm
 from storage.models import Storage
+
+logger = logging.getLogger(__name__)
 
 
 class MySimpleHistoryAdmin(SimpleHistoryAdmin):
@@ -15,6 +21,11 @@ class MySimpleHistoryAdmin(SimpleHistoryAdmin):
     #
     def has_change_permission(self, request, obj):
         return True
+
+
+@login_required
+def protected_media(request, path):
+    return static_serve(request, path, settings.MEDIA_ROOT)
 
 
 @login_required
