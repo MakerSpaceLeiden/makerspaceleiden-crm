@@ -64,6 +64,20 @@ def superuser_or_bearer_required(function):
 
     return wrap
 
+def login_or_bearer_required(function):
+    @wraps(function)
+    def wrap(request, *args, **kwargs):
+        if request.user or is_superuser_or_bearer(request):
+            return function(request, *args, **kwargs)
+
+        # Quell some odd 'code 400, message Bad request syntax ('tag=1-2-3-4')'
+        request.POST
+
+        # raise PermissionDenied
+        return HttpResponse("XS denied", status=403, content_type="text/plain")
+
+    return wrap
+
 
 def user_or_kiosk_required(function):
     @wraps(function)
