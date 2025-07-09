@@ -92,7 +92,9 @@ Last record change: {{ member.history.first.history_date }} {{ member.history.fi
                     {% if member.image %}
                     <a href="{{ member.image.url }}" ><img alt="" src="{{ member.image.medium.url }}"/></a>
                     {% else %}
-                    <div style="width: 150px; height: 50px; border: 1px solid #ccc;text-align: center;padding-top:10px;">No image</div>
+                    <div style="width: 150px; height: 50px; border: 1px solid #ccc;text-align: center;padding-top:10px;">
+			<a href="{{ member.image_url }}" ><img alt="" src="{{ member.image_url }}" width=30px height=30px/></a>
+		    </div>
                     {% endif %}
                 </div>
                 {% if member == user %}

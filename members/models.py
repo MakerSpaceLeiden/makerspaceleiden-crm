@@ -140,11 +140,13 @@ class User(AbstractUser):
     def url(self):
         return settings.BASE + self.path()
 
-    def image_img(self):
+    def image_url(self):
         if self.image:
-            return str('<img src="%s" width=80/>' % self.image.url)
-        else:
-            return "No images uploaded yet."
+            return self.image.url
+        return reverse('generate-fake-mugshot', args=[ self.id ])
+
+    def image_img(self):
+        return str('<img src="%s" width=80/>' % url)
 
     @property
     def in_group(request, group):
