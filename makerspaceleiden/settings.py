@@ -110,6 +110,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "django_settings_export.settings_export",
                 "motd.context_processors.motd_context",
+                "makerspaceleiden.context_processors.navbar_links",
             ],
         },
     },
