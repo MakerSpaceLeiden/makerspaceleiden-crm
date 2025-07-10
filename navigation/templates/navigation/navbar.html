@@ -92,32 +92,12 @@
                   {% if user.is_privileged or user|isPettycashAdmin or user|isTreasurer or user|isMainsAdmin or user|isNoderedAdmin %}
                   <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                      Trustee
+                      {{ navbar_links.trustee.label }}
                     </a>
                     <ul class="dropdown-menu">
-                    {% if user.is_privileged %}
-                      <li><a class="dropdown-item" href="{% url 'admin:index' %}">Raw database access</a></li>
-                      <li><a class="dropdown-item" href="{% url 'newmember' %}">Add a new member</a></li>
-                      <li><a class="dropdown-item" href="{% url 'pending' %}">Instructions pending approval</a></li>
-                      <li><a class="dropdown-item" href="{% url 'missing_doors' %}">Missing doors or tags</a></li>
-                      <li><a class="dropdown-item" href="{% url 'missing_forms' %}">Missing waivers</a></li>
-                      <li><a class="dropdown-item" href="{% url 'filed_forms' %}">Filed waivers</a></li>
-                      <li><a class="dropdown-item" href="{% url 'unknowntags' %}">Unknown tags</a></li>
-                      <li><a class="dropdown-item" href="{% url 'acl-index' %}">Permit use</a></li>
-                      <li><a class="dropdown-item" href="{% url 'cam53upload' %}">Upload Triodos transactions</a></li>
-                      <li><a class="dropdown-item" href="{% url 'mailinglists_subs' %}">Members mailing list subscriptions</a></li>
-                    {% endif %}
-                    {% if user.is_privileged or user|isMainsAdmin %}
-                      <li><a class="dropdown-item" href="{% url 'mainsindex' %}">Lucas MainsSensors</a></li>
-                      <li><a class="dropdown-item" href="/api/v1/mainssensor/resolve">Lucas MainsSensors resolved</a></li>
-                    {% endif %}
-
-                    {% if user.is_privileged or user|isPettycashAdmin or user|isTreasurer %}
-                          <li><a class="dropdown-item" href="{% url 'unpaired' %}">Payment stations</a></li>
-                    {% endif %}
-                    {% if user.is_privileged or user|isNoderedAdmin %}
-                          <li><a class="dropdown-item" href="{% url 'nodered_proxy' '' %}">Node-Red editor</a></li>
-                    {% endif %}
+                    {% for link in navbar_links.trustee.children %}
+                      <li><a href="{{link.url}}" class="dropdown-item">{{link.label}}</a></li>
+                    {% endfor %}
                     </ul>
                   </li>
                   {% endif %}
