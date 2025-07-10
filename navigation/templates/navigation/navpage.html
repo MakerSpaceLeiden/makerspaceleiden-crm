@@ -7,92 +7,68 @@
     .custom-nav-menu li {
         list-style-type: none;
     }
-
 </style>
 
     <div class="row">
         <div class="col-12 col-lg-2 mb-0 me-3">
-            <h2>Profile Settings</h2>
+            <h2>{{ navbar_links.profile.label }}</h2>
             <ul class="nav flex-column custom-nav-menu">
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'personal_page' %}">Personal profile </a></li>
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'userdetails' %}">Change personal details</a></li>
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'password_change' %}">Change password</a></li>
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'mytransactions' %}">Cash balance</a></li>
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'mailinglists_edit' %}">Mailing lists subscriptions</a></li>
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'notification_settings' %}">Notifications</a></li>
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'boxes' %}">Member box</a></li>
-
+                {% for link in navbar_links.profile.children %}
+                    <li class="nav-item pb-0">
+                        <a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{{ link.url }}">
+                            {{ link.label }}
+                        </a>
+                    </li>
+                {% endfor %}
             </ul>
         </div>
         <div class="col-12 col-lg-2 me-3">
-            <h2>Machines & Community</h2>
+            <h2>{{ navbar_links.community.label }}</h2>
             <ul class="nav flex-column custom-nav-menu">
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'overview' %}">All members</a></li>
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'machine_list' %}">Machines</a></li>
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'chores' %}">Chores</a></li>
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'add_instruction' %}">Record instructions</a></li>
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'mytransactions' %}">SpaceTegoed</a></li>
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'invoice' src=user.id %}">Pay for a product</a></li>
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'boxes' %}">Member boxes</a></li>
-                {%  if settings.STORAGE %}
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'storage' %}">Storage management</a></li>
+                {% for link in navbar_links.community.children %}
+                <li class="nav-item pb-0">
+                    <a href="{{ link.url }}" class="nav-link pt-1 pb-2 pe-1 ps-0">{{ link.label }}</a>
+                </li>
+                {% endfor %}
+                {% if settings.STORAGE %}
+                    <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'storage' %}">Storage management</a></li>
                 {% endif %}
                 {% if settings.GRAND_AMNESTY %}
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'amnesty' %}">Grand amnesty</a></li>
+                    <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'amnesty' %}">Grand amnesty</a></li>
                 {% endif %}
             </ul>
         </div>
         <div class="col-12 col-lg-2 me-3">
-            <h2>Current Events</h2>
+            <h2>{{ navbar_links.events.label }}</h2>
             <ul class="nav flex-column custom-nav-menu">
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'space_state' %}">Who is there now</a></li>
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'nodered_active_machines' %}">Active machines</a></li>
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'nodered_live_data_and_sensors' %}">Live data &amp; sensors</a></li>
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'agenda' %}">Agenda</a></li>
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'motd_messages' %}">Message of the day</a></li>
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'ufo' %}">UFO lost and found</a></li>
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'camindex' %}">Live 3D printer camera</a></li>
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'kwh_view' %}">Power consumption</a></li>
+                {% for link in navbar_links.events.children %}
+                    <li class="nav-item pb-0">
+                        <a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{{ link.url }}">
+                            {{ link.label }}
+                        </a>
+                    </li>
+                {% endfor %}
             </ul>
         </div>
         <div class="col-12 col-lg-2 me-3">
-            <h2>Wiki & Public Info</h2>
+            <h2>{{ navbar_links.public.label }}</h2>
             <ul class="nav flex-column custom-nav-menu">
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="https://wiki.makerspaceleiden.nl/" target="_blank">Wiki documentation</a></li>
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Categorie:Tools" target="_blank">Tools</a></li>
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Makerspace_Leiden#Veiligheid_en_geluidsproductie" target="_blank">Safety and noise production</a></li>
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Makerspace_Leiden#Procedures_en_Principes" target="_blank">Procedures and principles</a></li>
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/Create_a_new_wiki_page" target="_blank">Create a new wiki</a></li>
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="https://github.com/MakerSpaceLeiden" target="_blank">Github</a></li>
-                <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="https://wiki.makerspaceleiden.nl/mediawiki/index.php/About_Makerspace" target="_blank">About Us</a></li>
+                {% for link in navbar_links.public.children %}
+                  <li class="nav-item pb-0">
+                    <a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{{ link.url }}" target="_blank">{{ link.label }}</a>
+                  </li>
+                {% endfor %}
             </ul>
         </div>
         {% if user.is_privileged or user|isPettycashAdmin or user|isTreasurer or user|isMainsAdmin or user|isNoderedAdmin %}
             <div class="col-12 col-lg-2 me-0">
-                <h2>Trustee</h2>
+                <h2>{{ navbar_links.trustee.label }}</h2>
                 <ul class="nav flex-column custom-nav-menu">
-                {% if user.is_privileged %}
-                    <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'admin:index' %}">Raw database access</a></li>
-                    <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'newmember' %}">Add a new member</a></li>
-                    <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'pending' %}">Instructions pending approval</a></li>
-                    <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'missing_doors' %}">People with no doors or tags</a></li>
-                    <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'missing_forms' %}">Missing waivers</a></li>
-                    <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'filed_forms' %}">Filed waivers</a></li>
-                    <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'unknowntags' %}">Unknown tags</a></li>
-                    <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'acl-index' %}">Permit use</a></li>
-                    <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'cam53upload' %}">Upload Triodos transactions</a></li>
-                    <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'mailinglists_subs' %}">Members mailing list subscriptions</a></li>
-                {% endif %}
-                {% if user.is_privileged or user|isMainsAdmin %}
-                    <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'mainsindex' %}">Lucas MainsSensors</a></li>
-                    <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="/api/v1/mainssensor/resolve">Lucas MainsSensors resolved</a></li>
-                {% endif %}
-                {% if user.is_privileged or user|isPettycashAdmin or user|isTreasurer %}
-                    <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'unpaired' %}">Payment stations</a></li>
-                {% endif %}
-                {% if user.is_privileged or user|isNoderedAdmin %}
-                    <li class="nav-item pb-0"><a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{% url 'nodered_proxy' '' %}">Node-Red editor</a></li>
-                {% endif %}
+                {% for link in navbar_links.trustee.children %}
+                    <li class="nav-item pb-0">
+                        <a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{{ link.url }}" target="_blank">{{ link.label }}</a>
+                    </li>
+                {% endfor %}
                 </ul>
             </div>
         {% endif %}
