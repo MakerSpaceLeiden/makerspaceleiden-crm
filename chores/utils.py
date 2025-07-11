@@ -29,6 +29,7 @@ def get_chores_data(current_user_id=None, subset=None):
         key = f"{turn.chore.id}-{turn.timestamp}"
         volunteers_by_key[key].append(turn.user)
 
+    # Drop use of aggregator virtualisation, internalise to CRM
     data = aggregator_adapter.get_chores()
     if data is None:
         return None, "No data available"

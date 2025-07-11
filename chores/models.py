@@ -49,8 +49,47 @@ class ChoreVolunteer(models.Model):
         on_delete=models.CASCADE,
         related_name="chore",
     )
+
+    # Represents when the chore is scheduled to begin
     timestamp = models.IntegerField(null=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
 
     history = HistoricalRecords()
+
+
+class ChoreNotification(models.Model):
+    event_key = models.CharField(max_length=128, unique=True)
+    chore = models.ForeignKey(
+        Chore,
+        null=False,
+        on_delete=models.CASCADE,
+        related_name="notifications",
+    )
+    recipient_user = models.ForeignKey(
+        User,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="chore_notifications",
+    )
+
+    recipient_other = models.EmailField(null=True, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def clean(self):
+        from django.core.exceptions import ValidationError
+
+        if not self.recipient_user and not self.recipient_other:
+            raise ValidationError(
+                "Must have either a recipient_user or a recipient_other."
+            )
+        if self.recipient_user and self.recipient_other:
+            raise ValidationError(
+                "Cannot have both recipient_user and recipient_other."
+            )
+
+    def __str__(self):
+        recipient = self.recipient_user if self.recipient_user else self.recipient_other
+        return f"Notification to {recipient} for {self.chore} at {self.sent_at}"
