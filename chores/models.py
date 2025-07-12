@@ -57,6 +57,14 @@ class ChoreVolunteer(models.Model):
 
     history = HistoricalRecords()
 
+    @property
+    def first_name(self):
+        return self.user.first_name
+
+    @property
+    def full_name(self):
+        return f"{self.user.first_name} {self.user.last_name}"
+
 
 class ChoreNotification(models.Model):
     event_key = models.CharField(max_length=128, unique=True)

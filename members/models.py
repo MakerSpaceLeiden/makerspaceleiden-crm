@@ -147,6 +147,10 @@ class User(AbstractUser):
             return "No images uploaded yet."
 
     @property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
+
+    @property
     def in_group(request, group):
         return request.user.groups.filter(name=group).exists()
 

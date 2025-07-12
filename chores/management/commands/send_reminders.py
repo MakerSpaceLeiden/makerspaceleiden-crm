@@ -10,6 +10,7 @@ from django.core.mail import EmailMessage
 from django.core.management.base import BaseCommand
 
 from ...models import Chore, ChoreNotification, ChoreVolunteer
+from .messages import VolunteeringReminderNotification
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +42,9 @@ class Command(BaseCommand):
         for event in chores_logic.iter_events_with_reminders_from_to(
             now.add(-self.chores_warnings_check_window_in_hours, "hours"), now
         ):
+            ## LAFIXME: this should query based on event key
             volunteers = ChoreVolunteer.objects.all()
+            print("LADEBUG.volunteers", len(volunteers))
             params = NudgesParams(
                 volunteers,
                 now,
@@ -53,21 +56,7 @@ class Command(BaseCommand):
                 print("LADEBUG.Processing Chore nudge: {0}".format(nudge))
                 # Prevent multiple notifications using ChoreNotification
                 print("LADEBUG.nudge.get_string_key", nudge.get_string_key())
-                event_key = nudge.get_string_key()
-                exists = ChoreNotification.objects.filter(event_key=event_key).exists()
-                if not exists:
-                    nudge.send(self, logger)
-                    # send and create notification
-                    ChoreNotification.objects.create(
-                        event_key=nudge.get_string_key(),
-                        chore=Chore.objects.get(id=event.get_object_key()["chore_id"]),
-                        recipient_user=None,
-                        recipient_other="deelnemers@makerspaceleiden.nl",  # LADEBUG.FIXME
-                    )
-                else:
-                    logger.info(
-                        f"Skipping duplicate notification for event_key={event_key}"
-                    )
+                nudge.send(self, logger)
 
         self.stdout.write("Sending notifications")
 
@@ -199,9 +188,42 @@ ALL_CHORE_TYPES = [
 ]
 
 
-class EmailNudge(object):
-    def __init__(self, event, nudge_key, destination, subject, body):
+class BaseNudge(object):
+    """Base class for all nudge types with common functionality."""
+
+    def __init__(self, event):
         self.event = event
+
+    def get_string_key(self):
+        """Generate a unique string key for this nudge."""
+        event_key = self.event.get_object_key()
+        return "{0}-{1}-{2}".format(
+            self.nudge_key, event_key["chore_id"], event_key["ts"]
+        )
+
+    def send(self, aggregator, logger):
+        """Send the nudge - to be implemented by subclasses."""
+        raise NotImplementedError("Subclasses must implement send()")
+
+    def should_send(self, message_key):
+        """Check if a message with this key should be sent (not already sent)."""
+        return not ChoreNotification.objects.filter(event_key=message_key).exists()
+
+    def record_send(self, message_key, user=None):
+        """Record that a message with this key has been sent."""
+        ChoreNotification.objects.create(
+            event_key=message_key,
+            chore=Chore.objects.get(id=self.event.get_object_key()["chore_id"]),
+            recipient_user=user if "volunteer" in message_key else None,
+            recipient_other=None
+            if "volunteer" in message_key
+            else "deelnemers@makerspaceleiden.nl",
+        )
+
+
+class EmailNudge(BaseNudge):
+    def __init__(self, event, nudge_key, destination, subject, body):
+        super().__init__(event)
         self.nudge_key = nudge_key
         self.destination = destination
         self.subject = subject
@@ -212,27 +234,18 @@ class EmailNudge(object):
             self.event.chore.name, self.destination, self.subject
         )
 
-    def get_string_key(self):
-        event_key = self.event.get_object_key()
-        return "{0}-{1}-{2}".format(
-            self.nudge_key, event_key["chore_id"], event_key["ts"]
-        )
-
     def send(self, aggregator, logger):
         logger.info("Sending email nudge to: {0}".format(self.destination))
         print("LADEBUG.EmailNudge.send", self.destination)
 
-        EmailMessage(
-            self.subject,
-            self.body,
-            to=[self.destination],
-            from_email="MakerSpace BOT <noc@makerspaceleiden.nl>",
-        ).send()
-
-        # TODO: LADEBUG send email (1)
-        # aggregator.email_adapter.send_email(
-        #     self.destination, self.destination, self, logger
-        # )
+        if self.should_send(self.get_string_key()):
+            EmailMessage(
+                self.subject,
+                self.body,
+                to=[self.destination],
+                from_email="MakerSpace BOT <noc@makerspaceleiden.nl>",
+            ).send()
+            self.record_send(self.get_string_key())
 
     # Honour the Message API (see messages.py)
     def get_subject_for_email(self):
@@ -243,10 +256,11 @@ class EmailNudge(object):
         return self.body + "\n"
 
 
-class VolunteerViaChatBotNudge(object):
+class VolunteerViaChatBotNudge(BaseNudge):
     def __init__(self, event, nudge, params):
-        self.event = event
+        super().__init__(event)
         self.nudge = nudge
+        self.nudge_key = nudge["nudge_key"]
         self.message_users_seen_no_later_than_days = (
             params.message_users_seen_no_later_than_days
         )
@@ -255,15 +269,14 @@ class VolunteerViaChatBotNudge(object):
     def __str__(self):
         return "Chat BOT nudge: {0}".format(self.event.chore.name)
 
-    def get_string_key(self):
-        event_key = self.event.get_object_key()
-        return "{0}-{1}-{2}".format(
-            self.nudge["nudge_key"], event_key["chore_id"], event_key["ts"]
-        )
-
     def send(self, aggregator, logger):
         users = aggregator.get_users_seen_no_later_than_days(
             self.message_users_seen_no_later_than_days, logger
+        )
+        print(
+            "LADEBUG.Sending Chat BOT nudge to: {0}".format(
+                ", ".join(["{0}".format(u.full_name) for u in users])
+            )
         )
         logger.info(
             "Sending Chat BOT nudge to: {0}".format(
@@ -279,33 +292,39 @@ class VolunteerViaChatBotNudge(object):
             # )
 
 
-class VolunteerReminderViaChatBotNudge(object):
+class VolunteerReminderViaChatBotNudge(BaseNudge):
     def __init__(self, event, params):
-        self.event = event
+        super().__init__(event)
         self.volunteers = params.volunteers
+        self.nudge_key = "volunteer-reminder"
 
     def __str__(self):
         return "Volunteer reminder via Chat BOT: {0}".format(self.event.chore.name)
 
-    def get_string_key(self):
-        event_key = self.event.get_object_key()
-        return "volunteer-reminder-{0}-{1}".format(
-            event_key["chore_id"], event_key["ts"]
-        )
-
     def send(self, aggregator, _logger):
-        print("LADEBUG.VolunteerReminderViaChatBotNudge.Send")
+        print("LADEBUG.VolunteerReminderViaChatBotNudge.Send", len(self.volunteers))
         logger.info(
             "Sending volunteering reminder to: {0}".format(
                 ", ".join(["{0}".format(u.full_name) for u in self.volunteers])
             )
         )
-        for user in self.volunteers:
-            print("aggregator.send_user_notification")
-            print(user)
-            # aggregator.send_user_notification(
-            #     user, VolunteeringReminderNotification(user, self.event), logger
-            # )
+        for choreVolunteer in self.volunteers:
+            if self.should_send(self.get_string_key()):
+                print(
+                    "LADEBUG.aggregator.send_user_notification.{0}".format(
+                        choreVolunteer.user
+                    )
+                )
+                message = VolunteeringReminderNotification(
+                    choreVolunteer.user, self.event
+                )
+                EmailMessage(
+                    message.get_subject_for_email(),
+                    message.get_text(),
+                    to=[choreVolunteer.user.email],
+                    from_email="MakerSpace BOT <noc@makerspaceleiden.nl>",
+                ).send()
+                self.record_send(self.get_string_key(), choreVolunteer.user)
 
 
 class MissingVolunteersReminder(object):
@@ -404,6 +423,7 @@ def build_chore_instance(chore):
 
 
 def build_reminder(min_required_people, reminder_type, when, nudges=None):
+    print("LADEBUG.build_reminder", reminder_type, when)
     if reminder_type == "missing_volunteers":
         return MissingVolunteersReminder(min_required_people, when, nudges)
     if reminder_type == "volunteers_who_signed_up":
