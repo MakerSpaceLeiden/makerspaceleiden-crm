@@ -38,8 +38,7 @@ class Command(BaseCommand):
         for event in chores_logic.iter_events_with_reminders_from_to(
             now.add(-self.chores_warnings_check_window_in_hours, "hours"), now
         ):
-            ## LAFIXME: this should query based on event key
-            volunteers = ChoreVolunteer.objects.all()
+            volunteers = ChoreVolunteer.objects.all().filter(chore=event.chore.chore_id)
             logger.debug("volunteers", len(volunteers))
             params = NudgesParams(
                 volunteers,

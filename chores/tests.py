@@ -824,3 +824,105 @@ class FutureEventTest(TestCase):
         # Should not send reminder for future events
         self.assertEqual(len(mail.outbox), 0)
         self.assertEqual(ChoreNotification.objects.count(), 0)
+
+
+class VolunteerCrossContaminationTest(TestCase):
+    """Test the defect where volunteers from one chore incorrectly affect another chore's reminder logic"""
+
+    def setUp(self):
+        self.user = User.objects.create_user(
+            email="test@example.com",
+            password="testpass123",
+            first_name="Test",
+            last_name="User",
+        )
+
+    @time_machine.travel("2025-07-10 19:56")
+    def test_volunteer_cross_contamination_defect(self):
+        """Test that volunteers from one chore do not prevent reminders for another chore"""
+        # Create first chore that needs volunteers
+        chore1 = Chore.objects.create(
+            name="Chore 1 - Needs Volunteers",
+            description="A chore that needs volunteers",
+            class_type="BasicChore",
+            configuration={
+                "min_required_people": 1,
+                "events_generation": {
+                    "event_type": "recurrent",
+                    "starting_time": "21/7/2021 8:00",
+                    "crontab": "0 22 * * sun",
+                    "take_one_every": 2,
+                },
+                "reminders": [
+                    {
+                        "reminder_type": "missing_volunteers",
+                        "when": {"days_before": 10, "time": "17:00"},
+                        "nudges": [
+                            {
+                                "nudge_type": "email",
+                                "nudge_key": "chore1_reminder",
+                                "destination": "deelnemers@makerspaceleiden.nl",
+                                "subject_template": "Chore 1 needs volunteers",
+                                "body_template": "Chore 1 needs volunteers",
+                            }
+                        ],
+                    },
+                ],
+            },
+            creator=self.user,
+        )
+
+        # Create second chore that also needs volunteers
+        Chore.objects.create(
+            name="Chore 2 - Needs Volunteers",
+            description="Another chore that needs volunteers",
+            class_type="BasicChore",
+            configuration={
+                "min_required_people": 1,
+                "events_generation": {
+                    "event_type": "recurrent",
+                    "starting_time": "21/7/2021 8:00",
+                    "crontab": "0 22 * * sun",
+                    "take_one_every": 2,
+                },
+                "reminders": [
+                    {
+                        "reminder_type": "missing_volunteers",
+                        "when": {"days_before": 10, "time": "17:00"},
+                        "nudges": [
+                            {
+                                "nudge_type": "email",
+                                "nudge_key": "chore2_reminder",
+                                "destination": "deelnemers@makerspaceleiden.nl",
+                                "subject_template": "Chore 2 needs volunteers",
+                                "body_template": "Chore 2 needs volunteers",
+                            }
+                        ],
+                    },
+                ],
+            },
+            creator=self.user,
+        )
+
+        # Create a volunteer for chore1 only
+        volunteer = User.objects.create_user(
+            email="volunteer@example.com",
+            password="testpass123",
+            first_name="Volunteer",
+            last_name="User",
+        )
+        ChoreVolunteer.objects.create(
+            user=volunteer,
+            chore=chore1,  # Only volunteer for chore1
+            timestamp=1753041600,
+        )
+
+        out = StringIO()
+        call_command("send_reminders", stdout=out)
+
+        # DEFECT: Due to ChoreVolunteer.objects.all() query, chore2 should NOT get a reminder
+        # because the volunteer from chore1 is incorrectly counted for chore2
+        # Verify that chore2 should have gotten a reminder if the bug was fixed
+        # (This assertion documents the expected correct behavior)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn("Chore 2 needs volunteers", mail.outbox[0].subject)
