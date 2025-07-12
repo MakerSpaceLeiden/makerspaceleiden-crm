@@ -48,10 +48,8 @@ class Command(BaseCommand):
             )
             for nudge in event.iter_nudges(params):
                 logger.info("Processing Chore nudge: {0}".format(nudge))
-                logger.debug("Processing Chore nudge: {0}".format(nudge))
-                # Prevent multiple notifications using ChoreNotification
                 logger.debug("nudge.get_string_key", nudge.get_string_key())
-                nudge.send(self, logger)
+                nudge.send()
 
         self.stdout.write("Sending notifications")
 
@@ -196,7 +194,7 @@ class BaseNudge(object):
             self.nudge_key, event_key["chore_id"], event_key["ts"]
         )
 
-    def send(self, aggregator, logger):
+    def send(self):
         """Send the nudge - to be implemented by subclasses."""
         raise NotImplementedError("Subclasses must implement send()")
 
@@ -229,7 +227,7 @@ class EmailNudge(BaseNudge):
             self.event.chore.name, self.destination, self.subject
         )
 
-    def send(self, aggregator, logger):
+    def send(self):
         logger.info("Sending email nudge to: {0}".format(self.destination))
         logger.debug("EmailNudge.send", self.destination)
 
@@ -260,7 +258,7 @@ class VolunteersReminderNudge(BaseNudge):
     def __str__(self):
         return "Volunteer reminder via Chat BOT: {0}".format(self.event.chore.name)
 
-    def send(self, aggregator, _logger):
+    def send(self):
         logger.debug("VolunteersReminderNudge.Send", len(self.volunteers))
         logger.info(
             "Sending volunteering reminder to: {0}".format(
