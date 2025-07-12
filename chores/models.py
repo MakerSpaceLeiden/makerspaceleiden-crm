@@ -100,4 +100,4 @@ class ChoreNotification(models.Model):
 
     def __str__(self):
         recipient = self.recipient_user if self.recipient_user else self.recipient_other
-        return f"Notification to {recipient} for {self.chore} at {self.sent_at}"
+        return f"Notification to {recipient} for {self.chore} at {self.created_at}"

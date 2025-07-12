@@ -4,6 +4,7 @@ from io import StringIO
 
 import time_machine
 from django.core import mail
+from django.core.exceptions import ValidationError
 from django.core.management import call_command
 from django.test import TestCase
 
@@ -245,3 +246,581 @@ class CustomCommandTest(TestCase):
         self.assertIn(volunteeruser.email, email.to)
         self.assertIn("Volunteering reminder", email.subject)
         self.assertIn("friendly reminder that you signed up for", email.body)
+
+
+class ChoreModelTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            email="test@example.com",
+            password="testpass123",
+            first_name="Test",
+            last_name="User",
+        )
+
+    def test_chore_creation(self):
+        """Test basic chore creation"""
+        chore = Chore.objects.create(
+            name="Test Chore",
+            description="A test chore",
+            class_type="BasicChore",
+            configuration={"min_required_people": 1},
+            creator=self.user,
+        )
+        self.assertEqual(chore.name, "Test Chore")
+        self.assertEqual(chore.description, "A test chore")
+        self.assertEqual(chore.class_type, "BasicChore")
+        self.assertEqual(chore.creator, self.user)
+
+    def test_chore_str_representation(self):
+        """Test string representation of chore"""
+        chore = Chore.objects.create(
+            name="Test Chore",
+            description="A test chore",
+            class_type="BasicChore",
+            configuration={"min_required_people": 1},
+            creator=self.user,
+        )
+        self.assertEqual(str(chore), "Test Chore")
+
+    def test_chore_unique_name_constraint(self):
+        """Test that chore names must be unique"""
+        Chore.objects.create(
+            name="Test Chore",
+            description="A test chore",
+            class_type="BasicChore",
+            configuration={"min_required_people": 1},
+            creator=self.user,
+        )
+
+        with self.assertRaises(Exception):  # Should raise IntegrityError
+            Chore.objects.create(
+                name="Test Chore",  # Same name
+                description="Another test chore",
+                class_type="BasicChore",
+                configuration={"min_required_people": 1},
+                creator=self.user,
+            )
+
+
+class ChoreVolunteerModelTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            email="test@example.com",
+            password="testpass123",
+            first_name="Test",
+            last_name="User",
+        )
+        self.chore = Chore.objects.create(
+            name="Test Chore",
+            description="A test chore",
+            class_type="BasicChore",
+            configuration={"min_required_people": 1},
+            creator=self.user,
+        )
+
+    def test_chore_volunteer_creation(self):
+        """Test basic chore volunteer creation"""
+        volunteer = ChoreVolunteer.objects.create(
+            user=self.user,
+            chore=self.chore,
+            timestamp=1753041600,
+        )
+        self.assertEqual(volunteer.user, self.user)
+        self.assertEqual(volunteer.chore, self.chore)
+        self.assertEqual(volunteer.timestamp, 1753041600)
+
+    def test_chore_volunteer_properties(self):
+        """Test chore volunteer properties"""
+        volunteer = ChoreVolunteer.objects.create(
+            user=self.user,
+            chore=self.chore,
+            timestamp=1753041600,
+        )
+        self.assertEqual(volunteer.first_name, "Test")
+        self.assertEqual(volunteer.full_name, "Test User")
+
+
+class ChoreNotificationModelTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            email="test@example.com",
+            password="testpass123",
+            first_name="Test",
+            last_name="User",
+        )
+        self.chore = Chore.objects.create(
+            name="Test Chore",
+            description="A test chore",
+            class_type="BasicChore",
+            configuration={"min_required_people": 1},
+            creator=self.user,
+        )
+
+    def test_notification_with_user_recipient(self):
+        """Test notification creation with user recipient"""
+        notification = ChoreNotification.objects.create(
+            event_key="test-key-123",
+            chore=self.chore,
+            recipient_user=self.user,
+        )
+        self.assertEqual(notification.event_key, "test-key-123")
+        self.assertEqual(notification.chore, self.chore)
+        self.assertEqual(notification.recipient_user, self.user)
+        self.assertIsNone(notification.recipient_other)
+
+    def test_notification_with_email_recipient(self):
+        """Test notification creation with email recipient"""
+        notification = ChoreNotification.objects.create(
+            event_key="test-key-456",
+            chore=self.chore,
+            recipient_other="test@example.com",
+        )
+        self.assertEqual(notification.event_key, "test-key-456")
+        self.assertEqual(notification.chore, self.chore)
+        self.assertIsNone(notification.recipient_user)
+        self.assertEqual(notification.recipient_other, "test@example.com")
+
+    def test_notification_validation_both_recipients(self):
+        """Test that notification cannot have both user and email recipients"""
+        notification = ChoreNotification(
+            event_key="test-key-789",
+            chore=self.chore,
+            recipient_user=self.user,
+            recipient_other="test@example.com",
+        )
+        with self.assertRaises(ValidationError):
+            notification.clean()
+
+    def test_notification_validation_no_recipients(self):
+        """Test that notification must have at least one recipient"""
+        notification = ChoreNotification(
+            event_key="test-key-789",
+            chore=self.chore,
+        )
+        with self.assertRaises(ValidationError):
+            notification.clean()
+
+    def test_notification_str_representation(self):
+        """Test string representation of notification"""
+        notification = ChoreNotification.objects.create(
+            event_key="test-key-123",
+            chore=self.chore,
+            recipient_user=self.user,
+        )
+        self.assertIn("Notification to", str(notification))
+        self.assertIn("Test User", str(notification))
+        self.assertIn("Test Chore", str(notification))
+
+
+class SingleOccurrenceChoreTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            email="test@example.com",
+            password="testpass123",
+            first_name="Test",
+            last_name="User",
+        )
+
+    @time_machine.travel("2025-07-10 19:56")
+    def test_single_occurrence_chore_reminder(self):
+        """Test reminder for single occurrence chore"""
+        nudge_destination = "deelnemers@makerspaceleiden.nl"
+        Chore.objects.create(
+            name="Single Event Chore",
+            description="A one-time chore",
+            class_type="BasicChore",
+            configuration={
+                "min_required_people": 1,
+                "events_generation": {
+                    "event_type": "single_occurrence",
+                    "event_time": "21/7/2025 8:00",
+                },
+                "reminders": [
+                    {
+                        "reminder_type": "missing_volunteers",
+                        "when": {"days_before": 10, "time": "17:00"},
+                        "nudges": [
+                            {
+                                "nudge_type": "email",
+                                "nudge_key": "single_occurrence_reminder",
+                                "destination": nudge_destination,
+                                "subject_template": "Single event reminder",
+                                "body_template": "Reminder for single event: {event_day}",
+                            }
+                        ],
+                    },
+                ],
+            },
+            creator=self.user,
+        )
+
+        out = StringIO()
+        call_command("send_reminders", stdout=out)
+
+        # Should not send reminder since event is in the future
+        self.assertEqual(len(mail.outbox), 0)
+        self.assertEqual(ChoreNotification.objects.count(), 0)
+
+
+class NoVolunteersNeededTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            email="test@example.com",
+            password="testpass123",
+            first_name="Test",
+            last_name="User",
+        )
+
+    @time_machine.travel("2025-07-10 19:56")
+    def test_no_reminder_when_volunteers_exist(self):
+        """Test that no reminder is sent when volunteers are already signed up"""
+        nudge_destination = "deelnemers@makerspaceleiden.nl"
+        chore = Chore.objects.create(
+            name="Test Chore",
+            description="A test chore",
+            class_type="BasicChore",
+            configuration={
+                "min_required_people": 1,
+                "events_generation": {
+                    "event_type": "recurrent",
+                    "starting_time": "21/7/2021 8:00",
+                    "crontab": "0 22 * * sun",
+                    "take_one_every": 2,
+                },
+                "reminders": [
+                    {
+                        "reminder_type": "missing_volunteers",
+                        "when": {"days_before": 10, "time": "17:00"},
+                        "nudges": [
+                            {
+                                "nudge_type": "email",
+                                "nudge_key": "gentle_email_reminder",
+                                "destination": nudge_destination,
+                                "subject_template": "Test reminder",
+                                "body_template": "Test body",
+                            }
+                        ],
+                    },
+                ],
+            },
+            creator=self.user,
+        )
+
+        # Create a volunteer
+        volunteer_user = User.objects.create_user(
+            email="volunteer@example.com",
+            password="testpass123",
+            first_name="Volunteer",
+            last_name="User",
+        )
+        ChoreVolunteer.objects.create(
+            user=volunteer_user,
+            chore=chore,
+            timestamp=1753041600,
+        )
+
+        out = StringIO()
+        call_command("send_reminders", stdout=out)
+
+        # Should not send reminder since volunteer is already signed up
+        self.assertEqual(len(mail.outbox), 0)
+        self.assertEqual(ChoreNotification.objects.count(), 0)
+
+
+class InvalidChoreTypeTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            email="test@example.com",
+            password="testpass123",
+            first_name="Test",
+            last_name="User",
+        )
+
+    def test_invalid_chore_type_raises_exception(self):
+        """Test that invalid chore type raises exception"""
+        Chore.objects.create(
+            name="Test Chore",
+            description="A test chore",
+            class_type="InvalidChoreType",
+            configuration={"min_required_people": 1},
+            creator=self.user,
+        )
+
+        out = StringIO()
+        with self.assertRaises(
+            Exception
+        ):  # Should raise exception for invalid chore type
+            call_command("send_reminders", stdout=out)
+
+
+class InvalidReminderTypeTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            email="test@example.com",
+            password="testpass123",
+            first_name="Test",
+            last_name="User",
+        )
+
+    def test_invalid_reminder_type_raises_exception(self):
+        """Test that invalid reminder type raises exception"""
+        Chore.objects.create(
+            name="Test Chore",
+            description="A test chore",
+            class_type="BasicChore",
+            configuration={
+                "min_required_people": 1,
+                "events_generation": {
+                    "event_type": "recurrent",
+                    "starting_time": "21/7/2021 8:00",
+                    "crontab": "0 22 * * sun",
+                    "take_one_every": 2,
+                },
+                "reminders": [
+                    {
+                        "reminder_type": "invalid_reminder_type",
+                        "when": {"days_before": 10, "time": "17:00"},
+                    },
+                ],
+            },
+            creator=self.user,
+        )
+
+        out = StringIO()
+        with self.assertRaises(
+            Exception
+        ):  # Should raise exception for invalid reminder type
+            call_command("send_reminders", stdout=out)
+
+
+class MultipleVolunteersTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            email="test@example.com",
+            password="testpass123",
+            first_name="Test",
+            last_name="User",
+        )
+
+    @time_machine.travel("2025-07-13 21:56")
+    def test_multiple_volunteers_reminder(self):
+        """Test reminder for multiple volunteers"""
+        chore = Chore.objects.create(
+            name="Test Chore",
+            description="A test chore",
+            class_type="BasicChore",
+            configuration={
+                "min_required_people": 2,
+                "events_generation": {
+                    "event_type": "recurrent",
+                    "starting_time": "21/7/2021 8:00",
+                    "crontab": "0 22 * * sun",
+                    "take_one_every": 2,
+                },
+                "reminders": [
+                    {
+                        "reminder_type": "volunteers_who_signed_up",
+                        "when": {"days_before": 7, "time": "19:00"},
+                    },
+                ],
+            },
+            creator=self.user,
+        )
+
+        # Create multiple volunteers
+        volunteer1 = User.objects.create_user(
+            email="volunteer1@example.com",
+            password="testpass123",
+            first_name="Volunteer1",
+            last_name="User",
+        )
+        volunteer2 = User.objects.create_user(
+            email="volunteer2@example.com",
+            password="testpass123",
+            first_name="Volunteer2",
+            last_name="User",
+        )
+
+        ChoreVolunteer.objects.create(
+            user=volunteer1,
+            chore=chore,
+            timestamp=1753041600,
+        )
+        ChoreVolunteer.objects.create(
+            user=volunteer2,
+            chore=chore,
+            timestamp=1753041600,
+        )
+
+        out = StringIO()
+        call_command("send_reminders", stdout=out)
+
+        # Should send reminders to both volunteers
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertEqual(ChoreNotification.objects.count(), 2)
+
+        # Check that both volunteers received notifications
+        notification_emails = [email.to[0] for email in mail.outbox]
+        self.assertIn("volunteer1@example.com", notification_emails)
+        self.assertIn("volunteer2@example.com", notification_emails)
+
+
+class MultipleChoresTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            email="test@example.com",
+            password="testpass123",
+            first_name="Test",
+            last_name="User",
+        )
+
+    @time_machine.travel("2025-07-10 19:56")
+    def test_multiple_chores_processed(self):
+        """Test that multiple chores are processed correctly"""
+        # Create multiple chores
+        chore1 = Chore.objects.create(
+            name="Chore 1",
+            description="First test chore",
+            class_type="BasicChore",
+            configuration={
+                "min_required_people": 1,
+                "events_generation": {
+                    "event_type": "recurrent",
+                    "starting_time": "21/7/2021 8:00",
+                    "crontab": "0 22 * * sun",
+                    "take_one_every": 2,
+                },
+                "reminders": [
+                    {
+                        "reminder_type": "missing_volunteers",
+                        "when": {"days_before": 10, "time": "17:00"},
+                        "nudges": [
+                            {
+                                "nudge_type": "email",
+                                "nudge_key": "chore1_reminder",
+                                "destination": "deelnemers@makerspaceleiden.nl",
+                                "subject_template": "Chore 1 reminder",
+                                "body_template": "Reminder for chore 1",
+                            }
+                        ],
+                    },
+                ],
+            },
+            creator=self.user,
+        )
+
+        chore2 = Chore.objects.create(
+            name="Chore 2",
+            description="Second test chore",
+            class_type="BasicChore",
+            configuration={
+                "min_required_people": 1,
+                "events_generation": {
+                    "event_type": "recurrent",
+                    "starting_time": "21/7/2021 8:00",
+                    "crontab": "0 22 * * sun",
+                    "take_one_every": 2,
+                },
+                "reminders": [
+                    {
+                        "reminder_type": "missing_volunteers",
+                        "when": {"days_before": 10, "time": "17:00"},
+                        "nudges": [
+                            {
+                                "nudge_type": "email",
+                                "nudge_key": "chore2_reminder",
+                                "destination": "deelnemers@makerspaceleiden.nl",
+                                "subject_template": "Chore 2 reminder",
+                                "body_template": "Reminder for chore 2",
+                            }
+                        ],
+                    },
+                ],
+            },
+            creator=self.user,
+        )
+
+        out = StringIO()
+        call_command("send_reminders", stdout=out)
+
+        # Should send reminders for both chores
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertEqual(ChoreNotification.objects.count(), 2)
+
+        # Check that both chores generated notifications
+        notification_chores = [
+            notification.chore for notification in ChoreNotification.objects.all()
+        ]
+        self.assertIn(chore1, notification_chores)
+        self.assertIn(chore2, notification_chores)
+
+
+class NoChoresTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            email="test@example.com",
+            password="testpass123",
+            first_name="Test",
+            last_name="User",
+        )
+
+    @time_machine.travel("2025-07-10 19:56")
+    def test_no_chores_no_emails(self):
+        """Test that no emails are sent when no chores exist"""
+        out = StringIO()
+        call_command("send_reminders", stdout=out)
+
+        # Should not send any emails when no chores exist
+        self.assertEqual(len(mail.outbox), 0)
+        self.assertEqual(ChoreNotification.objects.count(), 0)
+
+
+class FutureEventTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            email="test@example.com",
+            password="testpass123",
+            first_name="Test",
+            last_name="User",
+        )
+
+    @time_machine.travel("2025-07-10 19:56")
+    def test_future_event_no_reminder(self):
+        """Test that no reminder is sent for future events"""
+        Chore.objects.create(
+            name="Future Chore",
+            description="A chore with future events",
+            class_type="BasicChore",
+            configuration={
+                "min_required_people": 1,
+                "events_generation": {
+                    "event_type": "recurrent",
+                    "starting_time": "21/7/2025 8:00",  # Future date
+                    "crontab": "0 22 * * sun",
+                    "take_one_every": 2,
+                },
+                "reminders": [
+                    {
+                        "reminder_type": "missing_volunteers",
+                        "when": {"days_before": 10, "time": "17:00"},
+                        "nudges": [
+                            {
+                                "nudge_type": "email",
+                                "nudge_key": "future_reminder",
+                                "destination": "deelnemers@makerspaceleiden.nl",
+                                "subject_template": "Future reminder",
+                                "body_template": "Future reminder body",
+                            }
+                        ],
+                    },
+                ],
+            },
+            creator=self.user,
+        )
+
+        out = StringIO()
+        call_command("send_reminders", stdout=out)
+
+        # Should not send reminder for future events
+        self.assertEqual(len(mail.outbox), 0)
+        self.assertEqual(ChoreNotification.objects.count(), 0)

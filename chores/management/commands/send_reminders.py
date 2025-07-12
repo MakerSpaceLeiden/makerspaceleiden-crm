@@ -27,13 +27,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         chores = Chore.objects.all()
-        print("LADEBUG.handle", len(chores))
+        logger.debug("handle", len(chores))
         chores_logic = ChoresLogic(chores)
         now = Clock.now()
-        events = chores_logic.get_events_from_to(now, now.add(90, "days"))
-
-        print("event count:")
-        print(len(events))
 
         # Configuration lifted from aggregator
         self.chores_warnings_check_window_in_hours = 2
@@ -44,7 +40,7 @@ class Command(BaseCommand):
         ):
             ## LAFIXME: this should query based on event key
             volunteers = ChoreVolunteer.objects.all()
-            print("LADEBUG.volunteers", len(volunteers))
+            logger.debug("volunteers", len(volunteers))
             params = NudgesParams(
                 volunteers,
                 now,
@@ -53,9 +49,9 @@ class Command(BaseCommand):
             )
             for nudge in event.iter_nudges(params):
                 logger.info("Processing Chore nudge: {0}".format(nudge))
-                print("LADEBUG.Processing Chore nudge: {0}".format(nudge))
+                logger.debug("Processing Chore nudge: {0}".format(nudge))
                 # Prevent multiple notifications using ChoreNotification
-                print("LADEBUG.nudge.get_string_key", nudge.get_string_key())
+                logger.debug("nudge.get_string_key", nudge.get_string_key())
                 nudge.send(self, logger)
 
         self.stdout.write("Sending notifications")
@@ -236,7 +232,7 @@ class EmailNudge(BaseNudge):
 
     def send(self, aggregator, logger):
         logger.info("Sending email nudge to: {0}".format(self.destination))
-        print("LADEBUG.EmailNudge.send", self.destination)
+        logger.debug("EmailNudge.send", self.destination)
 
         if self.should_send(self.get_string_key()):
             EmailMessage(
@@ -273,11 +269,6 @@ class VolunteerViaChatBotNudge(BaseNudge):
         users = aggregator.get_users_seen_no_later_than_days(
             self.message_users_seen_no_later_than_days, logger
         )
-        print(
-            "LADEBUG.Sending Chat BOT nudge to: {0}".format(
-                ", ".join(["{0}".format(u.full_name) for u in users])
-            )
-        )
         logger.info(
             "Sending Chat BOT nudge to: {0}".format(
                 ", ".join(["{0}".format(u.full_name) for u in users])
@@ -285,6 +276,7 @@ class VolunteerViaChatBotNudge(BaseNudge):
         )
         for user in users:
             print(user)
+            # LADEBUG: FIXME
             # aggregator.send_user_notification(
             #     user,
             #     AskForVolunteeringNotification(user, self.event, self.urls),
@@ -302,18 +294,19 @@ class VolunteerReminderViaChatBotNudge(BaseNudge):
         return "Volunteer reminder via Chat BOT: {0}".format(self.event.chore.name)
 
     def send(self, aggregator, _logger):
-        print("LADEBUG.VolunteerReminderViaChatBotNudge.Send", len(self.volunteers))
+        logger.debug("VolunteerReminderViaChatBotNudge.Send", len(self.volunteers))
         logger.info(
             "Sending volunteering reminder to: {0}".format(
                 ", ".join(["{0}".format(u.full_name) for u in self.volunteers])
             )
         )
         for choreVolunteer in self.volunteers:
-            if self.should_send(self.get_string_key()):
-                print(
-                    "LADEBUG.aggregator.send_user_notification.{0}".format(
-                        choreVolunteer.user
-                    )
+            notification_key = self.get_string_key() + "-{0}".format(
+                choreVolunteer.user.id
+            )
+            if self.should_send(notification_key):
+                logger.debug(
+                    "aggregator.send_user_notification.{0}".format(choreVolunteer.user)
                 )
                 message = VolunteeringReminderNotification(
                     choreVolunteer.user, self.event
@@ -324,7 +317,7 @@ class VolunteerReminderViaChatBotNudge(BaseNudge):
                     to=[choreVolunteer.user.email],
                     from_email="MakerSpace BOT <noc@makerspaceleiden.nl>",
                 ).send()
-                self.record_send(self.get_string_key(), choreVolunteer.user)
+                self.record_send(notification_key, choreVolunteer.user)
 
 
 class MissingVolunteersReminder(object):
@@ -375,34 +368,23 @@ class ChoresLogic(object):
     def get_events_from_to(self, ts_from, ts_to):
         events = []
         for chore in self.chores:
-            print("LADEBUG:chore", ts_from, ts_to)
             events.extend(chore.iter_events_from_to(ts_from, ts_to))
-            print("LADEBUG:Events.after", len(events))
 
         events.sort(key=lambda c: c.ts)
         return events
 
     def iter_events_with_reminders_from_to(self, ts_from, ts_to):
-        print("LADEBUG.iter_events_with_reminders_from_to", ts_from, ts_to)
+        logger.debug("iter_events_with_reminders_from_to", ts_from, ts_to)
         num_days_of_earliest_reminder = max(
             [0] + [chore.get_num_days_of_earliest_reminder() for chore in self.chores]
         )
         for event in self.get_events_from_to(
             ts_from, ts_to.add(num_days_of_earliest_reminder + 1, "days")
         ):
-            print("LADEBUG.get_events_from_to.event", event)
+            logger.debug("get_events_from_to.event", event)
             for reminder in event.chore.reminders:
-                print("LADEBUG.event.chore.reminders", reminder)
+                logger.debug("event.chore.reminders", reminder)
                 reminder_time = calculate_reminder_time(event, reminder.when)
-                print(
-                    "LADEBUG.event.chore.reminders.yield?",
-                    {
-                        "ts_from": ts_from,
-                        "reminder_time": reminder_time,
-                        "ts_to": ts_to,
-                        "test": ts_from <= reminder_time <= ts_to,
-                    },
-                )
                 if ts_from <= reminder_time <= ts_to:
                     yield event
 
@@ -423,7 +405,7 @@ def build_chore_instance(chore):
 
 
 def build_reminder(min_required_people, reminder_type, when, nudges=None):
-    print("LADEBUG.build_reminder", reminder_type, when)
+    logger.debug("build_reminder", reminder_type, when)
     if reminder_type == "missing_volunteers":
         return MissingVolunteersReminder(min_required_people, when, nudges)
     if reminder_type == "volunteers_who_signed_up":
@@ -437,7 +419,7 @@ def parse_hhmm(hhmm_str):
 
 
 def calculate_reminder_time(event, when):
-    print("LADEBUG.calculate_reminder_time", event, when)
+    logger.debug("calculate_reminder_time", event, when)
     hh, mm = parse_hhmm(when["time"])
     reminder_time = event.ts.add(-when["days_before"], "days").replace(
         hour=hh, minute=mm
