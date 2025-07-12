@@ -2,19 +2,13 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
-from members.models import User
-
 from ..models import Chore, ChoreNotification, ChoreVolunteer
+from .factories import UserFactory
 
 
 class ChoreModelTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(
-            email="test@example.com",
-            password="testpass123",
-            first_name="Test",
-            last_name="User",
-        )
+        self.user = UserFactory()
 
     def test_chore_creation(self):
         """Test basic chore creation"""
@@ -63,12 +57,7 @@ class ChoreModelTest(TestCase):
 
 class ChoreVolunteerModelTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(
-            email="test@example.com",
-            password="testpass123",
-            first_name="Test",
-            last_name="User",
-        )
+        self.user = UserFactory()
         self.chore = Chore.objects.create(
             name="Test Chore",
             description="A test chore",
@@ -95,18 +84,13 @@ class ChoreVolunteerModelTest(TestCase):
             chore=self.chore,
             timestamp=1753041600,
         )
-        self.assertEqual(volunteer.first_name, "Test")
-        self.assertEqual(volunteer.full_name, "Test User")
+        self.assertEqual(volunteer.first_name, self.user.first_name)
+        self.assertEqual(volunteer.full_name, self.user.full_name)
 
 
 class ChoreNotificationModelTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(
-            email="test@example.com",
-            password="testpass123",
-            first_name="Test",
-            last_name="User",
-        )
+        self.user = self.user = UserFactory()
         self.chore = Chore.objects.create(
             name="Test Chore",
             description="A test chore",
@@ -167,5 +151,5 @@ class ChoreNotificationModelTest(TestCase):
             recipient_user=self.user,
         )
         self.assertIn("Notification to", str(notification))
-        self.assertIn("Test User", str(notification))
+        self.assertIn(self.user.full_name, str(notification))
         self.assertIn("Test Chore", str(notification))

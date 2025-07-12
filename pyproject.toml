@@ -45,6 +45,7 @@ dependencies = [
     "croniter>=6.0.0",
     "humanize>=4.12.3",
     "time-machine>=2.16.0",
+    "factory-boy>=3.3.3",
 ]
 
 [dependency-groups]

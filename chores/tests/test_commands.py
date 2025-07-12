@@ -4,23 +4,17 @@ from io import StringIO
 
 import time_machine
 from django.core import mail
-from django.core.exceptions import ValidationError
 from django.core.management import call_command
 from django.test import TestCase
 
-from members.models import User
-
 from ..models import Chore, ChoreNotification, ChoreVolunteer
+from .factories import UserFactory
 
 
 class CustomCommandTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(
+        self.user = UserFactory(
             email="chore.author@example.com",
-            password="testpass123",
-            first_name="Task",
-            last_name="User",
-            telegram_user_id="987654321",
         )
 
     @time_machine.travel("2025-07-10 19:56")
@@ -218,12 +212,8 @@ class CustomCommandTest(TestCase):
             },
             creator=self.user,
         )
-        volunteeruser = User.objects.create_user(
+        volunteeruser = UserFactory(
             email="chore.volunteer@example.com",
-            password="testpass123",
-            first_name="Task",
-            last_name="Volunteer",
-            telegram_user_id="987654322",
         )
         ChoreVolunteer.objects.create(
             user=volunteeruser, chore=chore, timestamp=1753041600
@@ -247,14 +237,10 @@ class CustomCommandTest(TestCase):
         self.assertIn("Volunteering reminder", email.subject)
         self.assertIn("friendly reminder that you signed up for", email.body)
 
+
 class SingleOccurrenceChoreTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(
-            email="test@example.com",
-            password="testpass123",
-            first_name="Test",
-            last_name="User",
-        )
+        self.user = UserFactory()
 
     @time_machine.travel("2025-07-10 19:56")
     def test_single_occurrence_chore_reminder(self):
@@ -299,12 +285,7 @@ class SingleOccurrenceChoreTest(TestCase):
 
 class NoVolunteersNeededTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(
-            email="test@example.com",
-            password="testpass123",
-            first_name="Test",
-            last_name="User",
-        )
+        self.user = UserFactory()
 
     @time_machine.travel("2025-07-10 19:56")
     def test_no_reminder_when_volunteers_exist(self):
@@ -342,12 +323,7 @@ class NoVolunteersNeededTest(TestCase):
         )
 
         # Create a volunteer
-        volunteer_user = User.objects.create_user(
-            email="volunteer@example.com",
-            password="testpass123",
-            first_name="Volunteer",
-            last_name="User",
-        )
+        volunteer_user = UserFactory()
         ChoreVolunteer.objects.create(
             user=volunteer_user,
             chore=chore,
@@ -364,12 +340,7 @@ class NoVolunteersNeededTest(TestCase):
 
 class InvalidChoreTypeTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(
-            email="test@example.com",
-            password="testpass123",
-            first_name="Test",
-            last_name="User",
-        )
+        self.user = UserFactory()
 
     def test_invalid_chore_type_raises_exception(self):
         """Test that invalid chore type raises exception"""
@@ -390,12 +361,7 @@ class InvalidChoreTypeTest(TestCase):
 
 class InvalidReminderTypeTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(
-            email="test@example.com",
-            password="testpass123",
-            first_name="Test",
-            last_name="User",
-        )
+        self.user = UserFactory()
 
     def test_invalid_reminder_type_raises_exception(self):
         """Test that invalid reminder type raises exception"""
@@ -430,12 +396,7 @@ class InvalidReminderTypeTest(TestCase):
 
 class MultipleVolunteersTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(
-            email="test@example.com",
-            password="testpass123",
-            first_name="Test",
-            last_name="User",
-        )
+        self.user = UserFactory()
 
     @time_machine.travel("2025-07-13 21:56")
     def test_multiple_volunteers_reminder(self):
@@ -463,17 +424,11 @@ class MultipleVolunteersTest(TestCase):
         )
 
         # Create multiple volunteers
-        volunteer1 = User.objects.create_user(
+        volunteer1 = UserFactory(
             email="volunteer1@example.com",
-            password="testpass123",
-            first_name="Volunteer1",
-            last_name="User",
         )
-        volunteer2 = User.objects.create_user(
+        volunteer2 = UserFactory(
             email="volunteer2@example.com",
-            password="testpass123",
-            first_name="Volunteer2",
-            last_name="User",
         )
 
         ChoreVolunteer.objects.create(
@@ -496,18 +451,13 @@ class MultipleVolunteersTest(TestCase):
 
         # Check that both volunteers received notifications
         notification_emails = [email.to[0] for email in mail.outbox]
-        self.assertIn("volunteer1@example.com", notification_emails)
-        self.assertIn("volunteer2@example.com", notification_emails)
+        self.assertIn(volunteer1.email, notification_emails)
+        self.assertIn(volunteer2.email, notification_emails)
 
 
 class MultipleChoresTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(
-            email="test@example.com",
-            password="testpass123",
-            first_name="Test",
-            last_name="User",
-        )
+        self.user = UserFactory()
 
     @time_machine.travel("2025-07-10 19:56")
     def test_multiple_chores_processed(self):
@@ -592,12 +542,7 @@ class MultipleChoresTest(TestCase):
 
 class NoChoresTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(
-            email="test@example.com",
-            password="testpass123",
-            first_name="Test",
-            last_name="User",
-        )
+        self.user = UserFactory()
 
     @time_machine.travel("2025-07-10 19:56")
     def test_no_chores_no_emails(self):
@@ -612,12 +557,7 @@ class NoChoresTest(TestCase):
 
 class FutureEventTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(
-            email="test@example.com",
-            password="testpass123",
-            first_name="Test",
-            last_name="User",
-        )
+        self.user = UserFactory()
 
     @time_machine.travel("2025-07-10 19:56")
     def test_future_event_no_reminder(self):
@@ -665,12 +605,7 @@ class VolunteerCrossContaminationTest(TestCase):
     """Test the defect where volunteers from one chore incorrectly affect another chore's reminder logic"""
 
     def setUp(self):
-        self.user = User.objects.create_user(
-            email="test@example.com",
-            password="testpass123",
-            first_name="Test",
-            last_name="User",
-        )
+        self.user = UserFactory()
 
     @time_machine.travel("2025-07-10 19:56")
     def test_volunteer_cross_contamination_defect(self):
@@ -740,12 +675,7 @@ class VolunteerCrossContaminationTest(TestCase):
         )
 
         # Create a volunteer for chore1 only
-        volunteer = User.objects.create_user(
-            email="volunteer@example.com",
-            password="testpass123",
-            first_name="Volunteer",
-            last_name="User",
-        )
+        volunteer = UserFactory()
         ChoreVolunteer.objects.create(
             user=volunteer,
             chore=chore1,  # Only volunteer for chore1
