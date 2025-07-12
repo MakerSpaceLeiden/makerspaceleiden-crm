@@ -251,39 +251,7 @@ class EmailNudge(BaseNudge):
         return self.body + "\n"
 
 
-class VolunteerViaChatBotNudge(BaseNudge):
-    def __init__(self, event, nudge, params):
-        super().__init__(event)
-        self.nudge = nudge
-        self.nudge_key = nudge["nudge_key"]
-        self.message_users_seen_no_later_than_days = (
-            params.message_users_seen_no_later_than_days
-        )
-        self.urls = params.urls
-
-    def __str__(self):
-        return "Chat BOT nudge: {0}".format(self.event.chore.name)
-
-    def send(self, aggregator, logger):
-        users = aggregator.get_users_seen_no_later_than_days(
-            self.message_users_seen_no_later_than_days, logger
-        )
-        logger.info(
-            "Sending Chat BOT nudge to: {0}".format(
-                ", ".join(["{0}".format(u.full_name) for u in users])
-            )
-        )
-        for user in users:
-            print(user)
-            # LADEBUG: FIXME
-            # aggregator.send_user_notification(
-            #     user,
-            #     AskForVolunteeringNotification(user, self.event, self.urls),
-            #     logger,
-            # )
-
-
-class VolunteerReminderViaChatBotNudge(BaseNudge):
+class VolunteersReminderNudge(BaseNudge):
     def __init__(self, event, params):
         super().__init__(event)
         self.volunteers = params.volunteers
@@ -293,7 +261,7 @@ class VolunteerReminderViaChatBotNudge(BaseNudge):
         return "Volunteer reminder via Chat BOT: {0}".format(self.event.chore.name)
 
     def send(self, aggregator, _logger):
-        logger.debug("VolunteerReminderViaChatBotNudge.Send", len(self.volunteers))
+        logger.debug("VolunteersReminderNudge.Send", len(self.volunteers))
         logger.info(
             "Sending volunteering reminder to: {0}".format(
                 ", ".join(["{0}".format(u.full_name) for u in self.volunteers])
@@ -331,8 +299,8 @@ class MissingVolunteersReminder(object):
             for nudge in self.nudges:
                 if nudge["nudge_type"] == "email":
                     yield self._build_email_nudge(event, nudge, params)
-                if nudge["nudge_type"] == "volunteer_via_chat_bot":
-                    yield VolunteerViaChatBotNudge(event, nudge, params)
+                else:
+                    logger.warn("Unsupported nudge type", nudge["nudge_type"])
 
     def _build_email_nudge(self, event, nudge, params):
         template_data = {
@@ -357,7 +325,7 @@ class VolunteersReminder(object):
     def iter_nudges(self, event, params):
         reminder_time = calculate_reminder_time(event, self.when)
         if params.now > reminder_time:
-            yield VolunteerReminderViaChatBotNudge(event, params)
+            yield VolunteersReminderNudge(event, params)
 
 
 class ChoresLogic(object):
