@@ -2,21 +2,20 @@
 
 {% block content %}
 
-<p>
-    Below is the list of chores for the next 3 months.
-</p>
-<p>
-    Please sign up for the activities you can help with. If a chore is getting close and nobody has signed up yet, the system will send out reminders.
-</p>
-<p>
-    For the engineers - this data is also accessible as a JSON from <code><a href="{% url "chores_api"%}">{% url "chores_api"%}</a></code>.
-</p>
-
 <div class="row">
 	<div class="col-xl-12 col-lg-12 col-sm-12">
 	<!-- Chores -->
     <div class="pt-0 pb-1">
         {% if event_groups %}
+            <p>
+                Below is the list of chores for the next 3 months.
+            </p>
+            <p>
+                Please sign up for the activities you can help with. If a chore is getting close and nobody has signed up yet, the system will send out reminders.
+            </p>
+            <p>
+                For the engineers - this data is also accessible as a JSON from <code><a href="{% url "chores_api"%}">{% url "chores_api"%}</a></code>.
+            </p>
             <div class="card mt-2 mb-2">
                 <ul class="list-group list-group-flush pt-0 pb-0">
                     {% for group in event_groups %}
@@ -47,15 +46,20 @@
                                                 <li style="list-style-type: none; padding-bottom:0 !important">
                                                     <div>
                                                         {% if volunteer == 'offer_volunteering' %}
-                                                            <a href="{% url 'signup_chore' chore_id=event.chore.chore_id ts=event.when.timestamp %}?redirect_to=chores" class="btn btn-outline-secondary btn-sm">Add me as volunteer</a>
+                                                            <a href="{% url 'signup_chore' chore_id=event.chore.chore_id ts=event.when.timestamp %}?redirect_to=chores"
+                                                                class="btn btn-outline-secondary btn-sm"
+                                                                data-test-hook="chores-volunteer-button">
+                                                                Add me as volunteer
+                                                            </a>
                                                         {% elif volunteer is None %}
                                                             <i>Volunteer needed</i>
                                                         {% elif volunteer.id  %}
-                                                            Volunteer:
-                                                            <a href="{{volunteer.path}}">
-                                                                {{ volunteer.first_name }}
-                                                            </a>
-
+                                                            <div data-test-hook="chores-volunteer">
+                                                                Volunteer:
+                                                                <a href="{{volunteer.path}}">
+                                                                    {{ volunteer.first_name }}
+                                                                </a>
+                                                            </div>
                                                         {% endif %}
                                                     </div>
                                                 </li>
@@ -65,7 +69,10 @@
                                             {% if event.user_volunteered %}
                                                 <li style="list-style-type: none; margin-top: 0.3em; padding-bottom:0 !important">
                                                     <div>
-                                                        <a href="{% url 'remove_signup_chore' chore_id=event.chore.chore_id ts=event.when.timestamp %}?redirect_to=chores" class="btn btn-outline-secondary btn-sm">Remove me as volunteer</a>
+                                                        <a href="{% url 'remove_signup_chore' chore_id=event.chore.chore_id ts=event.when.timestamp %}?redirect_to=chores"
+                                                            class="btn btn-outline-secondary btn-sm"
+                                                            data-test-hook="chores-remove-volunteer">
+                                                            Remove me as volunteer</a>
                                                     </div>
                                                 </li>
                                             {% endif %}
@@ -78,7 +85,13 @@
                 </ul>
             </div>
         {% else %}
-            No upcoming tasks for the next 2 weeks, view all upcoming chores <a href="{% url 'chores' %}" class="chores-link">here</a>.
+            <div data-test-hook="empty-chores" class="mt-2">
+                <p>No upcoming tasks for the next 3 months.</p>
+                <p>
+                    As a busy space with plenty to do that seems unlikely.<br/>
+                Something may be broken, let <a href="mailto:noc@makerspaceleiden.nl">noc@makerspaceleiden.nl</a>
+                </p>
+            </div>
         {% endif %}
     </div>
     </div>

@@ -24,7 +24,6 @@ dependencies = [
     "reportlab>=4.0.7,<5",
     "pypdf2>=3.0.1,<4",
     "lxml>=5.0.0,<6",
-    "jsonfield2>=4.0.0.post0,<5",
     "django-money>=3.4.0,<4",
     "requests>=2.32.2,<3",
     "python-dateutil>=2.8.2,<3",
@@ -42,6 +41,11 @@ dependencies = [
     "pycryptodome>=3.22.0",
     "django-sendmail-backend>=0.1.2",
     "django-oauth-toolkit>=3.0.1",
+    "croniter>=6.0.0",
+    "humanize>=4.12.3",
+    "time-machine>=2.16.0",
+    "factory-boy>=3.3.3",
+    "jsonfield2>=4.0.0.post0",
 ]
 
 [dependency-groups]

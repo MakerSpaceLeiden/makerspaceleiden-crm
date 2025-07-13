@@ -1,0 +1,96 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "chores": {
+      "type": "array",
+      "uniqueItems": true,
+      "minItems": 1,
+      "items": {
+        "required": ["ts_str", "timestamp"],
+        "properties": {
+          "ts_str": {
+            "type": "string",
+            "minLength": 1
+          },
+          "timestamp": {
+            "type": "number"
+          },
+          "events": {
+            "type": "array",
+            "uniqueItems": true,
+            "minItems": 1,
+            "items": {
+              "required": ["time_str", "wiki_url"],
+              "properties": {
+                "chore": {
+                  "type": "object",
+                  "properties": {
+                    "chore_id": {
+                      "type": "number"
+                    },
+                    "description": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "min_required_people": {
+                      "type": "number"
+                    },
+                    "name": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "chore_id",
+                    "description",
+                    "min_required_people",
+                    "name"
+                  ]
+                },
+                "when": {
+                  "type": "object",
+                  "properties": {
+                    "human_str": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "timestamp": {
+                      "type": "number"
+                    }
+                  },
+                  "required": ["human_str", "timestamp"]
+                },
+                "time_str": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "volunteers": {
+                  "type": "array",
+                  "items": {
+                    "required": [],
+                    "properties": {}
+                  }
+                },
+                "wiki_url": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "required": ["title", "version", "chores"]
+}

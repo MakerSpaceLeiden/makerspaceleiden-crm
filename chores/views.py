@@ -12,20 +12,24 @@ from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.template.loader import render_to_string
 
-from selfservice.aggregator_adapter import get_aggregator_adapter
-
+from .core import ChoreEventsLogic, Time
 from .models import Chore, ChoreVolunteer
 
 logger = logging.getLogger(__name__)
 
+NUMBER_OF_DAYS_AHEAD = 90
+
+
+def chores_get_all_from(now):
+    then = now + (NUMBER_OF_DAYS_AHEAD * 24 * 60 * 60)  # Add 14 days
+    chores = Chore.objects.all()
+    data = ChoreEventsLogic(chores).get_events_from_to(
+        Time.from_timestamp(now), Time.from_timestamp(then)
+    )
+    return [e.for_json() for e in data]
+
 
 def getall(current_user_id=None, subset=None):
-    aggregator_adapter = get_aggregator_adapter()
-    if not aggregator_adapter:
-        return HttpResponse(
-            "No aggregator configuration found", status=500, content_type="text/plain"
-        )
-
     now = time.time()
     volunteers_turns = ChoreVolunteer.objects.filter(timestamp__gte=now)
     volunteers_by_key = defaultdict(list)
@@ -33,12 +37,13 @@ def getall(current_user_id=None, subset=None):
         key = f"{turn.chore.id}-{turn.timestamp}"
         volunteers_by_key[key].append(turn.user)
 
-    data = aggregator_adapter.get_chores()
+    # FIXME: replace use of aggregator_adapter.get_chores()
+    data = chores_get_all_from(now)
 
     event_groups = []
     ts = None
     if data is not None:
-        for event in data["events"]:
+        for event in data:
             event_ts = datetime.fromtimestamp(event["when"]["timestamp"])
             event_ts_str = event_ts.strftime("%d%m%Y")
             event["time_str"] = event_ts.strftime("%H:%M")
@@ -87,6 +92,7 @@ def index_api(request, name=None):
 
     if not chores:
         return HttpResponse("No chores found", status=404, content_type="text/plain")
+
     payload = {
         "title": "Chores of this week",
         "version": "1.00",
@@ -115,9 +121,7 @@ def index(request):
 
 
 def get_chores_overview(current_user_id=None, subset=None):
-    aggregator_adapter = get_aggregator_adapter()
-    if not aggregator_adapter:
-        return None, "No aggregator configuration found"
+    now = time.time()
 
     volunteers_turns = ChoreVolunteer.objects.all()
     volunteers_by_key = defaultdict(list)
@@ -125,13 +129,13 @@ def get_chores_overview(current_user_id=None, subset=None):
         key = f"{turn.chore.id}-{turn.timestamp}"
         volunteers_by_key[key].append(turn.user)
 
-    data = aggregator_adapter.get_chores()
-    if data is None:
+    chore_events = chores_get_all_from(now)
+    if chore_events is None:
         return None, "No data available"
 
     event_groups = {}
 
-    for event in data["events"]:
+    for event in chore_events:
         event_ts = datetime.fromtimestamp(event["when"]["timestamp"])
 
         event["time_str"] = event_ts.strftime("%H:%M")
