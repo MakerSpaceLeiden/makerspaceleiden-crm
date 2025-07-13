@@ -1,17 +1,20 @@
 import logging
 from datetime import datetime, timedelta, timezone
-from dateutil.tz import tzlocal
-from .messages import VolunteeringReminderNotification
 from functools import total_ordering
-from django.core.mail import EmailMessage
-from .models import Chore, ChoreNotification
 
 import humanize
 from croniter import croniter
+from dateutil.tz import tzlocal
+from django.core.mail import EmailMessage
+
+from .messages import VolunteeringReminderNotification
+from .models import Chore, ChoreNotification
+
 logger = logging.getLogger(__name__)
 
 HUMAN_DATETIME_STRING = "%H:%M:%S %d/%m/%Y"
 local_timezone = tzlocal()
+
 
 class BaseNudge(object):
     """Base class for all nudge types with common functionality."""
@@ -229,7 +232,6 @@ class BasicChore(object):
         return max([0] + [reminder.when["days_before"] for reminder in self.reminders])
 
 
-
 class RecurrentEventGenerator(object):
     def __init__(self, starting_time, crontab, take_one_every):
         self.starting_time = Time.from_datetime(
@@ -255,9 +257,6 @@ class SingleOccurrenceEventGenerator(object):
     def iter_events_from_to(self, aggregator, ts_from, ts_to):
         if ts_from <= self.event_time <= ts_to:
             yield ChoreEvent(aggregator, self.event_time)
-
-
-
 
 
 ALL_CHORE_TYPES = [
@@ -321,6 +320,7 @@ def get_chore_type_class(chore):
             return chore_class
     raise Exception(f'Cannot find Python class for chore of type "{chore.class_type}"')
 
+
 def build_chore_instance(chore):
     chore_class = get_chore_type_class(chore)
     return chore_class(chore.id, chore.name, chore.description, **chore.configuration)
@@ -338,6 +338,7 @@ def calculate_reminder_time(event, when):
         hour=hh, minute=mm
     )
     return reminder_time
+
 
 @total_ordering
 class Time(object):
