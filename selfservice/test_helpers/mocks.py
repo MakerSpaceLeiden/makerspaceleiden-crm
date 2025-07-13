@@ -11,9 +11,6 @@ class MockAggregatorAdapter:
     def onboard_signal(self, user_id):
         pass
 
-    def notification_test(self, user_id):
-        pass
-
     def checkout(self, user_id):
         pass
 
