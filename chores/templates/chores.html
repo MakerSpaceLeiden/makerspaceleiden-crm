@@ -2,21 +2,20 @@
 
 {% block content %}
 
-<p>
-    Below is the list of chores for the next 3 months.
-</p>
-<p>
-    Please sign up for the activities you can help with. If a chore is getting close and nobody has signed up yet, the system will send out reminders.
-</p>
-<p>
-    For the engineers - this data is also accessible as a JSON from <code><a href="{% url "chores_api"%}">{% url "chores_api"%}</a></code>.
-</p>
-
 <div class="row">
 	<div class="col-xl-12 col-lg-12 col-sm-12">
 	<!-- Chores -->
     <div class="pt-0 pb-1">
         {% if event_groups %}
+            <p>
+                Below is the list of chores for the next 3 months.
+            </p>
+            <p>
+                Please sign up for the activities you can help with. If a chore is getting close and nobody has signed up yet, the system will send out reminders.
+            </p>
+            <p>
+                For the engineers - this data is also accessible as a JSON from <code><a href="{% url "chores_api"%}">{% url "chores_api"%}</a></code>.
+            </p>
             <div class="card mt-2 mb-2">
                 <ul class="list-group list-group-flush pt-0 pb-0">
                     {% for group in event_groups %}
@@ -78,7 +77,13 @@
                 </ul>
             </div>
         {% else %}
-            No upcoming tasks for the next 2 weeks, view all upcoming chores <a href="{% url 'chores' %}" class="chores-link">here</a>.
+            <div class="mt-2">
+                <p>No upcoming tasks for the next 3 months.</p>
+                <p>
+                    As a busy space with plenty to do that seems unlikely.<br/>
+                Something may be broken, let <a href="mailto:noc@makerspaceleiden.nl">noc@makerspaceleiden.nl</a>
+                </p>
+            </div>
         {% endif %}
     </div>
     </div>
