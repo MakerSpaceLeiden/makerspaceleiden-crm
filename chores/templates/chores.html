@@ -46,15 +46,20 @@
                                                 <li style="list-style-type: none; padding-bottom:0 !important">
                                                     <div>
                                                         {% if volunteer == 'offer_volunteering' %}
-                                                            <a href="{% url 'signup_chore' chore_id=event.chore.chore_id ts=event.when.timestamp %}?redirect_to=chores" class="btn btn-outline-secondary btn-sm">Add me as volunteer</a>
+                                                            <a href="{% url 'signup_chore' chore_id=event.chore.chore_id ts=event.when.timestamp %}?redirect_to=chores"
+                                                                class="btn btn-outline-secondary btn-sm"
+                                                                data-test-hook="chores-volunteer-button">
+                                                                Add me as volunteer
+                                                            </a>
                                                         {% elif volunteer is None %}
                                                             <i>Volunteer needed</i>
                                                         {% elif volunteer.id  %}
-                                                            Volunteer:
-                                                            <a href="{{volunteer.path}}">
-                                                                {{ volunteer.first_name }}
-                                                            </a>
-
+                                                            <div data-test-hook="chores-volunteer">
+                                                                Volunteer:
+                                                                <a href="{{volunteer.path}}">
+                                                                    {{ volunteer.first_name }}
+                                                                </a>
+                                                            </div>
                                                         {% endif %}
                                                     </div>
                                                 </li>
@@ -64,7 +69,10 @@
                                             {% if event.user_volunteered %}
                                                 <li style="list-style-type: none; margin-top: 0.3em; padding-bottom:0 !important">
                                                     <div>
-                                                        <a href="{% url 'remove_signup_chore' chore_id=event.chore.chore_id ts=event.when.timestamp %}?redirect_to=chores" class="btn btn-outline-secondary btn-sm">Remove me as volunteer</a>
+                                                        <a href="{% url 'remove_signup_chore' chore_id=event.chore.chore_id ts=event.when.timestamp %}?redirect_to=chores"
+                                                            class="btn btn-outline-secondary btn-sm"
+                                                            data-test-hook="chores-remove-volunteer">
+                                                            Remove me as volunteer</a>
                                                     </div>
                                                 </li>
                                             {% endif %}
@@ -77,7 +85,7 @@
                 </ul>
             </div>
         {% else %}
-            <div class="mt-2">
+            <div data-test-hook="empty-chores" class="mt-2">
                 <p>No upcoming tasks for the next 3 months.</p>
                 <p>
                     As a busy space with plenty to do that seems unlikely.<br/>
