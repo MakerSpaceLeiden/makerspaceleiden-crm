@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -10,6 +10,62 @@ from django.views.decorators.http import require_safe
 
 from .forms import AgendaForm
 from .models import Agenda
+
+
+def get_next_occurrence_of_weekday(target_weekday, from_date=None):
+    """
+    Calculate the next occurrence of a specific weekday from a given date.
+
+    Args:
+        target_weekday (int): Day of week (0=Monday, 6=Sunday)
+        from_date (date): Starting date, defaults to today
+
+    Returns:
+        date: The next occurrence of the target weekday
+    """
+    if from_date is None:
+        from_date = date.today()
+
+    # Calculate days until next occurrence
+    days_ahead = target_weekday - from_date.weekday()
+
+    # If the target day is today or has passed this week, get next week's occurrence
+    if days_ahead <= 0:
+        days_ahead += 7
+
+    return from_date + timedelta(days=days_ahead)
+
+
+def get_suggested_dates_for_copy(startdate, enddate):
+    """
+    Calculate suggested start and end dates when copying an agenda item.
+
+    Args:
+        original_agenda (Agenda): The agenda item being copied
+
+    Returns:
+        tuple: (suggested_startdate, suggested_enddate)
+    """
+    suggested_startdate = startdate
+    suggested_enddate = enddate
+
+    if startdate:
+        # Get the weekday of the original start date (0=Monday, 6=Sunday)
+        original_start_weekday = startdate.weekday()
+        suggested_startdate = get_next_occurrence_of_weekday(original_start_weekday)
+
+    if enddate:
+        if startdate and enddate:
+            # If both dates exist, maintain the same relative timing
+            # Calculate the difference between original start and end dates
+            date_difference = enddate - startdate
+            suggested_enddate = suggested_startdate + date_difference
+        else:
+            # If only end date exists, suggest next occurrence of that weekday
+            original_end_weekday = enddate.weekday()
+            suggested_enddate = get_next_occurrence_of_weekday(original_end_weekday)
+
+    return suggested_startdate, suggested_enddate
 
 
 @login_required
@@ -63,7 +119,29 @@ def AgendaCreateView(request):
             # Redirect to agenda page with pk of the new item
             return redirect(reverse("agenda_detail", kwargs={"pk": new_item.pk}))
     else:
-        form = AgendaForm()
+        copy_from_id = request.GET.get("copy_from")
+        initial = None
+        if copy_from_id:
+            try:
+                copy_from = Agenda.objects.get(pk=copy_from_id)
+
+                # Get suggested dates using the helper method
+                suggested_startdate, suggested_enddate = get_suggested_dates_for_copy(
+                    copy_from.startdate, copy_from.enddate
+                )
+
+                initial = {
+                    "startdate": suggested_startdate,
+                    "starttime": copy_from.starttime,
+                    "enddate": suggested_enddate,
+                    "endtime": copy_from.endtime,
+                    "item_title": copy_from.item_title,
+                    "item_details": copy_from.item_details,
+                }
+            except Agenda.DoesNotExist:
+                initial = None
+
+        form = AgendaForm(initial=initial)
 
     context = {
         "form": form,

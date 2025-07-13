@@ -20,9 +20,9 @@
 
                 {% if selected_item %}
                     <div class="row">
-                        <div class="col-md pb-2 pt-1" style="font-weight:600; font-size: 1.1em">
+                        <h2 class="col-md pb-2 pt-0 mt-0">
                             {{ selected_item.item_title }}
-                        </div>
+                        </h2>
                     </div>
                     <div class="row">
                         <div class="col-xl-1 col-lg-2 col-12" style="font-weight:600;">
@@ -50,13 +50,24 @@
                         </div>
                         <div class="row row-sticky-bottom">
 
-                            <div class="creation-info">
+                            <div class="creation-info d-flex justify-content-between align-items-center">
                                 <small>
                                     Created: {{ creation_date|date:"l j M Y H:i" }} by
                                     <a href="{{created_by.path}}">
                                         {{ created_by.first_name }}
                                     </a>
                                 </small>
+
+                                <div class="col-auto pe-0">
+                                    <a href="{% url 'agenda_update' selected_item.pk %}"
+                                        class="btn btn-outline-secondary btn-sm">
+                                        Edit
+                                    </a>
+                                    <a href="{% url 'agenda_create' %}?copy_from={{ selected_item.id }}"
+                                        class="btn btn-outline-secondary btn-sm">
+                                        Copy
+                                    </a>
+                                </div>
                             </div>
                             {% if is_updated %}
                                 <div class="update-info">
@@ -68,9 +79,9 @@
                                     </small>
                                 </div>
                             {% endif %}
-
                         </div>
                     {% endif %}
+
                 {% else %}
                     <small>No upcoming events</small>
                 {% endif %}
@@ -81,11 +92,6 @@
                 <div class="col-auto pe-0">
                     <button type="button" onclick="window.location.href='{% url 'index' %}'" class="btn btn-secondary">Back</button>
                 </div>
-                {% if selected_item %}
-                <div class="col-auto pe-0">
-                    <button type="button" onclick="window.location.href='{% url 'agenda_update' selected_item.pk %}'" class="btn btn-primary btn-primary-custom">Edit</button>
-                </div>
-                {% endif %}
                 <div class="col-auto">
                     <button type="button" onclick="window.location.href='{% url 'agenda_create' %}'" class="btn btn-primary btn-primary-custom">Create New</button>
                 </div>
