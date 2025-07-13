@@ -16,6 +16,3 @@ class MockAggregatorAdapter:
 
     def checkout(self, user_id):
         pass
-
-    def get_chores(self):
-        return {"chores": ["mocked-chore-1", "mocked-chore-2"]}
