@@ -43,6 +43,8 @@ dependencies = [
     "django-sendmail-backend>=0.1.2",
     "django-oauth-toolkit>=3.0.1",
     "time-machine>=2.16.0",
+    "gunicorn>=23.0.0",
+    "babel>=2.17.0",
 ]
 
 [dependency-groups]
@@ -53,6 +55,7 @@ dev = [
 
 [tool.uv]
 package = false
+python-preference = "only-managed"
 
 [build-system]
 requires = ["hatchling"]
