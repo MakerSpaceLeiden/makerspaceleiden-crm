@@ -53,9 +53,6 @@ class AggregatorAdapter(object):
     def onboard_signal(self, user_id):
         self._request_with_user_id("/signal/onboard", user_id)
 
-    def notification_test(self, user_id):
-        self._request_with_user_id("/notification/test", user_id)
-
     def checkout(self, user_id):
         self._request_with_user_id("/space/checkout", user_id)
 

@@ -663,32 +663,6 @@ def save_email_notification_settings(request):
 
 
 @login_required
-def notification_test(request):
-    try:
-        user = request.user
-    except User.DoesNotExist:
-        return HttpResponse(
-            "You are probably not a member-- admin perhaps?",
-            status=400,
-            content_type="text/plain",
-        )
-
-    try:
-        User.objects.get(pk=user.id)
-    except ObjectDoesNotExist:
-        return HttpResponse("User not found", status=404, content_type="text/plain")
-
-    aggregator_adapter = get_aggregator_adapter()
-    if not aggregator_adapter:
-        return HttpResponse(
-            "No aggregator configuration found", status=500, content_type="text/plain"
-        )
-
-    aggregator_adapter.notification_test(user.id)
-    return redirect("notification_settings")
-
-
-@login_required
 def space_state(request):
     try:
         user = request.user
