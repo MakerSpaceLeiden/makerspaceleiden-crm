@@ -742,7 +742,7 @@ requires-dist = [
     { name = "djproxy", specifier = ">=2.3.6,<3" },
     { name = "factory-boy", specifier = ">=3.3.3" },
     { name = "humanize", specifier = ">=4.12.3" },
-    { name = "jsonfield2", specifier = ">=4.0.0.post0,<5" },
+    { name = "jsonfield2", specifier = ">=4.0.0.post0" },
     { name = "jsonschema", specifier = ">=4.23.0" },
     { name = "lxml", specifier = ">=5.0.0,<6" },
     { name = "mysqlclient", specifier = ">=2.2.0,<3" },

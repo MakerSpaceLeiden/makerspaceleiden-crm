@@ -1,6 +1,5 @@
 import json
 
-import jsonfield
 from django.core import exceptions
 from django.db import models
 from simple_history.models import HistoricalRecords
@@ -20,7 +19,7 @@ class Chore(models.Model):
     name = models.CharField(max_length=40, unique=True)
     description = models.CharField(max_length=200)
     class_type = models.CharField(max_length=40)
-    configuration = jsonfield.JSONField(validators=[validate_json])
+    configuration = models.JSONField(validators=[validate_json])
     wiki_url = models.URLField(blank=True, null=True)
     creator = models.ForeignKey(
         User,
