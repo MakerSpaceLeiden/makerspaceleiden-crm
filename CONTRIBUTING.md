@@ -54,8 +54,8 @@ The process for deploying changes to production:
    - Standard deployment process:
      ```
      git status  # Check current state
-     git pull    # Pull latest changes from prod branch
-     sh rollout-prod.sh  # Script makes backup, runs migrations, and restarts services
+     git checkout prod    # Pull latest changes from prod branch
+     ./rollout-prod.sh  # Script makes backup, runs migrations, and restarts services
      ```
 
 **Production Hotfixes**
