@@ -75,6 +75,7 @@ INSTALLED_APPS = [
     "django_bootstrap5",
     "django_flatpickr",
     "rest_framework",
+    "rest_framework_api_key",
     "terminal.apps.TerminalConfig",
     "oauth2_provider",
 ]
@@ -181,6 +182,14 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
+
+REST_FRAMEWORK = {
+    "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.URLPathVersioning",
+    # Use custom permission: allow if DjangoModelPermissions OR HasAPIKey
+    "DEFAULT_PERMISSION_CLASSES": [
+        "api.permissions.DjangoModelOrApiKeyPermission",
+    ],
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/

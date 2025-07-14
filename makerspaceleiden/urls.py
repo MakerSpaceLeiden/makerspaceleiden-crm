@@ -49,6 +49,7 @@ urlpatterns = [
     path("terminal/", include("terminal.urls")),
     path("", include("nodered.urls")),
     path("oauth2/", include(oauth2_urls)),
+    path("api/", include("api.urls")),
 ]
 
 urlpatterns += static(r"/favicon.ico", document_root="static/favicon.ico")
