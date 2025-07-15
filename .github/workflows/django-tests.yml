@@ -20,7 +20,6 @@ jobs:
           source .venv/bin/activate
           uv sync
           uv run python manage.py check
-          uv pip install rest-framework-api-key
           uv pip install coverage
           uv run coverage run --source='.' manage.py test
       - name: Coverage report
