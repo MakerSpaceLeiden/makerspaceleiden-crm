@@ -53,8 +53,9 @@ The process for deploying changes to production:
    - Contact the deployment team (such as @dirkx or @Younday) for assistance
    - Standard deployment process:
      ```
-     git status  # Check current state
-     git checkout prod    # Pull latest changes from prod branch
+     git status         # Check current state, the staging area should be clean to avoid losing any changes
+     git checkout prod  # Ensure we are running on the correct production branch
+     git pull origin    # Pull latest changes from prod branch
      ./rollout-prod.sh  # Script makes backup, runs migrations, and restarts services
      ```
 

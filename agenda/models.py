@@ -14,3 +14,19 @@ class Agenda(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     history = HistoricalRecords()
+
+    @property
+    def start_datetime(self):
+        if self.startdate and self.starttime:
+            from datetime import datetime
+
+            return datetime.combine(self.startdate, self.starttime)
+        return None
+
+    @property
+    def end_datetime(self):
+        if self.enddate and self.endtime:
+            from datetime import datetime
+
+            return datetime.combine(self.enddate, self.endtime)
+        return None
