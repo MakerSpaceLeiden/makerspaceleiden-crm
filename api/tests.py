@@ -37,9 +37,16 @@ class EventsApiTests(TestCase):
         client = APIClient()
         self.assertIs(client.login(email=user.email, password=user_password), True)
         response = client.get("/api/v1/events/")
+        json_response = json.loads(response.content)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertDictEqual(
-            json.loads(response.content)["data"][-1],
+            json_response["meta"],
+            {
+                "total": 1,
+            },
+        )
+        self.assertDictEqual(
+            json_response["data"][-1],
             {
                 "id": event.id,
                 "name": event.item_title,
@@ -68,9 +75,16 @@ class MembersApiTests(TestCase):
         client = APIClient()
         self.assertIs(client.login(email=user.email, password=user_password), True)
         response = client.get("/api/v1/members/")
+        json_response = json.loads(response.content)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertDictEqual(
+            json_response["meta"],
+            {
+                "total": 1,
+            },
+        )
         self.assertEqual(
-            json.loads(response.content)["data"],
+            json_response["data"],
             [
                 {
                     "id": user.id,
@@ -110,8 +124,15 @@ class MachinesApiTests(TestCase):
 
         response = client.get("/api/v1/machines/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        json_response = json.loads(response.content)
         self.assertDictEqual(
-            json.loads(response.content)["data"][-1],
+            json_response["meta"],
+            {
+                "total": 1,
+            },
+        )
+        self.assertDictEqual(
+            json_response["data"][-1],
             {
                 "id": machine.id,
                 "description": machine.description,
