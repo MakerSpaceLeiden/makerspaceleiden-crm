@@ -60,7 +60,14 @@ class MachineSerializer(serializers.HyperlinkedModelSerializer):
 
     def get_logs(self, obj):
         # This will return a list of description strings for each related servicelog
-        return [log.description for log in obj.servicelog_set.all()]
+        return [
+            {
+                "description": log.description,
+                "reported": log.reported,
+                "last_updated": log.last_updated,
+            }
+            for log in obj.servicelog_set.all()
+        ]
 
     def get_last_updated(self, obj):
         # Get the most recent last_updated from related servicelogs
