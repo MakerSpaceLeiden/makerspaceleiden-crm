@@ -28,7 +28,7 @@ class MembersApiTests(TestCase):
         response = client.get("/api/v1/members/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
-            json.loads(response.content),
+            json.loads(response.content)["data"],
             [
                 {
                     "id": user.id,
@@ -64,13 +64,16 @@ class MachinesApiTests(TestCase):
         self.assertIs(client.login(email=user.email, password=user_password), True)
         response = client.get("/api/v1/machines/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(
-            json.loads(response.content),
-            [
-                {
-                    "name": machine.name,
-                    "id": machine.id,
-                    "out_of_order": machine.out_of_order,
-                }
-            ],
+        self.assertDictEqual(
+            json.loads(response.content)["data"][-1],
+            {
+                "id": machine.id,
+                "description": machine.description,
+                "name": machine.name,
+                "out_of_order": machine.out_of_order,
+                "category": machine.category,
+                "location": None,
+                "logs": [],
+                "last_updated": None,
+            },
         )
