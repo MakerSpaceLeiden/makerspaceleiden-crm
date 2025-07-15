@@ -89,3 +89,65 @@ class AgendaCreateViewTest(TestCase):
         self.assertIn(original.item_title, html)
         self.assertIn(original.item_details, html)
         self.assertIn("2025-05-10", html, "Suggested dates")
+
+
+class AgendaModelPropertiesTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            first_name="Model",
+            last_name="Test",
+            password="testpassword",
+            email="modeltest@example.com",
+        )
+
+    def test_start_datetime_and_end_datetime_present(self):
+        agenda = Agenda.objects.create(
+            startdate=date(2025, 5, 3),
+            starttime=time(9, 0),
+            enddate=date(2025, 5, 3),
+            endtime=time(10, 0),
+            item_title="Test Agenda",
+            item_details="Test details.",
+            user=self.user,
+        )
+        self.assertEqual(agenda.start_datetime, datetime(2025, 5, 3, 9, 0))
+        self.assertEqual(agenda.end_datetime, datetime(2025, 5, 3, 10, 0))
+
+    def test_start_datetime_missing_time(self):
+        agenda = Agenda.objects.create(
+            startdate=date(2025, 5, 3),
+            starttime=None,
+            enddate=date(2025, 5, 3),
+            endtime=time(10, 0),
+            item_title="Test Agenda",
+            item_details="Test details.",
+            user=self.user,
+        )
+        self.assertIsNone(agenda.start_datetime)
+        self.assertEqual(agenda.end_datetime, datetime(2025, 5, 3, 10, 0))
+
+    def test_end_datetime_missing_date(self):
+        agenda = Agenda.objects.create(
+            startdate=date(2025, 5, 3),
+            starttime=time(9, 0),
+            enddate=None,
+            endtime=time(10, 0),
+            item_title="Test Agenda",
+            item_details="Test details.",
+            user=self.user,
+        )
+        self.assertEqual(agenda.start_datetime, datetime(2025, 5, 3, 9, 0))
+        self.assertIsNone(agenda.end_datetime)
+
+    def test_both_missing(self):
+        agenda = Agenda.objects.create(
+            startdate=None,
+            starttime=None,
+            enddate=None,
+            endtime=None,
+            item_title="Test Agenda",
+            item_details="Test details.",
+            user=self.user,
+        )
+        self.assertIsNone(agenda.start_datetime)
+        self.assertIsNone(agenda.end_datetime)
