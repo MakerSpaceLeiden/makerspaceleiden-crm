@@ -51,7 +51,7 @@ def emailPlain(
     if not subject:
         body = body.split("\n")
         subject = body[0].rstrip()
-        subject = re.sub(r'^Subject:\s+', string=subject, repl="", flags=re.IGNORECASE)
+        subject = re.sub(r"^Subject:\s+", string=subject, repl="", flags=re.IGNORECASE)
         body = "\n".join(body[1:])
 
     body_html = body

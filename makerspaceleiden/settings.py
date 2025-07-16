@@ -376,8 +376,8 @@ NOTIFICATION_MAP = {
     "noc": "noc@makerspaceleiden.nl",
 }
 
-ROBOHASH_SET='set1'
-ROBOHASH_COLOUR='red'
+ROBOHASH_SET = "set1"
+ROBOHASH_COLOUR = "red"
 
 try:
     from .local import *  # noqa: F403

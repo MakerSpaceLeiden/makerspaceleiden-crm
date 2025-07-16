@@ -143,10 +143,10 @@ class User(AbstractUser):
     def image_url(self):
         if self.image:
             return self.image.url
-        return reverse('generate-fake-mugshot', args=[ self.id ])
+        return reverse("generate-fake-mugshot", args=[self.id])
 
     def image_img(self):
-        return str('<img src="%s" width=80/>' % url)
+        return str('<img src="%s" width=80/>' % self.image_url())
 
     @property
     def in_group(request, group):
