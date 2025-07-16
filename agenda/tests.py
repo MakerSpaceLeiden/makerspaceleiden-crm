@@ -116,6 +116,38 @@ class AgendaModelPropertiesTest(TestCase):
         self.assertEqual(
             agenda.end_datetime, datetime(2025, 5, 3, 8, 0, tzinfo=timezone.utc)
         )
+        # Test that _startdatetime is stored as UTC
+        self.assertEqual(
+            agenda._startdatetime, datetime(2025, 5, 3, 7, 0, tzinfo=timezone.utc)
+        )
+
+        # Test that _startdatetime is stored as UTC
+        self.assertEqual(
+            agenda._enddatetime, datetime(2025, 5, 3, 8, 0, tzinfo=timezone.utc)
+        )
+
+    def test_startdatetime_field_is_none_if_missing(self):
+        agenda = Agenda.objects.create(
+            startdate=None,
+            starttime=None,
+            enddate=date(2025, 5, 3),
+            endtime=time(10, 0),
+            item_title="Test Agenda",
+            item_details="Test details.",
+            user=self.user,
+        )
+        self.assertIsNone(agenda._startdatetime)
+
+        agenda2 = Agenda.objects.create(
+            startdate=date(2025, 5, 3),
+            starttime=None,
+            enddate=date(2025, 5, 3),
+            endtime=time(10, 0),
+            item_title="Test Agenda",
+            item_details="Test details.",
+            user=self.user,
+        )
+        self.assertIsNone(agenda2._startdatetime)
 
     def test_start_datetime_missing_time(self):
         agenda = Agenda.objects.create(

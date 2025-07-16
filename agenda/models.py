@@ -11,8 +11,10 @@ CEST = ZoneInfo("Europe/Amsterdam")  # Handles both CET and CEST
 
 
 class Agenda(models.Model):
+    _startdatetime = models.DateTimeField(null=True)
     startdate = models.DateField(null=True)
     starttime = models.TimeField(null=True)
+    _enddatetime = models.DateTimeField(null=True)
     enddate = models.DateField(null=True)
     endtime = models.TimeField(null=True)
     item_title = models.TextField(max_length=600, default="")
@@ -23,6 +25,8 @@ class Agenda(models.Model):
 
     @property
     def start_datetime(self):
+        if self._startdatetime:
+            return self._startdatetime
         if self.startdate and self.starttime:
             dt = datetime.combine(self.startdate, self.starttime)
             if timezone.is_naive(dt):
@@ -38,3 +42,23 @@ class Agenda(models.Model):
                 dt = dt.replace(tzinfo=CEST)
             return dt.astimezone(timezone.utc)
         return None
+
+    def _get_utc_from_cest_date_and_time(self, date, time):
+        if date and time:
+            dt = datetime.combine(date, time)
+            if timezone.is_naive(dt):
+                dt = dt.replace(tzinfo=CEST)
+            return dt.astimezone(timezone.utc)
+
+        return None
+
+    def save(self, *args, **kwargs):
+        # Compute _startdatetime from startdate and starttime (assumed CE(S)T)
+        self._startdatetime = self._get_utc_from_cest_date_and_time(
+            self.startdate, self.starttime
+        )
+        self._enddatetime = self._get_utc_from_cest_date_and_time(
+            self.enddate, self.endtime
+        )
+
+        super().save(*args, **kwargs)
