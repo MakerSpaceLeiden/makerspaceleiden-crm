@@ -1,3 +1,5 @@
+import logging
+
 from django.utils.dateparse import parse_datetime
 from django.utils.timezone import is_naive, make_aware, utc
 from rest_framework import response, viewsets
@@ -7,6 +9,8 @@ from agenda.models import Agenda
 from members.models import User
 
 from .serializers import AgendaSerializer, MachineSerializer, UserSerializer
+
+logger = logging.getLogger(__name__)
 
 
 # ViewSets define the view behavior.
@@ -55,26 +59,30 @@ class EventViewSet(BaseListMetaViewSet):
         end_datetime_str = request.query_params.get("end_datetime")
 
         if start_datetime_str:
-            queryset = filter_by_datetime(queryset, "start", start_datetime_str, ">=")
+            queryset = self._filter_by_datetime(
+                queryset, "start", start_datetime_str, ">="
+            )
         if end_datetime_str:
-            queryset = filter_by_datetime(queryset, "end", end_datetime_str, "<=")
+            queryset = self._filter_by_datetime(queryset, "end", end_datetime_str, "<=")
         self.get_queryset = lambda: queryset
         return super().list(request, *args, **kwargs)
 
+    def _filter_by_datetime(self, queryset, prefix: str, dt_str: str, op: str):
+        dt = parse_datetime(dt_str)
+        if dt is None:
+            logger.warning("Invalid datetime string provided", dt_str)
 
-def filter_by_datetime(queryset, prefix, dt_str, op):
-    dt = parse_datetime(dt_str)
-    if dt and is_naive(dt):
-        dt = make_aware(dt, utc)
-    if dt:
-        date_field = f"{prefix}date__isnull"
-        time_field = f"{prefix}time__isnull"
-        where = f"({prefix}date || ' ' || {prefix}time) {op} %s"
-        queryset = queryset.filter(**{date_field: False, time_field: False}).extra(
-            where=[where],
-            params=[dt.strftime("%Y-%m-%d %H:%M:%S")],
-        )
-    return queryset
+        if dt and is_naive(dt):
+            dt = make_aware(dt, utc)
+        if dt:
+            date_field = f"{prefix}date__isnull"
+            time_field = f"{prefix}time__isnull"
+            where = f"({prefix}date || ' ' || {prefix}time) {op} %s"
+            queryset = queryset.filter(**{date_field: False, time_field: False}).extra(
+                where=[where],
+                params=[dt.strftime("%Y-%m-%d %H:%M:%S")],
+            )
+        return queryset
 
 
 class MachineViewSet(BaseListMetaViewSet):
