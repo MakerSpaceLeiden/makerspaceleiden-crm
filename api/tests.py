@@ -219,8 +219,11 @@ class MembersApiTests(TestCase):
                     "email": user.email,
                     "first_name": user.first_name,
                     "last_name": user.last_name,
-                    "image": None,
-                    "images": None,
+                    "image": "http://testserver/avatar/" + str(user.id),
+                    "images": {
+                        "original": "http://testserver/avatar/" + str(user.id),
+                        "thumbnail": "http://testserver/avatar/" + str(user.id),
+                    },
                 }
             ],
         )

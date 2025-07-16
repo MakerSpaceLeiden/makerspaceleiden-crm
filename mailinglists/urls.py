@@ -10,7 +10,7 @@ urlpatterns = [
     ),
     path("mailinglists_edit", views.mailinglists_edit, name="mailinglists_edit"),
     re_path(
-        "archive/(?P<mlist>\w+)/(?P<yearmonth>[\-\w]+)/attachments/(?P<attachment>\d+/[a-fA-F0-9]+/attachment[\d+\.\w\-]+)$",
+        r"archive/(?P<mlist>\w+)/(?P<yearmonth>[\-\w]+)/attachments/(?P<attachment>\d+/[a-fA-F0-9]+/attachment[\d+\.\w\-]+)$",
         views.mailinglists_archive,
         name="mailinglists_archive",
     ),
