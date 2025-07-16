@@ -11,6 +11,9 @@ from members.models import User
 
 
 class EventsApiTests(TestCase):
+    def setUp(self):
+        self.password = "testpassword"
+
     def test_events_list_returns_403(self):
         client = APIClient()
         response = client.get("/api/v1/events/")
@@ -51,10 +54,133 @@ class EventsApiTests(TestCase):
                 "id": event.id,
                 "name": event.item_title,
                 "description": event.item_details,
-                "start_datetime": event.start_datetime.strftime("%Y-%m-%dT%H:%M:%S"),
-                "end_datetime": event.end_datetime.strftime("%Y-%m-%dT%H:%M:%S"),
+                "start_datetime": event.start_datetime.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                "end_datetime": event.end_datetime.strftime("%Y-%m-%dT%H:%M:%SZ"),
             },
         )
+
+    def test_events_list_filter_start_datetime(self):
+        user_password = "testpassword"
+        user = User.objects.create_user(
+            email="testuser@example.com",
+            password=user_password,
+            first_name="Test",
+            last_name="User",
+            telegram_user_id="123456789",
+        )
+        # Create two events: one before, one after the filter date
+        event1 = Agenda.objects.create(
+            startdate=date(2023, 1, 1),
+            starttime=time(9, 0),
+            enddate=date(2023, 1, 1),
+            endtime=time(10, 0),
+            item_title="Event 1",
+            item_details="First event.",
+            user=user,
+        )
+        event2 = Agenda.objects.create(
+            startdate=date(2023, 2, 1),
+            starttime=time(9, 0),
+            enddate=date(2023, 2, 1),
+            endtime=time(10, 0),
+            item_title="Event 2",
+            item_details="Second event.",
+            user=user,
+        )
+        client = APIClient()
+        self.assertTrue(client.login(email=user.email, password=user_password))
+        # Filter for events starting after 2023-01-15
+        response = client.get("/api/v1/events/?start_datetime=2023-01-15T00:00:00Z")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = json.loads(response.content)["data"]
+        self.assertTrue(any(e["id"] == event2.id for e in data))
+        self.assertFalse(any(e["id"] == event1.id for e in data))
+
+    def test_events_list_filter_end_datetime(self):
+        user_password = "testpassword"
+        user = User.objects.create_user(
+            email="testuser@example.com",
+            password=user_password,
+            first_name="Test",
+            last_name="User",
+            telegram_user_id="123456789",
+        )
+        # Create two events: one before, one after the filter date
+        event1 = Agenda.objects.create(
+            startdate=date(2023, 1, 1),
+            starttime=time(9, 0),
+            enddate=date(2023, 1, 1),
+            endtime=time(10, 0),
+            item_title="Event 1",
+            item_details="First event.",
+            user=user,
+        )
+        event2 = Agenda.objects.create(
+            startdate=date(2023, 2, 1),
+            starttime=time(9, 0),
+            enddate=date(2023, 2, 1),
+            endtime=time(10, 0),
+            item_title="Event 2",
+            item_details="Second event.",
+            user=user,
+        )
+        client = APIClient()
+        self.assertTrue(client.login(email=user.email, password=user_password))
+        # Filter for events ending before 2023-01-15
+        response = client.get("/api/v1/events/?end_datetime=2023-01-15T00:00:00Z")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = json.loads(response.content)["data"]
+        self.assertTrue(any(e["id"] == event1.id for e in data))
+        self.assertFalse(any(e["id"] == event2.id for e in data))
+
+    def test_events_list_filter_start_and_end_datetime(self):
+        user_password = "testpassword"
+        user = User.objects.create_user(
+            email="testuser@example.com",
+            password=user_password,
+            first_name="Test",
+            last_name="User",
+            telegram_user_id="123456789",
+        )
+        # Create three events: one before, one in range, one after
+        event1 = Agenda.objects.create(
+            startdate=date(2023, 1, 1),
+            starttime=time(9, 0),
+            enddate=date(2023, 1, 1),
+            endtime=time(10, 0),
+            item_title="Event 1",
+            item_details="First event.",
+            user=user,
+        )
+        event2 = Agenda.objects.create(
+            startdate=date(2023, 2, 1),
+            starttime=time(9, 0),
+            enddate=date(2023, 2, 1),
+            endtime=time(10, 0),
+            item_title="Event 2",
+            item_details="Second event.",
+            user=user,
+        )
+        event3 = Agenda.objects.create(
+            startdate=date(2023, 3, 1),
+            starttime=time(9, 0),
+            enddate=date(2023, 3, 1),
+            endtime=time(10, 0),
+            item_title="Event 3",
+            item_details="Third event.",
+            user=user,
+        )
+        client = APIClient()
+        self.assertTrue(client.login(email=user.email, password=user_password))
+        # Filter for events between 2023-01-15 and 2023-02-15
+        response = client.get(
+            "/api/v1/events/?start_datetime=2023-01-15T00:00:00Z&end_datetime=2023-02-15T23:59:59Z"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = json.loads(response.content)["data"]
+        self.assertTrue(any(e["id"] == event2.id for e in data))
+        self.assertFalse(any(e["id"] == event1.id for e in data))
+        self.assertFalse(any(e["id"] == event3.id for e in data))
 
 
 class MembersApiTests(TestCase):

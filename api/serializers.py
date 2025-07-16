@@ -10,6 +10,8 @@ from servicelog.models import Servicelog
 class AgendaSerializer(serializers.HyperlinkedModelSerializer):
     name = serializers.SerializerMethodField()
     description = serializers.SerializerMethodField()
+    start_datetime = serializers.SerializerMethodField()
+    end_datetime = serializers.SerializerMethodField()
 
     class Meta:
         model = Agenda
@@ -20,6 +22,26 @@ class AgendaSerializer(serializers.HyperlinkedModelSerializer):
 
     def get_description(self, obj):
         return obj.item_details
+
+    def get_start_datetime(self, obj):
+        dt = obj.start_datetime
+        if dt:
+            from django.utils import timezone
+
+            if timezone.is_naive(dt):
+                dt = timezone.make_aware(dt, timezone.utc)
+            return dt.isoformat().replace("+00:00", "Z")
+        return None
+
+    def get_end_datetime(self, obj):
+        dt = obj.end_datetime
+        if dt:
+            from django.utils import timezone
+
+            if timezone.is_naive(dt):
+                dt = timezone.make_aware(dt, timezone.utc)
+            return dt.isoformat().replace("+00:00", "Z")
+        return None
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
