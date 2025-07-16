@@ -15,13 +15,19 @@
                 <div class="flex-shrink-0 me-3 d-flex align-items-center" style="height: 45px;">
                     {% if m.image %}
                         <a href="{{ m.image.url }}">
-                            <img alt="" src="{{ m.image.thumbnail.url }}" class="img-fluid avatar rounded-1" style="width: 45px; height: 45px; object-fit: cover;"/>
+                            <img
+                                alt=""
+                                src="{{ m.image.thumbnail.url }}"
+                                class="img-fluid avatar rounded-1"
+                                style="width: 45px; height: 45px; object-fit: cover;"/>
                         </a>
                     {% else %}
-                        <span
-                            class="avatar rounded-1 bg-secondary bg-gradient text-bg-secondary"
-				            style="width: 45px; height: 45px; object-fit: cover;">
-                          <img alt="" src="{{ m.image_url }}" class="img-fluid avatar rounded-1" style="width: 45px; height: 45px; object-fit: cover;"/>
+                        <span class="avatar rounded-1 bg-secondary bg-gradient text-bg-secondary">
+                          <img
+                            alt="Generated avatar for {{m}}"
+                            src="{{ m.image_url }}"
+                            class="img-fluid"
+                            style="width: 45px; height: 45px; object-fit: cover;"/>
                         </span>
                     {% endif %}
                 </div>

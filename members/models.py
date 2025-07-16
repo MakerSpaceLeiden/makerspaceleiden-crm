@@ -140,13 +140,14 @@ class User(AbstractUser):
     def url(self):
         return settings.BASE + self.path()
 
-    def image_url(self, size: str):
+    def image_url(self, size: str = None):
         if self.image:
             if size in settings.IMG_VARIATIONS:
                 variation = getattr(self.image, size, None)
                 if variation:
                     return variation.url
             return self.image.url
+
         return reverse("generate-fake-mugshot", args=[self.id])
 
     def image_img(self):
