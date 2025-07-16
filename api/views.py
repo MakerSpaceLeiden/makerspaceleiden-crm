@@ -59,30 +59,26 @@ class EventViewSet(BaseListMetaViewSet):
         end_datetime_str = request.query_params.get("end_datetime")
 
         if start_datetime_str:
-            queryset = self._filter_by_datetime(
-                queryset, "start", start_datetime_str, ">="
+            queryset = self._filter_by_datetime_field(
+                queryset, "_startdatetime", start_datetime_str, "gte"
             )
         if end_datetime_str:
-            queryset = self._filter_by_datetime(queryset, "end", end_datetime_str, "<=")
+            queryset = self._filter_by_datetime_field(
+                queryset, "_enddatetime", end_datetime_str, "lte"
+            )
         self.get_queryset = lambda: queryset
         return super().list(request, *args, **kwargs)
 
-    def _filter_by_datetime(self, queryset, prefix: str, dt_str: str, op: str):
+    def _filter_by_datetime_field(self, queryset, field: str, dt_str: str, lookup: str):
         dt = parse_datetime(dt_str)
         if dt is None:
             logger.warning("Invalid datetime string provided", dt_str)
-
-        if dt and is_naive(dt):
+            return queryset
+        if is_naive(dt):
             dt = make_aware(dt, utc)
-        if dt:
-            date_field = f"{prefix}date__isnull"
-            time_field = f"{prefix}time__isnull"
-            where = f"({prefix}date || ' ' || {prefix}time) {op} %s"
-            queryset = queryset.filter(**{date_field: False, time_field: False}).extra(
-                where=[where],
-                params=[dt.strftime("%Y-%m-%d %H:%M:%S")],
-            )
-        return queryset
+        # Use Django's ORM filtering for the datetime field
+        filter_expr = {f"{field}__{lookup}": dt}
+        return queryset.filter(**filter_expr)
 
 
 class MachineViewSet(BaseListMetaViewSet):
