@@ -1,3 +1,5 @@
+from django.utils.dateparse import parse_datetime
+from django.utils.timezone import is_naive, make_aware, utc
 from rest_framework import response, viewsets
 
 from acl.models import Machine
@@ -46,6 +48,33 @@ class UserViewSet(BaseListMetaViewSet):
 class EventViewSet(BaseListMetaViewSet):
     queryset = Agenda.objects.all()
     serializer_class = AgendaSerializer
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        start_datetime_str = request.query_params.get("start_datetime")
+        end_datetime_str = request.query_params.get("end_datetime")
+
+        if start_datetime_str:
+            queryset = filter_by_datetime(queryset, "start", start_datetime_str, ">=")
+        if end_datetime_str:
+            queryset = filter_by_datetime(queryset, "end", end_datetime_str, "<=")
+        self.get_queryset = lambda: queryset
+        return super().list(request, *args, **kwargs)
+
+
+def filter_by_datetime(queryset, prefix, dt_str, op):
+    dt = parse_datetime(dt_str)
+    if dt and is_naive(dt):
+        dt = make_aware(dt, utc)
+    if dt:
+        date_field = f"{prefix}date__isnull"
+        time_field = f"{prefix}time__isnull"
+        where = f"({prefix}date || ' ' || {prefix}time) {op} %s"
+        queryset = queryset.filter(**{date_field: False, time_field: False}).extra(
+            where=[where],
+            params=[dt.strftime("%Y-%m-%d %H:%M:%S")],
+        )
+    return queryset
 
 
 class MachineViewSet(BaseListMetaViewSet):
