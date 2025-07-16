@@ -18,15 +18,17 @@
                             <img alt="" src="{{ m.image.thumbnail.url }}" class="img-fluid avatar rounded-1" style="width: 45px; height: 45px; object-fit: cover;"/>
                         </a>
                     {% else %}
-                        <span class="avatar rounded-1 bg-secondary bg-gradient text-bg-secondary d-flex align-items-center justify-content-center" style="display: block; width: 45px; height: 45px; object-fit: cover;">
-                            {{ m.initials }}
+                        <span
+                            class="avatar rounded-1 bg-secondary bg-gradient text-bg-secondary"
+				            style="width: 45px; height: 45px; object-fit: cover;">
+                          <img alt="" src="{{ m.image_url }}" class="img-fluid avatar rounded-1" style="width: 45px; height: 45px; object-fit: cover;"/>
                         </span>
                     {% endif %}
                 </div>
                 <div class="flex-grow-1 d-flex align-items-center h-100" style="min-height: 45px;">
                     <a href="{{ m.path }}">
                     {% if m.is_active %}
-                    {{ m }}
+                        {{ m }}
                     {% else %}
                     <i><s>{{ m }}</s></i> Deactivated.<br>Last record change: {{ m.history.first.history_date }} {{ m.history.first.changeReason }}
                     {% endif %}

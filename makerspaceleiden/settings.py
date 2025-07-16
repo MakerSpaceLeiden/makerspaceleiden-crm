@@ -78,6 +78,7 @@ INSTALLED_APPS = [
     "rest_framework_api_key",
     "terminal.apps.TerminalConfig",
     "oauth2_provider",
+    "avatar",
 ]
 
 SITE_ID = 1
@@ -374,6 +375,9 @@ NODERED_URL = "http://localhost:1880"
 NOTIFICATION_MAP = {
     "noc": "noc@makerspaceleiden.nl",
 }
+
+ROBOHASH_SET = "set1"
+ROBOHASH_COLOUR = "red"
 
 try:
     from .local import *  # noqa: F403
