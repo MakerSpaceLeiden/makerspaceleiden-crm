@@ -63,7 +63,7 @@ INSTALLED_APPS = [
     "nodered.apps.NoderedConfig",
     "navigation",
     "motd",
-    "agenda",
+    "agenda.apps.AgendaConfig",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
