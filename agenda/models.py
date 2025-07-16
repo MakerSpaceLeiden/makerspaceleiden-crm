@@ -1,7 +1,13 @@
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
 from django.db import models
+from django.utils import timezone
 from simple_history.models import HistoricalRecords
 
 from members.models import User
+
+CEST = ZoneInfo("Europe/Amsterdam")  # Handles both CET and CEST
 
 
 class Agenda(models.Model):
@@ -18,15 +24,17 @@ class Agenda(models.Model):
     @property
     def start_datetime(self):
         if self.startdate and self.starttime:
-            from datetime import datetime
-
-            return datetime.combine(self.startdate, self.starttime)
+            dt = datetime.combine(self.startdate, self.starttime)
+            if timezone.is_naive(dt):
+                dt = dt.replace(tzinfo=CEST)
+            return dt.astimezone(timezone.utc)
         return None
 
     @property
     def end_datetime(self):
         if self.enddate and self.endtime:
-            from datetime import datetime
-
-            return datetime.combine(self.enddate, self.endtime)
+            dt = datetime.combine(self.enddate, self.endtime)
+            if timezone.is_naive(dt):
+                dt = dt.replace(tzinfo=CEST)
+            return dt.astimezone(timezone.utc)
         return None

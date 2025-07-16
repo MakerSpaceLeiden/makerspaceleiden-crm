@@ -1,4 +1,4 @@
-from datetime import date, datetime, time
+from datetime import date, datetime, time, timezone
 
 import time_machine
 from django.test import TestCase
@@ -110,8 +110,12 @@ class AgendaModelPropertiesTest(TestCase):
             item_details="Test details.",
             user=self.user,
         )
-        self.assertEqual(agenda.start_datetime, datetime(2025, 5, 3, 9, 0))
-        self.assertEqual(agenda.end_datetime, datetime(2025, 5, 3, 10, 0))
+        self.assertEqual(
+            agenda.start_datetime, datetime(2025, 5, 3, 7, 0, tzinfo=timezone.utc)
+        )
+        self.assertEqual(
+            agenda.end_datetime, datetime(2025, 5, 3, 8, 0, tzinfo=timezone.utc)
+        )
 
     def test_start_datetime_missing_time(self):
         agenda = Agenda.objects.create(
@@ -124,7 +128,9 @@ class AgendaModelPropertiesTest(TestCase):
             user=self.user,
         )
         self.assertIsNone(agenda.start_datetime)
-        self.assertEqual(agenda.end_datetime, datetime(2025, 5, 3, 10, 0))
+        self.assertEqual(
+            agenda.end_datetime, datetime(2025, 5, 3, 8, 0, tzinfo=timezone.utc)
+        )
 
     def test_end_datetime_missing_date(self):
         agenda = Agenda.objects.create(
@@ -136,7 +142,9 @@ class AgendaModelPropertiesTest(TestCase):
             item_details="Test details.",
             user=self.user,
         )
-        self.assertEqual(agenda.start_datetime, datetime(2025, 5, 3, 9, 0))
+        self.assertEqual(
+            agenda.start_datetime, datetime(2025, 5, 3, 7, 0, tzinfo=timezone.utc)
+        )
         self.assertIsNone(agenda.end_datetime)
 
     def test_both_missing(self):
