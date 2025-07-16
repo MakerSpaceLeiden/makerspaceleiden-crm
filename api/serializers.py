@@ -45,9 +45,29 @@ class AgendaSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
+    image = serializers.SerializerMethodField()
+    images = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ["id", "url", "email", "first_name", "last_name", "image"]
+        fields = ["id", "url", "email", "first_name", "last_name", "image", "images"]
+
+    def get_image(self, obj):
+        if not obj.image:
+            return None
+
+        return self.context["request"].build_absolute_uri(obj.image.thumbnail.url)
+
+    def get_images(self, obj):
+        if not obj.image:
+            return None
+
+        return {
+            "original": self.context["request"].build_absolute_uri(obj.image.url),
+            "thumbnail": self.context["request"].build_absolute_uri(
+                obj.image.thumbnail.url
+            ),
+        }
 
 
 class ServicelogSerializer(serializers.ModelSerializer):
