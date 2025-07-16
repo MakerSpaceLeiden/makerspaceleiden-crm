@@ -53,19 +53,15 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         fields = ["id", "url", "email", "first_name", "last_name", "image", "images"]
 
     def get_image(self, obj):
-        if not obj.image:
-            return None
-
-        return self.context["request"].build_absolute_uri(obj.image.thumbnail.url)
+        return self.context["request"].build_absolute_uri(obj.image_url("thumbnail"))
 
     def get_images(self, obj):
-        if not obj.image:
-            return None
-
         return {
-            "original": self.context["request"].build_absolute_uri(obj.image.url),
+            "original": self.context["request"].build_absolute_uri(
+                obj.image_url("original")
+            ),
             "thumbnail": self.context["request"].build_absolute_uri(
-                obj.image.thumbnail.url
+                obj.image_url("thumbnail")
             ),
         }
 

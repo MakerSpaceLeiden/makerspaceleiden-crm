@@ -47,7 +47,7 @@ urlpatterns = [
     path("pettycredit/", include("pettycredit.urls")),
     path("spaceapi/", include("spaceapi.urls")),
     path("terminal/", include("terminal.urls")),
-    path("robohash/", include("mugshotgen.urls")),
+    path("avatar/", include("avatar.urls")),
     path("", include("nodered.urls")),
     path("oauth2/", include(oauth2_urls)),
     path("api/", include("api.urls")),

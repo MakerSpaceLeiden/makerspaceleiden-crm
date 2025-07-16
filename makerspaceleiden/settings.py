@@ -78,7 +78,7 @@ INSTALLED_APPS = [
     "rest_framework_api_key",
     "terminal.apps.TerminalConfig",
     "oauth2_provider",
-    "mugshotgen",
+    "avatar",
 ]
 
 SITE_ID = 1
