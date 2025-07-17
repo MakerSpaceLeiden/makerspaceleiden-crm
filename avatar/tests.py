@@ -1,8 +1,8 @@
+from unittest.mock import MagicMock, patch
+
 from django.test import TestCase
-from unittest.mock import patch, MagicMock
 from rest_framework import status
 
-from avatar import views
 
 class AvatarIndexViewTests(TestCase):
     @patch("avatar.views.Robohash")
