@@ -16,8 +16,9 @@
                     {% if m.image %}
                         <a href="{{ m.image.url }}">
                             <img
-                                alt=""
+                                alt="Avatar for {{m}}"
                                 src="{{ m.image.thumbnail.url }}"
+                                loading="lazy"
                                 class="img-fluid avatar rounded-1"
                                 style="width: 45px; height: 45px; object-fit: cover;"/>
                         </a>
@@ -27,6 +28,7 @@
                             alt="Generated avatar for {{m}}"
                             src="{{ m.image_url }}"
                             class="img-fluid"
+                            loading="lazy"
                             style="width: 45px; height: 45px; object-fit: cover;"/>
                         </span>
                     {% endif %}
