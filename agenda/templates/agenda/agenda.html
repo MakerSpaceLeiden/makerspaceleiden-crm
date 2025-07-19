@@ -46,18 +46,29 @@
 
                     {% if object_list %}
                         <div class="row">
-                            <div class="card-text mt-4 mb-4" style="word-wrap: break-word; white-space: pre-wrap;">{{ selected_item.item_details|urlize }}
+                            <div class="card-text mt-4 mb-4">
+                                {{ selected_item.item_details|urlize }}
+
+                                {% if selected_item.type == 'chore' %}
+                                    <div class="mt-1">
+                                        <a href="{{ selected_item.chore.wiki_url }}">
+                                            More information available in the Wiki
+                                        </a>
+                                    </div>
+                                {% endif %}
                             </div>
-                            <br>
                         </div>
                         <div class="row row-sticky-bottom">
 
                             <div class="creation-info d-flex justify-content-between align-items-center">
                                 <small>
-                                    Created: {{ creation_date|date:"l j M Y H:i" }} by
+                                    Created: {{ creation_date|date:"l j M Y H:i" }}
+                                    {% if created_by.path %}
+                                        by
                                     <a href="{{created_by.path}}">
                                         {{ created_by.first_name }}
                                     </a>
+                                    {% endif %}
                                 </small>
 
                                 <div class="col-auto pe-0">
@@ -74,10 +85,13 @@
                             {% if is_updated %}
                                 <div class="update-info">
                                     <small>
-                                        Last edited: {{ update_date|date:"l j M Y H:i" }} by
+                                        Last edited: {{ update_date|date:"l j M Y H:i" }}
+                                        {% if updated_by.first_name != "" %}
+                                        by
                                         <a href="{{updated_by.path}}">
                                             {{ updated_by.first_name }}
                                         </a>
+                                        {% endif %}
                                     </small>
                                 </div>
                             {% endif %}

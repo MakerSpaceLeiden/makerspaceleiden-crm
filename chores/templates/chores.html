@@ -15,7 +15,7 @@
                     Please sign up for the activities you can help with. If a chore is getting close and nobody has signed up yet, the system will send out reminders.
                 </p>
                 <p>
-                    For the engineers - this data is also accessible as a JSON from <code><a href="/api/v1/events">/api/v1/events</a></code>.
+                    For the engineers - this data is also accessible as JSON from <code><a href="/api/v1/events">/api/v1/events</a></code>.
                 </p>
             </div>
             <div class="card mt-2 mb-2">
@@ -47,30 +47,4 @@
     </div>
     </div>
 </div>
-
-<style>
-	.chore-time-column {
-		width: 80px;
-        border-right: 1px solid #dee2e6; /* Bootstrap's default border color */
-    }
-
-	.chore-volunteer-column {
-		width: 190px;
-		padding-right: 0px;
-	}
-
-	/* Media query for large screens and smaller */
-	@media (max-width: 992px) { /* Bootstrap's lg breakpoint */
-		.chore-description-column {
-			flex: 0 0 100%; /* Takes full width on smaller screens */
-			max-width: 100%; /* Ensure the column does not exceed its parent */
-			border-right: none; /* Remove border on smaller screens */
-		}
-		.chore-time-column {
-			border-right: none; /* Remove border on smaller screens */
-		}
-	}
-</style>
-
-
 {% endblock %}

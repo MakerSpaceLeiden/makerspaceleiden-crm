@@ -216,21 +216,6 @@ function toggle() {
 
 
 <style>
-	.chore-time-column {
-		width: 80px;
-        border-right: 1px solid #dee2e6; /* Bootstrap's default border color */
-    }
-
-	.chore-description-column {
-		flex: 1; /* Takes remaining space */
-		border-right: 1px solid #dee2e6; /* Border for large screens */
-	}
-
-	.chore-volunteer-column {
-		width: 190px;
-		padding-right: 0px;
-	}
-
 	/* Container for UFO items */
 	.ufo-container {
 		display: flex;
@@ -268,18 +253,6 @@ function toggle() {
 
 	.bg-primary-custom {
 		background-color: #417690;
-	}
-
-	/* Media query for large screens and smaller */
-	@media (max-width: 992px) { /* Bootstrap's lg breakpoint */
-		.chore-description-column {
-			flex: 0 0 100%; /* Takes full width on smaller screens */
-			max-width: 100%; /* Ensure the column does not exceed its parent */
-			border-right: none; /* Remove border on smaller screens */
-		}
-		.chore-time-column {
-			border-right: none; /* Remove border on smaller screens */
-		}
 	}
 </style>
 
