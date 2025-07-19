@@ -77,6 +77,7 @@ class CustomCommandTest(TestCase):
         call_command("generate_events", limit=21, stdout=out)
 
         self.assertIn("Generating events for chores", out.getvalue())
+        print(out.getvalue())
         self.assertEqual(Agenda.objects.count(), 2)
         agenda = Agenda.objects.first()
         self.assertEqual(agenda.item_title, "Test Chore")
@@ -84,5 +85,41 @@ class CustomCommandTest(TestCase):
         self.assertEqual(
             agenda.start_datetime,
             datetime(2025, 7, 20, 20, 00, 0, 0, tzinfo=timezone.utc),
+        )
+        self.assertEqual(agenda.user, self.user)
+
+    # First occurence should be based on start date of chore not invocation
+    # of the command
+    @time_machine.travel("2025-07-19 14:56")
+    def test_generate_events_informed_by_starting_date(self):
+        out = StringIO()
+        Chore.objects.create(
+            name="Test Chore",
+            description="A test chore that runs every 12 weeks",
+            class_type="BasicChore",
+            configuration={
+                "min_required_people": 1,
+                "events_generation": {
+                    "event_type": "recurrent",
+                    "starting_time": "8/3/2020 7:00",
+                    "crontab": "0 22 * * sun",
+                    "take_one_every": 11,
+                },
+                "reminders": [],
+            },
+            creator=self.user,
+        )
+
+        call_command("generate_events", limit=90, stdout=out)
+        call_command("generate_events", limit=90, stdout=out)
+
+        self.assertIn("Generating events for chores", out.getvalue())
+        self.assertEqual(Agenda.objects.count(), 1)
+        agenda = Agenda.objects.first()
+        self.assertEqual(agenda.item_title, "Test Chore")
+        self.assertEqual(agenda.item_details, "A test chore that runs every 12 weeks")
+        self.assertEqual(
+            agenda.start_datetime,
+            datetime(2025, 8, 31, 20, 00, 0, 0, tzinfo=timezone.utc),
         )
         self.assertEqual(agenda.user, self.user)

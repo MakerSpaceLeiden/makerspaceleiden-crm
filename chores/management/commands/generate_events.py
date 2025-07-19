@@ -34,37 +34,45 @@ class Command(BaseCommand):
         )
         for chore in chores:
             logger.debug("Generating events for chore", chore)
+            events_config = chore.configuration["events_generation"]
+            if not events_config["event_type"] == "recurrent":
+                self.stdout.write(
+                    f"Unsupported event_type {events_config['event_type']}"
+                )
+                continue
+
             self.stdout.write(
                 f"Generating events for chore {chore} {chore.configuration['events_generation']['crontab']}"
             )
 
-            crontab = chore.configuration["events_generation"]["crontab"]
-            weekly_frequency = chore.configuration["events_generation"][
-                "take_one_every"
-            ]
+            crontab = events_config["crontab"]
+            weekly_frequency = events_config["take_one_every"]
 
+            start_time = datetime.strptime(
+                events_config["starting_time"], "%d/%m/%Y %H:%M"
+            )
             cron = croniter(
                 crontab,
-                datetime.now(),
+                start_time,
             )
             limit = datetime.now() + timedelta(days=number_of_days)
 
             i = 0
             while True:
                 next = cron.get_next(datetime)
-                if next:
-                    if next > limit:
-                        self.stdout.write(f"Reached limit for chore {chore}")
-                        break
-
-                    if i % weekly_frequency == 0:
-                        self.stdout.write(f"Next event for chore {chore}: {next}")
-                        self.create_event(chore, next)
-
-                    i += 1
-                else:
-                    self.stdout.write(f"No more events for chore {chore}")
+                if next > limit:
+                    self.stdout.write(f"Reached limit for chore {chore}")
                     break
+
+                if next < datetime.now():
+                    i += 1
+                    continue
+
+                if i % weekly_frequency == 0:
+                    self.stdout.write(f"Next event for chore {chore}: {next}")
+                    self.create_event(chore, next)
+
+                i += 1
 
     def create_event(self, chore, next):
         # Query first by chore.name + _startdatetime
