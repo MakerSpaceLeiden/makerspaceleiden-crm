@@ -82,7 +82,7 @@ class Command(BaseCommand):
             _startdatetime=next.astimezone(timezone.utc),
         ).exists():
             agenda = Agenda.objects.create(
-                item_title=chore.name,
+                item_title=chore.name.replace("_", " ").title(),
                 item_details=chore.description,
                 _startdatetime=next.astimezone(timezone.utc),
                 user=chore.creator,

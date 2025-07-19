@@ -77,7 +77,6 @@ class CustomCommandTest(TestCase):
         call_command("generate_events", limit=21, stdout=out)
 
         self.assertIn("Generating events for chores", out.getvalue())
-        print(out.getvalue())
         self.assertEqual(Agenda.objects.count(), 2)
         agenda = Agenda.objects.first()
         self.assertEqual(agenda.item_title, "Test Chore")
@@ -94,7 +93,7 @@ class CustomCommandTest(TestCase):
     def test_generate_events_informed_by_starting_date(self):
         out = StringIO()
         Chore.objects.create(
-            name="Test Chore",
+            name="test_chore",
             description="A test chore that runs every 12 weeks",
             class_type="BasicChore",
             configuration={
