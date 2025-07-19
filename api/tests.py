@@ -13,6 +13,13 @@ from members.models import User
 class EventsApiTests(TestCase):
     def setUp(self):
         self.password = "testpassword"
+        self.user = User.objects.create_user(
+            email="testuser@example.com",
+            password=self.password,
+            first_name="Test",
+            last_name="User",
+            telegram_user_id="123456789",
+        )
 
     def test_events_list_returns_403(self):
         client = APIClient()
@@ -20,14 +27,6 @@ class EventsApiTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_events_list_returns_200_for_authed(self):
-        user_password = "testpassword"
-        user = User.objects.create_user(
-            email="testuser@example.com",
-            password=user_password,
-            first_name="Test",
-            last_name="User",
-            telegram_user_id="123456789",
-        )
         event = Agenda.objects.create(
             startdate=date.today(),
             starttime=time(9, 0),
@@ -35,10 +34,10 @@ class EventsApiTests(TestCase):
             endtime=time(10, 0),
             item_title="Fixture Agenda Title",
             item_details="This is a fixture agenda item for testing.",
-            user=user,
+            user=self.user,
         )
         client = APIClient()
-        self.assertIs(client.login(email=user.email, password=user_password), True)
+        self.assertIs(client.login(email=self.user.email, password=self.password), True)
         response = client.get("/api/v1/events/")
         json_response = json.loads(response.content)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -56,18 +55,11 @@ class EventsApiTests(TestCase):
                 "description": event.item_details,
                 "start_datetime": event.start_datetime.strftime("%Y-%m-%dT%H:%M:%SZ"),
                 "end_datetime": event.end_datetime.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                "type": event.type,
             },
         )
 
     def test_events_list_filter_start_datetime(self):
-        user_password = "testpassword"
-        user = User.objects.create_user(
-            email="testuser@example.com",
-            password=user_password,
-            first_name="Test",
-            last_name="User",
-            telegram_user_id="123456789",
-        )
         # Create two events: one before, one after the filter date
         event1 = Agenda.objects.create(
             startdate=date(2023, 1, 1),
@@ -76,7 +68,7 @@ class EventsApiTests(TestCase):
             endtime=time(10, 0),
             item_title="Event 1",
             item_details="First event.",
-            user=user,
+            user=self.user,
         )
         event2 = Agenda.objects.create(
             startdate=date(2023, 2, 1),
@@ -85,10 +77,10 @@ class EventsApiTests(TestCase):
             endtime=time(10, 0),
             item_title="Event 2",
             item_details="Second event.",
-            user=user,
+            user=self.user,
         )
         client = APIClient()
-        self.assertTrue(client.login(email=user.email, password=user_password))
+        self.assertTrue(client.login(email=self.user.email, password=self.password))
         # Filter for events starting after 2023-01-15
         response = client.get("/api/v1/events/?start_datetime=2023-01-15T00:00:00Z")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -97,14 +89,6 @@ class EventsApiTests(TestCase):
         self.assertFalse(any(e["id"] == event1.id for e in data))
 
     def test_events_list_filter_end_datetime(self):
-        user_password = "testpassword"
-        user = User.objects.create_user(
-            email="testuser@example.com",
-            password=user_password,
-            first_name="Test",
-            last_name="User",
-            telegram_user_id="123456789",
-        )
         # Create two events: one before, one after the filter date
         event1 = Agenda.objects.create(
             startdate=date(2023, 1, 1),
@@ -113,7 +97,7 @@ class EventsApiTests(TestCase):
             endtime=time(10, 0),
             item_title="Event 1",
             item_details="First event.",
-            user=user,
+            user=self.user,
         )
         event2 = Agenda.objects.create(
             startdate=date(2023, 2, 1),
@@ -122,10 +106,10 @@ class EventsApiTests(TestCase):
             endtime=time(10, 0),
             item_title="Event 2",
             item_details="Second event.",
-            user=user,
+            user=self.user,
         )
         client = APIClient()
-        self.assertTrue(client.login(email=user.email, password=user_password))
+        self.assertTrue(client.login(email=self.user.email, password=self.password))
         # Filter for events ending before 2023-01-15
         response = client.get("/api/v1/events/?end_datetime=2023-01-15T00:00:00Z")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -134,14 +118,6 @@ class EventsApiTests(TestCase):
         self.assertFalse(any(e["id"] == event2.id for e in data))
 
     def test_events_list_filter_start_and_end_datetime(self):
-        user_password = "testpassword"
-        user = User.objects.create_user(
-            email="testuser@example.com",
-            password=user_password,
-            first_name="Test",
-            last_name="User",
-            telegram_user_id="123456789",
-        )
         # Create three events: one before, one in range, one after
         event1 = Agenda.objects.create(
             startdate=date(2023, 1, 1),
@@ -150,7 +126,7 @@ class EventsApiTests(TestCase):
             endtime=time(10, 0),
             item_title="Event 1",
             item_details="First event.",
-            user=user,
+            user=self.user,
         )
         event2 = Agenda.objects.create(
             startdate=date(2023, 2, 1),
@@ -159,7 +135,7 @@ class EventsApiTests(TestCase):
             endtime=time(10, 0),
             item_title="Event 2",
             item_details="Second event.",
-            user=user,
+            user=self.user,
         )
         event3 = Agenda.objects.create(
             startdate=date(2023, 3, 1),
@@ -168,10 +144,10 @@ class EventsApiTests(TestCase):
             endtime=time(10, 0),
             item_title="Event 3",
             item_details="Third event.",
-            user=user,
+            user=self.user,
         )
         client = APIClient()
-        self.assertTrue(client.login(email=user.email, password=user_password))
+        self.assertTrue(client.login(email=self.user.email, password=self.password))
         # Filter for events between 2023-01-15 and 2023-02-15
         response = client.get(
             "/api/v1/events/?start_datetime=2023-01-15T00:00:00Z&end_datetime=2023-02-15T23:59:59Z"
@@ -231,10 +207,10 @@ class MembersApiTests(TestCase):
 
 class MachinesApiTests(TestCase):
     def setUp(self):
-        self.user_password = "testpassword"
+        self.password = "testpassword"
         self.user = User.objects.create_user(
             email="testuser@example.com",
-            password=self.user_password,
+            password=self.password,
             first_name="Test",
             last_name="User",
             telegram_user_id="123456789",
@@ -248,9 +224,7 @@ class MachinesApiTests(TestCase):
     def test_machines_list_returns_200_for_authed(self):
         machine = Machine.objects.create(name="Test Machine")
         client = APIClient()
-        self.assertTrue(
-            client.login(email=self.user.email, password=self.user_password)
-        )
+        self.assertTrue(client.login(email=self.user.email, password=self.password))
 
         response = client.get("/api/v1/machines/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -281,9 +255,7 @@ class MachinesApiTests(TestCase):
         machine_ooo = Machine.objects.create(name="Broken Machine", out_of_order=True)
 
         client = APIClient()
-        self.assertTrue(
-            client.login(email=self.user.email, password=self.user_password)
-        )
+        self.assertTrue(client.login(email=self.user.email, password=self.password))
 
         response = client.get("/api/v1/machines/?out_of_order=true")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -300,9 +272,7 @@ class MachinesApiTests(TestCase):
         machine_ooo = Machine.objects.create(name="Broken Machine", out_of_order=True)
 
         client = APIClient()
-        self.assertTrue(
-            client.login(email=self.user.email, password=self.user_password)
-        )
+        self.assertTrue(client.login(email=self.user.email, password=self.password))
 
         response = client.get("/api/v1/machines/?out_of_order=false")
         self.assertEqual(response.status_code, status.HTTP_200_OK)

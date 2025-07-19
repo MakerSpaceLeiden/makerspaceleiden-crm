@@ -29,18 +29,20 @@
                             From:
                         </div>
                         <div class="col-md">
-                            {{ selected_item.startdate|date:"l j M Y" }} - {{ selected_item.starttime|time:"H:i" }}
+                            {{ selected_item.start_datetime|date:"l j M Y" }} - {{ selected_item.start_datetime|time:"H:i" }}
                         </div>
                     </div>
 
+                    {% if selected_item.end_datetime %}
                     <div class="row">
                         <div class="col-xl-1 col-lg-2 col-12" style="font-weight:600;">
                             To:
                         </div>
                         <div class="col-md">
-                            {{ selected_item.enddate|date:"l j M Y" }} - {{ selected_item.endtime|time:"H:i" }}
+                            {{ selected_item.end_datetime|date:"l j M Y" }} - {{ selected_item.end_datetime|time:"H:i" }}
                         </div>
                     </div>
+                    {% endif %}
 
                     {% if object_list %}
                         <div class="row">
@@ -118,7 +120,7 @@
 
                         <div class="row">
                                 <div class="col text-secondary" style="font-size: 14px;  ">
-                                    {{ agenda_item.startdate|date:"d-m-Y" }} - {{ agenda_item.starttime|time:"H:i"  }}
+                                    {{ agenda_item.start_datetime|date:"d-m-Y" }} - {{ agenda_item.start_datetime|time:"H:i"  }}
                                 </div>
                             </div>
                             <div class="row">

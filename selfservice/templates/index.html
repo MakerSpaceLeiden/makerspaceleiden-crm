@@ -18,20 +18,20 @@ function toggle() {
 	<!-- Agenda -->
 		<div class="pt-2 pb-2">
 			<h2>Agenda</h2>
-			<p>Upcoming events (max 5). View all events <a href="{% url 'agenda' %}" class="agenda-link">here</a>.</p>
+			<p>Upcoming events and chores (max 5). <a href="{% url 'agenda' %}" class="agenda-link">View all events</a>.</p>
 			<div class="card mt-2 mb-2">
 				<ul class="list-group list-group-flush pt-0 pb-0">
 					{% for agenda_item in agenda_items %}
 					<li class="list-group-item pt-2 pb-2">
 						<div class="row agenda-item-link">
 							<div class="pt-1 pb-1 border-end agenda-item-part" style="width:160px;">
-								{{ agenda_item.startdate|date:"l, j-m" }}
+								{{ agenda_item.start_datetime|date:"l, j-m" }}
 							</div>
 							<div class="pt-1 pb-1 agenda-item-part d-sm-none d-block" style="width:70px">
-								{{ agenda_item.starttime|time:"G:i" }}
+								{{ agenda_item.start_datetime|date:"G:i" }}
 							</div>
 							<div class="pt-1 pb-1 agenda-item-part border-end d-none d-sm-block" style="width:70px">
-								{{ agenda_item.starttime|time:"G:i" }}
+								{{ agenda_item.start_datetime|date:"G:i" }}
 							</div>
 							<div class="d-block d-sm-none w-100 pt-1 pb-1 agenda-item-part" style="font-weight:600;">
 								<a href="{% url 'agenda_detail' pk=agenda_item.pk %}">
@@ -51,76 +51,6 @@ function toggle() {
 					{% endfor %}
 				</ul>
 			</div>
-		</div>
-
-	<!-- Chores -->
-		<div class="pt-2 pb-1">
-			<h2>Chores</h2>
-			{% if event_groups %}
-				Upcoming tasks next 2 weeks, view all upcoming chores <a href="{% url 'chores' %}" class="chores-link">here</a>.
-				<div class="card mt-2 mb-2">
-					<ul class="list-group list-group-flush pt-0 pb-1">
-						{% for group in event_groups %}
-							<!-- Week Header -->
-							<li class="list-group-item col-sm-12 pt-0 pb-0" style="background-color: rgb(248, 248, 248)">
-								<div class="row">
-									<div class="col-12 mt-2 mb-2" style="font-weight: 600 !important;">
-										{{ group.0 }}
-									</div>
-								</div>
-							</li>
-							<!-- Chore Rows -->
-							{% for event in group.1.events %}
-								<li class="list-group-item pt-2 pb-2">
-									<div class="row">
-										<div class="chore-description-column mt-1 mb-1 ">
-											{{ event.chore.description }}&nbsp;
-											{% if event.wiki_url %}
-												<a href="{{ event.wiki_url }}" target="_blank" class="wiki-link" title="Open wiki page">
-													<i class="fas fa-external-link-alt" style="font-size: 0.7em;"></i> wiki
-												</a>
-											{% endif %}
-										</div>
-										<!-- Volunteer Buttons with fixed width -->
-										<div class="chore-volunteer-column">
-											<ul style="padding: 0 !important; margin: 0;">
-												{% for volunteer in event.volunteers %}
-													<li style="list-style-type: none; padding-bottom:0 !important">
-														<div>
-															{% if volunteer == 'offer_volunteering' %}
-																<a href="{% url 'signup_chore' chore_id=event.chore.chore_id ts=event.when.timestamp %}?redirect_to=index" class="btn btn-outline-secondary btn-sm">Add me as volunteer</a>
-															{% elif volunteer is None %}
-																<i>Volunteer needed</i>
-															{% elif volunteer.id  %}
-																Volunteer:
-																<a href="{{volunteer.path}}">
-																	{{ volunteer.first_name }}
-																</a>
-
-															{% endif %}
-														</div>
-													</li>
-												{% endfor %}
-
-												<!-- Show Remove Button Once -->
-												{% if event.user_volunteered %}
-													<li style="list-style-type: none; margin-top: 0.3em; padding-bottom:0 !important">
-														<div>
-															<a href="{% url 'remove_signup_chore' chore_id=event.chore.chore_id ts=event.when.timestamp %}?redirect_to=index" class="btn btn-outline-secondary btn-sm">Remove me as volunteer</a>
-														</div>
-													</li>
-												{% endif %}
-											</ul>
-										</div>
-									</div>
-								</li>
-							{% endfor %}
-						{% endfor %}
-					</ul>
-				</div>
-			{% else %}
-				No upcoming tasks for the next 2 weeks, view all upcoming chores <a href="{% url 'chores' %}" class="chores-link">here</a>.
-			{% endif %}
 		</div>
 
 	<!-- Unclaimed Floating Objects -->
