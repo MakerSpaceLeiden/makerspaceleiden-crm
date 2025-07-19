@@ -27,7 +27,7 @@ class AgendaQuerySet(models.QuerySet):
 
         return self.filter(
             **filter_kwargs,
-        ).order_by("startdate", "starttime", "item_title")[:limit]
+        ).order_by("_startdatetime", "item_title")[:limit]
 
 
 class Agenda(models.Model):
