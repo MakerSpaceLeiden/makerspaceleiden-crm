@@ -2,10 +2,8 @@ from datetime import date, timedelta
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from django.utils import timezone
 from django.views.decorators.http import require_safe
 
 from .forms import AgendaForm
@@ -157,7 +155,6 @@ def AgendaItemsView(request, pk=None):
     show_history = request.GET.get(
         "show_history", "off"
     )  # Get the state of the show_history parameter
-    now = timezone.now()
 
     if show_history == "off":
         agenda_list = Agenda.objects.upcoming().order_by(
@@ -174,14 +171,7 @@ def AgendaItemsView(request, pk=None):
         if pk:
             selected_item = get_object_or_404(Agenda, pk=pk)
         else:
-            selected_item = (
-                Agenda.objects.filter(
-                    Q(enddate=date.today(), endtime__gte=now)
-                    | Q(enddate__gt=date.today())
-                )
-                .order_by("enddate", "endtime", "startdate", "starttime")
-                .first()
-            )
+            selected_item = agenda_list.first()
 
     is_updated = False
     creation_date = "Time Unknown"
