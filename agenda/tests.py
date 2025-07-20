@@ -232,3 +232,28 @@ class AgendaModelPropertiesTest(TestCase):
             user=self.user,
         )
         self.assertEqual("social", agendaTypeSocial.type)
+
+    @time_machine.travel("2025-05-10 12:00")
+    def test_upcoming_includes_items_with_enddatetime_gte_today(self):
+        from datetime import datetime
+
+        from django.utils import timezone as dj_timezone
+
+        def make_agenda(start, end, title):
+            return Agenda.objects.create(
+                _startdatetime=datetime(*start, tzinfo=dj_timezone.utc),
+                _enddatetime=datetime(*end, tzinfo=dj_timezone.utc),
+                item_title=title,
+                item_details="Test",
+                user=self.user,
+            )
+
+        make_agenda((2025, 5, 8, 7, 0), (2025, 5, 10, 8, 0), "Ends today")
+        make_agenda((2025, 5, 12, 7, 0), (2025, 5, 12, 8, 0), "Future")
+        make_agenda((2025, 5, 1, 7, 0), (2025, 5, 5, 8, 0), "Past")
+
+        upcoming = list(Agenda.objects.upcoming(days=10, limit=None))
+        titles = [a.item_title for a in upcoming]
+        self.assertIn("Ends today", titles)
+        self.assertIn("Future", titles)
+        self.assertNotIn("Past", titles)

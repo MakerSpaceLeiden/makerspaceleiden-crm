@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
 from django.db import models
+from django.db.models import Q
 from django.utils import timezone
 from simple_history.models import HistoricalRecords
 
@@ -18,16 +19,14 @@ class AgendaQuerySet(models.QuerySet):
     def upcoming(self, days=90, limit: int = None, **kwargs):
         today = timezone.now().date()
         end_date = today + timedelta(days=days)
-        filter_kwargs = {
-            "_startdatetime__gte": today,
-            "_startdatetime__lte": end_date,
-        }
-
-        filter_kwargs.update(kwargs)
-
-        return self.filter(
-            **filter_kwargs,
-        ).order_by("_startdatetime", "item_title")[:limit]
+        base_kwargs = kwargs.copy()
+        start_q = Q(
+            _startdatetime__gte=today, _startdatetime__lte=end_date, **base_kwargs
+        )
+        end_q = Q(_enddatetime__gte=today, **base_kwargs)
+        return self.filter(start_q | end_q).order_by("_startdatetime", "item_title")[
+            :limit
+        ]
 
 
 class Agenda(models.Model):
