@@ -157,13 +157,9 @@ def AgendaItemsView(request, pk=None):
     )  # Get the state of the show_history parameter
 
     if show_history == "off":
-        agenda_list = Agenda.objects.upcoming().order_by(
-            "enddate", "endtime", "startdate", "starttime"
-        )  # Filter out items with endtime and date after now
+        agenda_list = Agenda.objects.upcoming()
     else:
-        agenda_list = Agenda.objects.all().order_by(
-            "enddate", "endtime", "startdate", "starttime"
-        )
+        agenda_list = Agenda.objects.all().order_by("_startdatetime", "item_title")
 
     selected_item = None
 
