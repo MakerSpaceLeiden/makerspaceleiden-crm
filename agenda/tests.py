@@ -7,6 +7,7 @@ from rest_framework import status
 
 from acl.models import User
 from agenda.models import Agenda
+from chores.models import Chore
 
 
 class AgendaCreateViewTest(TestCase):
@@ -191,3 +192,43 @@ class AgendaModelPropertiesTest(TestCase):
         )
         self.assertIsNone(agenda.start_datetime)
         self.assertIsNone(agenda.end_datetime)
+
+    def test_type(self):
+        chore = Chore.objects.create(
+            name="Test Chore",
+            description="A test chore that needs volunteers.",
+            class_type="BasicChore",
+            configuration={
+                "min_required_people": 1,
+                "events_generation": {
+                    "event_type": "recurrent",
+                    "starting_time": "21/7/2021 8:00",
+                    "crontab": "0 22 * * sun",
+                    "take_one_every": 1,
+                },
+                "reminders": [],
+            },
+            creator=self.user,
+        )
+        agendaTypeChore = Agenda.objects.create(
+            startdate=None,
+            starttime=None,
+            enddate=None,
+            endtime=None,
+            item_title="Test Agenda",
+            item_details="Test details.",
+            user=self.user,
+            chore=chore,
+        )
+        self.assertEqual("chore", agendaTypeChore.type)
+
+        agendaTypeSocial = Agenda.objects.create(
+            startdate=None,
+            starttime=None,
+            enddate=None,
+            endtime=None,
+            item_title="Test Agenda",
+            item_details="Test details.",
+            user=self.user,
+        )
+        self.assertEqual("social", agendaTypeSocial.type)

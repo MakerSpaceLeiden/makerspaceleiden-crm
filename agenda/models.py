@@ -1,13 +1,33 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
 from django.db import models
 from django.utils import timezone
 from simple_history.models import HistoricalRecords
 
+from chores.models import Chore
 from members.models import User
 
 CEST = ZoneInfo("Europe/Amsterdam")  # Handles both CET and CEST
+
+
+class AgendaQuerySet(models.QuerySet):
+    def upcoming_chores(self):
+        return self.upcoming(chore__isnull=False)
+
+    def upcoming(self, days=90, limit: int = None, **kwargs):
+        today = timezone.now().date()
+        end_date = today + timedelta(days=days)
+        filter_kwargs = {
+            "_startdatetime__gte": today,
+            "_startdatetime__lte": end_date,
+        }
+
+        filter_kwargs.update(kwargs)
+
+        return self.filter(
+            **filter_kwargs,
+        ).order_by("_startdatetime", "item_title")[:limit]
 
 
 class Agenda(models.Model):
@@ -20,8 +40,21 @@ class Agenda(models.Model):
     item_title = models.TextField(max_length=600, default="")
     item_details = models.TextField(max_length=5000, blank=True, default="")
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-
     history = HistoricalRecords()
+
+    STATUS_CHOICES = [
+        ("pending", "Pending"),
+        ("in_progress", "In Progress"),
+        ("completed", "Completed"),
+        ("cancelled", "Cancelled"),
+    ]
+
+    chore = models.ForeignKey(Chore, null=True, blank=True, on_delete=models.CASCADE)
+    status = models.CharField(
+        max_length=20, choices=STATUS_CHOICES, default=None, null=True
+    )
+
+    objects = AgendaQuerySet.as_manager()
 
     @property
     def start_datetime(self):
@@ -36,12 +69,20 @@ class Agenda(models.Model):
 
     @property
     def end_datetime(self):
+        if self._enddatetime:
+            return self._enddatetime
         if self.enddate and self.endtime:
             dt = datetime.combine(self.enddate, self.endtime)
             if timezone.is_naive(dt):
                 dt = dt.replace(tzinfo=CEST)
             return dt.astimezone(timezone.utc)
         return None
+
+    @property
+    def type(self) -> str:
+        if self.chore:
+            return "chore"
+        return "social"
 
     def _get_utc_from_cest_date_and_time(self, date, time):
         if date and time:
@@ -54,11 +95,14 @@ class Agenda(models.Model):
 
     def save(self, *args, **kwargs):
         # Compute _startdatetime from startdate and starttime (assumed CE(S)T)
-        self._startdatetime = self._get_utc_from_cest_date_and_time(
-            self.startdate, self.starttime
-        )
-        self._enddatetime = self._get_utc_from_cest_date_and_time(
-            self.enddate, self.endtime
-        )
+        if self.startdate and self.starttime and not self._startdatetime:
+            self._startdatetime = self._get_utc_from_cest_date_and_time(
+                self.startdate, self.starttime
+            )
+
+        if self.enddate and self.endtime and not self._enddatetime:
+            self._enddatetime = self._get_utc_from_cest_date_and_time(
+                self.enddate, self.endtime
+            )
 
         super().save(*args, **kwargs)
