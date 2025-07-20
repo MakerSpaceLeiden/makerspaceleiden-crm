@@ -3,6 +3,7 @@ from datetime import datetime, timedelta, timezone
 
 from croniter import croniter
 from django.core.management.base import BaseCommand
+from isodate import parse_duration
 
 from agenda.models import Agenda
 
@@ -81,14 +82,24 @@ class Command(BaseCommand):
             chore=chore,
             _startdatetime=next.astimezone(timezone.utc),
         ).exists():
+            end_datetime = _get_chore_enddatetime(next, chore.configuration)
+
             agenda = Agenda.objects.create(
                 item_title=chore.name.replace("_", " ").title(),
                 item_details=chore.description,
                 _startdatetime=next.astimezone(timezone.utc),
-                _enddatetime=(next + timedelta(days=7)).astimezone(timezone.utc),
+                _enddatetime=end_datetime,
                 user=chore.creator,
                 chore=chore,
             )
             logger.debug("Created agenda", agenda)
         else:
             logger.debug("Found existing agenda item.")
+
+
+def _get_chore_enddatetime(next, chore_configuration) -> datetime:
+    events_generation = chore_configuration.get("events_generation", {})
+    duration = events_generation.get("duration")
+    if not duration:
+        return (next + timedelta(days=7)).astimezone(timezone.utc)
+    return (next + parse_duration(duration)).astimezone(timezone.utc)

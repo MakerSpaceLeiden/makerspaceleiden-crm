@@ -31,6 +31,7 @@ class CustomCommandTest(TestCase):
                     "starting_time": "21/7/2021 8:00",
                     "crontab": "0 22 * * sun",
                     "take_one_every": 1,
+                    "duration": "PT1H",
                 },
                 "reminders": [],
             },
@@ -49,6 +50,10 @@ class CustomCommandTest(TestCase):
         self.assertEqual(
             agenda.start_datetime,
             datetime(2025, 7, 20, 20, 00, 0, 0, tzinfo=timezone.utc),
+        )
+        self.assertEqual(
+            agenda.end_datetime,
+            datetime(2025, 7, 20, 21, 00, 0, 0, tzinfo=timezone.utc),
         )
         self.assertEqual(agenda.user, self.user)
 

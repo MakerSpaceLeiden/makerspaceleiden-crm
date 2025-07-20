@@ -47,6 +47,7 @@ dependencies = [
     "robohash>=2.0",
     "factory-boy>=3.3.3",
     "croniter>=6.0.0",
+    "isodate>=0.7.2",
 ]
 
 [dependency-groups]
