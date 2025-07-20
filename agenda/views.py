@@ -160,7 +160,7 @@ def AgendaItemsView(request, pk=None):
     now = timezone.now()
 
     if show_history == "off":
-        agenda_list = Agenda.objects.filter(Q(enddate__gte=date.today())).order_by(
+        agenda_list = Agenda.objects.upcoming().order_by(
             "enddate", "endtime", "startdate", "starttime"
         )  # Filter out items with endtime and date after now
     else:

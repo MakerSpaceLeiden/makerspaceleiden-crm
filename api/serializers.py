@@ -15,7 +15,7 @@ class AgendaSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Agenda
-        fields = ["id", "name", "description", "start_datetime", "end_datetime"]
+        fields = ["id", "name", "description", "start_datetime", "end_datetime", "type"]
 
     def get_name(self, obj):
         return obj.item_title
