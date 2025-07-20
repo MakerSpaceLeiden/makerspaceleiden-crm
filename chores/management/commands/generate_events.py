@@ -85,6 +85,7 @@ class Command(BaseCommand):
                 item_title=chore.name.replace("_", " ").title(),
                 item_details=chore.description,
                 _startdatetime=next.astimezone(timezone.utc),
+                _enddatetime=(next + timedelta(days=7)).astimezone(timezone.utc),
                 user=chore.creator,
                 chore=chore,
             )

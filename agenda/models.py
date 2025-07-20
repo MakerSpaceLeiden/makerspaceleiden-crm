@@ -69,6 +69,8 @@ class Agenda(models.Model):
 
     @property
     def end_datetime(self):
+        if self._enddatetime:
+            return self._enddatetime
         if self.enddate and self.endtime:
             dt = datetime.combine(self.enddate, self.endtime)
             if timezone.is_naive(dt):

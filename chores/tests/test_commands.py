@@ -85,6 +85,10 @@ class CustomCommandTest(TestCase):
             agenda.start_datetime,
             datetime(2025, 7, 20, 20, 00, 0, 0, tzinfo=timezone.utc),
         )
+        self.assertEqual(
+            agenda.start_datetime,
+            datetime(2025, 7, 20, 20, 00, 0, 0, tzinfo=timezone.utc),
+        )
         self.assertEqual(agenda.user, self.user)
 
     # First occurence should be based on start date of chore not invocation
