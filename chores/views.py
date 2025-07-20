@@ -10,6 +10,7 @@ from django.core.mail import EmailMessage
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.template.loader import render_to_string
+from django.views.decorators.http import require_POST
 
 from agenda.models import Agenda
 
@@ -138,3 +139,14 @@ def remove_signup(request, chore_id, ts):
     redirect_to = request.GET.get("redirect_to", "chores")
 
     return redirect(redirect_to)
+
+
+@login_required
+@require_POST
+def mark_chore_complete(request, pk):
+    event = Agenda.objects.filter(pk=pk).first()
+    if not event:
+        return HttpResponse("Event not found", status=404, content_type="text/plain")
+    event.status = "completed"
+    event.save()
+    return redirect(request.META.get("HTTP_REFERER", "/"))

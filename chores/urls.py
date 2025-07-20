@@ -12,4 +12,7 @@ urlpatterns = [
         views.remove_signup,
         name="remove_signup_chore",
     ),
+    path(
+        "mark_complete/<int:pk>/", views.mark_chore_complete, name="mark_chore_complete"
+    ),
 ]

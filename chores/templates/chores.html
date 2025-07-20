@@ -25,17 +25,30 @@
                         <li class="list-group-item pt-2 pb-2">
                             <div class="d-flex">
                                 <div class="pt-1 pb-1 border-end agenda-item-part" style="min-width: 18ch">
+                                    <a href="{% url 'agenda_detail' pk=event.pk %}">
                                     {{ event.start_datetime|date:"l, j-m" }}
-                                    {{ event.start_datetime|date:"G:i" }}
+                                    {{ event.start_datetime|date:"G:i" }}</a>
                                 </div>
                                 <div class="ps-3">
                                     {{ event.item_details }}&nbsp;
-                                </div>
-                                {% if event.chore.wiki_url %}
+                                    {% if event.chore.wiki_url %}
                                         <a href="{{ event.wiki_url }}" target="_blank" class="wiki-link" title="Open wiki page">
                                             wiki&nbsp;<i class="fas fa-external-link-alt" style="font-size: 0.7em;"></i>
                                         </a>
                                     {% endif %}
+                                </div>
+                                Status:
+                                {% if event.status == None %}
+                                    Pending
+                                {% else %}
+                                    {{ event.status }}
+                                {% endif %}
+                                {% if event.status != "completed" %}
+                                <form method="post" action="{% url 'mark_chore_complete' event.pk %}">
+                                    {% csrf_token %}
+                                    <button class="btn btn-outline-primary">Mark as complete</button>
+                                </form>
+                                {% endif %}
                             </div>
                         </li>
                     {% endfor %}
