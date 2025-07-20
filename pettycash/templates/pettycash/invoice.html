@@ -7,14 +7,13 @@ Enter any description and amount in the form (up to a 100 euro) and press pay to
 
   <h2>{{ label }}</h2>
   <form method="post"  enctype="multipart/form-data">
-  <table>
-    {% csrf_token %}
-    {{ form.as_table }}
-    <tr><td></td><td>
-	      <button name="submit" value="pay" type="submit">{{ action }}</button> <br>
-<i>You have not yet paid; press this button to pay</i>.
-    </td></tr>
-  </table>
+    <table>
+      {% csrf_token %}
+      {{ form.as_table }}
+      <tr><td></td><td>
+          <button name="submit" value="pay" class="btn btn-primary me-2" type="submit">{{ action }}</button>
+      </td></tr>
+    </table>
   </form>
 
 {% if products %}

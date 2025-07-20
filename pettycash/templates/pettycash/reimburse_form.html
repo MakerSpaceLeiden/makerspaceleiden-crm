@@ -38,8 +38,7 @@ Once you've done that - press pay.
     {% csrf_token %}
     {{ form.as_table }}
     <tr><td></td><td>
-	      <button name="submit" value="pay" type="submit">{{ action }}</button> <br>
-<i>You have not yet paid; press this button to pay</i>.
+	      <button class="btn btn-primary text-capitalize me-2" name="submit" value="pay" type="submit">{{ action }}</button>
     </td></tr>
   </table>
   </form>
