@@ -126,6 +126,7 @@ SETTINGS_EXPORT = [
     "NONE_ID",
     "NONE_LABEL",
     "TRUSTEES",
+    "MAILINGLIST",
     "SITE_NAME",
 ]
 
