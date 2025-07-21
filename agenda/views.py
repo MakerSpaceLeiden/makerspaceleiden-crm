@@ -94,12 +94,22 @@ def AgendaUpdateView(request, pk):
             messages.success(request, "The item is updated successfully.")
             return redirect("agenda_update", pk=pk)
     else:
-        form = AgendaForm(instance=agenda)
+        # Use _startdatetime/_enddatetime if present to populate startdate/starttime/enddate/endtime
+        initial = {}
+        if agenda._startdatetime:
+            initial["startdate"] = agenda._startdatetime.date()
+            initial["starttime"] = agenda._startdatetime.time()
+        if agenda._enddatetime:
+            initial["enddate"] = agenda._enddatetime.date()
+            initial["endtime"] = agenda._enddatetime.time()
+        # Also include other fields from the instance
+        form = AgendaForm(instance=agenda, initial=initial)
 
     context = {
         "form": form,
         "title": "Edit agenda item",
         "has_permission": request.user.is_authenticated,
+        "agenda": agenda,
     }
     return render(request, "agenda/agenda_crud.html", context)
 

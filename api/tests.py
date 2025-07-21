@@ -56,6 +56,7 @@ class EventsApiTests(TestCase):
                 "start_datetime": event.start_datetime.strftime("%Y-%m-%dT%H:%M:%SZ"),
                 "end_datetime": event.end_datetime.strftime("%Y-%m-%dT%H:%M:%SZ"),
                 "type": event.type,
+                "status": None,
             },
         )
 

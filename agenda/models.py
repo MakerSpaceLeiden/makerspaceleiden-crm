@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
-from django.db import models
+from django.db import models, transaction
 from django.db.models import Q
 from django.utils import timezone
 from simple_history.models import HistoricalRecords
@@ -83,6 +83,26 @@ class Agenda(models.Model):
             return "chore"
         return "social"
 
+    @property
+    def display_status(self) -> str:
+        if self.type != "chore":
+            return None
+
+        return self.status if self.status else "pending"
+
+    @property
+    def display_datetime(self) -> str:
+        """
+        Returns a string like 'Monday, 10-07 – 17-07' or just the start date if no end date.
+        """
+        if not self.start_datetime:
+            return ""
+        start_str = self.start_datetime.strftime("%A, %d-%m")
+        if self.end_datetime:
+            end_str = self.end_datetime.strftime("%d-%m")
+            return f"{start_str} – {end_str}"
+        return start_str
+
     def _get_utc_from_cest_date_and_time(self, date, time):
         if date and time:
             dt = datetime.combine(date, time)
@@ -91,6 +111,25 @@ class Agenda(models.Model):
             return dt.astimezone(timezone.utc)
 
         return None
+
+    def set_status(self, new_status: str, user: User):
+        if not user:
+            raise ValueError(
+                "A user must be provided to set_status for audit trail purposes."
+            )
+
+        if self.status == new_status:
+            return
+
+        with transaction.atomic():
+            self.status = new_status
+            self.save()
+
+            AgendaChoreStatusChange.objects.create(
+                agenda=self,
+                user=user,
+                status=new_status,
+            )
 
     def save(self, *args, **kwargs):
         # Compute _startdatetime from startdate and starttime (assumed CE(S)T)
@@ -105,3 +144,21 @@ class Agenda(models.Model):
             )
 
         super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.item_title}"
+
+
+class AgendaChoreStatusChange(models.Model):
+    agenda = models.ForeignKey("Agenda", on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    status = models.CharField(max_length=20, choices=Agenda.STATUS_CHOICES)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "Agenda Chore Status Change"
+        verbose_name_plural = "Agenda Chore Status Changes"
+
+    def __str__(self):
+        return f"{self.user} set {self.agenda} to {self.status}"
