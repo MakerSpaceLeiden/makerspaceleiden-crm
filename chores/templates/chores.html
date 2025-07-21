@@ -10,33 +10,48 @@
             <div>
                 <p>
                     Below is the list of chores for the next 3 months.
-                </p>
-                <p>
                     Please sign up for the activities you can help with. If a chore is getting close and nobody has signed up yet, the system will send out reminders.
                 </p>
                 <p>
                     For the engineers - this data is also accessible as JSON from <code><a href="/api/v1/events">/api/v1/events</a></code>.
                 </p>
             </div>
-            <div class="card mt-2 mb-2">
-                <ul class="list-group list-group-flush pt-0 pb-0">
+            <div class="mt-2 mb-2">
+                <ul class="list-group">
                     <!-- Chore Rows -->
                     {% for event in chores %}
-                        <li class="list-group-item pt-2 pb-2">
-                            <div class="d-flex">
-                                <div class="pt-1 pb-1 border-end agenda-item-part" style="min-width: 18ch">
-                                    {{ event.start_datetime|date:"l, j-m" }}
-                                    {{ event.start_datetime|date:"G:i" }}
+                        <li class="list-group-item list-group-item-action py-3">
+                            <div class="w-100 d-flex justify-content-between">
+                                <h4 class="my-0">
+                                    <a href="{% url 'agenda_detail' pk=event.pk %}">
+                                        <span class="d-inline-block me-1">
+                                            {{ event.display_datetime }}
+                                        </span>
+
+                                        <span class="d-inline-block fw-normal">
+                                            {{ event.item_title }}
+                                        </span>
+                                    </a>
+                                </h4>
+                                <div class="badge  {%if event.display_status == 'completed'%}text-bg-success{% else %}text-bg-secondary{% endif %}"">
+                                    {{event.display_status.title }}
                                 </div>
-                                <div class="ps-3">
-                                    {{ event.item_details }}&nbsp;
-                                </div>
-                                {% if event.chore.wiki_url %}
-                                        <a href="{{ event.wiki_url }}" target="_blank" class="wiki-link" title="Open wiki page">
-                                            wiki&nbsp;<i class="fas fa-external-link-alt" style="font-size: 0.7em;"></i>
-                                        </a>
-                                    {% endif %}
                             </div>
+                            <p class="text-dark my-0 mt-1">
+                                {{ event.item_details }}
+                                {% if event.chore.wiki_url %}
+                                    <a href="{{ event.wiki_url }}" target="_blank" class="wiki-link" title="Open wiki page">
+                                        wiki&nbsp;<i class="fas fa-external-link-alt" style="font-size: 0.7em;"></i>
+                                    </a>
+                                {% endif %}
+
+                                {% if event.status != "completed" %}
+                                    <form method="post" action="{% url 'mark_chore_complete' event.pk %}">
+                                        {% csrf_token %}
+                                        <button class="btn btn-outline-primary btn-sm mt-2">Mark as complete</button>
+                                    </form>
+                                {% endif %}
+                            </p>
                         </li>
                     {% endfor %}
                 </ul>
