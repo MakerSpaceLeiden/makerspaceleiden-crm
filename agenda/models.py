@@ -31,15 +31,17 @@ class AgendaQuerySet(models.QuerySet):
 
 class Agenda(models.Model):
     startdatetime = models.DateTimeField(null=True)
-    startdate = models.DateField(null=True)
-    starttime = models.TimeField(null=True)
     enddatetime = models.DateTimeField(null=True)
-    enddate = models.DateField(null=True)
-    endtime = models.TimeField(null=True)
     item_title = models.TextField(max_length=600, default="")
     item_details = models.TextField(max_length=5000, blank=True, default="")
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     history = HistoricalRecords()
+
+    # Deprecated – These will be removed in the near future
+    startdate = models.DateField(null=True)
+    starttime = models.TimeField(null=True)
+    enddate = models.DateField(null=True)
+    endtime = models.TimeField(null=True)
 
     STATUS_CHOICES = [
         ("pending", "Pending"),
