@@ -15,10 +15,15 @@ jobs:
         run: uv python install
       - name: Install dependencies
         run: uv sync
-      - name: Run tests
+      - name: Setup env
         run: |
           source .venv/bin/activate
           uv sync
+      - name: Check migrations
+        run: |
+          uv run manage.py makemigrations --check --dry-run
+      - name: Run tests
+        run: |
           uv run python manage.py check
           uv pip install coverage
           uv run coverage run --source='.' manage.py test
