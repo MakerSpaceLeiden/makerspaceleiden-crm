@@ -147,6 +147,5 @@ def mark_chore_complete(request, pk):
     event = Agenda.objects.filter(pk=pk).first()
     if not event:
         return HttpResponse("Event not found", status=404, content_type="text/plain")
-    event.status = "completed"
-    event.save()
+    event.set_status("completed", request.user)
     return redirect(request.META.get("HTTP_REFERER", "/"))

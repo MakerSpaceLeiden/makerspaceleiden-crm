@@ -12,16 +12,28 @@ class AgendaSerializer(serializers.HyperlinkedModelSerializer):
     description = serializers.SerializerMethodField()
     start_datetime = serializers.SerializerMethodField()
     end_datetime = serializers.SerializerMethodField()
+    status = serializers.SerializerMethodField()
 
     class Meta:
         model = Agenda
-        fields = ["id", "name", "description", "start_datetime", "end_datetime", "type"]
+        fields = [
+            "id",
+            "name",
+            "description",
+            "start_datetime",
+            "end_datetime",
+            "type",
+            "status",
+        ]
 
     def get_name(self, obj):
         return obj.item_title
 
     def get_description(self, obj):
         return obj.item_details
+
+    def get_status(self, obj):
+        return obj.display_status
 
     def get_start_datetime(self, obj):
         dt = obj.start_datetime

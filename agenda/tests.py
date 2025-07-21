@@ -257,3 +257,44 @@ class AgendaModelPropertiesTest(TestCase):
         self.assertIn("Ends today", titles)
         self.assertIn("Future", titles)
         self.assertNotIn("Past", titles)
+
+    def test_set_status_creates_status_change_record(self):
+        from agenda.models import AgendaChoreStatusChange
+
+        other_user = User.objects.create_user(
+            first_name="Other",
+            last_name="User",
+            password="testpassword",
+            email="otheruser@example.com",
+        )
+        agenda = Agenda.objects.create(
+            startdate=date(2025, 5, 3),
+            starttime=time(9, 0),
+            enddate=date(2025, 5, 3),
+            endtime=time(10, 0),
+            item_title="Test Agenda",
+            item_details="Test details.",
+            user=self.user,
+        )
+        # Initially no status change records
+        self.assertEqual(AgendaChoreStatusChange.objects.count(), 0)
+        # Set status to completed
+        agenda.set_status("completed", other_user)
+        self.assertEqual(agenda.status, "completed")
+        # There should be one status change record
+        changes = AgendaChoreStatusChange.objects.filter(agenda=agenda)
+        self.assertEqual(changes.count(), 1)
+        change = changes.first()
+        self.assertEqual(change.status, "completed")
+        self.assertEqual(change.user, other_user)
+        # Setting to the same status again should not create a new record
+        agenda.set_status("completed", self.user)
+        self.assertEqual(
+            AgendaChoreStatusChange.objects.filter(agenda=agenda).count(), 1
+        )
+        # Setting to a new status should create another record
+        agenda.set_status("in_progress", self.user)
+        self.assertEqual(agenda.status, "in_progress")
+        self.assertEqual(
+            AgendaChoreStatusChange.objects.filter(agenda=agenda).count(), 2
+        )
