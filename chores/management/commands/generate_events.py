@@ -76,19 +76,19 @@ class Command(BaseCommand):
                 i += 1
 
     def create_event(self, chore, next):
-        # Query first by chore.name + _startdatetime
+        # Query first by chore.name + startdatetime
         # If not found, create new
         if not Agenda.objects.filter(
             chore=chore,
-            _startdatetime=next.astimezone(timezone.utc),
+            startdatetime=next.astimezone(timezone.utc),
         ).exists():
             end_datetime = _get_chore_enddatetime(next, chore.configuration)
 
             agenda = Agenda.objects.create(
                 item_title=chore.name.replace("_", " ").title(),
                 item_details=chore.description,
-                _startdatetime=next.astimezone(timezone.utc),
-                _enddatetime=end_datetime,
+                startdatetime=next.astimezone(timezone.utc),
+                enddatetime=end_datetime,
                 user=chore.creator,
                 chore=chore,
             )
