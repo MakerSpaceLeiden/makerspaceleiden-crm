@@ -28,6 +28,18 @@ class AgendaQuerySet(models.QuerySet):
             :limit
         ]
 
+    def previous(self, days=90, limit: int = None, **kwargs):
+        today = timezone.now().date()
+        end_date = today - timedelta(days=days)
+        base_kwargs = kwargs.copy()
+        start_q = Q(
+            startdatetime__lte=today, startdatetime__gte=end_date, **base_kwargs
+        )
+        end_q = Q(enddatetime__lte=today, **base_kwargs)
+        return self.filter(start_q & end_q).order_by("startdatetime", "item_title")[
+            :limit
+        ]
+
 
 class Agenda(models.Model):
     startdatetime = models.DateTimeField(null=True)

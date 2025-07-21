@@ -5,6 +5,7 @@ from collections import defaultdict
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import EmailMessage
 from django.db.models import Prefetch
@@ -12,8 +13,9 @@ from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.template.loader import render_to_string
 from django.views.decorators.http import require_POST
+from django.views.generic.detail import DetailView
 
-from agenda.models import Agenda
+from agenda.models import Agenda, AgendaChoreStatusChange
 
 from .models import Chore, ChoreVolunteer
 
@@ -81,7 +83,12 @@ def index(request):
                 "agenda_set",
                 queryset=Agenda.objects.upcoming(),
                 to_attr="upcoming_events",
-            )
+            ),
+            Prefetch(
+                "agenda_set",
+                queryset=Agenda.objects.previous(),
+                to_attr="previous_events",
+            ),
         ).order_by("name"),
     )
 
@@ -166,3 +173,31 @@ def mark_chore_complete(request, pk):
         return HttpResponse("Event not found", status=404, content_type="text/plain")
     event.set_status("completed", request.user)
     return redirect(request.META.get("HTTP_REFERER", "/"))
+
+
+class ChoreDetailView(LoginRequiredMixin, DetailView):
+    model = Chore
+    template_name = "chores/chore_detail.html"
+    context_object_name = "chore"
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        events = []
+        for agenda in Agenda.objects.filter(chore=self.object):
+            recent_completed_status_change = (
+                AgendaChoreStatusChange.objects.filter(
+                    agenda=agenda, status="completed"
+                )
+                .order_by("-created_at")
+                .first()
+            )
+            events.append(
+                {
+                    "agenda": agenda,
+                    "recent_completed_status_change": recent_completed_status_change,
+                }
+            )
+        ctx["title"] = "Chores"
+        ctx["name"] = self.object.name.replace("_", " ").title
+        ctx["events"] = events
+        return ctx

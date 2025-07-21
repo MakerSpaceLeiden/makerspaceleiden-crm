@@ -48,6 +48,9 @@
                                         <a href="{{ selected_item.chore.wiki_url }}">
                                             More information available in the Wiki
                                         </a>
+                                        <a href="{% url 'chore_detail' selected_item.chore.id %}">
+                                            Chore
+                                        </a>
                                     </div>
                                 {% endif %}
 
