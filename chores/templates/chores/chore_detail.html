@@ -32,18 +32,25 @@
               <td>{{ item.agenda.display_status }}</td>
               <td>{{ item.agenda.start_datetime }}</td>
               <td>{{ item.agenda.end_datetime }}</td>
-              <td>
               {% if item.recent_completed_status_change %}
+              <td>
                 {{ item.recent_completed_status_change.created_at }}
-              {% endif %}
               </td>
               <td>
-                {% if item.recent_completed_status_change %}
                 <a href="{% url 'overview' item.recent_completed_status_change.user.id %}">
                   {{ item.recent_completed_status_change.user }}
                 </a>
-                {% endif %}
               </td>
+              {% else %}
+              <td colspan="2">
+                <form method="post" action="{% url 'mark_chore_complete' item.agenda.pk %}">
+                    {% csrf_token %}
+                    <button
+                      data-test-hook="mark-chore-as-completed"
+                      class="btn btn-outline-primary btn-sm">Mark as complete</button>
+                </form>
+              </td>
+              {% endif %}
             </tr>
           {% endfor %}
         </tbody>
