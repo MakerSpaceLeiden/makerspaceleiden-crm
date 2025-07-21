@@ -95,6 +95,11 @@ class DetailViewTests(TestCase):
             creator=self.user,
         )
 
+    def test_detail_requires_auth(self):
+        url = reverse("chore_detail", kwargs={"pk": self.chore.pk})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_302_FOUND)
+
     @time_machine.travel("2025-05-10 14:56")
     def test_detail_view_renders_agenda_and_status(self):
         self.agenda = Agenda.objects.create(
