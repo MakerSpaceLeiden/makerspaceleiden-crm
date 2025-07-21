@@ -4,30 +4,29 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('agenda', '0004_agendachorestatuschange'),
+        ("agenda", "0004_agendachorestatuschange"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='agenda',
-            old_name='_enddatetime',
-            new_name='enddatetime',
+            model_name="agenda",
+            old_name="_enddatetime",
+            new_name="enddatetime",
         ),
         migrations.RenameField(
-            model_name='agenda',
-            old_name='_startdatetime',
-            new_name='startdatetime',
+            model_name="agenda",
+            old_name="_startdatetime",
+            new_name="startdatetime",
         ),
         migrations.RenameField(
-            model_name='historicalagenda',
-            old_name='_enddatetime',
-            new_name='enddatetime',
+            model_name="historicalagenda",
+            old_name="_enddatetime",
+            new_name="enddatetime",
         ),
         migrations.RenameField(
-            model_name='historicalagenda',
-            old_name='_startdatetime',
-            new_name='startdatetime',
+            model_name="historicalagenda",
+            old_name="_startdatetime",
+            new_name="startdatetime",
         ),
     ]
