@@ -7,6 +7,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import EmailMessage
+from django.db.models import Prefetch
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.template.loader import render_to_string
@@ -66,11 +67,27 @@ def index_api(request, name=None):
     return HttpResponse(js, content_type="application/json")
 
 
+def processChore(c):
+    c.name = c.name.replace("_", " ").title
+    return c
+
+
 @login_required
 def index(request):
+    chores = map(
+        processChore,
+        Chore.objects.prefetch_related(
+            Prefetch(
+                "agenda_set",
+                queryset=Agenda.objects.upcoming(),
+                to_attr="upcoming_events",
+            )
+        ).order_by("name"),
+    )
+
     context = {
+        "chores": chores,
         "title": "Chores",
-        "chores": Agenda.objects.upcoming_chores(),
         "has_permission": request.user.is_authenticated,
         "user": request.user,
     }

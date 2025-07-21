@@ -7,51 +7,64 @@
 	<!-- Chores -->
     <div class="pt-0 pb-1">
         {% if chores %}
-            <div>
-                <p>
-                    Below is the list of chores for the next 3 months.
-                    Please sign up for the activities you can help with. If a chore is getting close and nobody has signed up yet, the system will send out reminders.
-                </p>
-                <p>
-                    For the engineers - this data is also accessible as JSON from <code><a href="/api/v1/events">/api/v1/events</a></code>.
-                </p>
+            <div class="row justify-content-between">
+                <div class="col-md-6">
+                    <p class="lead">
+                        Routine tasks help keep our makerspace clean, organized, and safe for everyone.
+                        Pitch in to support the community and keep things running smoothly.
+                    </p>
+                    <p>
+                        Each task has clear documentation, so feel free to take on what you can.
+                        If a chore's due date is approaching and no one has signed up, the system will send out friendly reminders.
+                    </p>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-light mb-3">
+                        <div class="card-body">
+                            <p class="m-0 text-muted"> <strong>Note:</strong> These Chore definitions are responsible for creating items in our <a href="{% url 'agenda' %}">Agenda</a> on a recurring basis. They are not currently editable, but any suggestions for new chores or edits can be raised on <a href="mailto:{{ settings.MAILINGLIST }}">deelnemers@ mailing list</a>.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="mt-2 mb-2">
                 <ul class="list-group">
                     <!-- Chore Rows -->
-                    {% for event in chores %}
+                    {% for chore in chores %}
                         <li class="list-group-item list-group-item-action py-3">
-                            <div class="w-100 d-flex justify-content-between">
-                                <h4 class="my-0">
-                                    <a href="{% url 'agenda_detail' pk=event.pk %}">
-                                        <span class="d-inline-block me-1">
-                                            {{ event.display_datetime }}
-                                        </span>
-
-                                        <span class="d-inline-block fw-normal">
-                                            {{ event.item_title }}
-                                        </span>
-                                    </a>
-                                </h4>
-                                <div class="badge  {%if event.display_status == 'completed'%}text-bg-success{% else %}text-bg-secondary{% endif %}"">
-                                    {{event.display_status.title }}
+                            <div class="row">
+                                <div class="col-6">
+                                    <h2 class="my-0">
+                                        {{ chore.name.title }}
+                                    </h2>
+                                    <p class="text-dark my-0 mt-1">
+                                        {{ chore.description }}
+                                        {% if chore.wiki_url %}
+                                            <a href="{{ chore.wiki_url }}" target="_blank" class="wiki-link" title="Open wiki page">
+                                                wiki&nbsp;<i class="fas fa-external-link-alt" style="font-size: 0.7em;"></i>
+                                            </a>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                                <div class="col-6">
+                                    {% if chore.configuration.events_generation.event_type == 'recurrent' %}
+                                        <p class="my-0">
+                                            <strong>Frequency:</strong> Once every {{ chore.configuration.events_generation.take_one_every }} weeks
+                                        </p>
+                                        <p>
+                                            <strong>Next occurence:</strong>
+                                            {% if chore.upcoming_events %}
+                                                    {% for agenda in chore.upcoming_events|slice:":1" %}
+                                                            <a href="{% url 'agenda_detail' agenda.pk %}">
+                                                                {{ agenda.display_datetime }}
+                                                            </a>
+                                                    {% endfor %}
+                                            {% else %}
+                                                None scheduled
+                                            {% endif %}
+                                        </p>
+                                    {% endif %}
                                 </div>
                             </div>
-                            <p class="text-dark my-0 mt-1">
-                                {{ event.item_details }}
-                                {% if event.chore.wiki_url %}
-                                    <a href="{{ event.wiki_url }}" target="_blank" class="wiki-link" title="Open wiki page">
-                                        wiki&nbsp;<i class="fas fa-external-link-alt" style="font-size: 0.7em;"></i>
-                                    </a>
-                                {% endif %}
-
-                                {% if event.status != "completed" %}
-                                    <form method="post" action="{% url 'mark_chore_complete' event.pk %}">
-                                        {% csrf_token %}
-                                        <button class="btn btn-outline-primary btn-sm mt-2">Mark as complete</button>
-                                    </form>
-                                {% endif %}
-                            </p>
                         </li>
                     {% endfor %}
                 </ul>
