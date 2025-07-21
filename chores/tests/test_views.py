@@ -54,7 +54,8 @@ class IndexViewTests(TestCase):
         response = self.client.get(url)
         html = response.content.decode("utf-8")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn(agenda.item_details, html)
+        self.assertIn(self.chore.name, html)
+        self.assertIn(agenda.display_datetime, html)
 
     def test_api_path_returns_200(self):
         # If the root path is named 'chores', use reverse; otherwise, use '/'
