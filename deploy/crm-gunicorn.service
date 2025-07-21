@@ -1,0 +1,25 @@
+[Unit]
+Description=gunicorn Webserver for CRM
+After=network.target
+
+[Service]
+EnvironmentFile=/usr/local/makerspaceleiden-crm/.env
+Environment=SECURE_SSL_REDIRECT=False
+Environment=CRM_DEBUG=False
+Environment=LOG_FILE_NAME=/var/log/crm/crm-gunicorn-debug.log
+Environment=LOGIN_REDIRECT_URL=/crm
+Environment=LOGIN_URL=/crm
+Environment=UV_CACHE_DIR=/usr/local/makerspaceleiden-crm/.uv-cache
+Environment=UV_PYTHON_INSTALL_DIR=/usr/local/makerspaceleiden-crm/.uv-cache
+
+Type=simple
+User=www-data
+Group=crmadmin
+WorkingDirectory=/usr/local/makerspaceleiden-crm
+ExecStart=/usr/local/bin/uv run gunicorn \
+ --log-level=debug --workers=2 --bind=127.0.0.1:8008 \
+ --config=/usr/local/makerspaceleiden-crm/deploy/gunicorn.conf.py \
+ makerspaceleiden.wsgi:application
+
+[Install]
+WantedBy=multi-user.target

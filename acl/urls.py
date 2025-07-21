@@ -75,4 +75,9 @@ urlpatterns = [
         views.api2_gettags4machineBIN,
         name="acl-v2-gettags-bin",
     ),
+    path(
+        "acl/api/v2/recorduse/<str:machine>",
+        views.api_recorduse,
+        name="acl-v2-recorduse",
+    ),
 ]
