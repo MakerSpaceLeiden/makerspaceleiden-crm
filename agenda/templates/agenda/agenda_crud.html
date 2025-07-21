@@ -25,19 +25,15 @@
   {% endif %}
 
     <div class="mb-3">
-        <label for="startdate" class="form-label">Start time:</label>
+        <label for="startdate" class="form-label">Start date time:</label>
         <div class="input-group" id="custom_startdate_group" >
-            {{ form.startdate }}
-            <span class="input-group-text">at</span>
-            {{ form.starttime }}
+            {{ form.startdatetime }}
         </div>
     </div>
     <div class="mb-3">
-        <label for="enddate" class="form-label">End time:</label>
+        <label for="enddate" class="form-label">End date time:</label>
         <div class="input-group" id="custom_enddate_group">
-            {{ form.enddate }}
-            <span class="input-group-text">at</span>
-            {{ form.endtime }}
+            {{ form.enddatetime }}
         </div>
     </div>
 

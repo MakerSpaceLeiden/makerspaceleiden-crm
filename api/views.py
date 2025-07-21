@@ -60,11 +60,11 @@ class EventViewSet(BaseListMetaViewSet):
 
         if start_datetime_str:
             queryset = self._filter_by_datetime_field(
-                queryset, "_startdatetime", start_datetime_str, "gte"
+                queryset, "startdatetime", start_datetime_str, "gte"
             )
         if end_datetime_str:
             queryset = self._filter_by_datetime_field(
-                queryset, "_enddatetime", end_datetime_str, "lte"
+                queryset, "enddatetime", end_datetime_str, "lte"
             )
         self.get_queryset = lambda: queryset
         return super().list(request, *args, **kwargs)

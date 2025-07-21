@@ -2,8 +2,7 @@ from datetime import datetime
 
 from django import forms
 from django.core.exceptions import ValidationError
-from django_flatpickr.schemas import FlatpickrOptions
-from django_flatpickr.widgets import DatePickerInput, TimePickerInput
+from django_flatpickr.widgets import DateTimePickerInput
 
 from .models import Agenda
 
@@ -12,17 +11,11 @@ class AgendaForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         _ = kwargs.pop("form_type", "create_agenda_item")
         super().__init__(*args, **kwargs)
-        self.fields["startdate"].error_messages = {
-            "required": "Required: Please enter the start date."
+        self.fields["startdatetime"].error_messages = {
+            "required": "Required: Please enter the start date and time."
         }
-        self.fields["starttime"].error_messages = {
-            "required": "Required: Please enter the start time."
-        }
-        self.fields["enddate"].error_messages = {
-            "required": "Required: Please enter the end date."
-        }
-        self.fields["endtime"].error_messages = {
-            "required": "Required: Please enter the end time."
+        self.fields["enddatetime"].error_messages = {
+            "required": "Required: Please enter the end date and time."
         }
         self.fields["item_title"].initial = ""
         self.fields["item_title"].error_messages = {
@@ -49,10 +42,8 @@ class AgendaForm(forms.ModelForm):
     class Meta:
         model = Agenda
         fields = [
-            "startdate",
-            "starttime",
-            "enddate",
-            "endtime",
+            "startdatetime",
+            "enddatetime",
             "item_title",
             "item_details",
         ]
@@ -60,32 +51,6 @@ class AgendaForm(forms.ModelForm):
         widgets = {
             "item_title": forms.Textarea(attrs={"class": "form-control"}),
             "item_details": forms.Textarea(attrs={"class": "form-control"}),
-            "startdate": DatePickerInput(
-                options=FlatpickrOptions(
-                    altFormat="d-m-Y",
-                ),
-                attrs={"class": "date-input"},
-            ),
-            "starttime": TimePickerInput(
-                options=FlatpickrOptions(
-                    time_24hr=True,
-                    altFormat="H:i",
-                    minuteIncrement=1,
-                ),
-                attrs={"class": "date-input"},
-            ),
-            "enddate": DatePickerInput(
-                options=FlatpickrOptions(
-                    altFormat="d-m-Y",
-                ),
-                attrs={"class": "date-input"},
-            ),
-            "endtime": TimePickerInput(
-                options=FlatpickrOptions(
-                    time_24hr=True,
-                    altFormat="H:i",
-                    minuteIncrement=1,
-                ),
-                attrs={"class": "date-input"},
-            ),
+            "startdatetime": DateTimePickerInput(attrs={"class": "datetime-input"}),
+            "enddatetime": DateTimePickerInput(attrs={"class": "datetime-input"}),
         }

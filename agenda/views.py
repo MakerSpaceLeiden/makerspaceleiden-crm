@@ -94,14 +94,14 @@ def AgendaUpdateView(request, pk):
             messages.success(request, "The item is updated successfully.")
             return redirect("agenda_update", pk=pk)
     else:
-        # Use _startdatetime/_enddatetime if present to populate startdate/starttime/enddate/endtime
+        # Use startdatetime/enddatetime if present to populate startdate/starttime/enddate/endtime
         initial = {}
-        if agenda._startdatetime:
-            initial["startdate"] = agenda._startdatetime.date()
-            initial["starttime"] = agenda._startdatetime.time()
-        if agenda._enddatetime:
-            initial["enddate"] = agenda._enddatetime.date()
-            initial["endtime"] = agenda._enddatetime.time()
+        if agenda.startdatetime:
+            initial["startdate"] = agenda.startdatetime.date()
+            initial["starttime"] = agenda.startdatetime.time()
+        if agenda.enddatetime:
+            initial["enddate"] = agenda.enddatetime.date()
+            initial["endtime"] = agenda.enddatetime.time()
         # Also include other fields from the instance
         form = AgendaForm(instance=agenda, initial=initial)
 
@@ -169,7 +169,7 @@ def AgendaItemsView(request, pk=None):
     if show_history == "off":
         agenda_list = Agenda.objects.upcoming()
     else:
-        agenda_list = Agenda.objects.all().order_by("_startdatetime", "item_title")
+        agenda_list = Agenda.objects.all().order_by("startdatetime", "item_title")
 
     selected_item = None
 

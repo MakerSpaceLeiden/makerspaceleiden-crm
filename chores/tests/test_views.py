@@ -39,8 +39,8 @@ class IndexViewTests(TestCase):
         )
 
         agenda = Agenda.objects.create(
-            _startdatetime=datetime.now(tz=timezone.utc) + timedelta(days=2),
-            _enddatetime=datetime.now(tz=timezone.utc) + timedelta(days=3),
+            startdatetime=datetime.now(tz=timezone.utc) + timedelta(days=2),
+            enddatetime=datetime.now(tz=timezone.utc) + timedelta(days=3),
             item_title="Test Agenda",
             item_details="Test details.",
             user=self.user,
@@ -63,8 +63,8 @@ class IndexViewTests(TestCase):
         )
 
         Agenda.objects.create(
-            _startdatetime=datetime.now(tz=timezone.utc) + timedelta(days=2),
-            _enddatetime=datetime.now(tz=timezone.utc) + timedelta(days=3),
+            startdatetime=datetime.now(tz=timezone.utc) + timedelta(days=2),
+            enddatetime=datetime.now(tz=timezone.utc) + timedelta(days=3),
             item_title="Test Agenda",
             item_details="Test details.",
             user=self.user,

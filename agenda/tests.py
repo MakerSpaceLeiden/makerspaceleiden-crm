@@ -117,17 +117,17 @@ class AgendaModelPropertiesTest(TestCase):
         self.assertEqual(
             agenda.end_datetime, datetime(2025, 5, 3, 8, 0, tzinfo=timezone.utc)
         )
-        # Test that _startdatetime is stored as UTC
+        # Test that startdatetime is stored as UTC
         self.assertEqual(
-            agenda._startdatetime, datetime(2025, 5, 3, 7, 0, tzinfo=timezone.utc)
+            agenda.startdatetime, datetime(2025, 5, 3, 7, 0, tzinfo=timezone.utc)
         )
 
-        # Test that _startdatetime is stored as UTC
+        # Test that startdatetime is stored as UTC
         self.assertEqual(
-            agenda._enddatetime, datetime(2025, 5, 3, 8, 0, tzinfo=timezone.utc)
+            agenda.enddatetime, datetime(2025, 5, 3, 8, 0, tzinfo=timezone.utc)
         )
 
-    def test_startdatetime_field_is_none_if_missing(self):
+    def teststartdatetime_field_is_none_if_missing(self):
         agenda = Agenda.objects.create(
             startdate=None,
             starttime=None,
@@ -137,7 +137,7 @@ class AgendaModelPropertiesTest(TestCase):
             item_details="Test details.",
             user=self.user,
         )
-        self.assertIsNone(agenda._startdatetime)
+        self.assertIsNone(agenda.startdatetime)
 
         agenda2 = Agenda.objects.create(
             startdate=date(2025, 5, 3),
@@ -148,7 +148,7 @@ class AgendaModelPropertiesTest(TestCase):
             item_details="Test details.",
             user=self.user,
         )
-        self.assertIsNone(agenda2._startdatetime)
+        self.assertIsNone(agenda2.startdatetime)
 
     def test_start_datetime_missing_time(self):
         agenda = Agenda.objects.create(
@@ -234,15 +234,15 @@ class AgendaModelPropertiesTest(TestCase):
         self.assertEqual("social", agendaTypeSocial.type)
 
     @time_machine.travel("2025-05-10 12:00")
-    def test_upcoming_includes_items_with_enddatetime_gte_today(self):
+    def test_upcoming_includes_items_withenddatetime_gte_today(self):
         from datetime import datetime
 
         from django.utils import timezone as dj_timezone
 
         def make_agenda(start, end, title):
             return Agenda.objects.create(
-                _startdatetime=datetime(*start, tzinfo=dj_timezone.utc),
-                _enddatetime=datetime(*end, tzinfo=dj_timezone.utc),
+                startdatetime=datetime(*start, tzinfo=dj_timezone.utc),
+                enddatetime=datetime(*end, tzinfo=dj_timezone.utc),
                 item_title=title,
                 item_details="Test",
                 user=self.user,

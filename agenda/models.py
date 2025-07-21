@@ -21,19 +21,19 @@ class AgendaQuerySet(models.QuerySet):
         end_date = today + timedelta(days=days)
         base_kwargs = kwargs.copy()
         start_q = Q(
-            _startdatetime__gte=today, _startdatetime__lte=end_date, **base_kwargs
+            startdatetime__gte=today, startdatetime__lte=end_date, **base_kwargs
         )
-        end_q = Q(_enddatetime__gte=today, **base_kwargs)
-        return self.filter(start_q | end_q).order_by("_startdatetime", "item_title")[
+        end_q = Q(enddatetime__gte=today, **base_kwargs)
+        return self.filter(start_q | end_q).order_by("startdatetime", "item_title")[
             :limit
         ]
 
 
 class Agenda(models.Model):
-    _startdatetime = models.DateTimeField(null=True)
+    startdatetime = models.DateTimeField(null=True)
     startdate = models.DateField(null=True)
     starttime = models.TimeField(null=True)
-    _enddatetime = models.DateTimeField(null=True)
+    enddatetime = models.DateTimeField(null=True)
     enddate = models.DateField(null=True)
     endtime = models.TimeField(null=True)
     item_title = models.TextField(max_length=600, default="")
@@ -57,8 +57,8 @@ class Agenda(models.Model):
 
     @property
     def start_datetime(self):
-        if self._startdatetime:
-            return self._startdatetime
+        if self.startdatetime:
+            return self.startdatetime
         if self.startdate and self.starttime:
             dt = datetime.combine(self.startdate, self.starttime)
             if timezone.is_naive(dt):
@@ -68,8 +68,8 @@ class Agenda(models.Model):
 
     @property
     def end_datetime(self):
-        if self._enddatetime:
-            return self._enddatetime
+        if self.enddatetime:
+            return self.enddatetime
         if self.enddate and self.endtime:
             dt = datetime.combine(self.enddate, self.endtime)
             if timezone.is_naive(dt):
@@ -132,14 +132,14 @@ class Agenda(models.Model):
             )
 
     def save(self, *args, **kwargs):
-        # Compute _startdatetime from startdate and starttime (assumed CE(S)T)
-        if self.startdate and self.starttime and not self._startdatetime:
-            self._startdatetime = self._get_utc_from_cest_date_and_time(
+        # Compute startdatetime from startdate and starttime (assumed CE(S)T)
+        if self.startdate and self.starttime and not self.startdatetime:
+            self.startdatetime = self._get_utc_from_cest_date_and_time(
                 self.startdate, self.starttime
             )
 
-        if self.enddate and self.endtime and not self._enddatetime:
-            self._enddatetime = self._get_utc_from_cest_date_and_time(
+        if self.enddate and self.endtime and not self.enddatetime:
+            self.enddatetime = self._get_utc_from_cest_date_and_time(
                 self.enddate, self.endtime
             )
 

@@ -119,7 +119,7 @@
 
         {% block messages %}
             {% if messages %}
-            <ul class="messagelist">
+            <ul class="messagelist mt-0 py-0">
                 {% for message in messages %}
                 <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|capfirst }}</li>
                 {% endfor %}</ul>
