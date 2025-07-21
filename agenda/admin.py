@@ -8,13 +8,13 @@ from .models import Agenda, AgendaChoreStatusChange
 class AgendaAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     list_display = (
         "item_title",
-        "_startdatetime",
-        "_enddatetime",
+        "startdatetime",
+        "enddatetime",
         "user",
     )
-    ordering = ("_startdatetime", "_enddatetime")
+    ordering = ("startdatetime", "enddatetime")
     search_fields = ("item_title", "user__username")
-    list_filter = ("_startdatetime", "user")
+    list_filter = ("startdatetime", "user")
     readonly_fields = ("start_datetime", "end_datetime")
 
 

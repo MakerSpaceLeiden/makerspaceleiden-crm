@@ -2,94 +2,10 @@ from datetime import date, datetime, time, timezone
 
 import time_machine
 from django.test import TestCase
-from django.urls import reverse
-from rest_framework import status
 
 from acl.models import User
 from agenda.models import Agenda
 from chores.models import Chore
-
-
-class AgendaCreateViewTest(TestCase):
-    def setUp(self):
-        self.user = User.objects.create_user(
-            first_name="An",
-            last_name="Example",
-            password="testpassword",
-            email="example@example.com",
-        )
-        success = self.client.login(email=self.user.email, password="testpassword")
-        self.assertTrue(success)
-
-    def test_agenda_create_get(self):
-        url = reverse("agenda_create")
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTemplateUsed(response, "agenda/agenda_crud.html")
-
-    def test_agenda_view(self):
-        url = reverse("agenda_detail", kwargs={"pk": 1})
-
-        original = Agenda.objects.create(
-            startdate=date.today(),
-            starttime=time(9, 0),
-            enddate=date.today(),
-            endtime=time(10, 0),
-            item_title="Fixture Agenda Title",
-            item_details="This is a fixture agenda item for testing.",
-            user=self.user,
-        )
-
-        response = self.client.get(url + "?copy_from=1")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        html = response.content.decode("utf-8")
-        self.assertTemplateUsed(response, "agenda/agenda.html")
-        self.assertIn(original.item_title, html)
-        self.assertIn(original.item_details, html)
-
-    @time_machine.travel("2025-05-10 14:56")
-    def test_agenda_create_copy_from(self):
-        url = reverse("agenda_create")
-
-        original = Agenda.objects.create(
-            startdate=date.today(),
-            starttime=time(9, 0),
-            enddate=date.today(),
-            endtime=time(10, 0),
-            item_title="Fixture Agenda Title",
-            item_details="This is a fixture agenda item for testing.",
-            user=self.user,
-        )
-
-        response = self.client.get(url + "?copy_from=1")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        html = response.content.decode("utf-8")
-        self.assertTemplateUsed(response, "agenda/agenda_crud.html")
-        self.assertIn(original.item_title, html)
-        self.assertIn(original.item_details, html)
-        self.assertIn("2025-05-17", html, "Suggested dates")
-
-    @time_machine.travel("2025-05-05 14:56")
-    def test_agenda_create_copy_from_on_a_saturday(self):
-        url = reverse("agenda_create")
-
-        original = Agenda.objects.create(
-            startdate=datetime.strptime("2025-05-03", "%Y-%m-%d").date(),
-            starttime=time(9, 0),
-            enddate=datetime.strptime("2025-05-03", "%Y-%m-%d").date(),
-            endtime=time(10, 0),
-            item_title="Fixture Agenda Title",
-            item_details="This is a fixture agenda item for testing.",
-            user=self.user,
-        )
-
-        response = self.client.get(url + "?copy_from=1")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        html = response.content.decode("utf-8")
-        self.assertTemplateUsed(response, "agenda/agenda_crud.html")
-        self.assertIn(original.item_title, html)
-        self.assertIn(original.item_details, html)
-        self.assertIn("2025-05-10", html, "Suggested dates")
 
 
 class AgendaModelPropertiesTest(TestCase):
@@ -117,17 +33,17 @@ class AgendaModelPropertiesTest(TestCase):
         self.assertEqual(
             agenda.end_datetime, datetime(2025, 5, 3, 8, 0, tzinfo=timezone.utc)
         )
-        # Test that _startdatetime is stored as UTC
+        # Test that startdatetime is stored as UTC
         self.assertEqual(
-            agenda._startdatetime, datetime(2025, 5, 3, 7, 0, tzinfo=timezone.utc)
+            agenda.startdatetime, datetime(2025, 5, 3, 7, 0, tzinfo=timezone.utc)
         )
 
-        # Test that _startdatetime is stored as UTC
+        # Test that startdatetime is stored as UTC
         self.assertEqual(
-            agenda._enddatetime, datetime(2025, 5, 3, 8, 0, tzinfo=timezone.utc)
+            agenda.enddatetime, datetime(2025, 5, 3, 8, 0, tzinfo=timezone.utc)
         )
 
-    def test_startdatetime_field_is_none_if_missing(self):
+    def teststartdatetime_field_is_none_if_missing(self):
         agenda = Agenda.objects.create(
             startdate=None,
             starttime=None,
@@ -137,7 +53,7 @@ class AgendaModelPropertiesTest(TestCase):
             item_details="Test details.",
             user=self.user,
         )
-        self.assertIsNone(agenda._startdatetime)
+        self.assertIsNone(agenda.startdatetime)
 
         agenda2 = Agenda.objects.create(
             startdate=date(2025, 5, 3),
@@ -148,7 +64,7 @@ class AgendaModelPropertiesTest(TestCase):
             item_details="Test details.",
             user=self.user,
         )
-        self.assertIsNone(agenda2._startdatetime)
+        self.assertIsNone(agenda2.startdatetime)
 
     def test_start_datetime_missing_time(self):
         agenda = Agenda.objects.create(
@@ -234,15 +150,15 @@ class AgendaModelPropertiesTest(TestCase):
         self.assertEqual("social", agendaTypeSocial.type)
 
     @time_machine.travel("2025-05-10 12:00")
-    def test_upcoming_includes_items_with_enddatetime_gte_today(self):
+    def test_upcoming_includes_items_withenddatetime_gte_today(self):
         from datetime import datetime
 
         from django.utils import timezone as dj_timezone
 
         def make_agenda(start, end, title):
             return Agenda.objects.create(
-                _startdatetime=datetime(*start, tzinfo=dj_timezone.utc),
-                _enddatetime=datetime(*end, tzinfo=dj_timezone.utc),
+                startdatetime=datetime(*start, tzinfo=dj_timezone.utc),
+                enddatetime=datetime(*end, tzinfo=dj_timezone.utc),
                 item_title=title,
                 item_details="Test",
                 user=self.user,

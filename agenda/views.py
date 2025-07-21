@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta, timezone
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -34,15 +34,15 @@ def get_next_occurrence_of_weekday(target_weekday, from_date=None):
     return from_date + timedelta(days=days_ahead)
 
 
-def get_suggested_dates_for_copy(startdate, enddate):
+def get_suggested_dates_for_copy(startdate: datetime, enddate: datetime):
     """
-    Calculate suggested start and end dates when copying an agenda item.
+    Calculate suggested start and end datetimes when copying an agenda item, preserving the time component.
 
     Args:
         original_agenda (Agenda): The agenda item being copied
 
     Returns:
-        tuple: (suggested_startdate, suggested_enddate)
+        tuple: (suggested_startdatetime, suggested_enddatetime)
     """
     suggested_startdate = startdate
     suggested_enddate = enddate
@@ -50,18 +50,31 @@ def get_suggested_dates_for_copy(startdate, enddate):
     if startdate:
         # Get the weekday of the original start date (0=Monday, 6=Sunday)
         original_start_weekday = startdate.weekday()
-        suggested_startdate = get_next_occurrence_of_weekday(original_start_weekday)
+        next_date = get_next_occurrence_of_weekday(original_start_weekday)
+        # Preserve the time if present
+        if hasattr(startdate, "time"):
+            suggested_startdate = datetime.combine(
+                next_date, startdate.time(), tzinfo=timezone.utc
+            )
+        else:
+            suggested_startdate = next_date
 
     if enddate:
         if startdate and enddate:
             # If both dates exist, maintain the same relative timing
-            # Calculate the difference between original start and end dates
+            # Calculate the difference between original start and end datetimes
             date_difference = enddate - startdate
             suggested_enddate = suggested_startdate + date_difference
         else:
             # If only end date exists, suggest next occurrence of that weekday
             original_end_weekday = enddate.weekday()
-            suggested_enddate = get_next_occurrence_of_weekday(original_end_weekday)
+            next_date = get_next_occurrence_of_weekday(original_end_weekday)
+            if hasattr(enddate, "time"):
+                suggested_enddate = datetime.combine(
+                    next_date, enddate.time(), tzinfo=getattr(enddate, "tzinfo", None)
+                )
+            else:
+                suggested_enddate = next_date
 
     return suggested_startdate, suggested_enddate
 
@@ -94,14 +107,14 @@ def AgendaUpdateView(request, pk):
             messages.success(request, "The item is updated successfully.")
             return redirect("agenda_update", pk=pk)
     else:
-        # Use _startdatetime/_enddatetime if present to populate startdate/starttime/enddate/endtime
+        # Use startdatetime/enddatetime if present to populate startdate/starttime/enddate/endtime
         initial = {}
-        if agenda._startdatetime:
-            initial["startdate"] = agenda._startdatetime.date()
-            initial["starttime"] = agenda._startdatetime.time()
-        if agenda._enddatetime:
-            initial["enddate"] = agenda._enddatetime.date()
-            initial["endtime"] = agenda._enddatetime.time()
+        if agenda.startdatetime:
+            initial["startdate"] = agenda.startdatetime.date()
+            initial["starttime"] = agenda.startdatetime.time()
+        if agenda.enddatetime:
+            initial["enddate"] = agenda.enddatetime.date()
+            initial["endtime"] = agenda.enddatetime.time()
         # Also include other fields from the instance
         form = AgendaForm(instance=agenda, initial=initial)
 
@@ -134,15 +147,15 @@ def AgendaCreateView(request):
                 copy_from = Agenda.objects.get(pk=copy_from_id)
 
                 # Get suggested dates using the helper method
-                suggested_startdate, suggested_enddate = get_suggested_dates_for_copy(
-                    copy_from.startdate, copy_from.enddate
+                suggested_startdatetime, suggested_enddatetime = (
+                    get_suggested_dates_for_copy(
+                        copy_from.startdatetime, copy_from.enddatetime
+                    )
                 )
 
                 initial = {
-                    "startdate": suggested_startdate,
-                    "starttime": copy_from.starttime,
-                    "enddate": suggested_enddate,
-                    "endtime": copy_from.endtime,
+                    "startdatetime": suggested_startdatetime,
+                    "enddatetime": suggested_enddatetime,
                     "item_title": copy_from.item_title,
                     "item_details": copy_from.item_details,
                 }
@@ -169,7 +182,7 @@ def AgendaItemsView(request, pk=None):
     if show_history == "off":
         agenda_list = Agenda.objects.upcoming()
     else:
-        agenda_list = Agenda.objects.all().order_by("_startdatetime", "item_title")
+        agenda_list = Agenda.objects.all().order_by("startdatetime", "item_title")
 
     selected_item = None
 
