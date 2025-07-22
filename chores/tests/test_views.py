@@ -157,3 +157,24 @@ class DetailViewTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         # Agenda item should be present
         self.assertIn('data-test-hook="mark-chore-as-completed"', html)
+
+    @time_machine.travel("2025-05-10 14:56")
+    def test_detail_view_renders_futuer_agenda_item_without_cta(self):
+        self.agenda = Agenda.objects.create(
+            startdatetime=datetime.now(tz=timezone.utc) + timedelta(days=20),
+            enddatetime=datetime.now(tz=timezone.utc) + timedelta(days=21),
+            item_title="Agenda for Chore Detail",
+            item_details="Agenda details.",
+            user=self.user,
+            chore=self.chore,
+        )
+
+        self.assertTrue(
+            self.client.login(email=self.user.email, password=self.password)
+        )
+        url = reverse("chore_detail", kwargs={"pk": self.chore.pk})
+        response = self.client.get(url)
+        html = response.content.decode("utf-8")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # Agenda item should be present
+        self.assertNotIn('data-test-hook="mark-chore-as-completed"', html)

@@ -117,6 +117,11 @@ class Agenda(models.Model):
             return f"{start_str} – {end_str}"
         return start_str
 
+    @property
+    def is_active(self) -> bool:
+        now = datetime.now(tz=timezone.utc)
+        return self.startdatetime <= now and self.enddatetime >= now
+
     def _get_utc_from_cest_date_and_time(self, date, time):
         if date and time:
             dt = datetime.combine(date, time)

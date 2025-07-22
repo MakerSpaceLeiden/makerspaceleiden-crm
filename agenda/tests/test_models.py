@@ -214,3 +214,39 @@ class AgendaModelPropertiesTest(TestCase):
         self.assertEqual(
             AgendaChoreStatusChange.objects.filter(agenda=agenda).count(), 2
         )
+
+    @time_machine.travel("2025-05-03 10:00")
+    def test_is_active_property_table(self):
+        """
+        Table-driven test for Agenda.is_active property.
+        Each case defines start, end, current time, and expected result.
+        """
+        test_cases = [
+            {
+                "label": "active between start and end",
+                "start": datetime(2025, 5, 3, 6, 0, tzinfo=timezone.utc),
+                "end": datetime(2025, 5, 3, 16, 0, tzinfo=timezone.utc),
+                "expected": True,
+            },
+            {
+                "label": "inactive before start",
+                "start": datetime(2025, 5, 2, 9, 0, tzinfo=timezone.utc),
+                "end": datetime(2025, 5, 2, 10, 0, tzinfo=timezone.utc),
+                "expected": False,
+            },
+            {
+                "label": "inactive after end",
+                "start": datetime(2025, 5, 3, 9, 0, tzinfo=timezone.utc),
+                "end": datetime(2025, 5, 3, 10, 0, tzinfo=timezone.utc),
+                "expected": False,
+            },
+        ]
+        for case in test_cases:
+            with self.subTest(msg=case["label"]):
+                agenda = Agenda.objects.create(
+                    startdatetime=case["start"],
+                    enddatetime=case["end"],
+                    item_title=case["label"],
+                    user=self.user,
+                )
+                self.assertEqual(agenda.is_active, case["expected"])
