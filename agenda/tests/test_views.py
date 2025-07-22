@@ -41,7 +41,7 @@ class AgendaCreateViewTest(TestCase):
         response = self.client.get(url + "?copy_from=1")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         html = response.content.decode("utf-8")
-        self.assertTemplateUsed(response, "agenda/agenda.html")
+        self.assertTemplateUsed(response, "agenda/agenda_detail.html")
         self.assertIn(original.item_title, html)
         self.assertIn(original.item_details, html)
 
@@ -85,3 +85,26 @@ class AgendaCreateViewTest(TestCase):
         self.assertIn(original.item_details, html)
         self.assertIn("2025-05-10", html, "Suggested dates")
         self.assertIn("11:00", html, "Suggested time")
+
+
+class AgendaItemsView(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            first_name="An",
+            last_name="Example",
+            password="testpassword",
+            email="example@example.com",
+        )
+
+    def test_requires_login(self):
+        url = reverse("agenda")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_302_FOUND)
+
+    def test_list_get(self):
+        success = self.client.login(email=self.user.email, password="testpassword")
+        self.assertTrue(success)
+        url = reverse("agenda")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTemplateUsed(response, "agenda/agenda_list.html")
