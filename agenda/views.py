@@ -236,6 +236,7 @@ def AgendaItemsView(request, pk=None):
 
     return render(request, "agenda/agenda_list.html", context)
 
+
 @login_required
 def AgendaItemDetailView(request, pk=None):
     show_history = request.GET.get(

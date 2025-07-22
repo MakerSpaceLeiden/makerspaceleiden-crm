@@ -58,7 +58,7 @@
                                                     {% for agenda in chore.upcoming_events|slice:":1" %}
                                                             <span class="d-inline-block">
                                                                 <a href="{% url 'agenda_detail' agenda.pk %}" class="me-1">
-                                                                    {{ agenda.display_datetime }} 
+                                                                    {{ agenda.display_datetime }}
                                                                 </a>
                                                                 {% agenda_badge agenda %}
                                                             </span>

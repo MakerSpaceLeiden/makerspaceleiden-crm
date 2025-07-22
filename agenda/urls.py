@@ -3,8 +3,8 @@ from django.urls import path
 from agenda.views import (
     AgendaCreateView,
     AgendaDeleteView,
-    AgendaItemsView,
     AgendaItemDetailView,
+    AgendaItemsView,
     AgendaUpdateView,
 )
 
