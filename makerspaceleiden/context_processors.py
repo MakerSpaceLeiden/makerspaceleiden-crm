@@ -13,7 +13,7 @@ def get_trustee_links(user):
     if user is None:
         return trustee_links
 
-    # Privileged user links
+    # Privileged user linksp
     if user.is_authenticated and getattr(user, "is_privileged", True):
         trustee_links += [
             {"url": reverse("admin:index"), "label": "Raw database access"},

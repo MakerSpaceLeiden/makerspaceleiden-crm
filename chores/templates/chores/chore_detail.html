@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% load agenda_badge %}
+
+{% block content %}
+  <h2>{{ name }}</h2>
+  <p><strong>Description:</strong> {{ chore.description }}</p>
+  <p><strong>Frequency:</strong> Once every {{ chore.configuration.events_generation.take_one_every }} weeks</p>
+  <p><strong>Configuration:</strong> <pre>{{ chore.configuration|json_script:"chore-config" }}</pre></p>
+  {% if chore.wiki_url %}
+    <p><strong>Wiki URL:</strong> <a href="{{ chore.wiki_url }}">{{ chore.wiki_url }}</a></p>
+  {% endif %}
+  <p><strong>Creator:</strong> {{ chore.creator }}</p>
+  <p><strong>Created At:</strong> {{ chore.created_at }}</p>
+
+  {% if events %}
+    <h2>Related Agenda Items</h2>
+    <div class="table-responsive">
+      <table class="table table-striped table-bordered align-middle">
+        <thead>
+          <tr>
+            <th>Status</th>
+            <th>Start Datetime</th>
+            <th>End Datetime</th>
+            <th>Completed Datetime</th>
+            <th>
+              Member
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in events %}
+            <tr>
+              <td>{% agenda_badge item.agenda %}</td>
+              <td>
+                <a href="{% url 'agenda_detail' item.agenda.pk %}">
+                  {{ item.agenda.start_datetime }}
+                </a>
+
+              </td>
+              <td>{{ item.agenda.end_datetime }}</td>
+              {% if item.recent_completed_status_change %}
+              <td>
+                {{ item.recent_completed_status_change.created_at }}
+              </td>
+              <td>
+                <a href="{% url 'overview' item.recent_completed_status_change.user.id %}">
+                  {{ item.recent_completed_status_change.user }}
+                </a>
+              </td>
+              {% else %}
+              <td colspan="2">
+                {% if item.agenda.is_active %}
+                <form method="post" action="{% url 'mark_chore_complete' item.agenda.pk %}">
+                    {% csrf_token %}
+                    <button
+                      data-test-hook="mark-chore-as-completed"
+                      class="btn btn-outline-primary btn-sm">Mark as complete</button>
+                </form>
+                {% endif %}
+              </td>
+              {% endif %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
+{% endblock %}
