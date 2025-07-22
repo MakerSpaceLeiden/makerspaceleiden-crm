@@ -1,6 +1,7 @@
 from django.urls import path
 
 from . import views
+from .views import ChoreDetailView
 
 urlpatterns = [
     path("", views.index, name="chores"),
@@ -15,4 +16,5 @@ urlpatterns = [
     path(
         "mark_complete/<int:pk>/", views.mark_chore_complete, name="mark_chore_complete"
     ),
+    path("<int:pk>/", ChoreDetailView.as_view(), name="chore_detail"),
 ]

@@ -28,6 +28,18 @@ class AgendaQuerySet(models.QuerySet):
             :limit
         ]
 
+    def previous(self, days=90, limit: int = None, **kwargs):
+        today = timezone.now().date()
+        end_date = today - timedelta(days=days)
+        base_kwargs = kwargs.copy()
+        start_q = Q(
+            startdatetime__lte=today, startdatetime__gte=end_date, **base_kwargs
+        )
+        end_q = Q(enddatetime__lte=today, **base_kwargs)
+        return self.filter(start_q & end_q).order_by("startdatetime", "item_title")[
+            :limit
+        ]
+
 
 class Agenda(models.Model):
     startdatetime = models.DateTimeField(null=True)
@@ -48,6 +60,8 @@ class Agenda(models.Model):
         ("in_progress", "In Progress"),
         ("completed", "Completed"),
         ("cancelled", "Cancelled"),
+        ("overdue", "Overdue"),
+        ("help_wanted", "Help Wanted"),
     ]
 
     chore = models.ForeignKey(Chore, null=True, blank=True, on_delete=models.CASCADE)
@@ -90,7 +104,11 @@ class Agenda(models.Model):
         if self.type != "chore":
             return None
 
-        return self.status if self.status else "pending"
+        if self.is_active and self.status != "completed":
+            return "help wanted"
+
+        status = "pending"
+        return self.status if self.status else status
 
     @property
     def display_datetime(self) -> str:
@@ -104,6 +122,11 @@ class Agenda(models.Model):
             end_str = self.end_datetime.strftime("%d-%m")
             return f"{start_str} – {end_str}"
         return start_str
+
+    @property
+    def is_active(self) -> bool:
+        now = datetime.now(tz=timezone.utc)
+        return self.startdatetime <= now and self.enddatetime >= now
 
     def _get_utc_from_cest_date_and_time(self, date, time):
         if date and time:

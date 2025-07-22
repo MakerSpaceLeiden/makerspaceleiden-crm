@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load isingroup %}
+{% load agenda_badge %}
 
 {% block content %}
 
@@ -33,9 +34,7 @@ function toggle() {
 									{{ event.item_title }}
 								</span>
 							</h4>
-							<div class="badge {%if event.display_status == 'completed'%}text-bg-success{% else %}text-bg-secondary{% endif %}">
-								{{event.display_status.title }}
-							</div>
+							{% agenda_badge event %}
 						</div>
 						<p class="text-dark my-0 mt-1">{{ event.item_details }}</p>
 					</a>
