@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load agenda_badge %}
 {% block content %}
 
 <div class="row">
@@ -52,18 +52,21 @@
                                         <p class="my-1">
                                             <strong>Frequency:</strong> Once every {{ chore.configuration.events_generation.take_one_every }} weeks
                                         </p>
-                                        <p class="my-1">
+                                        <div class="my-1">
                                             <strong>Next occurrence:</strong>
                                             {% if chore.upcoming_events %}
                                                     {% for agenda in chore.upcoming_events|slice:":1" %}
-                                                            <a href="{% url 'agenda_detail' agenda.pk %}">
-                                                                {{ agenda.display_datetime }}
-                                                            </a>
+                                                            <span class="d-inline-block">
+                                                                <a href="{% url 'agenda_detail' agenda.pk %}" class="me-1">
+                                                                    {{ agenda.display_datetime }} 
+                                                                </a>
+                                                                {% agenda_badge agenda %}
+                                                            </span>
                                                     {% endfor %}
                                             {% else %}
                                                 None scheduled
                                             {% endif %}
-                                        </p>
+                                        </div>
                                         <p class="my-1">
                                             <strong>Previous occurrence:</strong>
                                             {% if chore.previous_events %}
