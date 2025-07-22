@@ -4,12 +4,13 @@ from agenda.views import (
     AgendaCreateView,
     AgendaDeleteView,
     AgendaItemsView,
+    AgendaItemDetailView,
     AgendaUpdateView,
 )
 
 urlpatterns = [
     path("agenda/", AgendaItemsView, name="agenda"),
-    path("agenda/<int:pk>/", AgendaItemsView, name="agenda_detail"),
+    path("agenda/<int:pk>/", AgendaItemDetailView, name="agenda_detail"),
     path("agenda/<int:pk>/update/", AgendaUpdateView, name="agenda_update"),
     path("agenda/<int:pk>/delete/", AgendaDeleteView, name="agenda_delete"),
     path("agenda/create/", AgendaCreateView, name="agenda_create"),

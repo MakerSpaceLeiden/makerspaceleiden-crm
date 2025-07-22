@@ -234,4 +234,67 @@ def AgendaItemsView(request, pk=None):
             }
         )
 
-    return render(request, "agenda/agenda.html", context)
+    return render(request, "agenda/agenda_list.html", context)
+
+@login_required
+def AgendaItemDetailView(request, pk=None):
+    show_history = request.GET.get(
+        "show_history", "off"
+    )  # Get the state of the show_history parameter
+
+    if show_history == "off":
+        agenda_list = Agenda.objects.upcoming()
+    else:
+        agenda_list = Agenda.objects.all().order_by("startdatetime", "item_title")
+
+    selected_item = None
+
+    if agenda_list.exists():
+        if pk:
+            selected_item = get_object_or_404(Agenda, pk=pk)
+        else:
+            selected_item = agenda_list.first()
+
+    is_updated = False
+    creation_date = "Time Unknown"
+    created_by = "Unknown"
+    update_date = "Time Unknown"
+    updated_by = "Unknown"
+
+    if selected_item:
+        history = selected_item.history.all()
+        if history.exists():
+            if history.earliest().history_date != history.latest().history_date:
+                is_updated = True
+
+            creation_date = history.earliest().history_date
+            created_by = history.earliest().history_user
+            update_date = history.latest().history_date
+            updated_by = history.latest().history_user
+
+    context = {
+        "object_list": agenda_list,
+        "selected_item": selected_item,
+        "title": "Agenda",
+        "has_permission": request.user.is_authenticated,
+        "show_history": show_history,
+    }
+
+    if selected_item:
+        context.update(
+            {
+                "creation_date": creation_date,
+                "created_by": created_by,
+            }
+        )
+
+    if is_updated:
+        context.update(
+            {
+                "is_updated": is_updated,
+                "update_date": update_date,
+                "updated_by": updated_by,
+            }
+        )
+
+    return render(request, "agenda/agenda_detail.html", context)

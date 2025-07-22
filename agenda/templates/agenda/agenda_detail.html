@@ -7,9 +7,10 @@
 
 <div class="row">
     <div class="col-md-9 mb-3">
-        Upcoming events and chores. Please feel free to <a href="{% url 'agenda_create' %}">add items</a>.
+        <p class="lead">Upcoming events and chores.</p>
+        <p>Please feel free to <a href="{% url 'agenda_create' %}">add items</a>.</p>
     </div>
-    <div class="col-md-3 mb-3">
+    <div class="col-md-3 mb-3 d-flex justify-content-end align-items-center">
         <a href="{% url 'agenda_create' %}" class="btn btn-primary btn-primary-custom text-light">
             Create New
         </a>
