@@ -216,7 +216,7 @@ class AgendaModelPropertiesTest(TestCase):
         )
 
     @time_machine.travel("2025-05-03 10:00")
-    def test_is_active_property_table(self):
+    def test_life_cycle_properties(self):
         """
         Table-driven test for Agenda.is_active property.
         Each case defines start, end, current time, and expected result.
@@ -227,20 +227,40 @@ class AgendaModelPropertiesTest(TestCase):
                 "start": datetime(2025, 5, 3, 6, 0, tzinfo=timezone.utc),
                 "end": datetime(2025, 5, 3, 16, 0, tzinfo=timezone.utc),
                 "expected": True,
+                "status": "help wanted",
             },
             {
                 "label": "inactive before start",
                 "start": datetime(2025, 5, 2, 9, 0, tzinfo=timezone.utc),
                 "end": datetime(2025, 5, 2, 10, 0, tzinfo=timezone.utc),
                 "expected": False,
+                "status": "pending",
             },
             {
                 "label": "inactive after end",
                 "start": datetime(2025, 5, 3, 9, 0, tzinfo=timezone.utc),
                 "end": datetime(2025, 5, 3, 10, 0, tzinfo=timezone.utc),
                 "expected": False,
+                "status": "pending",
             },
         ]
+
+        chore = Chore.objects.create(
+            name="Test Chore",
+            description="A test chore that needs volunteers.",
+            class_type="BasicChore",
+            configuration={
+                "min_required_people": 1,
+                "events_generation": {
+                    "event_type": "recurrent",
+                    "starting_time": "21/7/2021 8:00",
+                    "crontab": "0 22 * * sun",
+                    "take_one_every": 1,
+                },
+                "reminders": [],
+            },
+            creator=self.user,
+        )
         for case in test_cases:
             with self.subTest(msg=case["label"]):
                 agenda = Agenda.objects.create(
@@ -248,5 +268,7 @@ class AgendaModelPropertiesTest(TestCase):
                     enddatetime=case["end"],
                     item_title=case["label"],
                     user=self.user,
+                    chore=chore,
                 )
                 self.assertEqual(agenda.is_active, case["expected"])
+                self.assertEqual(agenda.display_status, case["status"])

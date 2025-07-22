@@ -53,7 +53,7 @@
                                             <strong>Frequency:</strong> Once every {{ chore.configuration.events_generation.take_one_every }} weeks
                                         </p>
                                         <p class="my-1">
-                                            <strong>Next occurence:</strong>
+                                            <strong>Next occurrence:</strong>
                                             {% if chore.upcoming_events %}
                                                     {% for agenda in chore.upcoming_events|slice:":1" %}
                                                             <a href="{% url 'agenda_detail' agenda.pk %}">
@@ -65,7 +65,7 @@
                                             {% endif %}
                                         </p>
                                         <p class="my-1">
-                                            <strong>Previous occurence:</strong>
+                                            <strong>Previous occurrence:</strong>
                                             {% if chore.previous_events %}
                                                     {% for agenda in chore.previous_events|slice:":1" %}
                                                             <a href="{% url 'agenda_detail' agenda.pk %}">
@@ -73,7 +73,7 @@
                                                             </a>
                                                     {% endfor %}
                                             {% else %}
-                                                None scheduled
+                                                –
                                             {% endif %}
                                         </p>
                                     {% endif %}

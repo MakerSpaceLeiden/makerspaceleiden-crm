@@ -60,6 +60,8 @@ class Agenda(models.Model):
         ("in_progress", "In Progress"),
         ("completed", "Completed"),
         ("cancelled", "Cancelled"),
+        ("overdue", "Overdue"),
+        ("help_wanted", "Help Wanted"),
     ]
 
     chore = models.ForeignKey(Chore, null=True, blank=True, on_delete=models.CASCADE)
@@ -102,7 +104,11 @@ class Agenda(models.Model):
         if self.type != "chore":
             return None
 
-        return self.status if self.status else "pending"
+        if self.is_active and self.status != "completed":
+            return "help wanted"
+
+        status = "pending"
+        return self.status if self.status else status
 
     @property
     def display_datetime(self) -> str:

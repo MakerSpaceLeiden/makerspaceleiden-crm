@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load django_bootstrap5 %}
 {% load static %}
+{% load agenda_badge %}
 
 {% block content %}
 
@@ -27,9 +28,7 @@
                             {{ selected_item.item_title }}
                         </h2>
                         {% if selected_item.type == "chore" %}
-                        <div class="badge  {%if selected_item.display_status == 'completed'%}text-bg-success{% else %}text-bg-secondary{% endif %}"">
-                            {{ selected_item.display_status.title }}
-                        </div>
+                            {% agenda_badge selected_item %}
                         {% endif %}
                     </div>
                     <div>
@@ -54,7 +53,7 @@
                                     </div>
                                 {% endif %}
 
-                                {% if selected_item.type == 'chore' and selected_item.status != "completed" %}
+                                {% if selected_item.type == 'chore' and selected_item.status != "completed" and selected_item.is_active %}
                                     <form method="post" action="{% url 'mark_chore_complete' selected_item.pk %}">
                                         {% csrf_token %}
                                         <button class="btn btn-outline-primary btn-sm mt-2">Mark as complete</button>

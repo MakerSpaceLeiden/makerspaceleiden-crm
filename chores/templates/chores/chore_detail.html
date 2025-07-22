@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load agenda_badge %}
 
 {% block content %}
   <h2>{{ name }}</h2>
@@ -29,8 +30,13 @@
         <tbody>
           {% for item in events %}
             <tr>
-              <td>{{ item.agenda.display_status }}</td>
-              <td>{{ item.agenda.start_datetime }}</td>
+              <td>{% agenda_badge item.agenda %}</td>
+              <td>
+                <a href="{% url 'agenda_detail' item.agenda.pk %}">
+                  {{ item.agenda.start_datetime }}
+                </a>
+
+              </td>
               <td>{{ item.agenda.end_datetime }}</td>
               {% if item.recent_completed_status_change %}
               <td>
