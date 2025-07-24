@@ -54,3 +54,14 @@ class AgendaForm(forms.ModelForm):
             "startdatetime": DateTimePickerInput(attrs={"class": "datetime-input"}),
             "enddatetime": DateTimePickerInput(attrs={"class": "datetime-input"}),
         }
+
+
+class AgendaStatusForm(forms.ModelForm):
+    class Meta:
+        model = Agenda
+        fields = ["status"]
+
+    def save(self, user):
+        self.instance.set_status(self.cleaned_data["status"], user)
+
+        return super().save(commit=True)

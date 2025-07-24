@@ -108,3 +108,57 @@ class AgendaItemsView(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTemplateUsed(response, "agenda/agenda_list.html")
+
+
+class AgendaUpdateStatusViewTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            first_name="An",
+            last_name="Example",
+            password="testpassword",
+            email="example@example.com",
+        )
+        success = self.client.login(email=self.user.email, password="testpassword")
+        self.assertTrue(success)
+
+    def test_agenda_update_status_get(self):
+        self.assertTrue(
+            self.client.login(email=self.user.email, password="testpassword")
+        )
+
+        chore = Agenda.objects.create(
+            startdatetime=datetime(2025, 5, 10, 9, 0, tzinfo=timezone.utc),
+            enddatetime=datetime(2025, 5, 10, 10, 0, tzinfo=timezone.utc),
+            item_title="Fixture Agenda Title",
+            item_details="This is a fixture agenda item for testing.",
+            user=self.user,
+        )
+
+        url = reverse("agenda_update_status", kwargs={"pk": chore.id})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_302_FOUND)
+        self.assertEqual(
+            response.url, reverse("agenda_detail", kwargs={"pk": chore.id})
+        )
+
+    def test_agenda_update_status_post(self):
+        self.assertTrue(
+            self.client.login(email=self.user.email, password="testpassword")
+        )
+
+        chore = Agenda.objects.create(
+            startdatetime=datetime(2025, 5, 10, 9, 0, tzinfo=timezone.utc),
+            enddatetime=datetime(2025, 5, 10, 10, 0, tzinfo=timezone.utc),
+            item_title="Fixture Agenda Title",
+            item_details="This is a fixture agenda item for testing.",
+            user=self.user,
+        )
+
+        url = reverse("agenda_update_status", kwargs={"pk": chore.id})
+        response = self.client.post(url, {"status": "completed"})
+        self.assertEqual(response.status_code, status.HTTP_302_FOUND)
+        self.assertEqual(
+            response.url, reverse("agenda_detail", kwargs={"pk": chore.id})
+        )
+        updated_chore = Agenda.objects.get(pk=chore.id)
+        self.assertEqual(updated_chore.status, "completed")

@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_safe
 
-from .forms import AgendaForm
+from .forms import AgendaForm, AgendaStatusForm
 from .models import Agenda
 
 
@@ -125,6 +125,22 @@ def AgendaUpdateView(request, pk):
         "agenda": agenda,
     }
     return render(request, "agenda/agenda_crud.html", context)
+
+
+@login_required
+def AgendaUpdateStatusView(request, pk):
+    agenda = get_object_or_404(Agenda, pk=pk)
+
+    if request.method == "POST":
+        form = AgendaStatusForm(request.POST, instance=agenda)
+        if form.is_valid():
+            form.save(request.user)
+            messages.success(request, "The item is updated successfully.")
+        else:
+            messages.error(request, "The item could not be updated.")
+        return redirect("agenda_detail", pk=pk)
+    else:
+        return redirect("agenda_detail", pk=pk)
 
 
 @login_required
@@ -273,12 +289,15 @@ def AgendaItemDetailView(request, pk=None):
             update_date = history.latest().history_date
             updated_by = history.latest().history_user
 
+    form = AgendaStatusForm(instance=selected_item)
+
     context = {
         "object_list": agenda_list,
         "selected_item": selected_item,
         "title": "Agenda",
         "has_permission": request.user.is_authenticated,
         "show_history": show_history,
+        "form": form,
     }
 
     if selected_item:
