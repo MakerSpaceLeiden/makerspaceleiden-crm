@@ -54,6 +54,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "mypy>=1.17.0",
     "poetry-dev",
     "pre-commit",
 ]
@@ -75,3 +76,52 @@ profile = "black"
 [tool.ruff]
 # Enable Pyflakes `E` and `F` codes by default.
 lint.ignore = ["E501", "E741"]
+
+[tool.mypy]
+disable_error_code = "var-annotated, attr-defined, assignment, misc"
+[[tool.mypy.overrides]]
+module = ["dateutil.tz.tz",
+"six",
+"requests",
+"croniter",
+"dateutil",
+"django",
+"django.*",
+"rest_framework",
+"rest_framework.*",
+"jsonschema",
+"import_export",
+"import_export.*","channels.*",
+"simple_history",
+"simple_history.*",
+"lxml",
+"ipware",
+"Crypto.*",
+"djmoney",
+"djmoney.*",
+"djproxy.*","time_machine",
+"moneyed",
+"moneyed.*",
+"websockets",
+"django_flatpickr.*",
+"isodate",
+"isodate.*",
+"stdimage.*",
+"jsonfield",
+"jsonfield.*",
+"cryptography",
+"dynamic_filenames",
+"reportlab.lib.units",
+"qrcode",
+"PyPDF2",
+"oauth2_provider",
+"oauth2_provider.*",
+"reportlab.*",
+"versatileimagefield",
+"versatileimagefield.*",
+"rest_framework_api_key.*",
+"robohash",
+"factory",
+"makerspaceleiden.local"
+]
+ignore_missing_imports = true

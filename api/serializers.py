@@ -33,7 +33,7 @@ class AgendaSerializer(serializers.HyperlinkedModelSerializer):
         return obj.item_details
 
     def get_status(self, obj):
-        return obj.display_status
+        return None if obj.display_status == "" else obj.display_status
 
     def get_start_datetime(self, obj):
         dt = obj.start_datetime
