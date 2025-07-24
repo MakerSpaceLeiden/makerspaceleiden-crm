@@ -279,7 +279,13 @@ class AgendaModelPropertiesTest(TestCase):
                 "label": "single day event",
                 "start": datetime(2025, 5, 3, 6, 0, tzinfo=timezone.utc),
                 "end": datetime(2025, 5, 3, 16, 0, tzinfo=timezone.utc),
-                "expected": "Saturday, 3/5 6-16h",
+                "expected": "Saturday, 3/5 6–16h",
+            },
+            {
+                "label": "single day event",
+                "start": datetime(2025, 5, 3, 6, 0, tzinfo=timezone.utc),
+                "end": datetime(2025, 5, 10, 16, 0, tzinfo=timezone.utc),
+                "expected": "Saturday, 3–10/5",
             },
         ]
         for case in test_cases:
