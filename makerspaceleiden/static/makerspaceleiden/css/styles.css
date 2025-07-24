@@ -114,14 +114,6 @@ ul {
     padding-bottom: 0.1rem !important;
 }
 
-ul.messagelist li {
-    font-size: 1.0rem;
-}
-
-ul.errorlist li {
-    font-size: 1.0rem;
-}
-
 table tbody tr {
     background-color: transparent !important;
     border-bottom: 0.05rem solid #eee;
@@ -252,9 +244,6 @@ input, textarea, select, .form-row p, form .button {
     padding-bottom: 0.25rem !important;
 }
 
-ul.messagelist li {
-    background-position: 40px 4px;
-}
 
 .login .navbar {
     display: none;

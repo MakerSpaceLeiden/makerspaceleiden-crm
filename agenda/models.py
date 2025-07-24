@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
@@ -8,6 +9,8 @@ from simple_history.models import HistoricalRecords
 
 from chores.models import Chore
 from members.models import User
+
+logger = logging.getLogger(__name__)
 
 CEST = ZoneInfo("Europe/Amsterdam")  # Handles both CET and CEST
 
@@ -104,7 +107,7 @@ class Agenda(models.Model):
         if self.type != "chore":
             return ""
 
-        if self.is_active and self.status != "completed":
+        if self.is_active and (self.status in ["", "pending"] or self.status is None):
             return "help wanted"
 
         status = "pending"
@@ -113,13 +116,21 @@ class Agenda(models.Model):
     @property
     def display_datetime(self) -> str:
         """
-        Returns a string like 'Monday, 10-07 – 17-07' or just the start date if no end date.
+        Returns a string like 'Monday, 10/07 – 17/07' or just the start date if no end date.
         """
         if not self.start_datetime:
             return ""
-        start_str = self.start_datetime.strftime("%A, %d-%m")
+        start_str = self.start_datetime.strftime("%A, %-d/%-m")
         if self.end_datetime:
-            end_str = self.end_datetime.strftime("%d-%m")
+            end_str = self.end_datetime.strftime("%-d/%-m")
+
+            if self.start_datetime.strftime("%-d/%-m") == end_str:
+                # Return a single day with time duration
+                return f"{start_str} {self.start_datetime.strftime('%-H')}–{self.end_datetime.strftime('%-H')}h"
+
+            if self.start_datetime.strftime("%m") == self.end_datetime.strftime("%m"):
+                return f"{self.start_datetime.strftime('%A, %-d')}–{self.end_datetime.strftime('%-d/%-m')}"
+
             return f"{start_str} – {end_str}"
         return start_str
 
@@ -143,7 +154,13 @@ class Agenda(models.Model):
                 "A user must be provided to set_status for audit trail purposes."
             )
 
-        if self.status == new_status:
+        old_status = None
+        if self.pk:
+            old_instance = self.__class__.objects.get(pk=self.pk)
+            old_status = old_instance.status
+
+        if old_status == new_status:
+            logger.debug("No change for status", old_status, new_status)
             return
 
         with transaction.atomic():

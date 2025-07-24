@@ -19,7 +19,7 @@
 <div class="row mt-1">
 
     <!-- Agenda item text -->
-    <div class="col-md-9 order-0 order-md-0 pt-2">
+    <div class="col-md-8 order-0 order-md-0 pt-2">
         <div class="card scrollable pt-0 pb-1" id="item-text">
             <div class="card-body" style="max-height: 600px; min-height:250px; overflow-y: auto;">
 
@@ -44,18 +44,15 @@
                                 {{ selected_item.item_details|urlize }}
 
                                 {% if selected_item.type == 'chore' %}
-                                    <div class="mt-1">
                                         <a href="{{ selected_item.chore.wiki_url }}">
                                             More information available in the Wiki
                                         </a>
-                                        <a href="{% url 'chore_detail' selected_item.chore.id %}">
-                                            Chore
-                                        </a>
-                                    </div>
                                 {% endif %}
 
                                 {% if selected_item.type == 'chore' and selected_item.status != "completed" and selected_item.is_active %}
-                                    <form method="post" action="{% url 'mark_chore_complete' selected_item.pk %}">
+                                    <form
+                                        method="post"
+                                        action="{% url 'mark_chore_complete' selected_item.pk %}">
                                         {% csrf_token %}
                                         <button class="btn btn-outline-primary btn-sm mt-2">Mark as complete</button>
                                     </form>
@@ -66,12 +63,18 @@
 
                             <div class="creation-info d-flex justify-content-between align-items-center">
                                 <small>
-                                    Created: {{ creation_date|date:"l j M Y H:i" }}
-                                    {% if created_by.path %}
-                                        by
-                                    <a href="{{created_by.path}}">
-                                        {{ created_by.first_name }}
-                                    </a>
+                                    {% if selected_item.type == 'chore' %}
+                                        Created by <a href="{% url 'chore_detail' selected_item.chore.id %}">
+                                            Chore: {{ selected_item.chore.name }}
+                                        </a>
+                                    {% else %}
+                                        Created: {{ creation_date|date:"l j M Y H:i" }}
+                                        {% if created_by.path %}
+                                            by
+                                        <a href="{{created_by.path}}">
+                                            {{ created_by.first_name }}
+                                        </a>
+                                        {% endif %}
                                     {% endif %}
                                 </small>
 
@@ -81,10 +84,10 @@
                                         Edit
                                     </a>
                                     {% if selected_item.type != 'chore' %}
-                                    <a href="{% url 'agenda_create' %}?copy_from={{ selected_item.id }}"
-                                        class="btn btn-outline-secondary btn-sm">
-                                        Copy
-                                    </a>
+                                        <a href="{% url 'agenda_create' %}?copy_from={{ selected_item.id }}"
+                                            class="btn btn-outline-secondary btn-sm">
+                                            Copy
+                                        </a>
                                     {% endif %}
                                 </div>
                             </div>
@@ -112,7 +115,25 @@
     </div>
 
     <!-- List of agenda items -->
-    <div class="col-md-3 order-2 order-md-1 pt-1" id="list-of-agenda-items">
+    <div class="col-md-4 order-2 order-md-1 pt-1" id="list-of-agenda-items">
+        <div class="card mb-3">
+            <div class="card-header">
+                <h2 class="card-title">Update status</h2>
+            </div>
+            <div class="card-body">
+                <form method="post"
+                action="{% url 'agenda_update_status' selected_item.pk %}">
+                    {% csrf_token %}
+                    <div class="d-flex justify-content-between align-items-center">
+                        {{ form }}
+                    </div>
+                    <div>
+                        <button class="btn btn-primary mt-3">Update</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
         <div>
             <h2 class="mt-0">All events</h2>
         </div>
