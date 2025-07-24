@@ -272,3 +272,22 @@ class AgendaModelPropertiesTest(TestCase):
                 )
                 self.assertEqual(agenda.is_active, case["expected"])
                 self.assertEqual(agenda.display_status, case["status"])
+
+    def test_display_datetime(self):
+        test_cases = [
+            {
+                "label": "single day event",
+                "start": datetime(2025, 5, 3, 6, 0, tzinfo=timezone.utc),
+                "end": datetime(2025, 5, 3, 16, 0, tzinfo=timezone.utc),
+                "expected": "Saturday, 3/5 6-16h",
+            },
+        ]
+        for case in test_cases:
+            with self.subTest(msg=case["label"]):
+                agenda = Agenda.objects.create(
+                    startdatetime=case["start"],
+                    enddatetime=case["end"],
+                    item_title=case["label"],
+                    user=self.user,
+                )
+                self.assertEqual(agenda.display_datetime, case["expected"])

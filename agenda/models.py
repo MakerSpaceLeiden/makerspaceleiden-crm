@@ -113,13 +113,18 @@ class Agenda(models.Model):
     @property
     def display_datetime(self) -> str:
         """
-        Returns a string like 'Monday, 10-07 – 17-07' or just the start date if no end date.
+        Returns a string like 'Monday, 10/07 – 17/07' or just the start date if no end date.
         """
         if not self.start_datetime:
             return ""
-        start_str = self.start_datetime.strftime("%A, %d-%m")
+        start_str = self.start_datetime.strftime("%A, %-d/%-m")
         if self.end_datetime:
-            end_str = self.end_datetime.strftime("%d-%m")
+            end_str = self.end_datetime.strftime("%-d/%-m")
+
+            if self.start_datetime.strftime("%-d/%-m") == end_str:
+                # Return a single day with time duration
+                return f"{start_str} {self.start_datetime.strftime('%-H')}-{self.end_datetime.strftime('%-H')}h"
+
             return f"{start_str} – {end_str}"
         return start_str
 
