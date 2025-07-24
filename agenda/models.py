@@ -102,7 +102,7 @@ class Agenda(models.Model):
     @property
     def display_status(self) -> str:
         if self.type != "chore":
-            return None
+            return ""
 
         if self.is_active and self.status != "completed":
             return "help wanted"
