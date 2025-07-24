@@ -138,7 +138,8 @@ class AgendaUpdateStatusViewTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_302_FOUND)
         self.assertEqual(
-            response.url, reverse("agenda_detail", kwargs={"pk": chore.id})
+            response.url,
+            "/",
         )
 
     def test_agenda_update_status_post(self):
@@ -157,8 +158,6 @@ class AgendaUpdateStatusViewTest(TestCase):
         url = reverse("agenda_update_status", kwargs={"pk": chore.id})
         response = self.client.post(url, {"status": "completed"})
         self.assertEqual(response.status_code, status.HTTP_302_FOUND)
-        self.assertEqual(
-            response.url, reverse("agenda_detail", kwargs={"pk": chore.id})
-        )
+        self.assertEqual(response.url, "/")
         updated_chore = Agenda.objects.get(pk=chore.id)
         self.assertEqual(updated_chore.status, "completed")
