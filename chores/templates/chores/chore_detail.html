@@ -50,8 +50,9 @@
               {% else %}
               <td colspan="2">
                 {% if item.agenda.is_active %}
-                <form method="post" action="{% url 'mark_chore_complete' item.agenda.pk %}">
+                <form method="post" action="{% url 'agenda_update_status' item.agenda.pk %}">
                     {% csrf_token %}
+                    <input type="hidden" name="status" value="completed">
                     <button
                       data-test-hook="mark-chore-as-completed"
                       class="btn btn-outline-primary btn-sm">Mark as complete</button>

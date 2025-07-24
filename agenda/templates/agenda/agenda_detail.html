@@ -48,15 +48,6 @@
                                             More information available in the Wiki
                                         </a>
                                 {% endif %}
-
-                                {% if selected_item.type == 'chore' and selected_item.status != "completed" and selected_item.is_active %}
-                                    <form
-                                        method="post"
-                                        action="{% url 'mark_chore_complete' selected_item.pk %}">
-                                        {% csrf_token %}
-                                        <button class="btn btn-outline-primary btn-sm mt-2">Mark as complete</button>
-                                    </form>
-                                {% endif %}
                             </div>
                         </div>
                         <div class="row row-sticky-bottom">

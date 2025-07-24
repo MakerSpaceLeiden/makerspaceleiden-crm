@@ -138,9 +138,9 @@ def AgendaUpdateStatusView(request, pk):
             messages.success(request, "The item is updated successfully.")
         else:
             messages.error(request, "The item could not be updated.")
-        return redirect("agenda_detail", pk=pk)
+        return redirect(request.META.get("HTTP_REFERER", "/"))
     else:
-        return redirect("agenda_detail", pk=pk)
+        return redirect(request.META.get("HTTP_REFERER", "/"))
 
 
 @login_required

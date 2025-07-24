@@ -12,7 +12,6 @@ from django.db.models import Prefetch
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.template.loader import render_to_string
-from django.views.decorators.http import require_POST
 from django.views.generic.detail import DetailView
 
 from agenda.models import Agenda, AgendaChoreStatusChange
@@ -165,16 +164,6 @@ def remove_signup(request, chore_id, ts):
     return redirect(redirect_to)
 
 
-@login_required
-@require_POST
-def mark_chore_complete(request, pk):
-    event = Agenda.objects.filter(pk=pk).first()
-    if not event:
-        return HttpResponse("Event not found", status=404, content_type="text/plain")
-    event.set_status("completed", request.user)
-    return redirect(request.META.get("HTTP_REFERER", "/"))
-
-
 class ChoreDetailView(LoginRequiredMixin, DetailView):
     model = Chore
     template_name = "chores/chore_detail.html"
@@ -186,11 +175,17 @@ class ChoreDetailView(LoginRequiredMixin, DetailView):
         for agenda in Agenda.objects.filter(chore=self.object):
             recent_completed_status_change = (
                 AgendaChoreStatusChange.objects.filter(
-                    agenda=agenda, status="completed"
+                    agenda=agenda,
                 )
                 .order_by("-created_at")
                 .first()
             )
+            if (
+                recent_completed_status_change
+                and recent_completed_status_change.status != "completed"
+            ):
+                recent_completed_status_change = None
+
             events.append(
                 {
                     "agenda": agenda,
