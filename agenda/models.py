@@ -8,11 +8,12 @@ from django.utils import timezone
 from simple_history.models import HistoricalRecords
 
 from chores.models import Chore
+from makerspaceleiden.settings import TIME_ZONE
 from members.models import User
 
 logger = logging.getLogger(__name__)
 
-CEST = ZoneInfo("Europe/Amsterdam")  # Handles both CET and CEST
+CEST = ZoneInfo(TIME_ZONE)  # Handles both CET and CEST
 
 
 class AgendaQuerySet(models.QuerySet):
@@ -120,16 +121,20 @@ class Agenda(models.Model):
         """
         if not self.start_datetime:
             return ""
-        start_str = self.start_datetime.strftime("%A, %-d/%-m")
+
+        start = self.start_datetime.astimezone(CEST)
+
+        start_str = start.strftime("%A, %-d/%-m")
         if self.end_datetime:
-            end_str = self.end_datetime.strftime("%-d/%-m")
+            end = self.end_datetime.astimezone(CEST)
+            end_str = end.strftime("%-d/%-m")
 
-            if self.start_datetime.strftime("%-d/%-m") == end_str:
+            if start.strftime("%-d/%-m") == end_str:
                 # Return a single day with time duration
-                return f"{start_str} {self.start_datetime.strftime('%-H')}–{self.end_datetime.strftime('%-H')}h"
+                return f"{start_str} {start.strftime('%-H')}–{end.strftime('%-H')}h"
 
-            if self.start_datetime.strftime("%m") == self.end_datetime.strftime("%m"):
-                return f"{self.start_datetime.strftime('%A, %-d')}–{self.end_datetime.strftime('%-d/%-m')}"
+            if start.strftime("%m") == self.end_datetime.strftime("%m"):
+                return f"{start.strftime('%A, %-d')}–{end.strftime('%-d/%-m')}"
 
             return f"{start_str} – {end_str}"
         return start_str
