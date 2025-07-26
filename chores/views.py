@@ -2,10 +2,11 @@ import json
 import logging
 import time
 from collections import defaultdict
+from datetime import datetime
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import EmailMessage
@@ -21,6 +22,7 @@ from agenda.models import Agenda, AgendaChoreStatusChange
 
 from .forms import ChoreForm
 from .models import Chore, ChoreVolunteer
+from .schedule import EventsGenerationConfiguration, generate_schedule_for_event
 
 logger = logging.getLogger(__name__)
 
@@ -170,19 +172,31 @@ def remove_signup(request, chore_id, ts):
 
 @login_required
 def preview_schedule(request):
+    configuration: EventsGenerationConfiguration = {
+        "event_type": "recurrent",
+        "starting_time": datetime.now().strftime("%d/%m/%Y %H:%M"),
+        "crontab": request.GET.get("crontab"),
+        "take_one_every": int(request.GET.get("take_one_every")),
+        "duration": "P1W",
+    }
+    schedule = generate_schedule_for_event(
+        configuration, int(request.GET.get("number_of_days"))
+    )
+
     return JsonResponse(
         {
-            "schedule": request.GET.get("schedule"),
+            "schedule": schedule,
             "crontab": request.GET.get("crontab"),
         }
     )
 
 
-class ChoreCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+class ChoreCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, CreateView):
     model = Chore
     form_class = ChoreForm
     template_name = "chores/chore_crud.html"
     context_object_name = "chore"
+    permission_required = "chores.add_chore"
 
     success_message = "Chore created successfully."
 

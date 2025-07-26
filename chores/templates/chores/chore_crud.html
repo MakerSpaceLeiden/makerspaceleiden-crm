@@ -81,20 +81,11 @@
         <div class="row mb-3">
 
           <div class="col-md-6">
-            <label for="frequency_type" class="form-label">Repetition Frequency:</label>
-            <p>One of the limitations with cron is that it only supports a limited set of expressions.
-
-            </p>
-            <div class="input-group" id="custom_frequency_type_group">
-            {{ form.frequency_type }}
-            </div>
-            <small class="form-text text-muted">How often should this chore repeat?</small>
-            <label for="frequency_value" class="form-label">Every:</label>
+            <label for="frequency_value" class="form-label">Execution Frequency:</label>
             <div class="input-group" id="custom_frequency_value_group">
-            {{ form.frequency}}
-            <span class="input-group-text" id="frequency-unit">week(s)</span>
+              {{ form.frequency}}
             </div>
-            <small class="form-text text-muted">Number of weeks between chore</small>
+            <p class="form-text text-muted">How often to actually execute this task. For example, set to 2 to run every 2nd occurrence, or 3 to run every 3rd occurrence. Set to 1 to run every scheduled time.</p>
           </div>
 
         </div>
@@ -109,61 +100,16 @@
               {{ form.duration_unit }}
             </div>
             </div>
-            <small class="form-text text-muted">How many days to complete this chore once it becomes due</small>
+            <small class="form-text text-muted">How much time to complete this chore</small>
           </div>
         </div>
 
-        <!-- Specific Time Window Option -->
-        <div id="specific_time_fields" class="row mb-3" style="display: none;">
-          <div class="col-md-3">
-            <label for="window_start_time" class="form-label">Start Time:</label>
-            <input type="time" name="window_start_time" class="form-control" value="{{ form.window_start_time.value|default:'09:00' }}">
-          </div>
-          <div class="col-md-3">
-            <label for="window_end_time" class="form-label">End Time:</label>
-            <input type="time" name="window_end_time" class="form-control" value="{{ form.window_end_time.value|default:'17:00' }}">
-          </div>
-          <div class="col-md-6">
-            <label for="window_days" class="form-label">Days of Week:</label>
-            <div class="d-flex flex-wrap gap-2">
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" name="window_days" value="monday" id="day_monday" {% if 'monday' in form.window_days.value %}checked{% endif %}>
-                <label class="form-check-label" for="day_monday">Mon</label>
-              </div>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" name="window_days" value="tuesday" id="day_tuesday" {% if 'tuesday' in form.window_days.value %}checked{% endif %}>
-                <label class="form-check-label" for="day_tuesday">Tue</label>
-              </div>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" name="window_days" value="wednesday" id="day_wednesday" {% if 'wednesday' in form.window_days.value %}checked{% endif %}>
-                <label class="form-check-label" for="day_wednesday">Wed</label>
-              </div>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" name="window_days" value="thursday" id="day_thursday" {% if 'thursday' in form.window_days.value %}checked{% endif %}>
-                <label class="form-check-label" for="day_thursday">Thu</label>
-              </div>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" name="window_days" value="friday" id="day_friday" {% if 'friday' in form.window_days.value %}checked{% endif %}>
-                <label class="form-check-label" for="day_friday">Fri</label>
-              </div>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" name="window_days" value="saturday" id="day_saturday" {% if 'saturday' in form.window_days.value %}checked{% endif %}>
-                <label class="form-check-label" for="day_saturday">Sat</label>
-              </div>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" name="window_days" value="sunday" id="day_sunday" {% if 'sunday' in form.window_days.value %}checked{% endif %}>
-                <label class="form-check-label" for="day_sunday">Sun</label>
-              </div>
-            </div>
-            <small class="form-text text-muted">Select which days of the week this chore can be completed</small>
-            <small class="form-text text-muted">Chore can only be completed during specified time window on selected days</small>
-          </div>
-        </div>
         <div>
           <label for="starting_from" class="form-label">Starting from:</label>
           <div class="input-group" id="custom_enddate_group">
               {{ form.starting_from }}
           </div>
+          <small class="form-text text-muted">Optionally, delay the start of the chore by a certain amount of time.</small>
         </div>
       </div><!-- .card-body -->
     </div><!-- .card -->
@@ -187,71 +133,4 @@
     </form>
   </div>
 </div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
- // Update frequency unit text based on frequency type selection
- const frequencyTypeSelect = document.querySelector('select[name="frequency_type"]');
- const frequencyUnitSpan = document.getElementById('frequency-unit');
-
- if (frequencyTypeSelect && frequencyUnitSpan) {
- function updateFrequencyUnit() {
- const selectedType = frequencyTypeSelect.value;
- switch(selectedType) {
- case 'daily':
- frequencyUnitSpan.textContent = 'day(s)';
- break;
- case 'weekly':
- frequencyUnitSpan.textContent = 'week(s)';
- break;
- case 'monthly':
- frequencyUnitSpan.textContent = 'month(s)';
- break;
- case 'yearly':
- frequencyUnitSpan.textContent = 'year(s)';
- break;
- default:
- frequencyUnitSpan.textContent = 'week(s)';
- }
- }
-
- frequencyTypeSelect.addEventListener('change', updateFrequencyUnit);
- updateFrequencyUnit(); // Initialize on page load
- }
-
- // Handle time window type switching
- const windowTypeRadios = document.querySelectorAll('input[name="window_type"]');
- const durationFields = document.getElementById('duration_fields');
- const specificTimeFields = document.getElementById('specific_time_fields');
-
- function toggleTimeWindowFields() {
- const selectedType = document.querySelector('input[name="window_type"]:checked').value;
-
- if (selectedType === 'duration') {
- durationFields.style.display = 'block';
- specificTimeFields.style.display = 'none';
- // Make duration field required
- document.querySelector('input[name="window_duration"]').required = true;
- // Remove required from specific time fields
- document.querySelector('input[name="window_start_time"]').required = false;
- document.querySelector('input[name="window_end_time"]').required = false;
- } else {
- durationFields.style.display = 'none';
- specificTimeFields.style.display = 'block';
- // Remove required from duration field
- document.querySelector('input[name="window_duration"]').required = false;
- // Make specific time fields required
- document.querySelector('input[name="window_start_time"]').required = true;
- document.querySelector('input[name="window_end_time"]').required = true;
- }
- }
-
- windowTypeRadios.forEach(radio => {
- radio.addEventListener('change', toggleTimeWindowFields);
- });
-
- // Initialize on page load
- toggleTimeWindowFields();
-});
-</script>
 {% endblock %}
