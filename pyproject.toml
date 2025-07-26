@@ -48,6 +48,8 @@ dependencies = [
     "factory-boy>=3.3.3",
     "croniter>=6.0.0",
     "isodate>=0.7.2",
+    "pytest-django>=4.11.1",
+    "pytest-cov>=6.2.1",
 ]
 
 [dependency-groups]
@@ -73,6 +75,10 @@ profile = "black"
 [tool.ruff]
 # Enable Pyflakes `E` and `F` codes by default.
 lint.ignore = ["E501", "E741"]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "makerspaceleiden.settings"
+python_files = "tests.py test_*.py *_tests.py"
 
 [tool.mypy]
 disable_error_code = "var-annotated, attr-defined, assignment, misc"
@@ -119,6 +125,7 @@ module = ["dateutil.tz.tz",
 "rest_framework_api_key.*",
 "robohash",
 "factory",
-"makerspaceleiden.local"
+"makerspaceleiden.local",
+"pytest",
 ]
 ignore_missing_imports = true
