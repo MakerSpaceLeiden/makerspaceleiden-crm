@@ -50,7 +50,7 @@ class UserViewSet(BaseListMetaViewSet):
 
 
 class EventViewSet(BaseListMetaViewSet):
-    queryset = Agenda.objects.all()
+    queryset = Agenda.objects.all().order_by("startdatetime")
     serializer_class = AgendaSerializer
 
     def list(self, request, *args, **kwargs):
@@ -66,6 +66,7 @@ class EventViewSet(BaseListMetaViewSet):
             queryset = self._filter_by_datetime_field(
                 queryset, "enddatetime", end_datetime_str, "lte"
             )
+
         self.get_queryset = lambda: queryset
         return super().list(request, *args, **kwargs)
 
