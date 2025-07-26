@@ -210,6 +210,8 @@ class CreateChoreTest(TestCase):
                 "frequency": 23,
                 "starting_from": starting_from,
                 "cron": "0 22 * * mon",
+                "duration_value": 1,
+                "duration_unit": "w",
             },
             follow=True,
         )
@@ -225,6 +227,7 @@ class CreateChoreTest(TestCase):
                     "starting_time": "2025/05/10 14:56",
                     "crontab": "0 22 * * mon",
                     "take_one_every": 23,
+                    "duration": "P1W",
                 },
             },
             chore.configuration,

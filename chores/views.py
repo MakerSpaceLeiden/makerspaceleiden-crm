@@ -10,7 +10,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import EmailMessage
 from django.db.models import Prefetch
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.template.loader import render_to_string
 from django.urls import reverse
@@ -166,6 +166,16 @@ def remove_signup(request, chore_id, ts):
     redirect_to = request.GET.get("redirect_to", "chores")
 
     return redirect(redirect_to)
+
+
+@login_required
+def preview_schedule(request):
+    return JsonResponse(
+        {
+            "schedule": request.GET.get("schedule"),
+            "crontab": request.GET.get("crontab"),
+        }
+    )
 
 
 class ChoreCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):

@@ -61,10 +61,14 @@ class ChoreForm(forms.ModelForm):
 
         self.fields["starting_from"].initial = datetime.now()
 
-        self.fields["cron"].initial = self.instance.configuration.get(
-            "events_generation", {}
-        ).get("crontab", "")
-        self.fields["frequency"].initial = self.instance.configuration.get(
+        configuration = self.instance.configuration
+        if isinstance(configuration, str):
+            configuration = {}
+
+        self.fields["cron"].initial = configuration.get("events_generation", {}).get(
+            "crontab", ""
+        )
+        self.fields["frequency"].initial = configuration.get(
             "events_generation", {}
         ).get("take_one_every", 1)
 
