@@ -1,5 +1,5 @@
 import json
-from datetime import date, time
+from datetime import date, datetime, time, timezone
 
 from django.test import TestCase
 from rest_framework import status
@@ -59,6 +59,31 @@ class EventsApiTests(TestCase):
                 "status": None,
             },
         )
+
+    def test_events_list_ordering(self):
+        # Create two events: one before, one after the filter date
+        new_event = Agenda.objects.create(
+            startdatetime=datetime(2023, 2, 5, 9, 0, tzinfo=timezone.utc),
+            enddatetime=datetime(2023, 2, 5, 10, 0, tzinfo=timezone.utc),
+            item_title="Event 1",
+            item_details="First event.",
+            user=self.user,
+        )
+        old_event = Agenda.objects.create(
+            startdatetime=datetime(2023, 2, 3, 9, 0, tzinfo=timezone.utc),
+            enddatetime=datetime(2023, 2, 3, 10, 0, tzinfo=timezone.utc),
+            item_title="Event 2",
+            item_details="Second event.",
+            user=self.user,
+        )
+        client = APIClient()
+        self.assertTrue(client.login(email=self.user.email, password=self.password))
+        response = client.get("/api/v1/events/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = json.loads(response.content)["data"]
+        self.assertEqual(len(data), 2)
+        self.assertEqual(old_event.item_title, data[0]["name"])
+        self.assertEqual(new_event.item_title, data[1]["name"])
 
     def test_events_list_filter_start_datetime(self):
         # Create two events: one before, one after the filter date
