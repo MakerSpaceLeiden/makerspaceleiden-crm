@@ -246,6 +246,11 @@ class UpdateChoreTest(TestCase):
         success = self.client.login(email=self.user.email, password="testpassword")
         self.assertTrue(success)
 
+    def test_create_chore_requires_permission(self):
+        url = reverse("chore_create")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
     def test_update_chore_get(self):
         chore = Chore.objects.create(
             name="Test Chore",
@@ -261,6 +266,7 @@ class UpdateChoreTest(TestCase):
             },
             creator=self.user,
         )
+        self.user.user_permissions.add("chores.add_chore")
 
         url = reverse("chore_update", kwargs={"pk": chore.id})
         response = self.client.get(url)
@@ -281,7 +287,7 @@ class UpdateChoreTest(TestCase):
         )
 
         url = reverse("chore_update", kwargs={"pk": chore.id})
-        starting_from = "2025-05-10 14:56"
+        starting_from = "2025/05/10 14:56"
         response = self.client.post(
             url,
             {

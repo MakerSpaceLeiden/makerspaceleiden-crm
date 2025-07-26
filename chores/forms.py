@@ -13,9 +13,10 @@ class ChoreForm(forms.ModelForm):
     )
     starting_from = forms.DateTimeField(
         required=False,
+        input_formats=["%Y/%m/%d %H:%M", "%Y-%m-%d %H:%M"],
         widget=forms.DateTimeInput(
-            attrs={"class": "form-control", "placeholder": "YYYY-MM-DD HH:MM"},
-            format="%Y-%m-%d %H:%M",
+            attrs={"class": "form-control", "placeholder": "YYYY/MM/DD HH:MM"},
+            format="%Y/%m/%d %H:%M",
         ),
     )
 
@@ -59,12 +60,17 @@ class ChoreForm(forms.ModelForm):
             "required": "Required: Please enter the wiki URL."
         }
 
-        self.fields["starting_from"].initial = datetime.now()
-
         configuration = self.instance.configuration
         if isinstance(configuration, str):
             configuration = {}
 
+        self.fields["starting_from"].initial = configuration.get(
+            "events_generation", {}
+        ).get("starting_time", datetime.now())
+        self.fields["starting_from"].error_messages = {
+            "required": "Required: Please enter the starting time.",
+            "invalid": "Required: Please enter a valid starting time.",
+        }
         self.fields["cron"].initial = configuration.get("events_generation", {}).get(
             "crontab", ""
         )
