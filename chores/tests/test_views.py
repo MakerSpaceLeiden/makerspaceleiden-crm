@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta, timezone
 
 import time_machine
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
 from django.test import Client, TestCase
 from django.urls import reverse
 from rest_framework import status
@@ -189,8 +191,29 @@ class CreateChoreTest(TestCase):
             password="testpassword",
             email="example@example.com",
         )
+        permission = Permission.objects.get(
+            codename="add_chore", content_type=ContentType.objects.get_for_model(Chore)
+        )
+        self.user.user_permissions.add(permission)
+
         success = self.client.login(email=self.user.email, password="testpassword")
         self.assertTrue(success)
+
+    def test_create_chore_get_requires_permission(self):
+        url = reverse("chore_create")
+
+        user_no_permission = User.objects.create_user(
+            first_name="An",
+            last_name="Example",
+            password="testpassword",
+            email="no_permission@example.com",
+        )
+
+        self.assertTrue(
+            self.client.login(email=user_no_permission.email, password="testpassword")
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_create_chore_get(self):
         url = reverse("chore_create")
@@ -243,13 +266,13 @@ class UpdateChoreTest(TestCase):
             password="testpassword",
             email="example@example.com",
         )
+        permission = Permission.objects.get(
+            codename="add_chore", content_type=ContentType.objects.get_for_model(Chore)
+        )
+        self.user.user_permissions.add(permission)
+
         success = self.client.login(email=self.user.email, password="testpassword")
         self.assertTrue(success)
-
-    def test_create_chore_requires_permission(self):
-        url = reverse("chore_create")
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_update_chore_get(self):
         chore = Chore.objects.create(
@@ -266,7 +289,6 @@ class UpdateChoreTest(TestCase):
             },
             creator=self.user,
         )
-        self.user.user_permissions.add("chores.add_chore")
 
         url = reverse("chore_update", kwargs={"pk": chore.id})
         response = self.client.get(url)
