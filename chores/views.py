@@ -191,7 +191,9 @@ def preview_schedule(request):
     )
 
 
-class ChoreCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, CreateView):
+class ChoreCreateView(
+    LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, CreateView
+):
     model = Chore
     form_class = ChoreForm
     template_name = "chores/chore_crud.html"
