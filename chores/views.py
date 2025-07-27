@@ -2,21 +2,27 @@ import json
 import logging
 import time
 from collections import defaultdict
+from datetime import datetime
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import EmailMessage
 from django.db.models import Prefetch
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.template.loader import render_to_string
+from django.urls import reverse
 from django.views.generic.detail import DetailView
+from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
 from agenda.models import Agenda, AgendaChoreStatusChange
 
+from .forms import ChoreForm
 from .models import Chore, ChoreVolunteer
+from .schedule import EventsGenerationConfiguration, generate_schedule_for_event
 
 logger = logging.getLogger(__name__)
 
@@ -164,6 +170,58 @@ def remove_signup(request, chore_id, ts):
     return redirect(redirect_to)
 
 
+@login_required
+def preview_schedule(request):
+    configuration: EventsGenerationConfiguration = {
+        "event_type": "recurrent",
+        "starting_time": datetime.now().strftime("%d/%m/%Y %H:%M"),
+        "crontab": request.GET.get("crontab"),
+        "take_one_every": int(request.GET.get("take_one_every")),
+        "duration": "P1W",
+    }
+    schedule = generate_schedule_for_event(
+        configuration, int(request.GET.get("number_of_days"))
+    )
+
+    return JsonResponse(
+        {
+            "schedule": schedule,
+            "crontab": request.GET.get("crontab"),
+        }
+    )
+
+
+class ChoreCreateView(
+    LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, CreateView
+):
+    model = Chore
+    form_class = ChoreForm
+    template_name = "chores/chore_crud.html"
+    context_object_name = "chore"
+    permission_required = "chores.add_chore"
+
+    success_message = "Chore created successfully."
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["title"] = "Create new chore"
+        return ctx
+
+
+class ChoreUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+    model = Chore
+    form_class = ChoreForm
+    template_name = "chores/chore_crud.html"
+    context_object_name = "chore"
+
+    success_message = "Chore updated successfully."
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["title"] = "Edit chore"
+        return ctx
+
+
 class ChoreDetailView(LoginRequiredMixin, DetailView):
     model = Chore
     template_name = "chores/chore_detail.html"
@@ -196,3 +254,17 @@ class ChoreDetailView(LoginRequiredMixin, DetailView):
         ctx["name"] = self.object.name.replace("_", " ").title
         ctx["events"] = events
         return ctx
+
+
+class ChoreDeleteView(LoginRequiredMixin, DeleteView):
+    model = Chore
+    template_name = "chores/chore_confirm_delete.html"
+    context_object_name = "chore"
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["title"] = "Confirm deletion"
+        return ctx
+
+    def get_success_url(self):
+        return reverse("chores")

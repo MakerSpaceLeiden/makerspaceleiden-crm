@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% load django_bootstrap5 %}
+{% load static %}
+
+{% block content %}
+{{ form.media.css }}
+{{ form.media.js }}
+
+<div class="row">
+  <div class="col-md-8 mb-3">
+    <form method="post">
+    {% csrf_token %}
+    <!-- Display validation errors -->
+    {% if form.errors %}
+    <div class="alert alert-danger" role="alert">
+    Please correct the following:
+    <ul>
+    {% for field, error_list in form.errors.items %}
+    {% for error in error_list %}
+    <li>{{ error }}</li>
+    {% endfor %}
+    {% endfor %}
+    </ul>
+    </div>
+    {% endif %}
+
+    <!-- Basic Information Section -->
+    <div class="card mb-4">
+      <div class="card-body">
+        <label for="name" class="form-label">Name:</label>
+        <div class="input-group mb-2" id="custom_name_group">
+        {{ form.name }}
+        </div>
+        <label for="description" class="form-label">Description:</label>
+        <div class="mb-2">
+          <div class="input-group" id="custom_description_group">
+            {{ form.description }}
+          </div>
+          <small class="text-muted">A short description for the chore.</small>
+        </div>
+        <div>
+          <label for="wiki_url" class="form-label">Wiki URL:</label>
+          <div class="input-group" id="custom_wiki_url_group">
+            {{ form.wiki_url }}
+          </div>
+          <small class="text-muted">A link to the wiki page providing all the information about this chore.</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scheduling Section -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5 class="my-0">Scheduling</h5>
+      </div>
+      <div class="card-body">
+        <div class="mb-3">
+          <div class="row">
+            <div class="w-100">
+              <label for="starting_from" class="form-label">Cron string:</label>
+            </div>
+            <div class="col-md-5">
+              <div class="input-group" id="custom_enddate_group">
+                  {{ form.cron }}
+              </div>
+              <small class="form-text text-muted">Cron string for how often should this chore repeat? Here's a <a href="https://crontab.guru/" target="_blank">helper</a> for writing a cron expression.</small>
+            </div>
+            <div class="col-md-6 ms-5">
+              <div class="text-muted small">
+                Some example cron strings:
+                <ul class="list-unstyled my-0">
+                  <li class="small"><code>0 22 * * mon</code> every Monday at 22:00</li>
+                  <li class="small"><code>0 22 * * 1-5</code> every day at 22:00 except on Saturday</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Repetition Frequency -->
+        <div class="row mb-3">
+
+          <div class="col-md-6">
+            <label for="frequency_value" class="form-label">Execution Frequency:</label>
+            <div class="input-group" id="custom_frequency_value_group">
+              {{ form.frequency}}
+            </div>
+            <p class="form-text text-muted">How often to actually execute this task. For example, set to 2 to run every 2nd occurrence, or 3 to run every 3rd occurrence. Set to 1 to run every scheduled time.</p>
+          </div>
+
+        </div>
+
+        <!-- Duration Option -->
+        <div id="duration_fields" class="mb-3">
+          <div>
+            <label for="window_duration" class="form-label">Duration:</label>
+            <div>
+              <div class="d-inline-flex">
+              <input type="number" name="window_duration" class="form-control" min="1" value="{{ form.window_duration.value|default:7 }}">
+              {{ form.duration_unit }}
+            </div>
+            </div>
+            <small class="form-text text-muted">How much time to complete this chore</small>
+          </div>
+        </div>
+
+        <div>
+          <label for="starting_from" class="form-label">Starting from:</label>
+          <div class="input-group" id="custom_enddate_group">
+              {{ form.starting_from }}
+          </div>
+          <small class="form-text text-muted">Optionally, delay the start of the chore by a certain amount of time.</small>
+        </div>
+      </div><!-- .card-body -->
+    </div><!-- .card -->
+
+      <!-- Action Buttons -->
+      <div class="d-flex gap-2">
+        {% if title == 'Create new chore' %}
+        <button type="submit" class="btn btn-primary btn-primary-custom">
+        <i class="fas fa-plus me-1"></i>Create Chore
+        </button>
+        {% endif %}
+        {% if title == 'Edit chore' %}
+        <button type="submit" class="btn btn-primary btn-primary-custom">
+        Update Chore
+        </button>
+        {% endif %}
+        <a href="{% url 'chores' %}" class="btn btn-secondary text-light">
+          Cancel
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

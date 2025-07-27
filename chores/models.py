@@ -3,6 +3,7 @@ import json
 import jsonfield
 from django.core import exceptions
 from django.db import models
+from django.urls import reverse
 from simple_history.models import HistoricalRecords
 
 from members.models import User
@@ -34,6 +35,9 @@ class Chore(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return reverse("chore_detail", kwargs={"pk": self.pk})
 
 
 class ChoreVolunteer(models.Model):

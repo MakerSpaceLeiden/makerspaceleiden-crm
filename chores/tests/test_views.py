@@ -1,10 +1,13 @@
 from datetime import datetime, timedelta, timezone
 
 import time_machine
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
 from django.test import Client, TestCase
 from django.urls import reverse
 from rest_framework import status
 
+from acl.models import User
 from agenda.models import Agenda, AgendaChoreStatusChange
 
 from ..models import Chore
@@ -178,3 +181,163 @@ class DetailViewTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         # Agenda item should be present
         self.assertNotIn('data-test-hook="mark-chore-as-completed"', html)
+
+
+class CreateChoreTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            first_name="An",
+            last_name="Example",
+            password="testpassword",
+            email="example@example.com",
+        )
+        permission = Permission.objects.get(
+            codename="add_chore", content_type=ContentType.objects.get_for_model(Chore)
+        )
+        self.user.user_permissions.add(permission)
+
+        success = self.client.login(email=self.user.email, password="testpassword")
+        self.assertTrue(success)
+
+    def test_create_chore_get_requires_permission(self):
+        url = reverse("chore_create")
+
+        user_no_permission = User.objects.create_user(
+            first_name="An",
+            last_name="Example",
+            password="testpassword",
+            email="no_permission@example.com",
+        )
+
+        self.assertTrue(
+            self.client.login(email=user_no_permission.email, password="testpassword")
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_create_chore_get(self):
+        url = reverse("chore_create")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTemplateUsed(response, "chores/chore_crud.html")
+
+    def test_create_chore_post(self):
+        url = reverse("chore_create")
+        starting_from = "2025-05-10 14:56"
+        response = self.client.post(
+            url,
+            {
+                "name": "Test Chore",
+                "description": "A test chore that needs volunteers.",
+                "wiki_url": "https://example.com",
+                "frequency": 23,
+                "starting_from": starting_from,
+                "cron": "0 22 * * mon",
+                "duration_value": 1,
+                "duration_unit": "w",
+            },
+            follow=True,
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        chore = Chore.objects.get(name="Test Chore")
+        self.assertEqual(chore.description, "A test chore that needs volunteers.")
+        self.assertEqual(chore.wiki_url, "https://example.com")
+        self.assertTemplateUsed(response, "chores/chore_detail.html")
+        self.assertEqual(
+            {
+                "events_generation": {
+                    "event_type": "recurrent",
+                    "starting_time": "2025/05/10 14:56",
+                    "crontab": "0 22 * * mon",
+                    "take_one_every": 23,
+                    "duration": "P1W",
+                },
+            },
+            chore.configuration,
+        )
+        self.assertIn('data-test-hook="success"', response.content.decode("utf-8"))
+
+
+class UpdateChoreTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            first_name="An",
+            last_name="Example",
+            password="testpassword",
+            email="example@example.com",
+        )
+        permission = Permission.objects.get(
+            codename="add_chore", content_type=ContentType.objects.get_for_model(Chore)
+        )
+        self.user.user_permissions.add(permission)
+
+        success = self.client.login(email=self.user.email, password="testpassword")
+        self.assertTrue(success)
+
+    def test_update_chore_get(self):
+        chore = Chore.objects.create(
+            name="Test Chore",
+            description="A test chore that needs volunteers.",
+            class_type="BasicChore",
+            configuration={
+                "events_generation": {
+                    "event_type": "recurrent",
+                    "take_one_every": 233,
+                    "starting_time": "2025/05/10 14:56",
+                    "crontab": "0 22 * * fri",
+                }
+            },
+            creator=self.user,
+        )
+
+        url = reverse("chore_update", kwargs={"pk": chore.id})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        html = response.content.decode("utf-8")
+        self.assertTemplateUsed(response, "chores/chore_crud.html")
+        self.assertIn(chore.name, html)
+        self.assertIn("0 22 * * fri", html)
+        self.assertIn("233", html)
+
+    def test_update_chore_post(self):
+        chore = Chore.objects.create(
+            name="Test Chore",
+            description="A test chore that needs volunteers.",
+            class_type="BasicChore",
+            configuration={"foo": "bar"},
+            creator=self.user,
+        )
+
+        url = reverse("chore_update", kwargs={"pk": chore.id})
+        starting_from = "2025/05/10 14:56"
+        response = self.client.post(
+            url,
+            {
+                "name": "Test Chore",
+                "description": "A test chore that needs volunteers.",
+                "wiki_url": "https://example.com",
+                "frequency": 23,
+                "starting_from": starting_from,
+                "cron": "0 22 * * mon",
+                "duration_value": 1,
+                "duration_unit": "w",
+            },
+            follow=True,
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        chore = Chore.objects.get(name="Test Chore")
+        self.assertEqual(chore.description, "A test chore that needs volunteers.")
+        self.assertEqual(chore.wiki_url, "https://example.com")
+        self.assertTemplateUsed(response, "chores/chore_detail.html")
+        self.assertEqual(
+            {
+                "events_generation": {
+                    "event_type": "recurrent",
+                    "starting_time": "2025/05/10 14:56",
+                    "crontab": "0 22 * * mon",
+                    "take_one_every": 23,
+                    "duration": "P1W",
+                },
+            },
+            chore.configuration,
+        )
