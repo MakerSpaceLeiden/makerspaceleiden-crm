@@ -25,7 +25,4 @@ jobs:
       - name: Run tests
         run: |
           uv run python manage.py check
-          uv pip install coverage
-          uv run coverage run --source='.' manage.py test
-      - name: Coverage report
-        run: uv run coverage report
+          uv run pytest --cov=.

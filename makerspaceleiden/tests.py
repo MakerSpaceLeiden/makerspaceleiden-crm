@@ -1,6 +1,7 @@
 from http import HTTPStatus
 from unittest import TestCase
 
+import pytest
 from django.conf import settings
 from django.test import Client, override_settings
 
@@ -18,6 +19,7 @@ class MakerspaceleidenTest(TestCase):
             "Intranet – " + settings.SITE_NAME, response.content.decode("utf-8")
         )
 
+    @pytest.mark.django_db
     def test_login(self):
         response = self.client.get("/login/")
         self.assertEqual(response.status_code, HTTPStatus.OK)
