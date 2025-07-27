@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="row">
+    <form method="post">
+        {% csrf_token %}
+
+  <div class="col-md-9 mb-3">
+    <p class="lead">Are you sure you want to delete this chore?</p>
+    <p>Please feel free to <a href="{% url 'chore_update' chore.id %}">edit it</a>.</p>
+  </div>
+  <div class="col-md-3 mb-3 d-flex justify-content-end align-items-center">
+    <a href="{% url 'chore_detail' chore.id %}" class="btn btn-secondary me-1 text-light">Cancel</a>
+    <button type="submit" class="btn btn-danger btn-primary me-1">Delete</button>
+  </div>
+  </form>
+</div>
+
+{% endblock %}
