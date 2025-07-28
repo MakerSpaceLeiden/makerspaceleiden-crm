@@ -1,6 +1,7 @@
 import json
 from datetime import date, datetime, time, timezone
 
+import time_machine
 from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
@@ -186,22 +187,25 @@ class EventsApiTests(TestCase):
 
 
 class MembersApiTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.password = "testpassword"
+        self.user = User.objects.create_user(
+            email="testuser.member.api@example.com",
+            password=self.password,
+            first_name="Test",
+            last_name="User",
+            telegram_user_id="123456789",
+        )
+
     def test_members_list_returns_403(self):
         client = APIClient()
         response = client.get("/api/v1/members/")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_members_list_returns_200_for_authed(self):
-        user_password = "testpassword"
-        user = User.objects.create_user(
-            email="testuser@example.com",
-            password=user_password,
-            first_name="Test",
-            last_name="User",
-            telegram_user_id="123456789",
-        )
         client = APIClient()
-        self.assertIs(client.login(email=user.email, password=user_password), True)
+        self.assertIs(client.login(email=self.user.email, password=self.password), True)
         response = client.get("/api/v1/members/")
         json_response = json.loads(response.content)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -215,19 +219,73 @@ class MembersApiTests(TestCase):
             json_response["data"],
             [
                 {
-                    "id": user.id,
+                    "id": self.user.id,
                     "url": "https://mijn.makerspaceleiden.nl/acl/member/"
-                    + str(user.id),
-                    "email": user.email,
-                    "first_name": user.first_name,
-                    "last_name": user.last_name,
-                    "image": "http://testserver/avatar/" + str(user.id),
+                    + str(self.user.id),
+                    "email": self.user.email,
+                    "first_name": self.user.first_name,
+                    "last_name": self.user.last_name,
+                    "image": "http://testserver/avatar/" + str(self.user.id),
+                    "is_onsite": False,
                     "images": {
-                        "original": "http://testserver/avatar/" + str(user.id),
-                        "thumbnail": "http://testserver/avatar/" + str(user.id),
+                        "original": "http://testserver/avatar/" + str(self.user.id),
+                        "thumbnail": "http://testserver/avatar/" + str(self.user.id),
                     },
                 }
             ],
+        )
+
+    def test_member_checkin(self):
+        client = APIClient()
+        self.assertTrue(client.login(email=self.user.email, password=self.password))
+
+        response = client.post(
+            f"/api/v1/members/{self.user.id}/checkin/",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.user.refresh_from_db()
+        self.assertDictEqual(
+            json.loads(response.content),
+            {
+                "meta": {
+                    "action": "checkin",
+                },
+                "data": {
+                    "id": self.user.id,
+                    "is_onsite": True,
+                    "onsite_updated_at": self.user.onsite_updated_at.strftime(
+                        "%Y-%m-%dT%H:%M:%SZ"
+                    ),
+                },
+            },
+        )
+
+    @time_machine.travel("2025-05-03 10:00")
+    def test_member_checkout(self):
+        client = APIClient()
+        self.assertTrue(client.login(email=self.user.email, password=self.password))
+
+        response = client.post(
+            f"/api/v1/members/{self.user.id}/checkout/",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.user.refresh_from_db()
+        self.assertDictEqual(
+            json.loads(response.content),
+            {
+                "meta": {
+                    "action": "checkout",
+                },
+                "data": {
+                    "id": self.user.id,
+                    "is_onsite": False,
+                    "onsite_updated_at": self.user.onsite_updated_at.strftime(
+                        "%Y-%m-%dT%H:%M:%SZ"
+                    ),
+                },
+            },
         )
 
 

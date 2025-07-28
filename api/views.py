@@ -2,7 +2,9 @@ import logging
 
 from django.utils.dateparse import parse_datetime
 from django.utils.timezone import is_naive, make_aware, utc
-from rest_framework import response, viewsets
+from rest_framework import response, status, viewsets
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
 
 from acl.models import Machine
 from agenda.models import Agenda
@@ -47,6 +49,65 @@ class BaseListMetaViewSet(viewsets.ModelViewSet):
 class UserViewSet(BaseListMetaViewSet):
     queryset = User.objects.all().filter(is_active=True)
     serializer_class = UserSerializer
+
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
+
+    @action(
+        detail=True,
+        methods=["POST"],
+        url_name="checkin",
+        permission_classes=[IsAuthenticated],
+    )
+    def checkin(self, request, pk=None, **kwargs):
+        user = self.get_object()
+        if user.checkin():
+            return response.Response(
+                status=status.HTTP_200_OK,
+                data={
+                    "meta": {
+                        "action": "checkin",
+                    },
+                    "data": {
+                        "id": user.id,
+                        "is_onsite": user.is_onsite,
+                        "onsite_updated_at": user.onsite_updated_at.strftime(
+                            "%Y-%m-%dT%H:%M:%SZ"
+                        ),
+                    },
+                },
+            )
+        else:
+            logger.error(f"checkin failed for {user}")
+            return response.Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @action(
+        detail=True,
+        methods=["POST"],
+        url_name="checkout",
+        permission_classes=[IsAuthenticated],
+    )
+    def checkout(self, request, pk=None, **kwargs):
+        user = self.get_object()
+        if user.checkout():
+            return response.Response(
+                status=status.HTTP_200_OK,
+                data={
+                    "meta": {
+                        "action": "checkout",
+                    },
+                    "data": {
+                        "id": user.id,
+                        "is_onsite": user.is_onsite,
+                        "onsite_updated_at": user.onsite_updated_at.strftime(
+                            "%Y-%m-%dT%H:%M:%SZ"
+                        ),
+                    },
+                },
+            )
+        else:
+            logger.error(f"checkin failed for {user}")
+            return response.Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class EventViewSet(BaseListMetaViewSet):
