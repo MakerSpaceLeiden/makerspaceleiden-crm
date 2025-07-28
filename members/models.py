@@ -122,7 +122,10 @@ class User(AbstractUser):
         help_text="Receive notifications via email even when using a chat BOT",
     )
 
-    history = HistoricalRecords()
+    is_onsite = models.BooleanField(default=False)
+    onsite_updated_at = models.DateTimeField(null=True, blank=True)
+
+    history = HistoricalRecords(excluded_fields=["is_onsite", "onsite_updated_at"])
     objects = UserManager()
 
     def __str__(self):
@@ -152,6 +155,18 @@ class User(AbstractUser):
 
     def image_img(self):
         return str('<img src="%s" width=80/>' % self.image_url())
+
+    def checkin(self):
+        self.is_onsite = True
+        self.onsite_updated_at = datetime.datetime.now(tz=datetime.timezone.utc)
+        self.save()
+        return self
+
+    def checkout(self):
+        self.is_onsite = False
+        self.onsite_updated_at = datetime.datetime.now(tz=datetime.timezone.utc)
+        self.save()
+        return self
 
     @property
     def in_group(request, group):

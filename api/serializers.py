@@ -62,7 +62,16 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = User
-        fields = ["id", "url", "email", "first_name", "last_name", "image", "images"]
+        fields = [
+            "id",
+            "url",
+            "email",
+            "first_name",
+            "last_name",
+            "image",
+            "images",
+            "is_onsite",
+        ]
 
     def get_image(self, obj):
         return self.context["request"].build_absolute_uri(obj.image_url("thumbnail"))
