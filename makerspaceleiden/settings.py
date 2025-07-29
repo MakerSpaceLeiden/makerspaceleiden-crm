@@ -378,8 +378,11 @@ NOTIFICATION_MAP = {
     "noc": "noc@makerspaceleiden.nl",
 }
 
-ROBOHASH_SET = "set1"
-ROBOHASH_COLOUR = "red"
+AVATAR = {
+    "CACHE_DIR": "avatar_cache",
+    "ROBOHASH_SET": "set1",
+    "ROBOHASH_COLOUR": "red",
+}
 
 try:
     from .local import *  # noqa: F403
