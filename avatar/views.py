@@ -12,6 +12,10 @@ from robohash import Robohash
 
 logger = logging.getLogger(__name__)
 
+DEFAULT_ROBOHASH_SET = "set1"
+DEFAULT_ROBOHASH_COLOR = "red"
+DEFAULT_CACHE_DIR = "avatar_cache"
+
 
 @cache_control(max_age=86400)  # Cache for 24 hours in browser
 def index(request, pk=None):
@@ -22,12 +26,11 @@ def index(request, pk=None):
     avatar_settings = getattr(settings, "AVATAR", {})
 
     # Define the file path for caching
-    cache_dir = avatar_settings.get("CACHE_DIR", "avatar_cache")
+    cache_dir = avatar_settings.get("CACHE_DIR", DEFAULT_CACHE_DIR)
     filename = f"mugshot-{pk}.png"
     file_path = os.path.join(cache_dir, filename)
 
     # Check if the image already exists in storage
-    print(file_path)
     if default_storage.exists(file_path):
         logger.info(f"Cached robohash image: {file_path}")
         try:
@@ -44,27 +47,26 @@ def index(request, pk=None):
     try:
         rh = Robohash(str(pk))
         rh.assemble(
-            roboset=avatar_settings.get("ROBOHASH_SET", "set1"),
+            roboset=avatar_settings.get("ROBOHASH_SET", DEFAULT_ROBOHASH_SET),
             format="png",
-            color=avatar_settings.get("ROBOHASH_COLOUR", None),
+            color=avatar_settings.get("ROBOHASH_COLOUR", DEFAULT_ROBOHASH_COLOR),
             bgset=None,
         )
 
         # Save image to BytesIO buffer
         img_buffer = BytesIO()
         rh.img.save(img_buffer, "PNG")
-        img_buffer.seek(0)
+        img_bytes = img_buffer.getvalue()  # Get bytes once
 
         # Cache the image in storage
         try:
-            default_storage.save(file_path, ContentFile(img_buffer.getvalue()))
+            default_storage.save(file_path, ContentFile(img_bytes))
             logger.info(f"Cached new robohash image: {file_path}")
         except Exception as e:
             logger.error(f"Failed to cache robohash image {file_path}: {e}")
 
         # Return the response
-        img_buffer.seek(0)
-        response = HttpResponse(img_buffer.getvalue(), content_type="image/png")
+        response = HttpResponse(img_bytes, content_type="image/png")
         response["Content-Disposition"] = f'inline; filename="{filename}"'
         return response
 
