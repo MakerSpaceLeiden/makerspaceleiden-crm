@@ -767,27 +767,6 @@ def checkout_from_space(request):
 
 
 @login_required
-def space_checkout(request):
-    try:
-        user = request.user
-    except User.DoesNotExist:
-        return HttpResponse(
-            "You are probably not a member-- admin perhaps?",
-            status=400,
-            content_type="text/plain",
-        )
-
-    aggregator_adapter = get_aggregator_adapter()
-    if not aggregator_adapter:
-        return HttpResponse(
-            "No aggregator configuration found", status=500, content_type="text/plain"
-        )
-
-    aggregator_adapter.checkout(user.id)
-    return redirect("space_state")
-
-
-@login_required
 @superuser_required
 def userdetails_admin_edit(request, user_id):
     try:

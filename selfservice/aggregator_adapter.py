@@ -53,18 +53,6 @@ class AggregatorAdapter(object):
     def onboard_signal(self, user_id):
         self._request_with_user_id("/signal/onboard", user_id)
 
-    def checkout(self, user_id):
-        self._request_with_user_id("/space/checkout", user_id)
-
-    def get_chores(self):
-        payload = self._request_with_user_id("/chores/overview")
-        if payload:
-            try:
-                return json.loads(payload)
-            except Exception:
-                logger.error("Failed to parse the json chore: '{}'.".format(payload))
-        return None
-
 
 def initialize_aggregator_adapter(base_url, username, password):
     return AggregatorAdapter(base_url, username, password)

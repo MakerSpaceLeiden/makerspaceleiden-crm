@@ -37,7 +37,6 @@ urlpatterns = [
         name="email_notification_settings",
     ),
     path("space_state", views.space_state, name="space_state"),
-    path("space_state/checkout", views.space_checkout, name="checkout_from_space"),
     path(
         "space_state/check_out",
         views.checkout_from_space,
