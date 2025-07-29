@@ -1,4 +1,6 @@
 # Create your tests here.
+from http import HTTPStatus
+
 from django.test import Client, TestCase
 from django.urls import reverse
 
@@ -90,3 +92,60 @@ class AclTest(TestCase):
             "Sorry - you have not had instructions on any machine yourself",
             response.content.decode("utf-8"),
         )
+
+    def test_space_state_get(self):
+        user = User.objects.create_user(
+            email="test@test.nl",
+            password="testpassword",
+            first_name="Test",
+            last_name="User",
+            is_onsite=True,
+        )
+
+        success = self.client.login(email=self.admin.email, password="testpassword")
+        self.assertTrue(success)
+
+        response = self.client.get(reverse("space_state"))
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        html = response.content.decode("utf-8")
+        self.assertIn("State of the Space", html)
+        self.assertIn(user.name(), html)
+        self.assertNotIn('data-test-hook="member-checkout"', html)
+
+    def test_space_state_get_self(self):
+        user = User.objects.create_user(
+            email="test@test.nl",
+            password="testpassword",
+            first_name="Test",
+            last_name="User",
+            is_onsite=True,
+        )
+
+        success = self.client.login(email=user.email, password="testpassword")
+        self.assertTrue(success)
+
+        response = self.client.get(reverse("space_state"))
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        html = response.content.decode("utf-8")
+        self.assertIn("State of the Space", html)
+        self.assertIn(user.name(), html)
+        self.assertIn('data-test-hook="member-checkout"', html)
+
+    def test_space_state_checkout(self):
+        user = User.objects.create_user(
+            email="test@test.nl",
+            password="testpassword",
+            first_name="Test",
+            last_name="User",
+            is_onsite=True,
+        )
+
+        success = self.client.login(email=user.email, password="testpassword")
+        self.assertTrue(success)
+
+        response = self.client.post(reverse("checkout_from_space_post"), follow=True)
+
+        user.refresh_from_db()
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertFalse(user.is_onsite, "user is checked out")
+        self.assertIn("You are now checked out.", response.content.decode("utf-8"))
