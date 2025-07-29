@@ -38,6 +38,11 @@ urlpatterns = [
     ),
     path("space_state", views.space_state, name="space_state"),
     path("space_state/checkout", views.space_checkout, name="checkout_from_space"),
+    path(
+        "space_state/check_out",
+        views.checkout_from_space,
+        name="checkout_from_space_post",
+    ),
     path("api/v1/state", views.space_state_api, name="space_state_api"),
     path("api/v1/info", views.space_state_api_info, name="space_state_api_info"),
     # For the trutee's -- to ease admin

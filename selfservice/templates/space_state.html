@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load humanize %}
 {% block content %}
 
 {% if no_data_available %}
@@ -21,18 +21,26 @@
 {% if users_in_space %}
 <h2>User check-ins</h2>
 
-
   <table>
     <tbody>
       {% for checkin in users_in_space %}
       <tr>
-        <td><b><a href="{% url 'overview' member_id=checkin.user.user_id %}">{{ checkin.user.full_name }}</a></b></td>
-        <td>{{ checkin.ts_checkin_human }}</i></td>
-        <td><i>{{ checkin.ts_checkin }}</i></td>
-        {% if checkin.user.user_id == user.id %}
+        <td><b><a href="{% url 'overview' member_id=checkin.id %}">{{ checkin.name }}</a></b></td>
         <td>
-          <a style="background-color: #CCCCCC; border-radius: 3px; font-size: 12px; border: 1px solid #003366; padding: 5px; color: black;" href="{% url 'checkout_from_space' %}">Check out</a>
+          {{ checkin.onsite_updated_at|naturaltime }}
         </td>
+        <td>
+          <i>{{ checkin.onsite_updated_at }}</i>
+        </td>
+        {% if checkin.id == user.id %}
+          <td>
+            <form method="post" action="{% url 'checkout_from_space_post' %}">
+                {% csrf_token %}
+                <button
+                  data-test-hook="member-checkout"
+                  class="btn btn-outline-primary btn-sm">Checkout</button>
+            </form>
+          </td>
         {% endif %}
       </tr>
       {% endfor %}
