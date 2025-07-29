@@ -2,6 +2,8 @@ import json
 from datetime import date, datetime, time, timezone
 
 import time_machine
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
@@ -197,6 +199,10 @@ class MembersApiTests(TestCase):
             last_name="User",
             telegram_user_id="123456789",
         )
+        permission = Permission.objects.get(
+            codename="add_user", content_type=ContentType.objects.get_for_model(User)
+        )
+        self.user.user_permissions.add(permission)
 
     def test_members_list_returns_403(self):
         client = APIClient()

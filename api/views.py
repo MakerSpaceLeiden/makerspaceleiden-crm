@@ -4,7 +4,6 @@ from django.utils.dateparse import parse_datetime
 from django.utils.timezone import is_naive, make_aware, utc
 from rest_framework import response, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
 
 from acl.models import Machine
 from agenda.models import Agenda
@@ -57,7 +56,6 @@ class UserViewSet(BaseListMetaViewSet):
         detail=True,
         methods=["POST"],
         url_name="checkin",
-        permission_classes=[IsAuthenticated],
     )
     def checkin(self, request, pk=None, **kwargs):
         user = self.get_object()
@@ -85,7 +83,6 @@ class UserViewSet(BaseListMetaViewSet):
         detail=True,
         methods=["POST"],
         url_name="checkout",
-        permission_classes=[IsAuthenticated],
     )
     def checkout(self, request, pk=None, **kwargs):
         user = self.get_object()
