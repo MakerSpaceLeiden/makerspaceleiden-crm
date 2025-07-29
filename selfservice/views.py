@@ -6,6 +6,7 @@ import sys
 import six
 from django import forms
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
@@ -20,6 +21,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.views.decorators.http import require_POST
 
 from acl.models import Entitlement, Machine, PermitType, RecentUse
 from agenda.models import Agenda
@@ -661,25 +663,23 @@ def space_state(request):
             content_type="text/plain",
         )
 
-    context = {}
-    aggregator_adapter = get_aggregator_adapter()
+    context = {
+        "user": user,
+        "title": "State of the Space",
+        "has_permission": request.user.is_authenticated,
+        "users_in_space": User.objects.all().filter(is_onsite=True),
+    }
+    # aggregator_adapter = get_aggregator_adapter()
 
-    try:
-        context = aggregator_adapter.fetch_state_space()
-    except Exception as e:
-        logger.error("No data available, exception: {0}".format(str(e)))
-        context["no_data_available"] = True
+    # try:
+    #     context = aggregator_adapter.fetch_state_space()
+    # except Exception as e:
+    #     logger.error("No data available, exception: {0}".format(str(e)))
+    #     context["no_data_available"] = True
 
-    # Sort 'machines' by machine name alphabetically
-    if "machines" in context and isinstance(context["machines"], list):
-        context["machines"] = sorted(
-            context["machines"],
-            key=lambda machine_state: machine_state["machine"]["name"].lower(),
-        )
-
-    context["user"] = user
-    context["title"] = "State of the Space"
-    context["has_permission"] = request.user.is_authenticated
+    # context["user"] = user
+    # context["title"] = "State of the Space"
+    # context["has_permission"] = request.user.is_authenticated
 
     return render(request, "space_state.html", context)
 
@@ -749,7 +749,8 @@ def space_state_api_info(request):
 
 
 @login_required
-def space_checkout(request):
+@require_POST
+def checkout_from_space(request):
     try:
         user = request.user
     except User.DoesNotExist:
@@ -759,13 +760,9 @@ def space_checkout(request):
             content_type="text/plain",
         )
 
-    aggregator_adapter = get_aggregator_adapter()
-    if not aggregator_adapter:
-        return HttpResponse(
-            "No aggregator configuration found", status=500, content_type="text/plain"
-        )
+    user.checkout()
+    messages.success(request, "You are now checked out.")
 
-    aggregator_adapter.checkout(user.id)
     return redirect("space_state")
 
 

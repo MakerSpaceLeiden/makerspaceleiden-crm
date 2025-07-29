@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load humanize %}
 {% block content %}
 
 {% if no_data_available %}
@@ -21,23 +21,46 @@
 {% if users_in_space %}
 <h2>User check-ins</h2>
 
+  <div class="row">
+    <div class="col-md-6">
+      <ul class="list-group">
+        {% for checkin in users_in_space %}
+        <li class="list-group-item py-3 d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-center">
+            <img
+              alt="Avatar for {{checkin.name}}"
+              src="{{ checkin.image_url }}"
+              loading="lazy"
+              class="avatar rounded-1 bg-secondary bg-gradient text-bg-secondary me-2"
+              style="width: 45px; height: 45px; object-fit: cover;"/>
+              <b><a href="{% url 'overview' member_id=checkin.id %}">{{ checkin.name }}</a></b>
+          </div>
+          <div>
+            {{ checkin.onsite_updated_at|naturaltime }}
+          </div>
+          <div>
+            <i>{{ checkin.onsite_updated_at }}</i>
+          </div>
+        </li>
 
-  <table>
-    <tbody>
-      {% for checkin in users_in_space %}
-      <tr>
-        <td><b><a href="{% url 'overview' member_id=checkin.user.user_id %}">{{ checkin.user.full_name }}</a></b></td>
-        <td>{{ checkin.ts_checkin_human }}</i></td>
-        <td><i>{{ checkin.ts_checkin }}</i></td>
-        {% if checkin.user.user_id == user.id %}
-        <td>
-          <a style="background-color: #CCCCCC; border-radius: 3px; font-size: 12px; border: 1px solid #003366; padding: 5px; color: black;" href="{% url 'checkout_from_space' %}">Check out</a>
-        </td>
+        {% if checkin.id == user.id %}
+          <li class="list-group-item list-group-item-secondary py-2">
+            <form method="post" action="{% url 'checkout_from_space_post' %}" class="d-flex justify-content-between align-items-center">
+                {% csrf_token %}
+                <div class="text-dark">
+                  Have you left the space?
+                </div>
+                <button
+                  data-test-hook="member-checkout"
+                  class="btn btn-outline-secondary btn-sm">Checkout</button>
+            </form>
+          </li>
         {% endif %}
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
 {% else %}
 <i>There's no one at the space now.</i>
 {% endif %}
