@@ -83,7 +83,7 @@ class User(AbstractUser):
     class Meta:
         ordering = ["first_name", "last_name"]
         permissions = [
-            ("wiki_account", "Can have account with WikiMedia"),
+            ("wiki_account", "Has access to Wiki account"),
         ]
 
     USERNAME_FIELD = "email"
