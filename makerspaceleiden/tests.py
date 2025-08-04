@@ -4,7 +4,7 @@ import pytest
 from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.test import Client, TestCase, override_settings
-from oauth2_provider.models import Application
+from oauth2_provider.models import Application, get_application_model
 
 from makerspaceleiden.utils import derive_initials
 from members.models import User
@@ -78,10 +78,13 @@ class OAuth2IntegrationTest(TestCase):
         self.user_with_permission.user_permissions.add(oauth_permission)
 
         # Create OAuth2 application
-        self.application = Application.objects.create(
+        self.client_secret = "plaintextsecret"
+        self.application = get_application_model().objects.create(
             name="Test App",
             client_type=Application.CLIENT_CONFIDENTIAL,
-            authorization_grant_type=Application.GRANT_PASSWORD,
+            authorization_grant_type=Application.GRANT_AUTHORIZATION_CODE,
+            client_secret=self.client_secret,
+            redirect_uris="http://testserver/callback",
         )
 
     def test_oauth2_openid_configuration_available(self):
@@ -100,6 +103,7 @@ class OAuth2IntegrationTest(TestCase):
             OAUTH2_PROVIDER={
                 "OIDC_ENABLED": True,
                 "OAUTH2_VALIDATOR_CLASS": "makerspaceleiden.oauth_validators.CustomOAuth2Validator",
+                "PKCE_REQUIRED": False,
             }
         ):
             success = self.client.login(
@@ -107,37 +111,85 @@ class OAuth2IntegrationTest(TestCase):
                 password="testpass123",
             )
             self.assertTrue(success)
+
+            # Get the authorization code
             response = self.client.post(
-                "/oauth2/token/",
+                "/oauth2/authorize/",
                 {
-                    "grant_type": "password",
-                    "email": self.user_with_permission.email,
-                    "password": "testpass123",
                     "client_id": self.application.client_id,
-                    "client_secret": self.application.client_secret,
+                    "response_type": "code",
+                    "redirect_uri": self.application.redirect_uris,
+                    "state": "random_state_string",
+                    "scope": "read",
                 },
             )
+            
+            # User submits authorization form (simulate approval)
+            response = self.client.post("/oauth2/authorize/", data={
+                "client_id": self.application.client_id,
+                "response_type": "code",
+                "redirect_uri": "http://testserver/callback",
+                "scope": "read",
+                "state": "random_state_string",
+                "allow": True,
+            })
 
-            self.assertEqual(response.status_code, HTTPStatus.OK)
-            self.assertIn("access_token", response.json())
-            self.assertIn("token_type", response.json())
+            # Extract code from redirect URL
+            redirect_url = response["Location"]
+            import urllib.parse as urlparse
+            query = urlparse.urlparse(redirect_url).query
+            params = urlparse.parse_qs(query)
+            print("PARAMS")
+            print(params)
+            code = params["code"][0]
+
+            print(code)
+
+            # Step 2: Exchange code for token
+            token_response = self.client.post("/oauth2/token/", data={
+                "grant_type": "authorization_code",
+                "code": code,
+                "redirect_uri": "http://testserver/callback",
+                "client_id": self.application.client_id,
+                "client_secret": self.client_secret,  # Use plaintext secret in tests
+            })
+
+            print("TOKEN RESPONSE")
+            print(token_response.content)
+
+            self.assertEqual(token_response.status_code, HTTPStatus.OK)
+            json_response = token_response.json()
+            self.assertIn("access_token", json_response)
 
     # def test_token_request_without_permission_fails(self):
     #     """Test full OAuth2 token request with unauthorized user."""
-    #     response = self.client.post(
-    #         "/o/token/",
-    #         {
-    #             "grant_type": "password",
-    #             "email": self.user_without_permission.email,
-    #             "password": "testpass123",
-    #             "client_id": self.application.client_id,
-    #             "client_secret": self.application.client_secret,
-    #         },
-    #     )
 
-    #     self.assertEqual(response.status_code, 400)
-    #     response_data = response.json()
-    #     self.assertEqual(response_data["error"], "invalid_grant")
+    #     with override_settings(
+    #         OAUTH2_PROVIDER={
+    #             "OIDC_ENABLED": True,
+    #             "OAUTH2_VALIDATOR_CLASS": "makerspaceleiden.oauth_validators.CustomOAuth2Validator",
+    #         }
+    #     ):
+    #         success = self.client.login(
+    #             email=self.user_without_permission.email,
+    #             password="testpass123",
+    #         )
+    #         self.assertTrue(success)
+
+    #         response = self.client.post(
+    #             "/oauth2/token/",
+    #             {
+    #                 "grant_type": Application.GRANT_AUTHORIZATION_CODE,
+    #                 "username": self.user_without_permission.email,
+    #                 "password": "testpass123",
+    #                 "client_id": self.application.client_id,
+    #                 "client_secret": self.client_secret,
+    #             },
+    #         )
+
+    #         self.assertEqual(response.status_code, 400)
+    #         response_data = response.json()
+    #         self.assertEqual(response_data["error"], "invalid_grant")
 
     # def test_token_request_invalid_credentials_fails(self):
     #     """Test token request with wrong password."""
