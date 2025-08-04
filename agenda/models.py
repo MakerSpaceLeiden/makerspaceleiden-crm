@@ -105,6 +105,13 @@ class Agenda(models.Model):
         return "social"
 
     @property
+    def intro(self) -> str:
+        if len(self.item_details) < 160:
+            return self.item_details
+
+        return self.item_details[:160] + "..."
+
+    @property
     def display_status(self) -> str:
         if self.type != "chore":
             return ""

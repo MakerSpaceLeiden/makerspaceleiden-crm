@@ -20,8 +20,8 @@
 
     <!-- Agenda item text -->
     <div class="col-md-8 order-0 order-md-0 pt-2">
-        <div class="card scrollable pt-0 pb-1" id="item-text">
-            <div class="card-body" style="max-height: 600px; min-height:250px; overflow-y: auto;">
+        <div class="card pt-0 pb-1" id="item-text">
+            <div class="card-body">
 
                 {% if selected_item %}
                     <div class="d-flex justify-content-between align-items-start">
@@ -41,7 +41,7 @@
                     {% if object_list %}
                         <div class="row">
                             <div class="card-text mt-4 mb-4">
-                                {{ selected_item.item_details|urlize }}
+                                {{ selected_item.item_details|linebreaksbr|urlize }}
 
                                 {% if selected_item.type == 'chore' %}
                                         <a href="{{ selected_item.chore.wiki_url }}">
@@ -107,6 +107,7 @@
 
     <!-- List of agenda items -->
     <div class="col-md-4 order-2 order-md-1 pt-1" id="list-of-agenda-items">
+        {% if selected_item.type == 'chore' %}
         <div class="card mb-3">
             <div class="card-header">
                 <h2 class="card-title">Update status</h2>
@@ -125,6 +126,7 @@
 
             </div>
         </div>
+        {% endif %}
         <div>
             <h2 class="mt-0">All events</h2>
         </div>
