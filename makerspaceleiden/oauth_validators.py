@@ -14,7 +14,6 @@ class CustomOAuth2Validator(OAuth2Validator):
         This is where we check permissions for authorization code flow.
         """
         logger.info(f"Validating code for client: {client_id}")
-        print("CUSTOM VALIDATE CODE CALLED")
         # First let parent validate the authorization code
         is_valid = super().validate_code(
             client_id, code, client, request, *args, **kwargs
