@@ -1,17 +1,17 @@
+import urllib.parse as urlparse
 from http import HTTPStatus
 
-import pytest
 from django.contrib.auth.models import Permission
-from django.test import Client, TestCase, override_settings
+from django.test import TestCase, override_settings
 from oauth2_provider.models import Application, get_application_model
-import urllib.parse as urlparse
 
 from members.models import User
+
 
 # Extract code from redirect URL
 def get_code_from_response(response):
     redirect_url = response["Location"]
-           
+
     query = urlparse.urlparse(redirect_url).query
     params = urlparse.parse_qs(query)
     return params["code"][0]
@@ -22,6 +22,7 @@ oauth_settings = {
     "OAUTH2_VALIDATOR_CLASS": "makerspaceleiden.oauth_validators.CustomOAuth2Validator",
     "PKCE_REQUIRED": False,
 }
+
 
 class OAuth2IntegrationTest(TestCase):
     """Integration tests using django-oauth-toolkit's test client."""

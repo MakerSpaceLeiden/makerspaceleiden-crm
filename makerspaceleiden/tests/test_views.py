@@ -6,6 +6,7 @@ from django.test import Client, TestCase
 
 from makerspaceleiden.utils import derive_initials
 
+
 class MakerspaceleidenTest(TestCase):
     def setUp(self):
         self.client = Client()
@@ -25,6 +26,7 @@ class MakerspaceleidenTest(TestCase):
             "<title>Login – " + settings.SITE_NAME + "</title>",
             response.content.decode("utf-8"),
         )
+
 
 class DeriveInitialsTest(TestCase):
     def test_derive_initials_cases(self):
