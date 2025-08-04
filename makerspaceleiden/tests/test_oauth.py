@@ -1,10 +1,12 @@
 import urllib.parse as urlparse
 from http import HTTPStatus
 
-from django.contrib.auth.models import Permission
 from django.test import TestCase, override_settings
+from django.urls import reverse
 from oauth2_provider.models import Application, get_application_model
 
+from acl.constants import ACL_PERMIT_WIKI_ACCOUNT
+from acl.models import Entitlement, PermitType
 from members.models import User
 
 
@@ -28,6 +30,16 @@ class OAuth2IntegrationTest(TestCase):
     """Integration tests using django-oauth-toolkit's test client."""
 
     def setUp(self):
+        admin = User.objects.create_superuser(
+            first_name="Admin",
+            last_name="User",
+            email="admin@example.com",
+            password="testpass123",
+        )
+        admin.is_staff = True
+        admin.is_superuser = True
+        admin.save()
+
         self.user_with_permission = User.objects.create_user(
             first_name="Model",
             last_name="Test",
@@ -42,9 +54,21 @@ class OAuth2IntegrationTest(TestCase):
             email="unauthorized_user.oauth@example.com",
         )
 
-        # Get the existing permission (it should already exist from migrations)
-        oauth_permission = Permission.objects.get(codename="wiki_account")
-        self.user_with_permission.user_permissions.add(oauth_permission)
+        # Create a new PermitType
+        permit = PermitType.objects.create(
+            name=ACL_PERMIT_WIKI_ACCOUNT,
+            description="Wiki account",
+            require_ok_trustee=False,
+            permit=None,
+        )
+
+        # Create a new Entitlement
+        Entitlement.objects.create(
+            holder=self.user_with_permission,
+            permit=permit,
+            active=True,
+            issuer=admin,
+        )
 
         # Create OAuth2 application
         self.client_secret = "plaintextsecret"
@@ -60,13 +84,15 @@ class OAuth2IntegrationTest(TestCase):
         with override_settings(
             OAUTH2_PROVIDER=oauth_settings,
         ):
-            response = self.client.get("/oauth2/.well-known/openid-configuration")
+            response = self.client.get(
+                reverse("oauth2_provider:oidc-connect-discovery-info")
+            )
             self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def _auth_flow(self):
         # Get the authorization code
         response = self.client.post(
-            "/oauth2/authorize/",
+            reverse("oauth2_provider:token"),
             {
                 "client_id": self.application.client_id,
                 "response_type": "code",
@@ -78,7 +104,7 @@ class OAuth2IntegrationTest(TestCase):
 
         # User submits authorization form (simulate approval)
         response = self.client.post(
-            "/oauth2/authorize/",
+            reverse("oauth2_provider:authorize"),
             data={
                 "client_id": self.application.client_id,
                 "response_type": "code",
@@ -91,7 +117,7 @@ class OAuth2IntegrationTest(TestCase):
 
         # Step 2: Exchange code for token
         token_response = self.client.post(
-            "/oauth2/token/",
+            reverse("oauth2_provider:token"),
             data={
                 "grant_type": "authorization_code",
                 "code": get_code_from_response(response),
