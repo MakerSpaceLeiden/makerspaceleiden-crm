@@ -11,7 +11,7 @@ LOGIN_REDIRECT_URL = os.environ.get("LOGIN_REDIRECT_URL", "/")
 LOGOUT_REDIRECT_URL = os.environ.get("LOGOUT_REDIRECT_URL", "/")
 STATIC_URL = os.environ.get("STATIC_URL", "/crm-static/")
 MEDIA_ROOT = os.environ.get("MEDIA_ROOT", "/usr/local/makerspaceleiden-crm/var/media")
-DEBUG = False
+DEBUG = os.getenv("DJANGO_DEBUG", "False") == "True"
 with open("/etc/crm_secret_key.txt") as f:
     SECRET_KEY = f.read().strip()
 SECURE_HSTS_SECONDS = 120

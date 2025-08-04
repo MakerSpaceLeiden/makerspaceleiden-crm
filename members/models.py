@@ -82,6 +82,9 @@ class AuditRecord(models.Model):
 class User(AbstractUser):
     class Meta:
         ordering = ["first_name", "last_name"]
+        permissions = [
+            ("wiki_account", "Has access to Wiki account"),
+        ]
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["first_name", "last_name", "telegram_user_id"]
