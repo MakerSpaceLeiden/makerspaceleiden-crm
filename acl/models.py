@@ -175,6 +175,7 @@ class Machine(models.Model):
     CATEGORY_CHOICES = [
         ("machine", "Machine"),
         ("general_equipment", "General equipment"),
+        ("software", "Software"),
         ("lights", "Lights"),
     ]
 
