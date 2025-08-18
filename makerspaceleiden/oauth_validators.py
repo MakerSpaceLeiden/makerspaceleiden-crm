@@ -2,9 +2,6 @@ import logging
 
 from oauth2_provider.oauth2_validators import OAuth2Validator
 
-from acl.constants import ACL_PERMIT_WIKI_ACCOUNT
-from acl.models import Entitlement, PermitType
-
 logger = logging.getLogger(__name__)
 
 logger.info("makerspaceleiden.customoauth2validator")
@@ -28,28 +25,14 @@ class CustomOAuth2Validator(OAuth2Validator):
 
         if hasattr(request, "user"):
             # Get the PermitType
-            permit = None
-            try:
-                permit = PermitType.objects.get(name=ACL_PERMIT_WIKI_ACCOUNT)
-            except Exception:
-                logger.info("Permit not found")
-                return False
-
+            permit = client.permit
             if not permit:
                 logger.info("Permit has no PermitType")
                 return False
 
-            entitlement = None
-            try:
-                entitlement = Entitlement.objects.get(
-                    holder=request.user, permit=permit, active=True
-                )
-            except Exception:
-                logger.info("Permit has no holder")
-
-            if not entitlement:
+            if not permit.hasThisPermit(request.user):
                 logger.info("User does not have necessary entitlement")
-                print("User does not have necessary entitlement")
+                print("User does not have necessary entitlement", permit)
                 return False
 
         return is_valid

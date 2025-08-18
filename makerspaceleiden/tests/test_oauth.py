@@ -5,7 +5,6 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 from oauth2_provider.models import Application, get_application_model
 
-from acl.constants import ACL_PERMIT_WIKI_ACCOUNT
 from acl.models import Entitlement, PermitType
 from members.models import User
 
@@ -40,6 +39,8 @@ class OAuth2IntegrationTest(TestCase):
         admin.is_superuser = True
         admin.save()
 
+        self.admin = admin
+
         self.user_with_permission = User.objects.create_user(
             first_name="Model",
             last_name="Test",
@@ -56,7 +57,7 @@ class OAuth2IntegrationTest(TestCase):
 
         # Create a new PermitType
         permit = PermitType.objects.create(
-            name=ACL_PERMIT_WIKI_ACCOUNT,
+            name="wiki account",
             description="Wiki account",
             require_ok_trustee=False,
             permit=None,
@@ -78,6 +79,7 @@ class OAuth2IntegrationTest(TestCase):
             authorization_grant_type=Application.GRANT_AUTHORIZATION_CODE,
             client_secret=self.client_secret,
             redirect_uris="http://testserver/callback",
+            permit=permit,
         )
 
     def test_oauth2_openid_configuration_available(self):
@@ -89,14 +91,14 @@ class OAuth2IntegrationTest(TestCase):
             )
             self.assertEqual(response.status_code, HTTPStatus.OK)
 
-    def _auth_flow(self):
+    def _auth_flow(self, application):
         # Get the authorization code
         response = self.client.post(
             reverse("oauth2_provider:token"),
             {
-                "client_id": self.application.client_id,
+                "client_id": application.client_id,
                 "response_type": "code",
-                "redirect_uri": self.application.redirect_uris,
+                "redirect_uri": application.redirect_uris,
                 "state": "random_state_string",
                 "scope": "read",
             },
@@ -106,7 +108,7 @@ class OAuth2IntegrationTest(TestCase):
         response = self.client.post(
             reverse("oauth2_provider:authorize"),
             data={
-                "client_id": self.application.client_id,
+                "client_id": application.client_id,
                 "response_type": "code",
                 "redirect_uri": "http://testserver/callback",
                 "scope": "read",
@@ -122,7 +124,7 @@ class OAuth2IntegrationTest(TestCase):
                 "grant_type": "authorization_code",
                 "code": get_code_from_response(response),
                 "redirect_uri": "http://testserver/callback",
-                "client_id": self.application.client_id,
+                "client_id": application.client_id,
                 "client_secret": self.client_secret,  # Use plaintext secret in tests
             },
         )
@@ -141,7 +143,7 @@ class OAuth2IntegrationTest(TestCase):
             )
             self.assertTrue(success)
 
-            token_response = self._auth_flow()
+            token_response = self._auth_flow(self.application)
 
             self.assertEqual(token_response.status_code, HTTPStatus.OK)
             json_response = token_response.json()
@@ -159,7 +161,7 @@ class OAuth2IntegrationTest(TestCase):
             )
             self.assertTrue(success)
 
-            response = self._auth_flow()
+            response = self._auth_flow(self.application)
 
             self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
             response_data = response.json()
