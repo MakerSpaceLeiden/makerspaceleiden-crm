@@ -1,8 +1,9 @@
 import logging
+from datetime import timezone
 
 from django.db.models import Q
 from django.utils.dateparse import parse_datetime
-from django.utils.timezone import is_naive, make_aware, utc
+from django.utils.timezone import is_naive, make_aware
 from rest_framework import response, status, viewsets
 from rest_framework.decorators import action
 
@@ -138,7 +139,7 @@ class EventViewSet(BaseListMetaViewSet):
             logger.warning("Invalid datetime string provided", dt_str)
             return None
         if is_naive(dt):
-            dt = make_aware(dt, utc)
+            dt = make_aware(dt, timezone.utc)
         return dt
 
     def _filter_by_datetime_field(self, queryset, field: str, dt_str: str, lookup: str):
