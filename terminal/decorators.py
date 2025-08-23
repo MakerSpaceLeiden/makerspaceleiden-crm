@@ -32,7 +32,6 @@ def is_paired_terminal(function):
                 status=400,
                 content_type="text/plain",
             )
-
         return function(request, terminal, *args, **kwargs)
 
     return wrap

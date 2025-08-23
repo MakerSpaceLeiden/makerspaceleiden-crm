@@ -7,7 +7,7 @@ test -f .env && source .env
 DIR=${DIR:-/usr/local/makerspaceleiden-crm}
 cd $DIR || exit 1
 
-uv venv
+uv venv --allow-existing --quiet
 source .venv/bin/activate
 
 DJANGO_RUN="uv run python manage.py"
