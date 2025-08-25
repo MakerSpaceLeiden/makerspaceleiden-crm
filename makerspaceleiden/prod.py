@@ -135,9 +135,11 @@ OAUTH2_PROVIDER = {
     "PKCE_REQUIRED": False,
     "OAUTH2_VALIDATOR_CLASS": "makerspaceleiden.oauth_validators.CustomOAuth2Validator",
     "OIDC_ENABLED": True,
+    "OIDC_USERINFO": "makerspaceleiden..oidc_provider_settings.userinfo",
     "SCOPES": {
         "openid": "OpenID Connect scope",
         "email": "Access to your email address",
+        "profile": "Access to your name",
     },
     "OIDC_RSA_PRIVATE_KEY": os.environ.get("OIDC_RSA_PRIVATE_KEY"),
 }
