@@ -5,6 +5,7 @@ from collections import defaultdict
 from datetime import datetime
 
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
@@ -12,7 +13,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import EmailMessage
 from django.db.models import Prefetch
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.views.generic.detail import DetailView
@@ -21,6 +22,7 @@ from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from agenda.models import Agenda, AgendaChoreStatusChange
 
 from .forms import ChoreForm
+from .helpers import create_chore_agenda_item
 from .models import Chore, ChoreVolunteer
 from .schedule import EventsGenerationConfiguration, generate_schedule_for_event
 
@@ -268,3 +270,35 @@ class ChoreDeleteView(LoginRequiredMixin, DeleteView):
 
     def get_success_url(self):
         return reverse("chores")
+
+
+def generate_events_for_chore(request, pk):
+    chore = get_object_or_404(Chore, pk=pk)
+    events_config = chore.configuration["events_generation"]
+    if not events_config["event_type"] == "recurrent":
+        return HttpResponse(
+            "Unsupported event_type", status=400, content_type="text/plain"
+        )
+
+    number_of_days = 30
+    schedule = generate_schedule_for_event(events_config, number_of_days)
+
+    print(f"Schedule: {schedule}")
+
+    event_generated_count = 0
+
+    for next in schedule:
+        if create_chore_agenda_item(chore, next, logger):
+            event_generated_count += 1
+
+    if event_generated_count == 0:
+        messages.info(
+            request,
+            f"No events generated for {chore.name} in next {number_of_days} days",
+        )
+    else:
+        messages.success(
+            request, f"{event_generated_count} events generated for {chore.name}"
+        )
+
+    return redirect(reverse("chore_detail", kwargs={"pk": chore.pk}))

@@ -341,3 +341,44 @@ class UpdateChoreTest(TestCase):
             },
             chore.configuration,
         )
+
+
+class GenerateEventsForChore(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            first_name="An",
+            last_name="Example",
+            password="testpassword",
+            email="example@example.com",
+        )
+        permission = Permission.objects.get(
+            codename="add_chore", content_type=ContentType.objects.get_for_model(Chore)
+        )
+        self.user.user_permissions.add(permission)
+
+        success = self.client.login(email=self.user.email, password="testpassword")
+        self.assertTrue(success)
+
+    def test_generate_events_for_chore_get(self):
+        chore = Chore.objects.create(
+            name="Test Chore",
+            description="A test chore that needs volunteers.",
+            class_type="BasicChore",
+            configuration={
+                "events_generation": {
+                    "event_type": "recurrent",
+                    "take_one_every": 2,
+                    "starting_time": "10/05/2024 14:56",
+                    "crontab": "0 22 * * fri",
+                }
+            },
+            creator=self.user,
+        )
+
+        url = reverse("generate_events_for_chore", kwargs={"pk": chore.id})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_302_FOUND)
+        self.assertEqual(response.url, reverse("chore_detail", kwargs={"pk": chore.id}))
+
+        events = Agenda.objects.all()
+        self.assertEqual(len(events), 2)
