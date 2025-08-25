@@ -397,3 +397,53 @@ class GenerateEventsForChore(TestCase):
 
         events = Agenda.objects.all()
         self.assertEqual(len(events), 2)
+
+
+class DeleteChoreTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            first_name="An",
+            last_name="Example",
+            password="testpassword",
+            email="example@example.com",
+        )
+        permission = Permission.objects.get(
+            codename="delete_chore",
+            content_type=ContentType.objects.get_for_model(Chore),
+        )
+        self.user.user_permissions.add(permission)
+
+        success = self.client.login(email=self.user.email, password="testpassword")
+        self.assertTrue(success)
+
+        self.user_no_permission = User.objects.create_user(
+            first_name="An",
+            last_name="Example",
+            password="testpassword",
+            email="no_permission@example.com",
+        )
+
+        self.chore = Chore.objects.create(
+            name="Test Chore",
+            description="A test chore that needs volunteers.",
+            class_type="BasicChore",
+            configuration={},
+            creator=self.user,
+        )
+
+    def test_delete_chore_requires_permission(self):
+        url = reverse("chore_delete", kwargs={"pk": self.chore.id})
+        success = self.client.login(
+            email=self.user_no_permission.email, password="testpassword"
+        )
+        self.assertTrue(success)
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_delete_chore_with_permission(self):
+        url = reverse("chore_delete", kwargs={"pk": self.chore.id})
+        response = self.client.post(url, follow=True)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # Verify chore was actually deleted
+        with self.assertRaises(Chore.DoesNotExist):
+            Chore.objects.get(id=self.chore.id)

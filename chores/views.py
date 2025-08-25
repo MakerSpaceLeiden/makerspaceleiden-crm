@@ -263,8 +263,9 @@ class ChoreDetailView(LoginRequiredMixin, DetailView):
         return ctx
 
 
-class ChoreDeleteView(LoginRequiredMixin, DeleteView):
+class ChoreDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     model = Chore
+    permission_required = "chores.delete_chore"
     template_name = "chores/chore_confirm_delete.html"
     context_object_name = "chore"
 
