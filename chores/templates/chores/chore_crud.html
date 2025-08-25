@@ -96,7 +96,8 @@
             <label for="window_duration" class="form-label">Duration:</label>
             <div>
               <div class="d-inline-flex">
-              <input type="number" name="window_duration" class="form-control" min="1" value="{{ form.window_duration.value|default:7 }}">
+              {{ form.duration_value }}
+              <!-- <input type="number" name="window_duration" class="form-control" min="1" value="{{ form.window_duration.value|default:7 }}"> -->
               {{ form.duration_unit }}
             </div>
             </div>

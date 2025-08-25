@@ -8,7 +8,7 @@
       <p><strong>Description:</strong> {{ chore.description }}</p>
       <p><strong>Frequency:</strong> Once every {{ chore.configuration.events_generation.take_one_every }} weeks</p>
       <p><strong>Cron:</strong> {{ chore.configuration.events_generation.crontab }}</p>
-      <p><strong>Configuration:</strong> <pre>{{ chore.configuration|json_script:"chore-config" }}</pre></p>
+      <p><strong>Configuration:</strong> <pre style="white-space: wrap;">{{ chore.configuration }}</pre></p>
       {% if chore.wiki_url %}
         <p><strong>Wiki URL:</strong> <a href="{{ chore.wiki_url }}">{{ chore.wiki_url }}</a></p>
       {% endif %}

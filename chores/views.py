@@ -14,6 +14,7 @@ from django.core.mail import EmailMessage
 from django.db.models import Prefetch
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.template.defaultfilters import pluralize
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.views.generic.detail import DetailView
@@ -21,6 +22,7 @@ from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
 from agenda.models import Agenda, AgendaChoreStatusChange
 
+from .constants import CHORES_GENERATE_EVENTS_FOR_DAYS
 from .forms import ChoreForm
 from .helpers import create_chore_agenda_item
 from .models import Chore, ChoreVolunteer
@@ -280,8 +282,9 @@ def generate_events_for_chore(request, pk):
             "Unsupported event_type", status=400, content_type="text/plain"
         )
 
-    number_of_days = 30
-    schedule = generate_schedule_for_event(events_config, number_of_days)
+    schedule = generate_schedule_for_event(
+        events_config, CHORES_GENERATE_EVENTS_FOR_DAYS
+    )
 
     print(f"Schedule: {schedule}")
 
@@ -294,11 +297,12 @@ def generate_events_for_chore(request, pk):
     if event_generated_count == 0:
         messages.info(
             request,
-            f"No events generated for {chore.name} in next {number_of_days} days",
+            f"No events were generated for {chore.name} in next {CHORES_GENERATE_EVENTS_FOR_DAYS} days",
         )
     else:
         messages.success(
-            request, f"{event_generated_count} events generated for {chore.name}"
+            request,
+            f"{event_generated_count} event{pluralize(event_generated_count)} generated for {chore.name}",
         )
 
     return redirect(reverse("chore_detail", kwargs={"pk": chore.pk}))

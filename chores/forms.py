@@ -1,8 +1,32 @@
 from datetime import datetime
 
 from django import forms
+from isodate import Duration, duration_isoformat, parse_duration
 
 from .models import Chore
+
+
+def parse_duration_str(duration: str) -> tuple[int, str]:
+    """Helper method to parse timedelta string with timezone handling"""
+    print("Duration_value", duration)
+
+    # Begins with P
+    if not duration.startswith("P"):
+        return 7, "D"
+
+    if (
+        not duration.endswith("W")
+        and not duration.endswith("D")
+        and not duration.endswith("H")
+    ):
+        return 7, "D"
+
+    d = parse_duration(duration, False)
+
+    if d.days:
+        return d.days, "D"
+
+    return int(int(d.seconds) / 60 / 60), "H"
 
 
 class ChoreForm(forms.ModelForm):
@@ -78,6 +102,13 @@ class ChoreForm(forms.ModelForm):
             "events_generation", {}
         ).get("take_one_every", 1)
 
+        [duration_val, duration_unit] = parse_duration_str(
+            configuration.get("events_generation", {}).get("duration", "P7W")
+        )
+
+        self.fields["duration_value"].initial = duration_val
+        self.fields["duration_unit"].initial = duration_unit
+
     class Meta:
         model = Chore
         fields = [
@@ -99,6 +130,16 @@ class ChoreForm(forms.ModelForm):
         frequency = self.cleaned_data.get("frequency")
         # Process or use frequency as needed before saving the instance
         # For example, set some attribute on the instance or trigger other logic:
+
+        ## Default Duration
+        duration = Duration(days=7)
+        if self.cleaned_data.get("duration_unit") == "h":
+            duration = Duration(hours=self.cleaned_data.get("duration_value"))
+        elif self.cleaned_data.get("duration_unit") == "d":
+            duration = Duration(days=self.cleaned_data.get("duration_value"))
+        elif self.cleaned_data.get("duration_unit") == "w":
+            duration = Duration(weeks=self.cleaned_data.get("duration_value"))
+
         instance.configuration = {
             "events_generation": {
                 "take_one_every": frequency,
@@ -107,7 +148,7 @@ class ChoreForm(forms.ModelForm):
                     "%Y/%m/%d %H:%M"
                 ),
                 "crontab": self.cleaned_data.get("cron"),
-                "duration": f"P{self.cleaned_data.get('duration_value')}{self.cleaned_data.get('duration_unit').upper()}",
+                "duration": duration_isoformat(duration),
             }
         }
         if commit:

@@ -250,7 +250,7 @@ class CreateChoreTest(TestCase):
                     "starting_time": "2025/05/10 14:56",
                     "crontab": "0 22 * * mon",
                     "take_one_every": 23,
-                    "duration": "P1W",
+                    "duration": "P7D",
                 },
             },
             chore.configuration,
@@ -336,7 +336,7 @@ class UpdateChoreTest(TestCase):
                     "starting_time": "2025/05/10 14:56",
                     "crontab": "0 22 * * mon",
                     "take_one_every": 23,
-                    "duration": "P1W",
+                    "duration": "P7D",
                 },
             },
             chore.configuration,
@@ -359,6 +359,7 @@ class GenerateEventsForChore(TestCase):
         success = self.client.login(email=self.user.email, password="testpassword")
         self.assertTrue(success)
 
+    @time_machine.travel("2025-05-10 14:56")
     def test_generate_events_for_chore_get(self):
         chore = Chore.objects.create(
             name="Test Chore",
@@ -370,6 +371,7 @@ class GenerateEventsForChore(TestCase):
                     "take_one_every": 2,
                     "starting_time": "10/05/2024 14:56",
                     "crontab": "0 22 * * fri",
+                    "duration": "PT7H",
                 }
             },
             creator=self.user,
@@ -379,6 +381,8 @@ class GenerateEventsForChore(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_302_FOUND)
         self.assertEqual(response.url, reverse("chore_detail", kwargs={"pk": chore.id}))
+
+        response = self.client.get(url)
 
         events = Agenda.objects.all()
         self.assertEqual(len(events), 2)

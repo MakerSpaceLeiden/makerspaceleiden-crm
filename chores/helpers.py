@@ -1,17 +1,23 @@
-from isodate import parse_duration
 from datetime import datetime, timedelta, timezone
-from datetime import datetime, timedelta
+
+from isodate import parse_duration
 
 from agenda.models import Agenda
+
 
 def _get_chore_enddatetime(next, chore_configuration) -> datetime:
     events_generation = chore_configuration.get("events_generation", {})
     duration = events_generation.get("duration")
     if not duration:
         return (next + timedelta(days=7)).astimezone(timezone.utc)
+
+    print("_get_chore_enddatetime.Duration")
+    print(duration)
+
     return (next + parse_duration(duration)).astimezone(timezone.utc)
 
-def create_chore_agenda_item(chore, next: datetime, logger = None) -> bool:
+
+def create_chore_agenda_item(chore, next: datetime, logger=None) -> bool:
     # Query first by chore.name + startdatetime
     # If not found, create new
     if not Agenda.objects.filter(
