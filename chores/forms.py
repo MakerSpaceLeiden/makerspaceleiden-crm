@@ -61,9 +61,9 @@ class ChoreForm(forms.ModelForm):
         widget=forms.Select(
             attrs={"class": "form-select h-100 ms-2"},
             choices=[
-                ("h", "hours"),
-                ("d", "days"),
-                ("w", "weeks"),
+                ("H", "hours"),
+                ("D", "days"),
+                ("W", "weeks"),
             ],
         ),
     )
