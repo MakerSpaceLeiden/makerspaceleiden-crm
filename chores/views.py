@@ -212,7 +212,10 @@ class ChoreCreateView(
         return ctx
 
 
-class ChoreUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+class ChoreUpdateView(
+    LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, UpdateView
+):
+    permission_required = "chores.change_chore"
     model = Chore
     form_class = ChoreForm
     template_name = "chores/chore_crud.html"

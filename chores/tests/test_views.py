@@ -267,15 +267,22 @@ class UpdateChoreTest(TestCase):
             email="example@example.com",
         )
         permission = Permission.objects.get(
-            codename="add_chore", content_type=ContentType.objects.get_for_model(Chore)
+            codename="change_chore",
+            content_type=ContentType.objects.get_for_model(Chore),
         )
         self.user.user_permissions.add(permission)
 
         success = self.client.login(email=self.user.email, password="testpassword")
         self.assertTrue(success)
 
-    def test_update_chore_get(self):
-        chore = Chore.objects.create(
+        self.user_no_permission = User.objects.create_user(
+            first_name="An",
+            last_name="Example",
+            password="testpassword",
+            email="no_permission@example.com",
+        )
+
+        self.chore = Chore.objects.create(
             name="Test Chore",
             description="A test chore that needs volunteers.",
             class_type="BasicChore",
@@ -290,25 +297,27 @@ class UpdateChoreTest(TestCase):
             creator=self.user,
         )
 
-        url = reverse("chore_update", kwargs={"pk": chore.id})
+    def test_update_chore_requires_permission(self):
+        url = reverse("chore_update", kwargs={"pk": self.chore.id})
+        success = self.client.login(
+            email=self.user_no_permission.email, password="testpassword"
+        )
+        self.assertTrue(success)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_update_chore_get(self):
+        url = reverse("chore_update", kwargs={"pk": self.chore.id})
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         html = response.content.decode("utf-8")
         self.assertTemplateUsed(response, "chores/chore_crud.html")
-        self.assertIn(chore.name, html)
+        self.assertIn(self.chore.name, html)
         self.assertIn("0 22 * * fri", html)
         self.assertIn("233", html)
 
     def test_update_chore_post(self):
-        chore = Chore.objects.create(
-            name="Test Chore",
-            description="A test chore that needs volunteers.",
-            class_type="BasicChore",
-            configuration={"foo": "bar"},
-            creator=self.user,
-        )
-
-        url = reverse("chore_update", kwargs={"pk": chore.id})
+        url = reverse("chore_update", kwargs={"pk": self.chore.id})
         starting_from = "2025/05/10 14:56"
         response = self.client.post(
             url,
@@ -325,9 +334,11 @@ class UpdateChoreTest(TestCase):
             follow=True,
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        chore = Chore.objects.get(name="Test Chore")
-        self.assertEqual(chore.description, "A test chore that needs volunteers.")
-        self.assertEqual(chore.wiki_url, "https://example.com")
+        updated_chore = Chore.objects.get(name="Test Chore")
+        self.assertEqual(
+            updated_chore.description, "A test chore that needs volunteers."
+        )
+        self.assertEqual(updated_chore.wiki_url, "https://example.com")
         self.assertTemplateUsed(response, "chores/chore_detail.html")
         self.assertEqual(
             {
@@ -339,7 +350,7 @@ class UpdateChoreTest(TestCase):
                     "duration": "P7D",
                 },
             },
-            chore.configuration,
+            updated_chore.configuration,
         )
 
 

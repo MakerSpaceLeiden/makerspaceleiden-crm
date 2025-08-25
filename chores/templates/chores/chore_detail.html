@@ -15,8 +15,12 @@
       <p><strong>Creator:</strong> {{ chore.creator }}</p>
       <p><strong>Created At:</strong> {{ chore.created_at }}</p>
 
-      <a href="{% url 'chore_update' chore.id %}" class="btn btn-primary text-light">Edit</a>
-      <a href="{% url 'chore_delete' chore.id %}" class="btn btn-danger text-light">Delete</a>
+      {% if perms.chores.change_chore %}
+        <a href="{% url 'chore_update' chore.id %}" class="btn btn-primary text-light">Edit</a>
+      {% endif %}
+      {% if perms.chores.delete_chore %}
+        <a href="{% url 'chore_delete' chore.id %}" class="btn btn-danger text-light">Delete</a>
+      {% endif %}
     </div>
     <div class="col-md-7">
       {% if events %}
