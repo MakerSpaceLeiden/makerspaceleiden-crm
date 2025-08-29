@@ -11,6 +11,7 @@ from django.db.models.signals import post_save
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
+from oauth2_provider.models import AbstractApplication
 from simple_history.models import HistoricalRecords
 
 from members.models import Tag, User
@@ -479,6 +480,12 @@ def yn(v):
     if v:
         return "yes"
     return "no"
+
+
+class Application(AbstractApplication):
+    permit = models.ForeignKey(
+        PermitType, on_delete=models.CASCADE, null=True, blank=True
+    )
 
 
 # This class tracks XS changes; it gets updated everytime something is
