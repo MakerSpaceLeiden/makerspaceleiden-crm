@@ -1,0 +1,62 @@
+name: Generate SBOM
+
+on:
+  push:
+    branches-ignore:
+      - master
+
+jobs:
+  generate-sbom:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: 0.7.19
+
+      - name: Setup python
+        run: uv python install
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Install cyclonedx-bom
+        run: uv tool install cyclonedx-bom
+
+      - name: Create SBOM directory
+        run: mkdir -p ./.dist-info/sboms
+
+      - name: Generate SBOM
+        run: |
+          source .venv/bin/activate
+          cyclonedx-py environment "$(uv python find)" --spec-version 1.6 --output-reproducible > ./.dist-info/sboms/cyclonedx-1.6.json
+
+      - name: Check for changes
+        id: verify-changed-files
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit SBOM changes
+        if: steps.verify-changed-files.outputs.changed == 'true'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add ./.dist-info/sboms/cyclonedx-1.6.json
+          git commit -m "chore(deps): update SBOM"
+
+      - name: Push changes
+        if: steps.verify-changed-files.outputs.changed == 'true'
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
