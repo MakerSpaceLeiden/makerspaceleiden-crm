@@ -27,3 +27,4 @@ ${DJANGO_RUN} pettycash-recache
 ${DJANGO_RUN} clean_duplicate_history --auto > /dev/null
 ${DJANGO_RUN} clean_old_history --days 1000 --auto > /dev/null
 ${DJANGO_RUN} send-acl-reminders > /dev/null
+${DJANGO_RUN} generate_events --limit=90 > /dev/null
