@@ -115,7 +115,6 @@ def navbar_links(request):
                     {"url": reverse("agenda"), "label": "Agenda"},
                     {"url": reverse("motd_messages"), "label": "Message of the day"},
                     {"url": reverse("ufo"), "label": "UFO lost and found"},
-                    {"url": reverse("camindex"), "label": "Live 3D printer camera"},
                     {"url": reverse("kwh_view"), "label": "Power consumption"},
                 ],
             },

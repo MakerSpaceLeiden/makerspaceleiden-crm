@@ -57,7 +57,6 @@ INSTALLED_APPS = [
     "kwh.apps.KwhConfig",
     "pettycash.apps.PettycashConfig",
     "pettycredit.apps.PettycreditConfig",
-    "ultimaker.apps.UltimakerConfig",
     "spaceapi.apps.SpaceapiConfig",
     "memberlist",
     "nodered.apps.NoderedConfig",

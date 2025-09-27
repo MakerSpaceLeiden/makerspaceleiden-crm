@@ -42,7 +42,6 @@ urlpatterns = [
     path("chores/", include("chores.urls")),
     path("admin/", admin.site.urls),
     path("kwh/", include("kwh.urls")),
-    path("ultimaker/", include("ultimaker.urls")),
     path("pettycash/", include("pettycash.urls")),
     path("pettycredit/", include("pettycredit.urls")),
     path("spaceapi/", include("spaceapi.urls")),
