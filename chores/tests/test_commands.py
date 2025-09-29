@@ -11,7 +11,39 @@ from ..models import Chore
 from .factories import UserFactory
 
 
-class CustomCommandTest(TestCase):
+class UpdateEventStatusTest(TestCase):
+    def setUp(self):
+        self.user = UserFactory(
+            email="chore.author@example.com",
+        )
+
+    @time_machine.travel("2025-07-15 14:56")
+    def test_update_event_status(self):
+        Agenda.objects.create(
+            item_title="Test Chore",
+            item_details="A test chore that needs volunteers.",
+            startdatetime=datetime(2025, 7, 10, 20, 00, 0, 0, tzinfo=timezone.utc),
+            enddatetime=datetime(2025, 7, 10, 21, 00, 0, 0, tzinfo=timezone.utc),
+            user=self.user,
+            status="help_wanted",
+        )
+
+        Agenda.objects.create(
+            item_title="Test Chore",
+            item_details="A test chore that needs volunteers.",
+            startdatetime=datetime(2025, 7, 20, 20, 00, 0, 0, tzinfo=timezone.utc),
+            enddatetime=datetime(2025, 7, 20, 21, 00, 0, 0, tzinfo=timezone.utc),
+            user=self.user,
+            status="help_wanted",
+        )
+
+        call_command("update_event_status", stdout=StringIO())
+
+        agenda = Agenda.objects.all().filter(status="not_done")
+        self.assertEqual(len(agenda), 1)
+
+
+class GenerateEventsTest(TestCase):
     def setUp(self):
         self.user = UserFactory(
             email="chore.author@example.com",
