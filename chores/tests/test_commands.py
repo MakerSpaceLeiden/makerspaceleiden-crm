@@ -19,12 +19,31 @@ class UpdateEventStatusTest(TestCase):
 
     @time_machine.travel("2025-07-15 14:56")
     def test_update_event_status(self):
+        chore = Chore.objects.create(
+            name="Test Chore",
+            description="A test chore that needs volunteers.",
+            class_type="BasicChore",
+            configuration={
+                "min_required_people": 1,
+                "events_generation": {
+                    "event_type": "recurrent",
+                    "starting_time": "21/7/2021 8:00",
+                    "crontab": "0 22 * * sun",
+                    "take_one_every": 1,
+                    "duration": "PT1H",
+                },
+                "reminders": [],
+            },
+            creator=self.user,
+        )
+
         Agenda.objects.create(
             item_title="Test Chore",
             item_details="A test chore that needs volunteers.",
             startdatetime=datetime(2025, 7, 10, 20, 00, 0, 0, tzinfo=timezone.utc),
             enddatetime=datetime(2025, 7, 10, 21, 00, 0, 0, tzinfo=timezone.utc),
             user=self.user,
+            chore=chore,
             status="help_wanted",
         )
 
@@ -34,7 +53,16 @@ class UpdateEventStatusTest(TestCase):
             startdatetime=datetime(2025, 7, 20, 20, 00, 0, 0, tzinfo=timezone.utc),
             enddatetime=datetime(2025, 7, 20, 21, 00, 0, 0, tzinfo=timezone.utc),
             user=self.user,
+            chore=chore,
             status="help_wanted",
+        )
+
+        Agenda.objects.create(
+            item_title="Test Event",
+            item_details="An event which has nothing to do with a chore.",
+            startdatetime=datetime(2025, 7, 10, 20, 00, 0, 0, tzinfo=timezone.utc),
+            enddatetime=datetime(2025, 7, 10, 21, 00, 0, 0, tzinfo=timezone.utc),
+            user=self.user,
         )
 
         call_command("update_event_status", stdout=StringIO())
