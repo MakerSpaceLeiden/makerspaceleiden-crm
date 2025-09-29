@@ -1,4 +1,4 @@
-from django.conf import settings
+ from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import models
 from django.db.models import Q
@@ -21,14 +21,14 @@ from terminal.models import Terminal
 logger = logging.getLogger(__name__)
 
 class Checkout(models.Model):
-    STATES = { 
+    STATES = {
         "PREPARED": "Prepared but not yet submitted to sumit",
         "SUBMITTED": "Submitted to sumup; no callback yet",
         "SUCCESSFUL": "Sumup reported the transaction as successful",
         "CANCELLED": "Sumup reported the transaction as cancelled (usually by the end user",
         "FAILED": "Sumup reported transaction failed",
         "PENDING": "Sumup reported the transaction pending",
-        "ERROR": "Internal error",
+        "ERROR": "Internal error or unknown state reported by Sumup",
     }
 
     member = models.ForeignKey(
@@ -54,8 +54,12 @@ class Checkout(models.Model):
         null=True,
         blank=True,
     )
+    client_transaction_id = models.CharField(max_length=48, blank=True, null=True)
+    transaction_id = models.CharField(max_length=48, blank=True, null=True)
+    transaction_date = models.DateTimeField(blank=True, null=True, help_text="Date of sumup callback")
 
-    sumup_tx = models.CharField(max_length=300, blank=True, null=True)
+    debug_note = models.CharField(max_length=512,blank=True, null=True, 
+             help_text="Additional information on SumUP state when applicable")
 
     state = models.CharField(
         max_length=4, choices=STATES, default="PREPARED", blank=True, null=True
@@ -71,10 +75,27 @@ class Checkout(models.Model):
 
     # Submit to sumup
     #
-    # For now in the model; should move this out to 
+    # For now in the model; should move this out to
     # a controller if we start collecting too much logic
     #
     def transact(self, terminal):
+        if state != 'PREPARED':
+            raise Exception(f"Sumup transact: State of {pk} is already {state}, cannot submit.")
+
+        state = 'PENDING'
         save() # we need to get our PK
+
 	description = f"MSL-f{pk}-f{member.pk}-f{terminal.pk}, f{member} deposit"
 
+        body=CreateReaderCheckoutBody(
+            description=description
+	    return_url='https://weser.webweaving.org/cgi-bin/sumup?src=6512766745',
+	    tip_rates = [],
+	    total_amount=CreateReaderCheckoutAmount(currency ='EUR', minor_unit=2, value='1000')
+        ))
+
+        # Update the transaction state
+        client_transaction_id = checkout.data.client_transaction_id
+        state = 'SUBMITTED'
+        date = datetime.now()
+        save()

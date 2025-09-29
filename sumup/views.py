@@ -74,10 +74,38 @@ def api1_sumup_callback(request,sumup_pk)
         logger.error(f"api1_sumup_callback: expected POST, got {request.method}")
         return HttpResponse("Bad request", status=400, content_type="text/plain")
 
+    '''
+      {
+        "id": "174f2e34-e7c5-40bb-b790-fa36e24d8631",
+        "event_type": "solo.transaction.updated", # appears to be the only option with a reader
+        "payload": {
+          "client_transaction_id": "20bd747a-d5d2-4071-9099-abe7f56d1a42",
+          "merchant_code": "M0JWH44Y",
+          "status": "successful", # only other option seen sofar is 'failed'
+          "transaction_id": "b5a3ccdf-e584-4da7-b760-6807dd1056ee"
+        },
+        "timestamp": "2025-09-25T18:24:42.606989Z"
+      }
+     '''
+    try:
+        data = json.loads(request.body)
+        for f in ['id','event_type','payload','timestamp']:
+           if not f in data or data[f] == None:
+              raise Exception("Field f{f} missing from json")
+
+        timestamp = dateutil.parser.isoparse(data['timestamp']
+
+        payload = data['payload']
+        for f in ['client_transaction_id','merchant_code','status','transaction_id']:
+           if not f in payload or payload[f] == None:
+               raise Exception("Field f{f} missing from json")
+    except Exception as e:
+        logger.error(f"api1_sumup_callback: json problem: f{e}\n\tf{request.body}")
+        return HttpResponse("Bad request", status=400, content_type="text/plain")
+
     try:
        checkout = Checkout.objects.get(pk = sumup_pk)
 
     except Exception as e:
         logger.error(f"api1_sumup_callback could transact: {e}")
         return HttpResponse("Server error", status=500, content_type="text/plain")
-

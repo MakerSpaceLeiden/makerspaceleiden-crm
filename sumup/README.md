@@ -45,14 +45,14 @@ Design
 
 -	Every week (later month) - runs a transaction check on the sumup API
 
-	-	list REFUND 
+	-	list REFUND
 			assume manual fix by treasuer for now
-	
+
 	-	list CHARGE_BACK
 			assume manual fix by treasuer for now
 
 	-	delete dangling/incompleted transactions
-	
+
 		add to report for treasuer as a simple FYI
 
 	-	count  on the 4 possibilities
@@ -63,12 +63,9 @@ Also available per transaction
 	SUCCESSFUL 	- can be added to petty cash
 	PAID_OUT 	- ok to delete the record; we're fully done ?
 	CANCEL_FAILED 	??
-	FAILED 
-	REFUND_FAILED 
+	FAILED
+	REFUND_FAILED
 	recall ?
-		CHARGEBACK 
-		REFUNDED 
+		CHARGEBACK
+		REFUNDED
 		NON_COLLECTION
-
-
-
