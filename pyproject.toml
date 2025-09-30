@@ -50,6 +50,8 @@ dependencies = [
     "isodate>=0.7.2",
     "pytest-django>=4.11.1",
     "pytest-cov>=6.2.1",
+    "rich>=14.1.0",
+    "sumup>=0.0.10",
 ]
 
 [dependency-groups]
