@@ -146,3 +146,33 @@ d) Successful payment
 	back as if the reader is asking for payment (but it is not) and no callback
 	after 60 seconds/timeout.
 
+
+py-SumIP - https://github.com/sumup/sumup-py
+
+-      based on pydantic - with strict schema's. Violates the internet/
+       architecture maxim of be strict of what you sent, leisure on what
+       you expect. Important as the SumUP API is relatively bloated and
+       context/culture sensitive & exposes such with little abstraction.
+       Already broke on one (https://github.com/sumup/sumup-py/issues/76)
+       ease/fundamental case.
+
+      In the critical path in 3 places
+
+       1) pass through on initial submit; situation not too bad
+          as the data is fairly trivial/simple; but risk when
+	  they start to enrich user information feedback
+
+       2) callback - not an issue - parsing that ourselves
+
+       3) trnsaction crossref - main risk - any improvement
+          in the api will break the pydantic checks
+
+      other places are under interactive human control. 
+
+      API is fairly trivial (bearer token, URL with merchant code 
+      and json bodies). So perhaps, once it works, replace just
+      those 2 (1&3) by our own; but levave the code in the
+      management utils for pairing/etc as thare not ran
+      unsupervised / not in a time critical workflow and/or
+      can be ran repeatedly.
+
