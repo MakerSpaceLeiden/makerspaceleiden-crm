@@ -1,3 +1,19 @@
+'''
+
+1)	Relies on 
+		ssh -R 8000:localhost:8000 fqdn
+
+	or similar to expose local django to internet
+
+2)	Relies on 
+		
+		<Location /sumup>
+			ProxyPass http://127.0.0.1:8000/sumup
+			Require all granted
+		</Location>
+
+	in a webserver on the internet side to map things through
+'''
 import logging
 from datetime import timedelta,datetime
 
