@@ -4,11 +4,15 @@ from rich import print as printr
 
 from django.core.management.base import BaseCommand
 
-from sumup import Sumup
-from sumup.transactions.resource import TransactionHistory
+from sumup import Sumup,APIError
+from sumup.transactions.resource import TransactionHistory, GetTransactionParams
 
 class Command(BaseCommand):
     help = "List all transactions"
+
+    def add_arguments(self , parser):
+       parser.add_argument('-r', '--raw', action="store_true",
+            help='Show raw (as opposed to TSV)')
 
     def handle(self, *args, **options):
         rc = 0
@@ -29,6 +33,16 @@ class Command(BaseCommand):
              sys.exit(-3)
 
         transactions = client.transactions.list(settings.SUMUP_MERCHANT)
-        printr(transactions)
+        if options['raw']:
+           printr(transactions)
+           sys.exit(rc)
 
+        print("#status    	amount		type	card      	description")
+        for tx in transactions.items:
+           print(f"{tx.status:10}	{tx.amount} {tx.currency}	{tx.type}	{tx.card_type:12}	{tx.product_summary}")
+           if True:
+                try:
+                    printr(client.transactions.get(settings.SUMUP_MERCHANT, GetTransactionParams(id=tx.id)))
+                except APIError as e:
+                    pass # print(f"Error: {e.status} - {e.body}")
         sys.exit(rc)

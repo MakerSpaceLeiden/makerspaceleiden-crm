@@ -1,5 +1,8 @@
 import logging
-from datetime import timedelta
+import json
+import dateutil
+
+from datetime import timedelta,datetime
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -11,7 +14,10 @@ from moneyed import EUR, Money
 
 from makerspaceleiden.mail import emailPlain, emails_for_group
 from members.models import User
+
+from terminal.models import Terminal
 from terminal.decorators import is_paired_terminal
+from .models import Checkout, gen_hash
 
 from pettycash.views import alertOwnersToChange
 
@@ -28,11 +34,6 @@ def email_fail(
     subject="Error during SumUP paument",
 ):
     admins = emails_for_group(settings.PETTYCASH_ADMIN_GROUP)
-    if user and user.email:
-        admins.append(checkout.user.email)
-    else:
-        if claim is not None and claim.src is not None and claim.src.email is not None:
-            admins.append(claim.src.email)
     emailPlain(
         "sumup/email_fail.txt",
         toinform=admins,
@@ -43,8 +44,8 @@ def email_fail(
 @csrf_exempt
 @is_paired_terminal
 def api1_sumup_pay(request, terminal):
-    if not request.POST:
-        logger.error(f"api1_sumup_pay: expected POST, got {request.method}")
+    if request.method !='POST':
+        logger.error(f"api1_sumup_pay: expected POST")
         return HttpResponse("Bad request", status=400, content_type="text/plain")
 
     p = {}
@@ -52,7 +53,7 @@ def api1_sumup_pay(request, terminal):
         if not f in request.POST:
             logger.error(f"api1_sumup_pay: param {f} missing")
             return HttpResponse("Missing param", status=422, content_type="text/plain")
-	p[f] = " ".request.POST.getlist(f)
+        p[f] = " ".request.POST.getlist(f)
 
     try:
         member = User.objects.get(pk=p['userid'])
@@ -62,8 +63,8 @@ def api1_sumup_pay(request, terminal):
         return HttpResponse("Missing param", status=422, content_type="text/plain")
 
     try:
-        checkout = Checkout(user=member, amount=amount)
-        checkout.transact(terminal = terminal)
+        checkout = Checkout(member=member, amount=amount, terminal = terminal )
+        checkout.transact()
     except Exception as e:
         logger.error(f"api1_sumup_pay could transact: {e}")
         return HttpResponse("Server error", status=500, content_type="text/plain")
@@ -71,18 +72,20 @@ def api1_sumup_pay(request, terminal):
     return HttpResponse("OK");
 
 @csrf_exempt
-def api1_sumup_callback(request,sumup_pk,time,hash)
-    if not request.POST:
+def api1_sumup_callback(request,sumup_pk,timeint,hash):
+    if request.method !='POST':
         logger.error(f"api1_sumup_callback: expected POST, got {request.method}")
         return HttpResponse("Bad request", status=400, content_type="text/plain")
 
-    if Checkout.gen_hash(pk,time) != hash:
+    if gen_hash(sumup_pk,timeint) != hash:
         logger.error(f"api1_sumup_callback: wrong hash")
-        return HttpResponse("Bad request", status=400, content_type="text/plain")
+        return HttpResponse("Ignored", status=200, content_type="text/plain")
 
-    if time > datetime.now() or time < datetime.now - GRACE:
-        logger.error(f"api1_sumup_callback: time {time} outside range")
-        return HttpResponse("Bad request", status=400, content_type="text/plain")
+    f = (datetime.now()- GRACE).timestamp()
+    t = datetime.now().timestamp()
+    if timeint < f or timeint > t:
+        logger.error(f"api1_sumup_callback: time {timeint} outside range {f}..{t}" )
+        # return HttpResponse("Bad request", status=400, content_type="text/plain")
 
     '''
       {
@@ -99,47 +102,55 @@ def api1_sumup_callback(request,sumup_pk,time,hash)
      '''
     try:
         data = json.loads(request.body)
+        print(data)
         for f in ['id','event_type','payload','timestamp']:
-           if not f in data or data[f] == None:
-              raise Exception("Field f{f} missing from json")
+           if not f in data:
+              raise Exception("Field {f} missing from json")
 
-        timestamp = dateutil.parser.isoparse(data['timestamp']
+        timestamp = dateutil.parser.isoparse(data['timestamp'])
 
         payload = data['payload']
         for f in ['client_transaction_id','merchant_code','status','transaction_id']:
-           if not f in payload or payload[f] == None:
-               raise Exception("Field f{f} missing from json")
+           if not f in payload:
+               raise Exception(f"Field f{f} missing from json")
 
     except Exception as e:
         logger.error(f"api1_sumup_callback: json problem: f{e}\n\tf{request.body}")
-        email_fail(checkout, "Error while parsing Sumup response. No deposit.", request.body)
+        email_fail(None, "Error while parsing Sumup response. No deposit.", request.body)
         return HttpResponse("Bad request", status=400, content_type="text/plain")
+
 
     try:
        checkout = Checkout.objects.get(pk = sumup_pk)
+       checkout.debug_note = data
        checkout.status = 'ERROR'
 
-       if data.event_type == 'solo.transaction.updated' and 
-	  payload.merchant_code =-= settings.SUMUP_MERCHANT_CODE and
-          checkout.client_transaction_id != payload.client_transaction_id and
-          payload.status in ['successful', 'failed']:
-
+       if ( data['event_type'] == 'solo.transaction.updated' and 
+	    payload['merchant_code'] == settings.SUMUP_MERCHANT and
+            checkout.client_transaction_id == payload['client_transaction_id'] and
+            payload['status'] in ['successful', 'failed']
+          ):
           checkout.status = 'FAILED'
 
-          if states == 'successful':
+          if payload['status'] == 'successful':
              checkout.deposit(data)
+          else:
+             checkout.state = 'CANCELLED'
+             logger.error(f"api1_sumup_callback: report of failed from cb, user propably canceled.")
+             checkout.save()
 
           # No email on failed - is 'normal' 
           return HttpResponse("OK", status=200, content_type="text/plain")
 
        logger.error(f"api1_sumup_callback: failed to process: {request.body}")
-       checkout.debug_notes = f"Failed to process: f{request.body}";
+       checkout.debug_note = "{'err':'Failed to process'}"
        checkout.save()
 
        email_fail(checkout, "Sumup response could not be processed. No deposit.", request.body)
 
     except Exception as e:
-        logger.error(f"api1_sumup_callback could not transact: e={e} body={request,body}")
+        logger.error(f"api1_sumup_callback could not transact: e={e}")
+        checkout.debug_note = "{'err':'exception'}"
         email_fail(checkout, "Error while processing Sumup response. No deposit.", request.body)
 
     return HttpResponse("Server error", status=500, content_type="text/plain")

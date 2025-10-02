@@ -4,9 +4,5 @@ from . import views
 
 urlpatterns = [
     path("api/v1/sumup-pay", views.api1_sumup_pay, name="sumup-v1-pay"),
-    path(
-        "api/v1/sumup-callback/{sumup_pk}-{time}-{hash}",
-        views.api1_sumup_callback,
-        name="sumup-v1-callback",
-    ),
+    path("api/v1/sumup-callback/<int:sumup_pk>-<int:timeint>-<str:hash>", views.api1_sumup_callback, name="sumup-v1-callback"),
 ]
