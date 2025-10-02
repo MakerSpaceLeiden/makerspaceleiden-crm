@@ -146,3 +146,10 @@ d) Successful payment
 	back as if the reader is asking for payment (but it is not) and no callback
 	after 60 seconds/timeout.
 
+
+Know issues
+
+-	if you do not reply to the callback with a 200 -- e.g. a 5xx or 4xx - it seems
+	that it keeps retrying for at least 12 hours every few hours. So we may
+	need to respond to wrong hashes with a OK
+-	the callbacks can come minutes later if ??they are busy???
