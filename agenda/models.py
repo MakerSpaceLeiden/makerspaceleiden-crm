@@ -2,6 +2,7 @@ import logging
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
+from dateutil import rrule
 from django.db import models, transaction
 from django.db.models import Q
 from django.utils import timezone
@@ -45,6 +46,41 @@ class AgendaQuerySet(models.QuerySet):
         ]
 
 
+class AgendaManager(models.Manager):
+    def create_occurrence(self, parent, start_datetime, end_datetime, **kwargs):
+        print("Creating occurrences based on the provided data.")
+
+        # Create an occurrence based on the recurrences field which is
+        # a rrule string
+        recurrences = parent.recurrences
+        if not rrule:
+            print("No recurrence rule provided.")
+            return
+
+        try:
+            # Create occurrences based on the rrule string
+
+            rlstr = (
+                f"RRULE:{recurrences};UNTIL={end_datetime.strftime('%Y%m%dT%H%M%S')}"
+            )
+            rule = rrule.rrulestr(rlstr, dtstart=start_datetime)
+            occurrences = list(rule)
+
+            # Create occurrences based on the occurrences list
+            for occurrence in occurrences:
+                Agenda.objects.create(
+                    recurrence_parent=parent,
+                    startdatetime=occurrence,
+                    enddatetime=occurrence + timedelta(hours=1),
+                    user=parent.user,
+                    **kwargs,
+                )
+
+            pass
+        except Exception as e:
+            print(f"Error creating occurrences: {e}")
+
+
 class Agenda(models.Model):
     startdatetime = models.DateTimeField(null=True)
     enddatetime = models.DateTimeField(null=True)
@@ -85,7 +121,7 @@ class Agenda(models.Model):
         max_length=20, choices=STATUS_CHOICES, default=None, null=True
     )
 
-    objects = AgendaQuerySet.as_manager()
+    objects = AgendaManager.from_queryset(AgendaQuerySet)()
 
     @property
     def start_datetime(self):
