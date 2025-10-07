@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from dateutil import rrule
 from django import forms
 from django.core.exceptions import ValidationError
 from django_flatpickr.widgets import DateTimePickerInput
@@ -29,6 +30,14 @@ class AgendaForm(forms.ModelForm):
         enddate = cleaned_data.get("enddate")
         endtime = cleaned_data.get("endtime")
 
+        # Validate the recurrence rule
+        recurrences = cleaned_data.get("recurrences")
+        if recurrences != "":
+            try:
+                _ = rrule.rrulestr(recurrences)
+            except ValueError:
+                raise ValidationError("Invalid recurrence rule")
+
         # Check if both start date/time and end date/time are provided
         if startdate and starttime and enddate and endtime:
             start_datetime = datetime.combine(startdate, starttime)
@@ -53,7 +62,7 @@ class AgendaForm(forms.ModelForm):
             "item_details": forms.Textarea(attrs={"class": "form-control"}),
             "startdatetime": DateTimePickerInput(attrs={"class": "datetime-input"}),
             "enddatetime": DateTimePickerInput(attrs={"class": "datetime-input"}),
-            "recurrences": forms.Textarea(attrs={"class": "form-control"}),
+            "recurrences": forms.TextInput(attrs={"class": "form-control"}),
         }
 
 
