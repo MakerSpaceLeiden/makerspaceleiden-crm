@@ -53,6 +53,17 @@ class Agenda(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     history = HistoricalRecords()
 
+    # Support for recurring agenda items
+    recurrences = models.TextField(max_length=255, blank=True, default="", null=True)
+    recurrence_parent = models.ForeignKey(
+        "self",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="recurrence_items",
+    )
+    occurrence_date = models.DateField(null=True)
+
     # Deprecated – These will be removed in the near future
     startdate = models.DateField(null=True)
     starttime = models.TimeField(null=True)

@@ -24,7 +24,6 @@ class AgendaForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        cleaned_data = super().clean()
         startdate = cleaned_data.get("startdate")
         starttime = cleaned_data.get("starttime")
         enddate = cleaned_data.get("enddate")
@@ -46,6 +45,7 @@ class AgendaForm(forms.ModelForm):
             "enddatetime",
             "item_title",
             "item_details",
+            "recurrences",
         ]
 
         widgets = {
@@ -53,6 +53,7 @@ class AgendaForm(forms.ModelForm):
             "item_details": forms.Textarea(attrs={"class": "form-control"}),
             "startdatetime": DateTimePickerInput(attrs={"class": "datetime-input"}),
             "enddatetime": DateTimePickerInput(attrs={"class": "datetime-input"}),
+            "recurrences": forms.Textarea(attrs={"class": "form-control"}),
         }
 
 
