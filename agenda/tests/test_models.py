@@ -308,10 +308,19 @@ class AgendaModelPropertiesTest(TestCase):
             user=self.user,
         )
 
+        start = datetime.now(tz=timezone.utc)
+        end = start + timedelta(days=6)
+
         Agenda.objects.create_occurrence(
             parent=agenda,
-            start_datetime=datetime.now(),
-            end_datetime=datetime.now() + timedelta(days=6),
+            start_datetime=start,
+            end_datetime=end,
+        )
+
+        Agenda.objects.create_occurrence(
+            parent=agenda,
+            start_datetime=start,
+            end_datetime=end,
         )
 
         child_items = Agenda.objects.filter(recurrence_parent=agenda)

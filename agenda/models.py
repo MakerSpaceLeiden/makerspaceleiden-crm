@@ -47,33 +47,37 @@ class AgendaQuerySet(models.QuerySet):
 
 
 class AgendaManager(models.Manager):
-    def create_occurrence(self, parent, start_datetime, end_datetime, **kwargs):
-        print("Creating occurrences based on the provided data.")
-
-        # Create an occurrence based on the recurrences field which is
-        # a rrule string
+    def create_occurrence(self, parent, start_datetime, end_datetime):
+        """Create occurrence instances from parent's rrule"""
         recurrences = parent.recurrences
-        if not rrule:
+        if not recurrences:
             print("No recurrence rule provided.")
             return
 
         try:
-            # Create occurrences based on the rrule string
-
             rlstr = (
-                f"RRULE:{recurrences};UNTIL={end_datetime.strftime('%Y%m%dT%H%M%S')}"
+                f"RRULE:{recurrences};UNTIL={end_datetime.strftime('%Y%m%dT%H%M%S%z')}"
             )
             rule = rrule.rrulestr(rlstr, dtstart=start_datetime)
-            occurrences = list(rule)
+
+            # Filter occurrences within date range
+            occurrences = [dt for dt in rule if start_datetime <= dt <= end_datetime]
 
             # Create occurrences based on the occurrences list
             for occurrence in occurrences:
+                if Agenda.objects.filter(
+                    recurrence_parent=parent, occurrence_date=occurrence.date()
+                ).exists():
+                    continue
+
                 Agenda.objects.create(
                     recurrence_parent=parent,
+                    occurrence_date=occurrence.date(),
                     startdatetime=occurrence,
                     enddatetime=occurrence + timedelta(hours=1),
                     user=parent.user,
-                    **kwargs,
+                    item_title=parent.item_title,
+                    item_details=parent.item_details,
                 )
 
             pass
