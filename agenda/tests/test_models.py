@@ -311,13 +311,13 @@ class AgendaModelPropertiesTest(TestCase):
         start = datetime.now(tz=timezone.utc)
         end = start + timedelta(days=6)
 
-        Agenda.objects.create_occurrence(
+        created_first = Agenda.objects.create_occurrence(
             parent=agenda,
             start_datetime=start,
             end_datetime=end,
         )
 
-        Agenda.objects.create_occurrence(
+        created_second = Agenda.objects.create_occurrence(
             parent=agenda,
             start_datetime=start,
             end_datetime=end,
@@ -325,3 +325,5 @@ class AgendaModelPropertiesTest(TestCase):
 
         child_items = Agenda.objects.filter(recurrence_parent=agenda)
         self.assertEqual(child_items.count(), 1)
+        self.assertEqual(len(created_first), 1)
+        self.assertEqual(len(created_second), 0)

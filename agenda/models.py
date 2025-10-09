@@ -62,6 +62,7 @@ class AgendaManager(models.Manager):
 
             # Filter occurrences within date range
             occurrences = [dt for dt in rule if start_datetime <= dt <= end_datetime]
+            created = []
 
             # Create occurrences based on the occurrences list
             for occurrence in occurrences:
@@ -70,7 +71,7 @@ class AgendaManager(models.Manager):
                 ).exists():
                     continue
 
-                Agenda.objects.create(
+                agenda = Agenda.objects.create(
                     recurrence_parent=parent,
                     occurrence_date=occurrence.date(),
                     startdatetime=occurrence,
@@ -79,9 +80,10 @@ class AgendaManager(models.Manager):
                     item_title=parent.item_title,
                     item_details=parent.item_details,
                 )
+                created.append(agenda)
 
-            pass
-        except Exception as e:
+            return created
+        except ValueError as e:
             print(f"Error creating occurrences: {e}")
 
 
