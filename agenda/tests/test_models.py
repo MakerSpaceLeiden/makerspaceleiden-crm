@@ -318,7 +318,7 @@ class AgendaModelPropertiesTest(TestCase):
                 from_datetime=start,
                 to_datetime=end,
             )
-        assert "Invalid recurrence rrule" in str(err.value)
+        self.assertIn("Invalid recurrence rrule", str(err.value))
 
     @time_machine.travel("2025-05-06 10:00")
     def test_generate_occurrences(self):

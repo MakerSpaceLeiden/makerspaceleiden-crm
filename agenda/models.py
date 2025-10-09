@@ -51,8 +51,7 @@ class AgendaManager(models.Manager):
         """Create occurrence instances from parent's rrule"""
         recurrences = parent.recurrences
         if not recurrences:
-            print("No recurrence rule provided.")
-            return
+            return []
 
         # Validate recurrence rule
         try:
@@ -63,33 +62,30 @@ class AgendaManager(models.Manager):
         except ValueError as e:
             raise ValueError(f"Invalid recurrence rrule: {e}")
 
-        try:
-            duration = parent.enddatetime - parent.startdatetime
-            # Filter occurrences within date range
-            occurrences = [dt for dt in rule if from_datetime <= dt <= to_datetime]
-            created = []
+        duration = parent.enddatetime - parent.startdatetime
+        # Filter occurrences within date range
+        occurrences = [dt for dt in rule if from_datetime <= dt <= to_datetime]
+        created = []
 
-            # Create occurrences based on the occurrences list
-            for occurrence in occurrences:
-                if Agenda.objects.filter(
-                    recurrence_parent=parent, occurrence_date=occurrence.date()
-                ).exists():
-                    continue
+        # Create occurrences based on the occurrences list
+        for occurrence in occurrences:
+            if Agenda.objects.filter(
+                recurrence_parent=parent, occurrence_date=occurrence.date()
+            ).exists():
+                continue
 
-                agenda = Agenda.objects.create(
-                    recurrence_parent=parent,
-                    occurrence_date=occurrence.date(),
-                    startdatetime=occurrence,
-                    enddatetime=occurrence + duration,
-                    user=parent.user,
-                    item_title=parent.item_title,
-                    item_details=parent.item_details,
-                )
-                created.append(agenda)
+            agenda = Agenda.objects.create(
+                recurrence_parent=parent,
+                occurrence_date=occurrence.date(),
+                startdatetime=occurrence,
+                enddatetime=occurrence + duration,
+                user=parent.user,
+                item_title=parent.item_title,
+                item_details=parent.item_details,
+            )
+            created.append(agenda)
 
-            return created
-        except ValueError as e:
-            print(f"Error creating occurrences: {e}")
+        return created
 
 
 class Agenda(models.Model):
