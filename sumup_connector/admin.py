@@ -14,7 +14,7 @@ from makerspaceleiden.admin import SimpleHistoryWithDeletedAdmin
 from .models import Checkout
 
 class CheckoutAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
-  readonly_fields = ['extra_information','date','member','amount','terminal','client_transaction_id','transaction_id','transaction_date']
+  readonly_fields = ['extra_information','date','member','amount','terminal','client_transaction_id','transaction_id','transaction_date','settled_tx']
   exclude = ['debug_note']
 
   # history_list_display = ["changed_fields","list_changes"]

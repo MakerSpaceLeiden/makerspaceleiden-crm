@@ -23,9 +23,9 @@ from pettycash.views import alertOwnersToChange
 
 logger = logging.getLogger(__name__)
 
-# Max time of the actual unit is 60 seconds.
+# Max time of the actual unit is 60 seconds. But we've seen hours.
 #
-GRACE = timedelta(hours=0, minutes=3)
+GRACE = timedelta(hours=100, minutes=0)
 
 def email_fail(
     checkout = None,
@@ -44,22 +44,26 @@ def email_fail(
 @csrf_exempt
 @is_paired_terminal
 def api1_sumup_pay(request, terminal):
+    if terminal.pk not in settings.SUMUP_TERMINALS:
+        logger.error(f"api1_sumup_pay: payment request from terminal #{terminal.pk} which is not in the list of SUMUP_TERMINALs")
+        return HttpResponse("Bad request", status=400, content_type="text/plain")
+
     if request.method !='POST':
         logger.error(f"api1_sumup_pay: expected POST")
         return HttpResponse("Bad request", status=400, content_type="text/plain")
 
     p = {}
     for f in ['userid','amount']:
-        if not f in request.POST:
-            logger.error(f"api1_sumup_pay: param {f} missing")
+        if not f in request.POST or len(request.POST.getlist(f)) != 1:
+            logger.error(f"api1_sumup_pay: param {f} missing/not singular")
             return HttpResponse("Missing param", status=422, content_type="text/plain")
-        p[f] = " ".request.POST.getlist(f)
+        p[f] = ''.request.POST.getlist(f)
 
     try:
         member = User.objects.get(pk=p['userid'])
         amount = Money(float(amount), EUR)
     except Exception as e:
-        logger.error(f"api1_sumup_pay could process data: {e}")
+        logger.error(f"api1_sumup_pay could process data {p} : {e}")
         return HttpResponse("Missing param", status=422, content_type="text/plain")
 
     try:
@@ -100,9 +104,9 @@ def api1_sumup_callback(request,sumup_pk,timeint,hash):
         "timestamp": "2025-09-25T18:24:42.606989Z"
       }
      '''
+    logger.debug(request.body)
     try:
         data = json.loads(request.body)
-        print(data)
         for f in ['id','event_type','payload','timestamp']:
            if not f in data:
               raise Exception("Field {f} missing from json")
@@ -133,9 +137,10 @@ def api1_sumup_callback(request,sumup_pk,timeint,hash):
           checkout.status = 'FAILED'
 
           if payload['status'] == 'successful':
-             checkout.deposit(data)
+             checkout.deposit(payload['transaction_id'],timestamp)
           else:
              checkout.state = 'CANCELLED'
+             checkout._change_reason = 'Valid callback, with status set to failed - generally a user that cancelled or a timeout on the SOLO'
              logger.error(f"api1_sumup_callback: report of failed from cb, user propably canceled.")
              checkout.save()
 
@@ -143,14 +148,22 @@ def api1_sumup_callback(request,sumup_pk,timeint,hash):
           return HttpResponse("OK", status=200, content_type="text/plain")
 
        logger.error(f"api1_sumup_callback: failed to process: {request.body}")
-       checkout.debug_note = "{'err':'Failed to process'}"
+       checkout.debug_note = data
+       checkout._change_reason = 'Valid callback, but the data could not be recignized.'
        checkout.save()
 
        email_fail(checkout, "Sumup response could not be processed. No deposit.", request.body)
 
     except Exception as e:
-        logger.error(f"api1_sumup_callback could not transact: e={e}")
-        checkout.debug_note = "{'err':'exception'}"
-        email_fail(checkout, "Error while processing Sumup response. No deposit.", request.body)
+       logger.error(f"api1_sumup_callback could not transact: e={e}")
+       checkout._change_reason = 'Valid callback, but exception while handling it'
+       checkout.debug_note = {'err':'exception','data':data,'erm':e}
+       if checkout:
+             try:
+               checkout.save()
+             except Exception as e:
+               pass
+       email_fail(checkout, "Error while processing Sumup response. No deposit.", request.body)
 
+    # We may need to make this a 200 -- as to quell needless retries.
     return HttpResponse("Server error", status=500, content_type="text/plain")

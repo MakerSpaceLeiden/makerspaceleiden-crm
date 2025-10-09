@@ -149,11 +149,16 @@ d) Successful payment
 Know issues
 
 -	if you do not reply to the callback with a 200 -- e.g. a 5xx or 4xx - it seems
-	that it keeps retrying for at least 12 hours every few hours. So we may
-	need to respond to wrong hashes with a OK
+	that it keeps retrying for at least 8 hours;first every few minutes and dropping
+        to every 4 hours. We may need to respond to wrong hashes with a OK
 
 -	the callbacks can come minutes later if ??they are busy???
 
+-	Sometimes a transaction clears - but the transaction_id is Null.
+	A few seconds later - a list transdaction call will show it.
+	Know issue: https://github.com/sumup/sumup-android-sdk/issues/195 
+	from 2024
+ 
 py-SumIP - https://github.com/sumup/sumup-py
 
 -      based on pydantic - with strict schema's. Violates the internet/

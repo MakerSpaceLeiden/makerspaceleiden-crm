@@ -95,7 +95,7 @@ def alertOwnersToChange(
     else:
         toinform.append(tx.dst.email)
 
-    if userThatMadeTheChange.email not in toinform:
+    if userThatMadeTheChange is not None and userThatMadeTheChange.email not in toinform:
         toinform.append(userThatMadeTheChange.email)
 
     return emailPlain(

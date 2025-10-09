@@ -18,6 +18,7 @@ from members.models import User
 
 from terminal.models import Terminal
 from pettycash.models import PettycashTransaction
+from pettycash.views import alertOwnersToChange
 
 from django.contrib.sites.shortcuts import get_current_site
 
@@ -37,7 +38,6 @@ logger = logging.getLogger(__name__)
 
 def gen_hash(pk,time):
     val = settings.SUMUP_NONCE + '-' + str(pk) + '-' + str(int(time))
-    print(f"hash base = {val}")
     sha = hashlib.sha256(val.encode('utf-8')).hexdigest()
     return sha[0:16]
 
@@ -85,6 +85,14 @@ class Checkout(models.Model):
 	help_text = 'Transaction reported back from Sumup after the payment completed on the SOLO terminal')
     transaction_date = models.DateTimeField(blank=True, null=True, help_text="Date of sumup callback")
 
+    settled_tx = models.ForeignKey(
+        PettycashTransaction,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        help_text = "Actual settlement into the participants account (if any)",
+    )
+
     debug_note = models.JSONField(max_length=512,blank=True, null=True, 
              help_text="Additional information on SumUP state when applicable")
 
@@ -113,6 +121,7 @@ class Checkout(models.Model):
             raise Exception(f"Sumup transact: State of {self.pk} is already {state}, cannot submit.")
 
         self.state = 'PENDING'
+        self._change_reason = 'Initial creation with no data; to get a pk reference for SumUP'
         self.save() # we need to get our PK
 
         self.description = f"MSL-{self.pk}-{self.member.pk}-{self.terminal.pk}, {self.member}, sumup deposit"
@@ -124,7 +133,7 @@ class Checkout(models.Model):
                 description=self.description,
                 return_url=url,
                 tip_rates = [],
-                total_amount=CreateReaderCheckoutAmount(currency ='EUR', minor_unit=2, value=self.amount.amount)
+                total_amount=CreateReaderCheckoutAmount(currency ='EUR', minor_unit=2, value=100 * self.amount.amount)
             )
             client = Sumup(api_key=settings.SUMUP_API_KEY)
             
@@ -144,25 +153,46 @@ class Checkout(models.Model):
             logger.error(f"transact({self.pk}) failed: {e} --  {e.status} {e.body}")
             self.debug_note = e.body
 
+        self._change_reason = 'Submitted to Sumup'
         self.save()
 
-    def deposit(self, data):
+    def deposit(self, transaction_id, timestamp):
         # Transact first; so we leave an error if the transaction fails.
         #
         tx = PettycashTransaction(
              src=User.objects.get(id=settings.POT_ID),
              dst=self.member,
              amount=self.amount,
-             description=f"Sumup deposit at f{self.terminal},  f{self.transaction_id}"
+             description=f"Sumup deposit at {self.terminal.name}, {transaction_id}"
         )
-        tx._change_reason = f"Sumpup; f{data}"
+        tx._change_reason = f"Sumpup; f{transaction_id}"
         tx.save()
+ 
+        fee = Money(self.amount.amount * settings.SUMUP_FEE_PERCENTAGE / 100)
+        actual_amount = Money(self.amount.amount / (1 + settings.SUMUP_FEE_PERCENTAGE / 100))
 
-        self.status = 'SUCCESSFUL'
+        txf = PettycashTransaction(
+             src=self.member,
+             dst=User.objects.get(id=settings.POT_ID),
+             amount=fee,
+             description=f"Transaction fee {transaction_id}, #{tx.pk}"
+        )
+        txf._change_reason = f"Sumpup fee; f{transaction_id}"
+        txf.save()
+
+        self.state = 'SUCCESSFUL'
+        self.settled_tx = tx
+
+        self.transaction_id = transaction_id
+        self.transaction_date = timestamp
+        self._change_reason = f"{transaction_id}/{self.pk} Complete; references for the deposit: {tx.pk} and fee: {txf.pk}"
+
         self.save()
 
-        alertOwnersToChange(tx, template = 'sumup/email_deposit.txt')
-    
+        alertOwnersToChange(tx, userThatMadeTheChange = self.member, template = 'sumup/email_deposit.txt', {
+             'fee': , fee, 
+             'actual_amount': actual_amount 
+        }
 
     def signed_callback_url(self):
         url = ''.join(['https://', 
@@ -173,14 +203,4 @@ class Checkout(models.Model):
 			'timeint': int(self.date.timestamp()),
 			'hash': gen_hash(self.pk,self.date.timestamp())
 	        })])
-        print(url)
         return url
-
-    def _cleanse(e):
-        #            {"errors":{"detail":"Unprocessable Entity"}}
-        if 'errors' in e:
-            if 'detail' in e.errors:
-                return f"{e.errors.body}"
-            return f"{e.errors}"
-        return f"{e}"
-
