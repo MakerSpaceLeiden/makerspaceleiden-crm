@@ -302,7 +302,7 @@ class AgendaModelPropertiesTest(TestCase):
     def test_create_occurrence(self):
         agenda = Agenda.objects.create(
             startdatetime=datetime(2025, 5, 3, 8, 0, tzinfo=timezone.utc),
-            enddatetime=datetime(2025, 5, 3, 9, 0, tzinfo=timezone.utc),
+            enddatetime=datetime(2025, 5, 3, 16, 0, tzinfo=timezone.utc),
             item_title="Test Agenda",
             recurrences="FREQ=WEEKLY;INTERVAL=1;BYDAY=SA",
             user=self.user,
@@ -324,6 +324,11 @@ class AgendaModelPropertiesTest(TestCase):
         )
 
         child_items = Agenda.objects.filter(recurrence_parent=agenda)
+
+        # Get the duration of the first occurrence
+        duration_created = created_first[0].enddatetime - created_first[0].startdatetime
+        self.assertEqual(agenda.enddatetime - agenda.startdatetime, duration_created)
+
         self.assertEqual(child_items.count(), 1)
         self.assertEqual(len(created_first), 1)
         self.assertEqual(len(created_second), 0)

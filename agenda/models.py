@@ -59,7 +59,7 @@ class AgendaManager(models.Manager):
                 f"RRULE:{recurrences};UNTIL={end_datetime.strftime('%Y%m%dT%H%M%S%z')}"
             )
             rule = rrule.rrulestr(rlstr, dtstart=start_datetime)
-
+            duration = parent.enddatetime - parent.startdatetime
             # Filter occurrences within date range
             occurrences = [dt for dt in rule if start_datetime <= dt <= end_datetime]
             created = []
@@ -75,7 +75,7 @@ class AgendaManager(models.Manager):
                     recurrence_parent=parent,
                     occurrence_date=occurrence.date(),
                     startdatetime=occurrence,
-                    enddatetime=occurrence + timedelta(hours=1),
+                    enddatetime=occurrence + duration,
                     user=parent.user,
                     item_title=parent.item_title,
                     item_details=parent.item_details,
