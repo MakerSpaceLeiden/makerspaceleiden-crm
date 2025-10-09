@@ -83,7 +83,7 @@ class Command(BaseCommand):
              if (idx > len(members)):
                  raise Exception(f"Tag entry {i} has a OOB reference to members data")
 
-             has =  int.from_bytes(members[idx:1],'big')
+             has =  int.from_bytes(members[idx:idx+1],'big')
              print(f"	Has: 		{has:02x}")
 
              needs =  int.from_bytes(members[idx+1:idx+2],'big')
