@@ -54,11 +54,16 @@ class AgendaManager(models.Manager):
             print("No recurrence rule provided.")
             return
 
+        # Validate recurrence rule
         try:
             rlstr = (
                 f"RRULE:{recurrences};UNTIL={to_datetime.strftime('%Y%m%dT%H%M%S%z')}"
             )
             rule = rrule.rrulestr(rlstr, dtstart=from_datetime)
+        except ValueError as e:
+            raise ValueError(f"Invalid recurrence rrule: {e}")
+
+        try:
             duration = parent.enddatetime - parent.startdatetime
             # Filter occurrences within date range
             occurrences = [dt for dt in rule if from_datetime <= dt <= to_datetime]

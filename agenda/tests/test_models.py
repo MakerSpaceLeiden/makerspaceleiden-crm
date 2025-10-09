@@ -1,5 +1,6 @@
 from datetime import date, datetime, time, timedelta, timezone
 
+import pytest
 import time_machine
 from django.test import TestCase
 
@@ -297,6 +298,27 @@ class AgendaModelPropertiesTest(TestCase):
                     user=self.user,
                 )
                 self.assertEqual(agenda.display_datetime, case["expected"])
+
+    @time_machine.travel("2025-05-06 10:00")
+    def test_generate_occurrences_invalid_rrule(self):
+        agenda = Agenda.objects.create(
+            startdatetime=datetime(2025, 5, 3, 8, 0, tzinfo=timezone.utc),
+            enddatetime=datetime(2025, 5, 3, 16, 0, tzinfo=timezone.utc),
+            item_title="Test Agenda",
+            recurrences="Hallo world",
+            user=self.user,
+        )
+
+        start = datetime.now(tz=timezone.utc)
+        end = start + timedelta(days=6)
+
+        with pytest.raises(ValueError) as err:
+            Agenda.objects.generate_occurrences(
+                parent=agenda,
+                from_datetime=start,
+                to_datetime=end,
+            )
+        assert "Invalid recurrence rrule" in str(err.value)
 
     @time_machine.travel("2025-05-06 10:00")
     def test_generate_occurrences(self):
