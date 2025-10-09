@@ -17,6 +17,6 @@ class Command(BaseCommand):
         terminal = None
         machine = options["machine"]
 
-        sys.stdout.buffer.write(tags4machineBIN(terminal, machine))
+        sys.stdout.buffer.write(tags4machineBIN(terminal, machine,v2=True))
 
         sys.exit(rc)
