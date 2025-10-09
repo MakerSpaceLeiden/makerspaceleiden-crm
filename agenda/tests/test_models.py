@@ -299,7 +299,7 @@ class AgendaModelPropertiesTest(TestCase):
                 self.assertEqual(agenda.display_datetime, case["expected"])
 
     @time_machine.travel("2025-05-06 10:00")
-    def test_create_occurrence(self):
+    def test_generate_occurrences(self):
         agenda = Agenda.objects.create(
             startdatetime=datetime(2025, 5, 3, 8, 0, tzinfo=timezone.utc),
             enddatetime=datetime(2025, 5, 3, 16, 0, tzinfo=timezone.utc),
@@ -311,16 +311,16 @@ class AgendaModelPropertiesTest(TestCase):
         start = datetime.now(tz=timezone.utc)
         end = start + timedelta(days=6)
 
-        created_first = Agenda.objects.create_occurrence(
+        created_first = Agenda.objects.generate_occurrences(
             parent=agenda,
-            start_datetime=start,
-            end_datetime=end,
+            from_datetime=start,
+            to_datetime=end,
         )
 
-        created_second = Agenda.objects.create_occurrence(
+        created_second = Agenda.objects.generate_occurrences(
             parent=agenda,
-            start_datetime=start,
-            end_datetime=end,
+            from_datetime=start,
+            to_datetime=end,
         )
 
         child_items = Agenda.objects.filter(recurrence_parent=agenda)

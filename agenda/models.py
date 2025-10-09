@@ -47,7 +47,7 @@ class AgendaQuerySet(models.QuerySet):
 
 
 class AgendaManager(models.Manager):
-    def create_occurrence(self, parent, start_datetime, end_datetime):
+    def generate_occurrences(self, parent, from_datetime, to_datetime):
         """Create occurrence instances from parent's rrule"""
         recurrences = parent.recurrences
         if not recurrences:
@@ -56,12 +56,12 @@ class AgendaManager(models.Manager):
 
         try:
             rlstr = (
-                f"RRULE:{recurrences};UNTIL={end_datetime.strftime('%Y%m%dT%H%M%S%z')}"
+                f"RRULE:{recurrences};UNTIL={to_datetime.strftime('%Y%m%dT%H%M%S%z')}"
             )
-            rule = rrule.rrulestr(rlstr, dtstart=start_datetime)
+            rule = rrule.rrulestr(rlstr, dtstart=from_datetime)
             duration = parent.enddatetime - parent.startdatetime
             # Filter occurrences within date range
-            occurrences = [dt for dt in rule if start_datetime <= dt <= end_datetime]
+            occurrences = [dt for dt in rule if from_datetime <= dt <= to_datetime]
             created = []
 
             # Create occurrences based on the occurrences list
