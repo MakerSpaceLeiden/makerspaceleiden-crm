@@ -10,6 +10,8 @@ from django.http import Http404, HttpResponse
 from django.views.decorators.cache import cache_control
 from robohash import Robohash
 
+from makerspaceleiden.decorators import login_or_bearer_required
+
 logger = logging.getLogger(__name__)
 
 DEFAULT_ROBOHASH_SET = "set1"
@@ -17,6 +19,7 @@ DEFAULT_ROBOHASH_COLOR = "red"
 DEFAULT_CACHE_DIR = "avatar_cache"
 
 
+@login_or_bearer_required
 @cache_control(max_age=86400)  # Cache for 24 hours in browser
 def index(request, pk=None):
     if not pk:
