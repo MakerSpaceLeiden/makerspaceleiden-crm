@@ -859,9 +859,11 @@ def tags4machineBIN(terminal=None, machine=None, v2=False):
     hdr += keysalt
     hdr += iv
 
-    logger.debug(f"Header {len(hdr)} Tags: {len(tlb)} Users: {len(udb)}\n")
-    return hdr + tlb + udb
+    binfile = hdr + tlb + udb
+    sha = hashlib.sha256(binfile)).digest().hex()
 
+    logger.debug(f"Header {len(hdr)} Tags: {len(tlb)} Users: {len(udb)} - sha256({sha})\n")
+    return binfile
 
 @csrf_exempt
 @is_paired_terminal
