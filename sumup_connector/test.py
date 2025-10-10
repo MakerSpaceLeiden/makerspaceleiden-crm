@@ -1,59 +1,55 @@
-'''
+"""
 
-1)	Relies on 
-		ssh -R 8000:localhost:8000 fqdn
+1)	Relies on
+                ssh -R 8000:localhost:8000 fqdn
 
-	or similar to expose local django to internet
+        or similar to expose local django to internet
 
-2)	Relies on 
-		
-		<Location /sumup>
-			ProxyPass http://127.0.0.1:8000/sumup
-			Require all granted
-		</Location>
+2)	Relies on
 
-	in a webserver on the internet side to map things through
-'''
-import logging
-from datetime import timedelta,datetime
+                <Location /sumup>
+                        ProxyPass http://127.0.0.1:8000/sumup
+                        Require all granted
+                </Location>
 
-from django.conf import settings
-from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
-from django.shortcuts import render
-from django.utils import timezone
-from django.views.decorators.csrf import csrf_exempt
-from moneyed import EUR, Money
+        in a webserver on the internet side to map things through
+"""
 
-from makerspaceleiden.mail import emailPlain, emails_for_group
-from members.models import User
-from terminal.decorators import is_paired_terminal
-from terminal.models import Terminal
-from .models import Checkout
-
-from pettycash.views import alertOwnersToChange
+from datetime import datetime
 
 from django.contrib.sites.models import Site
+from moneyed import EUR, Money
+
+from members.models import User
+from terminal.models import Terminal
+
+from .models import Checkout
+
 x = Site.objects.all()[0]
-if x.domain != 'weser.webweaving.org':
-    x.domain = 'weser.webweaving.org'
-    x.name = 'My Special Site Name'
+if x.domain != "weser.webweaving.org":
+    x.domain = "weser.webweaving.org"
+    x.name = "My Special Site Name"
     x.save()
 
 member = User.objects.all().first()
 terminal = Terminal.objects.all().first()
-if terminal == None:
-   terminal = Terminal(name = "Sumup test", fingerprint = "test", nonce = "foo", date = datetime.now(), accepted = True)
-   terminal.save()
+if terminal is None:
+    terminal = Terminal(
+        name="Sumup test",
+        fingerprint="test",
+        nonce="foo",
+        date=datetime.now(),
+        accepted=True,
+    )
+    terminal.save()
 
 amount = Money(10.00, EUR)
 
 try:
     print(f"Payment by {member} on terminal {terminal} of {amount} send to sumup Solo")
-    checkout = Checkout(member=member, amount=amount, terminal = terminal)
+    checkout = Checkout(member=member, amount=amount, terminal=terminal)
     checkout.transact()
     print("Done!")
 
 except Exception as e:
     print(f"Submit failed\n\t{e}")
-
