@@ -43,11 +43,11 @@ class Command(BaseCommand):
         len_mem = int.from_bytes(sys.stdin.buffer.read(4),'big')
 
         salt = sys.stdin.buffer.read(32)
-        print("Salt:		{salt.hex()}")
+        print(f"Salt:		{salt.hex()}")
         keysalt = sys.stdin.buffer.read(32)
-        print("Keysalt:	{keysalt.hex()}")
+        print(f"Keysalt:	{keysalt.hex()}")
         ivs = sys.stdin.buffer.read(32)
-        print("IVector:	{ivs.hex()}")
+        print(f"IVector:	{ivs.hex()}")
      
         tags = sys.stdin.buffer.read(len_tag)
         if len(tags) != len_tag:

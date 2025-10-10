@@ -860,7 +860,7 @@ def tags4machineBIN(terminal=None, machine=None, v2=False):
     hdr += iv
 
     binfile = hdr + tlb + udb
-    sha = hashlib.sha256(binfile)).digest().hex()
+    sha = hashlib.sha256(binfile).digest().hex()
 
     logger.debug(f"Header {len(hdr)} Tags: {len(tlb)} Users: {len(udb)} - sha256({sha})\n")
     return binfile
