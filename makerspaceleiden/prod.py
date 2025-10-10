@@ -11,7 +11,7 @@ LOGIN_REDIRECT_URL = os.environ.get("LOGIN_REDIRECT_URL", "/")
 LOGOUT_REDIRECT_URL = os.environ.get("LOGOUT_REDIRECT_URL", "/")
 STATIC_URL = os.environ.get("STATIC_URL", "/crm-static/")
 MEDIA_ROOT = os.environ.get("MEDIA_ROOT", "/usr/local/makerspaceleiden-crm/var/media")
-DEBUG = False
+DEBUG = os.getenv("DJANGO_DEBUG", "False") == "True"
 with open("/etc/crm_secret_key.txt") as f:
     SECRET_KEY = f.read().strip()
 SECURE_HSTS_SECONDS = 120
@@ -135,9 +135,11 @@ OAUTH2_PROVIDER = {
     "PKCE_REQUIRED": False,
     "OAUTH2_VALIDATOR_CLASS": "makerspaceleiden.oauth_validators.CustomOAuth2Validator",
     "OIDC_ENABLED": True,
+    "OIDC_USERINFO": "makerspaceleiden..oidc_provider_settings.userinfo",
     "SCOPES": {
         "openid": "OpenID Connect scope",
         "email": "Access to your email address",
+        "profile": "Access to your name",
     },
     "OIDC_RSA_PRIVATE_KEY": os.environ.get("OIDC_RSA_PRIVATE_KEY"),
 }

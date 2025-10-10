@@ -39,6 +39,9 @@ def forget(request, pk):
 def api_none(request):
     # Very short reply - for CA_fetch/tests by IoT hardware with
     # limited heap/memory.
+    client_sha = client_cert(request)
+    if client_sha != "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855":
+        return HttpResponse("ok\n", status=200, content_type="text/plain")
     return HttpResponse("OK\n", status=200, content_type="text/plain")
 
 

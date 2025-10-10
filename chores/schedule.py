@@ -12,12 +12,23 @@ class EventsGenerationConfiguration(TypedDict):
     duration: str | None
 
 
+def _normalize_starting_time(starting_time: str) -> datetime:
+    """Helper method to parse datetime string with timezone handling"""
+    print("Normalizing")
+    print(starting_time)
+    try:
+        return datetime.strptime(starting_time, "%d/%m/%Y %H:%M")
+    except ValueError:
+        return datetime.strptime(starting_time, "%Y/%m/%d %H:%M")
+
+
 def generate_schedule_for_event(
     events_config: EventsGenerationConfiguration, number_of_days: int
 ) -> list[datetime]:
     crontab = events_config["crontab"]
     take_one_every = events_config["take_one_every"]
-    start_time = datetime.strptime(events_config["starting_time"], "%d/%m/%Y %H:%M")
+    start_time = _normalize_starting_time(events_config["starting_time"])
+    print(start_time)
     cron = croniter(
         crontab,
         start_time,
