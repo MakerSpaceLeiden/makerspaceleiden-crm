@@ -15,6 +15,11 @@ urlpatterns = [
         name="remove_signup_chore",
     ),
     path("<int:pk>/", ChoreDetailView.as_view(), name="chore_detail"),
+    path(
+        "<int:pk>/generate_events/",
+        views.generate_events_for_chore,
+        name="generate_events_for_chore",
+    ),
     path("create/", views.ChoreCreateView.as_view(), name="chore_create"),
     path("<int:pk>/delete/", views.ChoreDeleteView.as_view(), name="chore_delete"),
     path("<int:pk>/update/", views.ChoreUpdateView.as_view(), name="chore_update"),

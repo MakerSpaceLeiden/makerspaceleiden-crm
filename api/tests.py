@@ -89,7 +89,7 @@ class EventsApiTests(TestCase):
         self.assertEqual(new_event.item_title, data[1]["name"])
 
     def test_events_list_filter_start_datetime(self):
-        # Create two events: one before, one after the filter date
+        # Create three events: one before, one after the filter date
         event1 = Agenda.objects.create(
             startdate=date(2023, 1, 1),
             starttime=time(9, 0),
@@ -108,6 +108,14 @@ class EventsApiTests(TestCase):
             item_details="Second event.",
             user=self.user,
         )
+        # Ongoing event should be shown
+        event3 = Agenda.objects.create(
+            startdatetime=datetime(2023, 1, 1, 9, 0, tzinfo=timezone.utc),
+            enddatetime=datetime(2023, 3, 1, 10, 0, tzinfo=timezone.utc),
+            item_title="Event 3",
+            item_details="Third event.",
+            user=self.user,
+        )
         client = APIClient()
         self.assertTrue(client.login(email=self.user.email, password=self.password))
         # Filter for events starting after 2023-01-15
@@ -115,6 +123,7 @@ class EventsApiTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = json.loads(response.content)["data"]
         self.assertTrue(any(e["id"] == event2.id for e in data))
+        self.assertTrue(any(e["id"] == event3.id for e in data))
         self.assertFalse(any(e["id"] == event1.id for e in data))
 
     def test_events_list_filter_end_datetime(self):

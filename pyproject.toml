@@ -9,9 +9,8 @@ dependencies = [
     "django>=4.2.17,<5",
     "pytz~=2023.3.post1",
     "wheel>=0.42.0,<0.43",
-    "django-import-export>=3.3.3,<4",
+    "django-import-export>4",
     "django-simple-history>=3.4.0,<4",
-    "qrcode>=7.4.2,<8",
     "django-settings-export>=1.2.1,<2",
     "django-stdimage>=6.0.2,<7",
     "django-dynamic-filenames>=1.3.2,<2",
@@ -50,8 +49,9 @@ dependencies = [
     "isodate>=0.7.2",
     "pytest-django>=4.11.1",
     "pytest-cov>=6.2.1",
-    "rich>=14.1.0",
-    "sumup>=0.0.10",
+    "qrcode>=8.2",
+    "gunicorn>=23.0.0",
+    "babel>=2.17.0",
 ]
 
 [dependency-groups]
@@ -63,6 +63,7 @@ dev = [
 
 [tool.uv]
 package = false
+python-preference = "only-managed"
 
 [build-system]
 requires = ["hatchling"]

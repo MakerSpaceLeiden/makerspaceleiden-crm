@@ -385,6 +385,9 @@ AVATAR = {
     "ROBOHASH_COLOUR": "red",
 }
 
+# OAuth2 Provider settings
+OAUTH2_PROVIDER_APPLICATION_MODEL = "acl.Application"
+
 try:
     from .local import *  # noqa: F403
 except ImportError:

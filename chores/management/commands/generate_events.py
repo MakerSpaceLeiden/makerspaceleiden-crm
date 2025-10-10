@@ -1,11 +1,8 @@
 import logging
-from datetime import datetime, timedelta, timezone
 
 from django.core.management.base import BaseCommand
-from isodate import parse_duration
 
-from agenda.models import Agenda
-
+from ...helpers import create_chore_agenda_item
 from ...models import Chore
 from ...schedule import generate_schedule_for_event
 
@@ -49,33 +46,4 @@ class Command(BaseCommand):
             schedule = generate_schedule_for_event(events_config, number_of_days)
 
             for next in schedule:
-                self.create_event(chore, next)
-
-    def create_event(self, chore, next):
-        # Query first by chore.name + startdatetime
-        # If not found, create new
-        if not Agenda.objects.filter(
-            chore=chore,
-            startdatetime=next.astimezone(timezone.utc),
-        ).exists():
-            end_datetime = _get_chore_enddatetime(next, chore.configuration)
-
-            agenda = Agenda.objects.create(
-                item_title=chore.name.replace("_", " ").title(),
-                item_details=chore.description,
-                startdatetime=next.astimezone(timezone.utc),
-                enddatetime=end_datetime,
-                user=chore.creator,
-                chore=chore,
-            )
-            logger.debug("Created agenda", agenda)
-        else:
-            logger.debug("Found existing agenda item.")
-
-
-def _get_chore_enddatetime(next, chore_configuration) -> datetime:
-    events_generation = chore_configuration.get("events_generation", {})
-    duration = events_generation.get("duration")
-    if not duration:
-        return (next + timedelta(days=7)).astimezone(timezone.utc)
-    return (next + parse_duration(duration)).astimezone(timezone.utc)
+                create_chore_agenda_item(chore, next, logger)

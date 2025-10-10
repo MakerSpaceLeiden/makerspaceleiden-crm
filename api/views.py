@@ -1,7 +1,9 @@
 import logging
+from datetime import timezone
 
+from django.db.models import Q
 from django.utils.dateparse import parse_datetime
-from django.utils.timezone import is_naive, make_aware, utc
+from django.utils.timezone import is_naive, make_aware
 from rest_framework import response, status, viewsets
 from rest_framework.decorators import action
 
@@ -117,9 +119,11 @@ class EventViewSet(BaseListMetaViewSet):
         end_datetime_str = request.query_params.get("end_datetime")
 
         if start_datetime_str:
-            queryset = self._filter_by_datetime_field(
-                queryset, "startdatetime", start_datetime_str, "gte"
-            )
+            start_dt = self._parse_datetime(start_datetime_str)
+            if start_dt:
+                queryset = queryset.filter(
+                    Q(startdatetime__gte=start_dt) | Q(enddatetime__gt=start_dt)
+                )
         if end_datetime_str:
             queryset = self._filter_by_datetime_field(
                 queryset, "enddatetime", end_datetime_str, "lte"
@@ -128,13 +132,20 @@ class EventViewSet(BaseListMetaViewSet):
         self.get_queryset = lambda: queryset
         return super().list(request, *args, **kwargs)
 
-    def _filter_by_datetime_field(self, queryset, field: str, dt_str: str, lookup: str):
+    def _parse_datetime(self, dt_str: str):
+        """Helper method to parse datetime string with timezone handling"""
         dt = parse_datetime(dt_str)
         if dt is None:
             logger.warning("Invalid datetime string provided", dt_str)
-            return queryset
+            return None
         if is_naive(dt):
-            dt = make_aware(dt, utc)
+            dt = make_aware(dt, timezone.utc)
+        return dt
+
+    def _filter_by_datetime_field(self, queryset, field: str, dt_str: str, lookup: str):
+        dt = self._parse_datetime(dt_str)
+        if dt is None:
+            return queryset
         # Use Django's ORM filtering for the datetime field
         filter_expr = {f"{field}__{lookup}": dt}
         return queryset.filter(**filter_expr)

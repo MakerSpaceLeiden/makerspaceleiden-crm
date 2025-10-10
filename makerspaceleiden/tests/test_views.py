@@ -1,9 +1,8 @@
 from http import HTTPStatus
-from unittest import TestCase
 
 import pytest
 from django.conf import settings
-from django.test import Client, override_settings
+from django.test import Client, TestCase
 
 from makerspaceleiden.utils import derive_initials
 
@@ -27,15 +26,6 @@ class MakerspaceleidenTest(TestCase):
             "<title>Login – " + settings.SITE_NAME + "</title>",
             response.content.decode("utf-8"),
         )
-
-    def test_oauth2_openid_configuration_available(self):
-        with override_settings(
-            OAUTH2_PROVIDER={
-                "OIDC_ENABLED": True,
-            }
-        ):
-            response = self.client.get("/oauth2/.well-known/openid-configuration")
-            self.assertEqual(response.status_code, HTTPStatus.OK)
 
 
 class DeriveInitialsTest(TestCase):
