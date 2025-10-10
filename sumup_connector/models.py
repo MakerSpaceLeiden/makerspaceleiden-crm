@@ -166,8 +166,7 @@ class Checkout(models.Model):
 
     def signed_callback_url(self):
         url = ''.join(['https://', 
-                #get_current_site(None).domain, 
-                settings.SUMUP_HACK,
+                get_current_site(None).domain, 
 		reverse('sumup-v1-callback', kwargs = {
 			'sumup_pk': self.pk,
 			'timeint': int(self.date.timestamp()),
