@@ -1,0 +1,18 @@
+Subject: [makerbot] Sumup deposit failed
+L.S.
+
+Just to let you know; deposit {{ checkout.pk }} failed.
+
+The error is unfortunately a bit technical:
+
+     {{ error }}
+
+as it is not appears not to be a simple case of
+an rejected credit, debit or banking-cart, or
+the loss of connectivity to our Sumup payment
+provider.  So the treasurer has been emailed
+to look at this (reference {{ checkout.pk }}).
+
+Your friendly makerbot.
+--
+Makerspace Leiden, internal payment notifcations.

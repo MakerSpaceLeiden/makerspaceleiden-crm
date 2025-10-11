@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     "kwh.apps.KwhConfig",
     "pettycash.apps.PettycashConfig",
     "pettycredit.apps.PettycreditConfig",
+    "sumup_connector.apps.SumupConfig",
     "ultimaker.apps.UltimakerConfig",
     "spaceapi.apps.SpaceapiConfig",
     "memberlist",
@@ -372,6 +373,12 @@ PETTYCASH_TERMS_MIN_UNKNOWN = 1
 PETTYCASH_TERMS_MINS_CUTOFF = 10
 
 NODERED_URL = "http://localhost:1880"
+
+SUMUP_MERCHANT = "Mxxxxx"
+SUMUP_READER = "rdr_xxxxx"
+SUMUP_API_KEY = "sup_sk_xxxxx"
+SUMUP_FEE_PERCENTAGE = 2.5
+SUMUP_NONCE = "xxx"  # At least 96 bits of entropy
 
 # Notification aliases
 NOTIFICATION_MAP = {

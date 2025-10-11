@@ -49,6 +49,7 @@ urlpatterns = [
     path("spaceapi/", include("spaceapi.urls")),
     path("terminal/", include("terminal.urls")),
     path("avatar/", include("avatar.urls")),
+    path("sumup/", include("sumup_connector.urls")),
     # We strip the leading / to supress a warning.
     path(
         settings.MEDIA_URL[1:] + "<path:path>",
