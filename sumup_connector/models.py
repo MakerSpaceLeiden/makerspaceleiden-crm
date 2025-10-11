@@ -7,16 +7,15 @@ from django.urls import reverse
 from django.utils import timezone
 from djmoney.models.fields import MoneyField
 from djmoney.models.validators import MinMoneyValidator
-from moneyed import Money
+from moneyed import Money, EUR
 from simple_history.models import HistoricalRecords
-from sumup import APIError, Sumup
-from sumup.readers.resource import CreateReaderCheckoutBody
-from sumup.readers.types import CreateReaderCheckoutAmount
 
 from members.models import User
 from pettycash.models import PettycashTransaction
 from pettycash.views import alertOwnersToChange
 from terminal.models import Terminal
+
+from sumup_connector.sumupapi import SumupAPI,SumupError
 
 logger = logging.getLogger(__name__)
 
@@ -28,6 +27,8 @@ def gen_hash(pk, time):
 
 
 class Checkout(models.Model):
+    sumup = SumupAPI(merchant_code = settings.SUMUP_MERCHANT, api_key=settings.SUMUP_API_KEY)
+
     STATES = (
         ("PREPARED", "Prepared but not yet submitted to sumit"),
         ("SUBMITTED", "Submitted to sumup; no callback yet"),
@@ -138,33 +139,22 @@ class Checkout(models.Model):
         self.description = f"MSL-{self.pk}-{self.member.pk}-{self.terminal.pk}, {self.member}, sumup deposit"
         self.date = timezone.now()
         try:
-            url = self.signed_callback_url()
-            logger.info(url)
-            body = CreateReaderCheckoutBody(
-                description=self.description,
-                return_url=url,
-                tip_rates=[],
-                total_amount=CreateReaderCheckoutAmount(
-                    currency="EUR", minor_unit=2, value=100 * self.amount.amount
-                ),
-            )
-            client = Sumup(api_key=settings.SUMUP_API_KEY)
-
-            checkout = client.readers.create_checkout(
-                merchant_code=settings.SUMUP_MERCHANT,
-                id=settings.SUMUP_READER,
-                body=body,
-            )
-            self.debug_note = checkout.model_dump_json()
-            self.client_transaction_id = checkout.data.client_transaction_id
+            return_url = self.signed_callback_url()
+            logger.error(return_url)
+            reply = self.sumup.trigger_checkout(settings.SUMUP_READER, self.amount, self.description, return_url)
+            self.debug_note = reply
+            self.client_transaction_id = reply['client_transaction_id']
             self.state = "SUBMITTED"
 
-        except APIError as e:
+        except SumupError as e:
             self.state = "ERROR"
-            if e.status == 422:
-                self.state = "FAILED"
-            logger.error(f"transact({self.pk}) failed: {e} --  {e.status} {e.body}")
-            self.debug_note = e.body
+            if e['status_code'] == 422:
+                 self.state = "FAILED"
+            logger.error(f"transact({self.pk}) failed: {e} --  {e['status_code']} {e['message']}")
+            self.debug_note = e['json']
+        except Exception as e:
+            logger.error(f"transact({self.pk}) error: {e}")
+            self.debug_note = e
 
         self._change_reason = "Submitted to Sumup"
         self.save()
@@ -181,10 +171,8 @@ class Checkout(models.Model):
         tx._change_reason = f"Sumpup; f{transaction_id}"
         tx.save()
 
-        fee = Money(self.amount.amount * settings.SUMUP_FEE_PERCENTAGE / 100)
-        actual_amount = Money(
-            self.amount.amount / (1 + settings.SUMUP_FEE_PERCENTAGE / 100)
-        )
+        fee = Money(float(self.amount.amount) * settings.SUMUP_FEE_PERCENTAGE / 100, EUR)
+        actual_amount = self.amount - fee
 
         txf = PettycashTransaction(
             src=self.member,
