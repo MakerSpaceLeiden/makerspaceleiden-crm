@@ -87,6 +87,71 @@ class AgendaCreateViewTest(TestCase):
         self.assertIn("11:00", html, "Suggested time")
 
 
+class AgendaUpdateViewTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            first_name="An",
+            last_name="Example",
+            password="testpassword",
+            email="example@example.com",
+        )
+        success = self.client.login(email=self.user.email, password="testpassword")
+        self.assertTrue(success)
+
+    def test_agenda_update_get(self):
+        self.assertTrue(
+            self.client.login(email=self.user.email, password="testpassword")
+        )
+
+        chore = Agenda.objects.create(
+            startdatetime=datetime(2025, 5, 10, 9, 0, tzinfo=timezone.utc),
+            enddatetime=datetime(2025, 5, 10, 10, 0, tzinfo=timezone.utc),
+            item_title="Fixture Agenda Title",
+            item_details="This is a fixture agenda item for testing.",
+            user=self.user,
+        )
+
+        url = reverse("agenda_update", kwargs={"pk": chore.id})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTemplateUsed(response, "agenda/agenda_crud.html")
+        self.assertNotContains(
+            response, 'data-test-hook="recurrence-parent-agenda-item-found"'
+        )
+        self.assertContains(response, 'data-test-hook="recurrence-rule-input"')
+
+    def test_agenda_update_get_with_recurrence_parent(self):
+        self.assertTrue(
+            self.client.login(email=self.user.email, password="testpassword")
+        )
+
+        parent = Agenda.objects.create(
+            startdatetime=datetime(2025, 5, 10, 9, 0, tzinfo=timezone.utc),
+            enddatetime=datetime(2025, 5, 10, 10, 0, tzinfo=timezone.utc),
+            item_title="Fixture Agenda Title",
+            item_details="This is a fixture agenda item for testing.",
+            user=self.user,
+        )
+
+        chore = Agenda.objects.create(
+            startdatetime=datetime(2025, 5, 10, 9, 0, tzinfo=timezone.utc),
+            enddatetime=datetime(2025, 5, 10, 10, 0, tzinfo=timezone.utc),
+            item_title="Fixture Agenda Title",
+            item_details="This is a fixture agenda item for testing.",
+            user=self.user,
+            recurrence_parent=parent,
+        )
+
+        url = reverse("agenda_update", kwargs={"pk": chore.id})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTemplateUsed(response, "agenda/agenda_crud.html")
+        self.assertContains(
+            response, 'data-test-hook="recurrence-parent-agenda-item-found"'
+        )
+        self.assertNotContains(response, 'data-test-hook="recurrence-rule-input"')
+
+
 class AgendaItemsView(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(

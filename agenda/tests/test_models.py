@@ -320,7 +320,7 @@ class AgendaModelPropertiesTest(TestCase):
             )
         self.assertIn("Invalid recurrence rrule", str(err.value))
 
-    @time_machine.travel("2025-05-06 10:00")
+    @time_machine.travel("2025-05-06 04:32")
     def test_generate_occurrences(self):
         agenda = Agenda.objects.create(
             startdatetime=datetime(2025, 5, 3, 8, 0, tzinfo=timezone.utc),
@@ -346,6 +346,13 @@ class AgendaModelPropertiesTest(TestCase):
         )
 
         child_items = Agenda.objects.filter(recurrence_parent=agenda)
+
+        self.assertEqual(agenda.startdatetime.hour, child_items[0].startdatetime.hour)
+        self.assertEqual(
+            agenda.startdatetime.minute, child_items[0].startdatetime.minute
+        )
+        self.assertEqual(agenda.enddatetime.hour, child_items[0].enddatetime.hour)
+        self.assertEqual(agenda.enddatetime.minute, child_items[0].enddatetime.minute)
 
         # Get the duration of the first occurrence
         duration_created = created_first[0].enddatetime - created_first[0].startdatetime
