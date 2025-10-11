@@ -418,7 +418,7 @@ def waiverform(request, user_id=None):
         reverse("waiver_confirmation", kwargs=dict(user_id=user_id))
     )
     name = f"{member.first_name} {member.last_name}"
-    safename = re.sub("\W+", "-", name)
+    safename = re.sub(r"\W+", "-", name)
 
     fd = generate_waiverform_fd(member.id, name, confirmation_url)
 

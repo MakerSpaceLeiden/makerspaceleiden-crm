@@ -264,10 +264,10 @@ def upload_zip(request):
                     if zi.is_dir():
                         skipped.append("{0}: skipped, directory".format(f))
                         continue
-                    if re.match("\..*", f):
+                    if re.match(r"\..*", f):
                         skipped.append("{0}: skipped, hidden file".format(f))
                         continue
-                    if re.match(".*/\.", f):
+                    if re.match(r".*/\.", f):
                         skipped.append("{0}: skipped, hidden file".format(f))
                         continue
                     if zi.file_size < settings.MIN_IMAGE_SIZE:
@@ -278,9 +278,9 @@ def upload_zip(request):
                         continue
 
                     extension = "raw"
-                    if re.match(".*\.(jpg|jpeg)$", f, re.IGNORECASE):
+                    if re.match(r".*\.(jpg|jpeg)$", f, re.IGNORECASE):
                         extension = "jpg"
-                    elif re.match(".*\.(png)$", f, re.IGNORECASE):
+                    elif re.match(r".*\.(png)$", f, re.IGNORECASE):
                         extension = "png"
                     else:
                         skipped.append(
