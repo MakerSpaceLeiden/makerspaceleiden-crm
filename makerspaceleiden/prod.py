@@ -144,14 +144,12 @@ OAUTH2_PROVIDER = {
     "OIDC_RSA_PRIVATE_KEY": os.environ.get("OIDC_RSA_PRIVATE_KEY"),
 }
 
-SUMUP_MERCHANT='M0JWH44Y'
-SUMUP_READER='rdr_4H24YF5P2S9QVAM0YDH9576TV6'
-SUMUP_TERMINALS = [ 8472 ]
-# Try to prevent accidental git-commit/showing it with 'ps' as an 
+SUMUP_MERCHANT = "M0JWH44Y"
+SUMUP_READER = "rdr_4H24YF5P2S9QVAM0YDH9576TV6"
+SUMUP_TERMINALS = [8472]
+# Try to prevent accidental git-commit/showing it with 'ps' as an
 # environment variable.
-with open('/etc/sumup/key') as f:
+with open("/etc/sumup/key") as f:
     SUMUP_API_KEY = f.read().strip()
-with open('/etc/sumup/nonce') as f:
+with open("/etc/sumup/nonce") as f:
     SUMUP_NONCE = f.read().strip()
-
-

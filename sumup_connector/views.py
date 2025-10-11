@@ -6,7 +6,6 @@ import dateutil
 from django.conf import settings
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.contrib.sites.shortcuts import get_current_site
 from moneyed import EUR, Money
 
 from makerspaceleiden.mail import emailPlain, emails_for_group

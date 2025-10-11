@@ -2,6 +2,7 @@ import hashlib
 import logging
 
 from django.conf import settings
+from django.contrib.sites.shortcuts import get_current_site
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
@@ -9,12 +10,11 @@ from djmoney.models.fields import MoneyField
 from djmoney.models.validators import MinMoneyValidator
 from moneyed import EUR, Money
 from simple_history.models import HistoricalRecords
-from django.contrib.sites.shortcuts import get_current_site
 
 from members.models import User
 from pettycash.models import PettycashTransaction
 from pettycash.views import alertOwnersToChange
-from sumup_connector.sumupapi import SumupAPI, SumupError
+from sumup_connector.sumupapi import SumupAPI
 from terminal.models import Terminal
 
 logger = logging.getLogger(__name__)
