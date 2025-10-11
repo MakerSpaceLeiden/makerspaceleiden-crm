@@ -1,5 +1,6 @@
-from datetime import date, datetime, time, timezone
+from datetime import date, datetime, time, timedelta, timezone
 
+import pytest
 import time_machine
 from django.test import TestCase
 
@@ -297,3 +298,59 @@ class AgendaModelPropertiesTest(TestCase):
                     user=self.user,
                 )
                 self.assertEqual(agenda.display_datetime, case["expected"])
+
+    @time_machine.travel("2025-05-06 10:00")
+    def test_generate_occurrences_invalid_rrule(self):
+        agenda = Agenda.objects.create(
+            startdatetime=datetime(2025, 5, 3, 8, 0, tzinfo=timezone.utc),
+            enddatetime=datetime(2025, 5, 3, 16, 0, tzinfo=timezone.utc),
+            item_title="Test Agenda",
+            recurrences="Hallo world",
+            user=self.user,
+        )
+
+        start = datetime.now(tz=timezone.utc)
+        end = start + timedelta(days=6)
+
+        with pytest.raises(ValueError) as err:
+            Agenda.objects.generate_occurrences(
+                parent=agenda,
+                from_datetime=start,
+                to_datetime=end,
+            )
+        self.assertIn("Invalid recurrence rrule", str(err.value))
+
+    @time_machine.travel("2025-05-06 10:00")
+    def test_generate_occurrences(self):
+        agenda = Agenda.objects.create(
+            startdatetime=datetime(2025, 5, 3, 8, 0, tzinfo=timezone.utc),
+            enddatetime=datetime(2025, 5, 3, 16, 0, tzinfo=timezone.utc),
+            item_title="Test Agenda",
+            recurrences="FREQ=WEEKLY;INTERVAL=1;BYDAY=SA",
+            user=self.user,
+        )
+
+        start = datetime.now(tz=timezone.utc)
+        end = start + timedelta(days=6)
+
+        created_first = Agenda.objects.generate_occurrences(
+            parent=agenda,
+            from_datetime=start,
+            to_datetime=end,
+        )
+
+        created_second = Agenda.objects.generate_occurrences(
+            parent=agenda,
+            from_datetime=start,
+            to_datetime=end,
+        )
+
+        child_items = Agenda.objects.filter(recurrence_parent=agenda)
+
+        # Get the duration of the first occurrence
+        duration_created = created_first[0].enddatetime - created_first[0].startdatetime
+        self.assertEqual(agenda.enddatetime - agenda.startdatetime, duration_created)
+
+        self.assertEqual(child_items.count(), 1)
+        self.assertEqual(len(created_first), 1)
+        self.assertEqual(len(created_second), 0)

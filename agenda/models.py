@@ -2,6 +2,7 @@ import logging
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
+from dateutil import rrule
 from django.db import models, transaction
 from django.db.models import Q
 from django.utils import timezone
@@ -45,6 +46,48 @@ class AgendaQuerySet(models.QuerySet):
         ]
 
 
+class AgendaManager(models.Manager):
+    def generate_occurrences(self, parent, from_datetime, to_datetime):
+        """Create occurrence instances from parent's rrule"""
+        recurrences = parent.recurrences
+        if not recurrences:
+            return []
+
+        # Validate recurrence rule
+        try:
+            rlstr = (
+                f"RRULE:{recurrences};UNTIL={to_datetime.strftime('%Y%m%dT%H%M%S%z')}"
+            )
+            rule = rrule.rrulestr(rlstr, dtstart=from_datetime)
+        except ValueError as e:
+            raise ValueError(f"Invalid recurrence rrule: {e}")
+
+        duration = parent.enddatetime - parent.startdatetime
+        # Filter occurrences within date range
+        occurrences = [dt for dt in rule if from_datetime <= dt <= to_datetime]
+        created = []
+
+        # Create occurrences based on the occurrences list
+        for occurrence in occurrences:
+            if Agenda.objects.filter(
+                recurrence_parent=parent, occurrence_date=occurrence.date()
+            ).exists():
+                continue
+
+            agenda = Agenda.objects.create(
+                recurrence_parent=parent,
+                occurrence_date=occurrence.date(),
+                startdatetime=occurrence,
+                enddatetime=occurrence + duration,
+                user=parent.user,
+                item_title=parent.item_title,
+                item_details=parent.item_details,
+            )
+            created.append(agenda)
+
+        return created
+
+
 class Agenda(models.Model):
     startdatetime = models.DateTimeField(null=True)
     enddatetime = models.DateTimeField(null=True)
@@ -52,6 +95,17 @@ class Agenda(models.Model):
     item_details = models.TextField(max_length=5000, blank=True, default="")
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     history = HistoricalRecords()
+
+    # Support for recurring agenda items
+    recurrences = models.TextField(max_length=255, blank=True, default="", null=True)
+    recurrence_parent = models.ForeignKey(
+        "self",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="recurrence_items",
+    )
+    occurrence_date = models.DateField(null=True)
 
     # Deprecated – These will be removed in the near future
     startdate = models.DateField(null=True)
@@ -74,7 +128,7 @@ class Agenda(models.Model):
         max_length=20, choices=STATUS_CHOICES, default=None, null=True
     )
 
-    objects = AgendaQuerySet.as_manager()
+    objects = AgendaManager.from_queryset(AgendaQuerySet)()
 
     @property
     def start_datetime(self):
