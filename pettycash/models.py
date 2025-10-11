@@ -224,6 +224,7 @@ class PettycashTransaction(models.Model):
         new_transaction.dst = self.src
         new_transaction.amount = self.amount
         new_transaction.description = "refund %s (%d)" % (self.description, self.pk)
+        new_transaction._change_reason = "Refund"
         new_transaction.save()
 
     def save(self, *args, **kwargs):
