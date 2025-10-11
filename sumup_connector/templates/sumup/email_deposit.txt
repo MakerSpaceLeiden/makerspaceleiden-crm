@@ -1,28 +1,28 @@
 Subject: [makerbot] Sumup deposit for {{ tx.amount }} -- {{ label }}
 L.S.
 
-Just to let you know; we recorded the following despoit into 
+Just to let you know; we recorded the following despoit into
 your account on {{ tx.date }}:
 
          {{ actual_amount }}
 
-The actual amount charged is to your bank/credit card is {{ tx.amount }}.  
-The amount deposited is lower, i.e. {{ actual_amount }}, as we need to 
+The actual amount charged is to your bank/credit card is {{ tx.amount }}.
+The amount deposited is lower, i.e. {{ actual_amount }}, as we need to
 pay a fee of {{ fee }} to the bank.
 
 You should see this appear on your bank account under, usually, the name:
 
          SumUp* Stichtig Makerspace Leiden
 
-SumUp is the name of payment provider. Should it be a different name - let 
+SumUp is the name of payment provider. Should it be a different name - let
 the treasurer know. We're still trying to understand how exactly this works.
 
-Should this be wrong; let one of the trustee's know at {{ settings.TRUSTEES }}. The 
-full details of this transaction can be seen at 
+Should this be wrong; let one of the trustee's know at {{ settings.TRUSTEES }}. The
+full details of this transaction can be seen at
 
-	{{ base }}{% url 'transactiondetail' pk=tx.pk  %}.  
+	{{ base }}{% url 'transactiondetail' pk=tx.pk  %}.
 
-This is also the place where you can delete a transaction.  Or consult 
+This is also the place where you can delete a transaction.  Or consult
 your personal page at:
 
         {{ base }}{% url 'mytransactions' %}

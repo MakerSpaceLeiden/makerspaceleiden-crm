@@ -78,7 +78,12 @@ def pettycash_treasurer_emails():
 # Which can help when sheparding the community.
 #
 def alertOwnersToChange(
-    tx, userThatMadeTheChange=None, toinform=[], reason=None, template="email_tx.txt", context = {}
+    tx,
+    userThatMadeTheChange=None,
+    toinform=[],
+    reason=None,
+    template="email_tx.txt",
+    context={},
 ):
     src_label = "%s" % tx.src
     dst_label = "%s" % tx.dst
@@ -95,19 +100,26 @@ def alertOwnersToChange(
     else:
         toinform.append(tx.dst.email)
 
-    if userThatMadeTheChange is not None and userThatMadeTheChange.email not in toinform:
+    if (
+        userThatMadeTheChange is not None
+        and userThatMadeTheChange.email not in toinform
+    ):
         toinform.append(userThatMadeTheChange.email)
 
-    context["user"]=  userThatMadeTheChange
-    context["base"]=  settings.BASE
-    context["reason"]=  reason
-    context["tx"]=  tx
-    context["src_label"]=  src_label
-    context["dst_label"]=  dst_label
-    context["label"]=  label
-    context["settings"]=  settings
+    context["user"] = userThatMadeTheChange
+    context["base"] = settings.BASE
+    context["reason"] = reason
+    context["tx"] = tx
+    context["src_label"] = src_label
+    context["dst_label"] = dst_label
+    context["label"] = label
+    context["settings"] = settings
 
-    return emailPlain( template, toinform=toinform, context = context,)
+    return emailPlain(
+        template,
+        toinform=toinform,
+        context=context,
+    )
 
 
 def pettycash_redirect(pk=None):

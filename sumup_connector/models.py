@@ -7,15 +7,14 @@ from django.urls import reverse
 from django.utils import timezone
 from djmoney.models.fields import MoneyField
 from djmoney.models.validators import MinMoneyValidator
-from moneyed import Money, EUR
+from moneyed import EUR, Money
 from simple_history.models import HistoricalRecords
 
 from members.models import User
 from pettycash.models import PettycashTransaction
 from pettycash.views import alertOwnersToChange
+from sumup_connector.sumupapi import SumupAPI, SumupError
 from terminal.models import Terminal
-
-from sumup_connector.sumupapi import SumupAPI,SumupError
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +26,9 @@ def gen_hash(pk, time):
 
 
 class Checkout(models.Model):
-    sumup = SumupAPI(merchant_code = settings.SUMUP_MERCHANT, api_key=settings.SUMUP_API_KEY)
+    sumup = SumupAPI(
+        merchant_code=settings.SUMUP_MERCHANT, api_key=settings.SUMUP_API_KEY
+    )
 
     STATES = (
         ("PREPARED", "Prepared but not yet submitted to sumit"),
@@ -141,17 +142,21 @@ class Checkout(models.Model):
         try:
             return_url = self.signed_callback_url()
             logger.error(return_url)
-            reply = self.sumup.trigger_checkout(settings.SUMUP_READER, self.amount, self.description, return_url)
+            reply = self.sumup.trigger_checkout(
+                settings.SUMUP_READER, self.amount, self.description, return_url
+            )
             self.debug_note = reply
-            self.client_transaction_id = reply['client_transaction_id']
+            self.client_transaction_id = reply["client_transaction_id"]
             self.state = "SUBMITTED"
 
         except SumupError as e:
             self.state = "ERROR"
-            if e['status_code'] == 422:
-                 self.state = "FAILED"
-            logger.error(f"transact({self.pk}) failed: {e} --  {e['status_code']} {e['message']}")
-            self.debug_note = e['json']
+            if e["status_code"] == 422:
+                self.state = "FAILED"
+            logger.error(
+                f"transact({self.pk}) failed: {e} --  {e['status_code']} {e['message']}"
+            )
+            self.debug_note = e["json"]
         except Exception as e:
             logger.error(f"transact({self.pk}) error: {e}")
             self.debug_note = e
@@ -171,7 +176,9 @@ class Checkout(models.Model):
         tx._change_reason = f"Sumpup; f{transaction_id}"
         tx.save()
 
-        fee = Money(float(self.amount.amount) * settings.SUMUP_FEE_PERCENTAGE / 100, EUR)
+        fee = Money(
+            float(self.amount.amount) * settings.SUMUP_FEE_PERCENTAGE / 100, EUR
+        )
         actual_amount = self.amount - fee
 
         txf = PettycashTransaction(
