@@ -171,9 +171,9 @@ class Checkout(models.Model):
             src=User.objects.get(id=settings.POT_ID),
             dst=self.member,
             amount=self.amount,
-            description=f"Sumup deposit at {self.terminal.name}, {transaction_id}",
+            description=f"Sumup deposit at {self.terminal.name}, {self.client_transaction_id}",
         )
-        tx._change_reason = f"Sumpup; f{transaction_id}"
+        tx._change_reason = f"Sumup; f{self._client_transaction_id}"
         tx.save()
 
         fee = Money(
@@ -185,9 +185,9 @@ class Checkout(models.Model):
             src=self.member,
             dst=User.objects.get(id=settings.POT_ID),
             amount=fee,
-            description=f"Transaction fee {transaction_id}, #{tx.pk}",
+            description=f"Transaction fee {self.client_transaction_id}, #{tx.pk}",
         )
-        txf._change_reason = f"Sumpup fee; f{transaction_id}"
+        txf._change_reason = f"Sumpup fee; f{self.client_transaction_id}"
         txf.save()
 
         self.state = "SUCCESSFUL"
@@ -195,7 +195,7 @@ class Checkout(models.Model):
 
         self.transaction_id = transaction_id
         self.transaction_date = timestamp
-        self._change_reason = f"{transaction_id}/{self.pk} Complete; references for the deposit: {tx.pk} and fee: {txf.pk}"
+        self._change_reason = f"{self.client_transaction_id}/{self.pk} Complete; references for the deposit: {tx.pk} and fee: {txf.pk}"
 
         self.save()
 
