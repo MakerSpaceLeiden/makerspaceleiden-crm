@@ -51,6 +51,40 @@
             <textarea id="item_details" name="item_details" class="form-control" rows="8" wrap="soft">{{ form.item_details.value }}</textarea>
         </div>
 
+        {% if form.instance.recurrence_parent %}
+          <div class="card" data-test-hook="recurrence-parent-agenda-item-found">
+            <div class="card-body">
+              This agenda item was created from the recurrence pattern in: <a href="{% url 'agenda_detail' pk=form.instance.recurrence_parent.pk %}">{{ form.instance.recurrence_parent.item_title }}</a>. <br/>
+              You can edit this item in isolation. Or if you want to adjust the recurrence pattern, you can do so in the <a href="{% url 'agenda_update' pk=form.instance.recurrence_parent.pk %}">parent&nbsp;item</a>
+            </div>
+          </div>
+
+        {% else %}
+          <details class="card" xopen>
+            <summary class="card-header">
+              Does this item repeat?
+            </summary>
+            <div class="card-body" data-test-hook="recurrence-rule-input">
+              <h4 class="mt-0">Repeats every:</h4>
+              <p>
+                Use the <a href="https://icalendar.org/iCalendar-RFC-5545/3-8-5-3-recurrence-rule.html" target="_blank">RRULE format</a>, to specify the recurrence pattern. You can <a href="https://icalendar.org/rrule-tool.html">use the RRule Generator tool</a> to help you with  the formatting.
+              </p>
+                <input type="text" id="recurrences" name="recurrences" class="form-control" value="{{ form.recurrences.value }}" maxlength="255">
+              <div class="mt-2">
+                Some examples:
+                <ul>
+                  <li>
+                    <pre class="d-inline">FREQ=MONTHLY;INTERVAL=1;BYDAY=1MO</pre> 1st Monday of each month. Repeat for ever
+                  </li>
+                  <li>
+                    <pre class="d-inline">FREQ=WEEKLY;INTERVAL=1;BYDAY=SA;COUNT=12</pre> Every Saturday, for the next 12 weeks
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </details>
+        {% endif %}
+
         <div class="mt-3">
             {% if title == 'Edit agenda item' %}
                 <button type="button" onclick="window.location.href='{% url 'agenda_detail' pk=form.instance.pk %}'" class="btn btn-secondary me-1">Back</button>
@@ -62,6 +96,7 @@
                 <button type="submit" class="btn btn-primary btn-primary-custom me-1">Create</button>
             {% endif %}
         </div>
+
     </form>
   </div>
 </div>
