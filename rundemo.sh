@@ -13,4 +13,4 @@ DJANGO_RUN="uv run python manage.py"
 
 ${DJANGO_RUN} makemigrations
 ${DJANGO_RUN} migrate
-${DJANGO_RUN} runserver
+${DJANGO_RUN} runserver 7000

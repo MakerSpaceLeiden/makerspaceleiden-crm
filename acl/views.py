@@ -550,6 +550,11 @@ def checktag(function):
     @wraps(function)
     def wrap(request, *args, **kwargs):
         if not request.POST:
+            logger.error(
+                "not/empty post: {} {}, '{}' rejecting".format(
+                    request.method, request.path, request.POST
+                )
+            )
             return HttpResponse("XS denied", status=403, content_type="text/plain")
 
         try:
@@ -580,6 +585,7 @@ def checktag(function):
             )
 
         kwargs["tag"] = tag
+
         return function(request, *args, **kwargs)
 
     return wrap
@@ -673,7 +679,6 @@ def api_gettags4machine(request, terminal=None, machine=None):
 #       anything about the others. We may not want that in the future.
 #
 @csrf_exempt
-@csrf_exempt
 @is_paired_terminal
 def api_gettags4machineJSON(request, terminal=None, machine=None):
     out = api_gettags4machine(request, terminal, machine)
@@ -688,7 +693,6 @@ def api_gettags4machineJSON(request, terminal=None, machine=None):
 #       with this node or machine. I.e any valid terminal can ask
 #       anything about the others. We may not want that in the future.
 #
-@csrf_exempt
 @csrf_exempt
 @is_paired_terminal
 def api_gettags4machineCSV(request, terminal=None, machine=None):
@@ -859,8 +863,13 @@ def tags4machineBIN(terminal=None, machine=None, v2=False):
     hdr += keysalt
     hdr += iv
 
-    logger.debug(f"Header {len(hdr)} Tags: {len(tlb)} Users: {len(udb)}\n")
-    return hdr + tlb + udb
+    binfile = hdr + tlb + udb
+    sha = hashlib.sha256(binfile).digest().hex()
+
+    logger.debug(
+        f"Header {len(hdr)} Tags: {len(tlb)} Users: {len(udb)} - sha256({sha})\n"
+    )
+    return binfile
 
 
 @csrf_exempt
@@ -907,11 +916,35 @@ def api_getok(request, machine=None, tag=None):
         r.save()
     except Exception as e:
         logger.error(
-            "Unexpected error when recording machine use of {} by {}: {}".format(
+            "Unexpected error when responding to query on machine use of {} by {}: {}".format(
                 machine, tag.owner, e
             )
         )
     return JsonResponse(get_perms(tag, machine))
+
+
+@csrf_exempt
+@is_paired_terminal
+@checktag
+def api_recorduse(request, terminal, machine=None, tag=None):
+    try:
+        machine = Machine.objects.get(node_machine_name=machine)
+    except ObjectDoesNotExist:
+        logger.error("getok: Machine '{}' not found, denied.".format(machine))
+        return HttpResponse("Machine not found", status=404, content_type="text/plain")
+
+    try:
+        r = RecentUse(user=tag.owner, machine=machine)
+        r.save()
+    except Exception as e:
+        logger.error(
+            "Unexpected error when recording machine use of {} by {}: {}".format(
+                machine, tag.owner, e
+            )
+        )
+        return HttpResponse("Internal Error", status=500, content_type="text/plain")
+
+    return HttpResponse("OK", status=200, content_type="text/plain")
 
 
 @csrf_exempt

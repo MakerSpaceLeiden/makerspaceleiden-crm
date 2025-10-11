@@ -374,11 +374,11 @@ PETTYCASH_TERMS_MINS_CUTOFF = 10
 
 NODERED_URL = "http://localhost:1880"
 
-SUMUP_MERCHANT='Mxxxxx'
-SUMUP_READER='rdr_xxxxx'
-SUMUP_API_KEY='sup_sk_xxxxx'
-SUMUP_FEE_PERCENTAGE=2.5
-SUMUP_NONCE='xxx' # At least 96 bits of entropy
+SUMUP_MERCHANT = "Mxxxxx"
+SUMUP_READER = "rdr_xxxxx"
+SUMUP_API_KEY = "sup_sk_xxxxx"
+SUMUP_FEE_PERCENTAGE = 2.5
+SUMUP_NONCE = "xxx"  # At least 96 bits of entropy
 
 # Notification aliases
 NOTIFICATION_MAP = {
@@ -390,6 +390,9 @@ AVATAR = {
     "ROBOHASH_SET": "set1",
     "ROBOHASH_COLOUR": "red",
 }
+
+# OAuth2 Provider settings
+OAUTH2_PROVIDER_APPLICATION_MODEL = "acl.Application"
 
 try:
     from .local import *  # noqa: F403

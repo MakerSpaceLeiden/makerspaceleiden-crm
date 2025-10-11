@@ -79,12 +79,12 @@ Know responses
 *) Reader offline or switched off
 
 	client.readers.create_checkout
-	1)	Unprocessable Entity 
+	1)	Unprocessable Entity
 		422
 		{"errors":{"detail":"The device is offline.","type":"READER_OFFLINE"}}
 
         no callback
- 
+
 *) Timeout on reader
 	callback with
 
@@ -118,8 +118,8 @@ Know responses
 c) Request while reader is already waiting for a payment:
 
 	client.readers.create_checkout
-	1) Unprocessable Entity 
-	   422 
+	1) Unprocessable Entity
+	   422
            {"errors":{"detail":"Unprocessable Entity"}}
 
 d) Successful payment
@@ -139,7 +139,7 @@ d) Successful payment
           },
           "timestamp": "2025-09-25T18:07:36.545397Z"
 
-*) It is possible (e.g during startup or when the connectvity is flaky) to get a 
+*) It is possible (e.g during startup or when the connectvity is flaky) to get a
 
 	   {'data': {'client_transaction_id': '6ed7cebb-a1b5-4168-bd9a-a82bc8c4f329'}}
 
@@ -156,9 +156,9 @@ Know issues
 
 -	Sometimes a transaction clears - but the transaction_id is Null.
 	A few seconds later - a list transdaction call will show it.
-	Know issue: https://github.com/sumup/sumup-android-sdk/issues/195 
+	Know issue: https://github.com/sumup/sumup-android-sdk/issues/195
 	from 2024
- 
+
 py-SumIP - https://github.com/sumup/sumup-py
 
 -      based on pydantic - with strict schema's. Violates the internet/
@@ -179,12 +179,11 @@ py-SumIP - https://github.com/sumup/sumup-py
        3) trnsaction crossref - main risk - any improvement
           in the api will break the pydantic checks
 
-      other places are under interactive human control. 
+      other places are under interactive human control.
 
-      API is fairly trivial (bearer token, URL with merchant code 
+      API is fairly trivial (bearer token, URL with merchant code
       and json bodies). So perhaps, once it works, replace just
       those 2 (1&3) by our own; but levave the code in the
       management utils for pairing/etc as thare not ran
       unsupervised / not in a time critical workflow and/or
       can be ran repeatedly.
-

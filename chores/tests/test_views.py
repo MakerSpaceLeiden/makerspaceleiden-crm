@@ -250,7 +250,7 @@ class CreateChoreTest(TestCase):
                     "starting_time": "2025/05/10 14:56",
                     "crontab": "0 22 * * mon",
                     "take_one_every": 23,
-                    "duration": "P1W",
+                    "duration": "P7D",
                 },
             },
             chore.configuration,
@@ -267,15 +267,22 @@ class UpdateChoreTest(TestCase):
             email="example@example.com",
         )
         permission = Permission.objects.get(
-            codename="add_chore", content_type=ContentType.objects.get_for_model(Chore)
+            codename="change_chore",
+            content_type=ContentType.objects.get_for_model(Chore),
         )
         self.user.user_permissions.add(permission)
 
         success = self.client.login(email=self.user.email, password="testpassword")
         self.assertTrue(success)
 
-    def test_update_chore_get(self):
-        chore = Chore.objects.create(
+        self.user_no_permission = User.objects.create_user(
+            first_name="An",
+            last_name="Example",
+            password="testpassword",
+            email="no_permission@example.com",
+        )
+
+        self.chore = Chore.objects.create(
             name="Test Chore",
             description="A test chore that needs volunteers.",
             class_type="BasicChore",
@@ -290,25 +297,27 @@ class UpdateChoreTest(TestCase):
             creator=self.user,
         )
 
-        url = reverse("chore_update", kwargs={"pk": chore.id})
+    def test_update_chore_requires_permission(self):
+        url = reverse("chore_update", kwargs={"pk": self.chore.id})
+        success = self.client.login(
+            email=self.user_no_permission.email, password="testpassword"
+        )
+        self.assertTrue(success)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_update_chore_get(self):
+        url = reverse("chore_update", kwargs={"pk": self.chore.id})
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         html = response.content.decode("utf-8")
         self.assertTemplateUsed(response, "chores/chore_crud.html")
-        self.assertIn(chore.name, html)
+        self.assertIn(self.chore.name, html)
         self.assertIn("0 22 * * fri", html)
         self.assertIn("233", html)
 
     def test_update_chore_post(self):
-        chore = Chore.objects.create(
-            name="Test Chore",
-            description="A test chore that needs volunteers.",
-            class_type="BasicChore",
-            configuration={"foo": "bar"},
-            creator=self.user,
-        )
-
-        url = reverse("chore_update", kwargs={"pk": chore.id})
+        url = reverse("chore_update", kwargs={"pk": self.chore.id})
         starting_from = "2025/05/10 14:56"
         response = self.client.post(
             url,
@@ -325,9 +334,11 @@ class UpdateChoreTest(TestCase):
             follow=True,
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        chore = Chore.objects.get(name="Test Chore")
-        self.assertEqual(chore.description, "A test chore that needs volunteers.")
-        self.assertEqual(chore.wiki_url, "https://example.com")
+        updated_chore = Chore.objects.get(name="Test Chore")
+        self.assertEqual(
+            updated_chore.description, "A test chore that needs volunteers."
+        )
+        self.assertEqual(updated_chore.wiki_url, "https://example.com")
         self.assertTemplateUsed(response, "chores/chore_detail.html")
         self.assertEqual(
             {
@@ -336,8 +347,103 @@ class UpdateChoreTest(TestCase):
                     "starting_time": "2025/05/10 14:56",
                     "crontab": "0 22 * * mon",
                     "take_one_every": 23,
-                    "duration": "P1W",
+                    "duration": "P7D",
                 },
             },
-            chore.configuration,
+            updated_chore.configuration,
         )
+
+
+class GenerateEventsForChore(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            first_name="An",
+            last_name="Example",
+            password="testpassword",
+            email="example@example.com",
+        )
+        permission = Permission.objects.get(
+            codename="add_chore", content_type=ContentType.objects.get_for_model(Chore)
+        )
+        self.user.user_permissions.add(permission)
+
+        success = self.client.login(email=self.user.email, password="testpassword")
+        self.assertTrue(success)
+
+    @time_machine.travel("2025-05-10 14:56")
+    def test_generate_events_for_chore_get(self):
+        chore = Chore.objects.create(
+            name="Test Chore",
+            description="A test chore that needs volunteers.",
+            class_type="BasicChore",
+            configuration={
+                "events_generation": {
+                    "event_type": "recurrent",
+                    "take_one_every": 2,
+                    "starting_time": "10/05/2024 14:56",
+                    "crontab": "0 22 * * fri",
+                    "duration": "PT7H",
+                }
+            },
+            creator=self.user,
+        )
+
+        url = reverse("generate_events_for_chore", kwargs={"pk": chore.id})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_302_FOUND)
+        self.assertEqual(response.url, reverse("chore_detail", kwargs={"pk": chore.id}))
+
+        response = self.client.get(url)
+
+        events = Agenda.objects.all()
+        self.assertEqual(len(events), 2)
+
+
+class DeleteChoreTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            first_name="An",
+            last_name="Example",
+            password="testpassword",
+            email="example@example.com",
+        )
+        permission = Permission.objects.get(
+            codename="delete_chore",
+            content_type=ContentType.objects.get_for_model(Chore),
+        )
+        self.user.user_permissions.add(permission)
+
+        success = self.client.login(email=self.user.email, password="testpassword")
+        self.assertTrue(success)
+
+        self.user_no_permission = User.objects.create_user(
+            first_name="An",
+            last_name="Example",
+            password="testpassword",
+            email="no_permission@example.com",
+        )
+
+        self.chore = Chore.objects.create(
+            name="Test Chore",
+            description="A test chore that needs volunteers.",
+            class_type="BasicChore",
+            configuration={},
+            creator=self.user,
+        )
+
+    def test_delete_chore_requires_permission(self):
+        url = reverse("chore_delete", kwargs={"pk": self.chore.id})
+        success = self.client.login(
+            email=self.user_no_permission.email, password="testpassword"
+        )
+        self.assertTrue(success)
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_delete_chore_with_permission(self):
+        url = reverse("chore_delete", kwargs={"pk": self.chore.id})
+        response = self.client.post(url, follow=True)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # Verify chore was actually deleted
+        with self.assertRaises(Chore.DoesNotExist):
+            Chore.objects.get(id=self.chore.id)

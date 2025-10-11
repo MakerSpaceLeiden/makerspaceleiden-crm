@@ -60,12 +60,13 @@ class Agenda(models.Model):
     endtime = models.TimeField(null=True)
 
     STATUS_CHOICES = [
+        ("help_wanted", "Help Wanted"),
         ("pending", "Pending"),
+        ("overdue", "Overdue"),
         ("in_progress", "In Progress"),
         ("completed", "Completed"),
         ("cancelled", "Cancelled"),
-        ("overdue", "Overdue"),
-        ("help_wanted", "Help Wanted"),
+        ("not_done", "Not Done"),
     ]
 
     chore = models.ForeignKey(Chore, null=True, blank=True, on_delete=models.CASCADE)
@@ -102,6 +103,13 @@ class Agenda(models.Model):
         if self.chore:
             return "chore"
         return "social"
+
+    @property
+    def intro(self) -> str:
+        if len(self.item_details) < 160:
+            return self.item_details
+
+        return self.item_details[:160] + "..."
 
     @property
     def display_status(self) -> str:
