@@ -177,10 +177,8 @@ class Checkout(models.Model):
         tx._change_reason = f"Sumpup; f{self.client_transaction_id}"
         tx.save()
 
-        fee = Money(
-            float(self.amount.amount) * settings.SUMUP_FEE_PERCENTAGE / 100, EUR
-        )
-        actual_amount = self.amount - fee
+        actual_amount = Money( float(self.amount.amount) / (1 + settings.SUMUP_FEE_PERCENTAGE / 100), EUR)
+        fee = self.amount - actual_amount
 
         txf = PettycashTransaction(
             src=self.member,
