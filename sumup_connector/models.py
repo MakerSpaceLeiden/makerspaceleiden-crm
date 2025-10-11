@@ -9,6 +9,7 @@ from djmoney.models.fields import MoneyField
 from djmoney.models.validators import MinMoneyValidator
 from moneyed import EUR, Money
 from simple_history.models import HistoricalRecords
+from django.contrib.sites.shortcuts import get_current_site
 
 from members.models import User
 from pettycash.models import PettycashTransaction
@@ -149,14 +150,14 @@ class Checkout(models.Model):
             self.client_transaction_id = reply["client_transaction_id"]
             self.state = "SUBMITTED"
 
-        except SumupError as e:
-            self.state = "ERROR"
-            if e["status_code"] == 422:
-                self.state = "FAILED"
-            logger.error(
-                f"transact({self.pk}) failed: {e} --  {e['status_code']} {e['message']}"
-            )
-            self.debug_note = e["json"]
+        # except SumupError as e:
+        #    self.state = "ERROR"
+        #    if e["status_code"] == 422:
+        #        self.state = "FAILED"
+        #    logger.error(
+        #        f"transact({self.pk}) failed: {e} --  {e['status_code']} {e['message']}"
+        #    )
+        #    self.debug_note = e["json"]
         except Exception as e:
             logger.error(f"transact({self.pk}) error: {e}")
             self.debug_note = e
@@ -210,8 +211,7 @@ class Checkout(models.Model):
         url = "".join(
             [
                 "https://",
-                # get_current_site(None).domain,
-                settings.SUMUP_HACK,
+                get_current_site(None).domain,
                 reverse(
                     "sumup-v1-callback",
                     kwargs={

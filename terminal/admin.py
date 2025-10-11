@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 
 class TerminalAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
-    list_display = ("accepted", "date", "used_at", "name", "fingerprint")
+    list_display = ("pk", "accepted", "date", "used_at", "name", "fingerprint")
     readonly_fields = ["fingerprint", "nonce", "date", "used_at"]
 
     def used_at(self, terminal):
