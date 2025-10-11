@@ -74,11 +74,18 @@ class AgendaManager(models.Manager):
             ).exists():
                 continue
 
+            # Ocurrence hours + minute is set to time of invocation
+            dt = occurrence.replace(
+                hour=parent.startdatetime.hour,
+                minute=parent.startdatetime.minute,
+                second=parent.startdatetime.second,
+            )
+
             agenda = Agenda.objects.create(
                 recurrence_parent=parent,
                 occurrence_date=occurrence.date(),
-                startdatetime=occurrence,
-                enddatetime=occurrence + duration,
+                startdatetime=dt,
+                enddatetime=dt + duration,
                 user=parent.user,
                 item_title=parent.item_title,
                 item_details=parent.item_details,
