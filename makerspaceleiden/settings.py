@@ -377,7 +377,7 @@ NODERED_URL = "http://localhost:1880"
 SUMUP_MERCHANT = "Mxxxxx"
 SUMUP_READER = "rdr_xxxxx"
 SUMUP_API_KEY = "sup_sk_xxxxx"
-SUMUP_FEE_PERCENTAGE = 2.5
+SUMUP_FEE_PERCENTAGE = 3.0
 SUMUP_NONCE = "xxx"  # At least 96 bits of entropy
 
 # Notification aliases

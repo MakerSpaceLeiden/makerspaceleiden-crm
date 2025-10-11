@@ -125,8 +125,8 @@ POT_ID = 63
 NONE_ID = 217
 
 # Increased; As per discussion with treasurer 2025-04-02
-#
-MAX_PAY_API = Money(35.00, EUR)
+#            again - for deposits 2025-10-07
+MAX_PAY_API = Money(55.00, EUR)
 MAX_PAY_CRM = Money(300.00, EUR)
 
 
@@ -143,3 +143,13 @@ OAUTH2_PROVIDER = {
     },
     "OIDC_RSA_PRIVATE_KEY": os.environ.get("OIDC_RSA_PRIVATE_KEY"),
 }
+
+SUMUP_MERCHANT = "M0JWH44Y"
+SUMUP_READER = "rdr_4H24YF5P2S9QVAM0YDH9576TV6"
+SUMUP_TERMINALS = [8472]
+# Try to prevent accidental git-commit/showing it with 'ps' as an
+# environment variable.
+with open("/etc/sumup/key") as f:
+    SUMUP_API_KEY = f.read().strip()
+with open("/etc/sumup/nonce") as f:
+    SUMUP_NONCE = f.read().strip()

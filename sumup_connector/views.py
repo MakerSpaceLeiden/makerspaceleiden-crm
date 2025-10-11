@@ -45,7 +45,7 @@ def email_fail(
 def api1_sumup_pay(request, terminal):
     if terminal.pk not in settings.SUMUP_TERMINALS:
         logger.error(
-            f"api1_sumup_pay: payment request from terminal #{terminal.pk} which is not in the list of SUMUP_TERMINALs"
+            f"api1_sumup_pay: payment request from terminal {terminal}, #{terminal.pk} which is not in the list of SUMUP_TERMINALs"
         )
         return HttpResponse("Bad request", status=400, content_type="text/plain")
 
@@ -58,7 +58,7 @@ def api1_sumup_pay(request, terminal):
         if f not in request.POST or len(request.POST.getlist(f)) != 1:
             logger.error(f"api1_sumup_pay: param {f} missing/not singular")
             return HttpResponse("Missing param", status=422, content_type="text/plain")
-        p[f] = "".request.POST.getlist(f)
+        p[f] = "".join(request.POST.getlist(f))
 
     try:
         member = User.objects.get(pk=p["userid"])
@@ -71,7 +71,7 @@ def api1_sumup_pay(request, terminal):
         checkout = Checkout(member=member, amount=amount, terminal=terminal)
         checkout.transact()
     except Exception as e:
-        logger.error(f"api1_sumup_pay could transact: {e}")
+        logger.error(f"api1_sumup_pay not could transact: {e}")
         return HttpResponse("Server error", status=500, content_type="text/plain")
 
     return HttpResponse("OK")

@@ -2,6 +2,7 @@ import hashlib
 import logging
 
 from django.conf import settings
+from django.contrib.sites.shortcuts import get_current_site
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
@@ -13,7 +14,7 @@ from simple_history.models import HistoricalRecords
 from members.models import User
 from pettycash.models import PettycashTransaction
 from pettycash.views import alertOwnersToChange
-from sumup_connector.sumupapi import SumupAPI, SumupError
+from sumup_connector.sumupapi import SumupAPI
 from terminal.models import Terminal
 
 logger = logging.getLogger(__name__)
@@ -149,14 +150,14 @@ class Checkout(models.Model):
             self.client_transaction_id = reply["client_transaction_id"]
             self.state = "SUBMITTED"
 
-        except SumupError as e:
-            self.state = "ERROR"
-            if e["status_code"] == 422:
-                self.state = "FAILED"
-            logger.error(
-                f"transact({self.pk}) failed: {e} --  {e['status_code']} {e['message']}"
-            )
-            self.debug_note = e["json"]
+        # except SumupError as e:
+        #    self.state = "ERROR"
+        #    if e["status_code"] == 422:
+        #        self.state = "FAILED"
+        #    logger.error(
+        #        f"transact({self.pk}) failed: {e} --  {e['status_code']} {e['message']}"
+        #    )
+        #    self.debug_note = e["json"]
         except Exception as e:
             logger.error(f"transact({self.pk}) error: {e}")
             self.debug_note = e
@@ -210,8 +211,7 @@ class Checkout(models.Model):
         url = "".join(
             [
                 "https://",
-                # get_current_site(None).domain,
-                settings.SUMUP_HACK,
+                get_current_site(None).domain,
                 reverse(
                     "sumup-v1-callback",
                     kwargs={
