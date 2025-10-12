@@ -12,6 +12,11 @@
 
 {% if checkout_items %}
     <div>
+    {% if demo %}
+	<font color="red">
+		<b>DEMO MODE</b> <i>All transactions are canceled by a second transaction just afterwards. Wether they transact with SumUP depends on the account setting and API/Merchant keys configured. </i>
+	</font>
+    {% endif %}
     <p>
 	<b>note:</b> <i>The transaction links require an admin login here and on sumup.</i>
     </p>
@@ -36,8 +41,7 @@
 	</tr>
 	<tr>
 		<td></td>
-		<td></td>
-        	<td>{{ item.member }}</td>
+		<td colspan=2>{{ item.member }}</td>
 		{% if item.settled_tx %}
 			<td>Deposited: <a href="{% url 'transactiondetail' item.settled_tx.pk %}">{{ item.settled_tx.amount }}</a></td>
 		{% endif %}

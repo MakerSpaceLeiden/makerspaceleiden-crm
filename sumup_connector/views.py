@@ -40,6 +40,7 @@ def email_fail(
             "args": args,
             "subject": subject,
             "merchant": settings.SUMUP_MERCHANT,
+            "demo": settings.SUMPUP_DEMO_MODE,
             "checkout": checkout,
         },
     )
@@ -72,6 +73,8 @@ def index(request):
         "form": form,
         "title": "Recent SumUP transactions",
         "checkout_items": Checkout.objects.all().filter(filter).order_by("-date"),
+        "merchant": settings.SUMUP_MERCHANT,
+        "demo": settings.SUMPUP_DEMO_MODE,
     }
     return render(request, "sumup/index.html", context)
 
