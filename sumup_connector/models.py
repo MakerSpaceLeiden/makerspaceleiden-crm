@@ -204,8 +204,17 @@ class Checkout(models.Model):
             tx,
             userThatMadeTheChange=self.member,
             template="sumup/email_deposit.txt",
-            context={"fee": fee, "actual_amount": actual_amount},
+            context={
+                "fee": fee,
+                "actual_amount": actual_amount,
+                "demo": settings.SUMPUP_DEMO_MODE,
+            },
         )
+
+        if settings.SUMPUP_DEMO_MODE:
+            # Revert the payments; to make testing easier.
+            tx.refund_booking("SumUP in demo mode, undoing deposit")
+            txf.refund_booking("SumUP in demo mode, refunding fee")
 
     def signed_callback_url(self):
         url = "".join(
