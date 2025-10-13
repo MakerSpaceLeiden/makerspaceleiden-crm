@@ -189,10 +189,10 @@ class Checkout(models.Model):
         self.settled_tx = tx
         self._change_reason = f"{self.client_transaction_id}/{self.pk} Complete; references for the deposit: {tx.pk}"
 
-        fee = Money(
-            float(self.amount.amount) * settings.SUMUP_FEE_PERCENTAGE / 100, EUR
+        actual_amount = Money(
+            float(self.amount.amount) / (1 + settings.SUMUP_FEE_PERCENTAGE / 100), EUR
         )
-        actual_amount = self.amount - fee
+        fee = self.amount - actual_amount
 
         txf = None
         if settings.SUMUP_FEE_PERCENTAGE != 0:
@@ -212,7 +212,6 @@ class Checkout(models.Model):
 
         self.transaction_id = transaction_id
         self.transaction_date = timestamp
-
         self.save()
 
         alertOwnersToChange(
