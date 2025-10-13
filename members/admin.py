@@ -6,7 +6,6 @@ from import_export.admin import ImportExportModelAdmin
 from simple_history.admin import SimpleHistoryAdmin
 
 from makerspaceleiden.admin import SimpleHistoryWithDeletedAdmin
-from search_admin_autocomplete.admin import SearchAutoCompleteAdmin
 
 from .models import AuditRecord, Tag, User
 
@@ -42,7 +41,6 @@ class TagResource(resources.ModelResource):
 
 class UserAdmin(
     ImportExportModelAdmin,
-    SearchAutoCompleteAdmin,
     BaseUserAdmin,
     SimpleHistoryWithDeletedAdmin,
 ):
@@ -102,7 +100,7 @@ class UserAdmin(
 admin.site.register(User, UserAdmin)
 
 
-class TagAdmin(ImportExportModelAdmin, SimpleHistoryAdmin, SearchAutoCompleteAdmin):
+class TagAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     list_display = ("tag", "owner", "last_used", "description")
     resource_class = TagResource
     search_fields = ["tag", "owner__first_name", "owner__last_name", "owner__email"]
