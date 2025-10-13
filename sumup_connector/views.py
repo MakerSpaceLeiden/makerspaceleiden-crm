@@ -4,7 +4,10 @@ from datetime import datetime, timedelta
 
 import dateutil
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from django.http import HttpResponse
+from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from moneyed import EUR, Money
 
@@ -12,6 +15,7 @@ from makerspaceleiden.mail import emailPlain, emails_for_group
 from members.models import User
 from terminal.decorators import is_paired_terminal
 
+from .forms import CheckoutsForm
 from .models import Checkout, gen_hash
 
 logger = logging.getLogger(__name__)
@@ -35,9 +39,44 @@ def email_fail(
             "error": error,
             "args": args,
             "subject": subject,
+            "merchant": settings.SUMUP_MERCHANT,
+            "demo": settings.SUMPUP_DEMO_MODE,
             "checkout": checkout,
         },
     )
+
+
+@login_required
+def index(request):
+    filter = Q(state="SUCCESSFUL")
+
+    if request.method == "POST":
+        form = CheckoutsForm(request.POST)
+        if form.is_valid():
+            f = form.cleaned_data
+            print(f)
+            if f["state"] == "1":
+                filter = Q(state="SUCCESSFUL") | Q(state="SUBMITTED")
+            elif f["state"] == "2":
+                filter = Q()
+            if f["from_date"]:
+                filter &= Q(date__gte=f["from_date"])
+            if f["until_date"]:
+                filter &= Q(date__lte=f["until_date"])
+            if f["user"]:
+                filter &= Q(member=f["user"])
+    else:
+        form = CheckoutsForm()
+    print(filter)
+
+    context = {
+        "form": form,
+        "title": "Recent SumUP transactions",
+        "checkout_items": Checkout.objects.all().filter(filter).order_by("-date"),
+        "merchant": settings.SUMUP_MERCHANT,
+        "demo": settings.SUMPUP_DEMO_MODE,
+    }
+    return render(request, "sumup/index.html", context)
 
 
 @csrf_exempt

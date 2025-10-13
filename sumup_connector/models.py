@@ -96,7 +96,16 @@ class Checkout(models.Model):
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
+        related_name="depositedBy",
         help_text="Actual settlement into the participants account (if any)",
+    )
+    fee_tx = models.ForeignKey(
+        PettycashTransaction,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name="feeFor",
+        help_text="Fee for this transaction (if any)",
     )
 
     debug_note = models.JSONField(
@@ -174,38 +183,53 @@ class Checkout(models.Model):
             amount=self.amount,
             description=f"Sumup deposit at {self.terminal.name}, {self.client_transaction_id}",
         )
-        tx._change_reason = f"Sumpup; f{self.client_transaction_id}"
+        tx._change_reason = f"Sumup; f{self.client_transaction_id}"
         tx.save()
+
+        self.settled_tx = tx
+        self._change_reason = f"{self.client_transaction_id}/{self.pk} Complete; references for the deposit: {tx.pk}"
 
         actual_amount = Money(
             float(self.amount.amount) / (1 + settings.SUMUP_FEE_PERCENTAGE / 100), EUR
         )
         fee = self.amount - actual_amount
 
-        txf = PettycashTransaction(
-            src=self.member,
-            dst=User.objects.get(id=settings.POT_ID),
-            amount=fee,
-            description=f"Transaction fee {self.client_transaction_id}, #{tx.pk}",
-        )
-        txf._change_reason = f"Sumpup fee; f{self.client_transaction_id}"
-        txf.save()
+        txf = None
+        if settings.SUMUP_FEE_PERCENTAGE != 0:
+            txf = PettycashTransaction(
+                src=self.member,
+                dst=User.objects.get(id=settings.POT_ID),
+                amount=fee,
+                description=f"Transaction fee {self.client_transaction_id}, #{tx.pk}",
+            )
+            txf._change_reason = f"Sumpup fee; f{self.client_transaction_id}"
+            txf.save()
+
+            self.fee_tx = txf
+            self._change_reason = self._change_reason + f" and fee: {txf.pk}"
 
         self.state = "SUCCESSFUL"
-        self.settled_tx = tx
 
         self.transaction_id = transaction_id
         self.transaction_date = timestamp
-        self._change_reason = f"{self.client_transaction_id}/{self.pk} Complete; references for the deposit: {tx.pk} and fee: {txf.pk}"
-
         self.save()
 
         alertOwnersToChange(
             tx,
             userThatMadeTheChange=self.member,
             template="sumup/email_deposit.txt",
-            context={"fee": fee, "actual_amount": actual_amount},
+            context={
+                "fee": fee,
+                "actual_amount": actual_amount,
+                "demo": settings.SUMPUP_DEMO_MODE,
+            },
         )
+
+        if settings.SUMPUP_DEMO_MODE:
+            # Revert the payments; to make testing easier.
+            tx.refund_booking("SumUP in demo mode, undoing deposit")
+            if txf is not None:
+                txf.refund_booking("SumUP in demo mode, refunding fee")
 
     def signed_callback_url(self):
         url = "".join(

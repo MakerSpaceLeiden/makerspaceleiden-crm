@@ -12,7 +12,14 @@ class SumupError(Exception):
     def __init__(self, r, message):
         super().__init__(message)
         self.reason = str(message)
-        self.json = {"status_code": "000", "message": str(message), "reason": message}
+        try:
+            self.json = {
+                "status_code": "000",
+                "message": str(message),
+                "reason": message,
+            }
+        except Exception:
+            self.json = {}
         if r is not None:
             self.json["url"] = r.url
             if r.status_code:
@@ -42,9 +49,10 @@ class SumupAPI:
         try:
             r = requests.get(url, headers=self.headers)
             r.raise_for_status()
+            return r.json()
         except Exception as e:
             raise SumupError(r, e)
-        return r.json()
+        return None
 
     def POST(self, path, postdata):
         url = self.URL + path

@@ -1,4 +1,9 @@
 Subject: [makerbot] Sumup deposit for {{ tx.amount }} -- {{ label }}
+{% if demo %}
+ * DEMO mode - this transaction is for demo purposes; it should be
+ * followed by two more transactions/refunds that cancel out this
+ * deposit. If not - alert the {{ settings.TRUSTEES }}.
+{% endif %}
 L.S.
 
 Just to let you know; we recorded the following despoit into

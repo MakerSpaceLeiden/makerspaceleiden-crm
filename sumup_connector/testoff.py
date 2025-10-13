@@ -15,7 +15,9 @@
         in a webserver on the internet side to map things through
 """
 
-from datetime import datetime
+import datetime
+import secrets
+import time
 
 from django.contrib.sites.models import Site
 from moneyed import EUR, Money
@@ -45,11 +47,22 @@ if terminal is None:
 
 amount = Money(10.00, EUR)
 
-try:
-    print(f"Payment by {member} on terminal {terminal} of {amount} send to sumup Solo")
-    checkout = Checkout(member=member, amount=amount, terminal=terminal)
-    checkout.transact()
-    print("Done!")
+print(f"Payment by {member} on terminal {terminal} of {amount} send to sumup Solo")
 
-except Exception as e:
-    print(f"Submit failed\n\t{e}")
+checkout = Checkout(member=member, amount=amount, terminal=terminal)
+checkout.transact()
+checkout.deposit(
+    timestamp=datetime.datetime.now(), transaction_id=secrets.token_urlsafe(16)
+)
+time.sleep(60)
+
+checkout.deposit()
+checkout = Checkout(member=member, amount=amount, terminal=terminal)
+checkout.transact()
+checkout.deposit(
+    timestamp=datetime.datetime.now(), transaction_id=secrets.token_urlsafe(16)
+)
+time.sleep(60)
+
+checkout = Checkout(member=member, amount=amount, terminal=terminal)
+checkout.transact()

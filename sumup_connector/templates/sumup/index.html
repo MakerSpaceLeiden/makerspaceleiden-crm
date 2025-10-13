@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% load static %}
+
+<head>
+    <link rel="stylesheet" type="text/css" href="{% block stylesheet_motd %}{% static "motd/css/styles.css" %}{% endblock %}">
+</head>
+
+{% block content %}
+
+{{ form.media.css }}
+{{ form.media.js }}
+
+{% if checkout_items %}
+    <div>
+    {% if demo %}
+	<font color="red">
+		<b>DEMO MODE</b> <i>All transactions are canceled by a second transaction just afterwards. Wether they transact with SumUP depends on the account setting and API/Merchant keys configured. </i>
+	</font>
+    {% endif %}
+    <p>
+	<b>note:</b> <i>The transaction links require an admin login here and on sumup.</i>
+    </p>
+    <table>
+    {% for item in checkout_items %}
+	<tr>
+        	<td>
+		<!-- could add an if admins.. -->
+		<a href="{% url 'admin:sumup_connector_checkout_change' item.pk %} ">{{ item.pk }}</a>
+        	<td>{{ item.date }}</td>
+        	<td>{{ item.state }}</td>
+        	<td style="
+			{% if item.state != 'SUCCESSFUL' %}
+				text-decoration: line-through;
+				color: grey;
+			{% endif %}
+		">
+			{{ item.amount }}
+		</td>
+		<td>
+			<a href="https://sales-receipt.sumup.com/pos/public/v1/{{ merchant }}/receipt/transaction:{{ item.transaction_id }}?format=html">{{ item.client_transaction_id }}</td>
+	</tr>
+	<tr>
+		<td></td>
+		<td colspan=2>{{ item.member }}</td>
+		{% if item.settled_tx %}
+			<td>Deposited: <a href="{% url 'transactiondetail' item.settled_tx.pk %}">{{ item.settled_tx.amount }}</a></td>
+		{% endif %}
+		{% if item.fee_tx %}
+			<td>Fee: <a href="{% url 'transactiondetail' item.fee_tx.pk %}">{{ item.fee_tx.amount }}</a></td>
+		{% endif %}
+	</tr>
+    {% endfor %}
+    </table>
+    </div>
+</div>
+{% else %}
+	No transactions. Sorry.
+	<hr/>
+{% endif %}
+
+<form method="post">
+  {% csrf_token %}
+
+  <!-- Display validation errors -->
+  {% if form.errors %}
+  <div class="alert alert-danger" role="alert">
+    Please correct the following:
+    <ul>
+      {% for field, error_list in form.errors.items %}
+        {% for error in error_list %}
+          <li> {{ error }}</li>
+        {% endfor %}
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  <blockquote>
+  <h2>Filter transactions</h2>
+  <table>
+    {{ form.as_table }}
+    <tr><td></td><td><input type="submit" value="Apply filter"/></td></tr>
+  </table>
+  </blockquote>
+</form>
+
+{% endblock content %}

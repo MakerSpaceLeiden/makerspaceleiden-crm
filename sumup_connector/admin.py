@@ -19,6 +19,7 @@ class CheckoutAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
         "transaction_id",
         "transaction_date",
         "settled_tx",
+        "fee_tx",
     ]
 
     # history_list_display = ["changed_fields","list_changes"]

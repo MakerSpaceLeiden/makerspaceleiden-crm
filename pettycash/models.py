@@ -215,7 +215,7 @@ class PettycashTransaction(models.Model):
         except Exception as e:
             logger.error("Transaction cache failure on update post delete: %s" % (e))
 
-    def refund_booking(self):
+    def refund_booking(self, reason="Refund"):
         """
         Refund a booking by doing a new 'reverse' booking, this way all amounts stay positive
         """
@@ -224,7 +224,7 @@ class PettycashTransaction(models.Model):
         new_transaction.dst = self.src
         new_transaction.amount = self.amount
         new_transaction.description = "refund %s (%d)" % (self.description, self.pk)
-        new_transaction._change_reason = "Refund"
+        new_transaction._change_reason = reason
         new_transaction.save()
 
     def save(self, *args, **kwargs):
