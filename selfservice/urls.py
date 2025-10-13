@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.urls import include, path, re_path
+from django.urls import include, path
 
 from . import views
 
@@ -53,9 +53,7 @@ urlpatterns = [
         name="confirm_email",
     ),
     # for the password reset by email.
-    re_path(
-        "^registration/", include("django.contrib.auth.urls"), name="password_reset"
-    ),
+    path("registration/", include("django.contrib.auth.urls"), name="password_reset"),
 ]
 
 if settings.GRAND_AMNESTY:

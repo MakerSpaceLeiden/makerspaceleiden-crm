@@ -9,11 +9,9 @@ from .models import Mailinglist, Subscription
 logger = logging.getLogger(__name__)
 
 
+@admin.register(Mailinglist)
 class MailinglistAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     pass
-
-
-admin.site.register(Mailinglist, MailinglistAdmin)
 
 
 def subscribe_selected(modeladmin, request, queryset):
@@ -34,9 +32,7 @@ def unsubscribe_selected(modeladmin, request, queryset):
 unsubscribe_selected.short_description = "Deactivate selected"
 
 
+@admin.register(Subscription)
 class SubscriptionAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     list_display = ("mailinglist", "member", "active", "digest")
     actions = [subscribe_selected, unsubscribe_selected]
-
-
-admin.site.register(Subscription, SubscriptionAdmin)
