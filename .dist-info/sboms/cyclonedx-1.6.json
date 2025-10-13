@@ -350,6 +350,44 @@
       "version": "0.7.0"
     },
     {
+      "bom-ref": "anyio==4.11.0",
+      "description": "High-level concurrency and networking framework on top of asyncio or Trio",
+      "externalReferences": [
+        {
+          "comment": "from packaging metadata Project-URL: Documentation",
+          "type": "documentation",
+          "url": "https://anyio.readthedocs.io/en/latest/"
+        },
+        {
+          "comment": "from packaging metadata Project-URL: Issue tracker",
+          "type": "issue-tracker",
+          "url": "https://github.com/agronholm/anyio/issues"
+        },
+        {
+          "comment": "from packaging metadata Project-URL: Source code",
+          "type": "other",
+          "url": "https://github.com/agronholm/anyio"
+        },
+        {
+          "comment": "from packaging metadata Project-URL: Changelog",
+          "type": "release-notes",
+          "url": "https://anyio.readthedocs.io/en/stable/versionhistory.html"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "acknowledgement": "declared",
+            "id": "MIT"
+          }
+        }
+      ],
+      "name": "anyio",
+      "purl": "pkg:pypi/anyio@4.11.0",
+      "type": "library",
+      "version": "4.11.0"
+    },
+    {
       "bom-ref": "asgiref==3.9.1",
       "description": "ASGI specs, helper code, and adapters",
       "externalReferences": [
@@ -1592,6 +1630,112 @@
       "version": "23.0.0"
     },
     {
+      "bom-ref": "h11==0.16.0",
+      "description": "A pure-Python, bring-your-own-I/O implementation of HTTP/1.1",
+      "externalReferences": [
+        {
+          "comment": "from packaging metadata: Home-page",
+          "type": "website",
+          "url": "https://github.com/python-hyper/h11"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "acknowledgement": "declared",
+            "id": "MIT"
+          }
+        }
+      ],
+      "name": "h11",
+      "purl": "pkg:pypi/h11@0.16.0",
+      "type": "library",
+      "version": "0.16.0"
+    },
+    {
+      "bom-ref": "httpcore==1.0.9",
+      "description": "A minimal low-level HTTP client.",
+      "externalReferences": [
+        {
+          "comment": "from packaging metadata Project-URL: Documentation",
+          "type": "documentation",
+          "url": "https://www.encode.io/httpcore"
+        },
+        {
+          "comment": "from packaging metadata Project-URL: Source",
+          "type": "other",
+          "url": "https://github.com/encode/httpcore"
+        },
+        {
+          "comment": "from packaging metadata Project-URL: Homepage",
+          "type": "website",
+          "url": "https://www.encode.io/httpcore/"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "acknowledgement": "declared",
+            "id": "BSD-3-Clause"
+          }
+        }
+      ],
+      "name": "httpcore",
+      "purl": "pkg:pypi/httpcore@1.0.9",
+      "type": "library",
+      "version": "1.0.9"
+    },
+    {
+      "bom-ref": "httpx==0.28.1",
+      "description": "The next generation HTTP client.",
+      "externalReferences": [
+        {
+          "comment": "from packaging metadata Project-URL: Documentation",
+          "type": "documentation",
+          "url": "https://www.python-httpx.org"
+        },
+        {
+          "comment": "from packaging metadata Project-URL: Source",
+          "type": "other",
+          "url": "https://github.com/encode/httpx"
+        },
+        {
+          "comment": "from packaging metadata Project-URL: Changelog",
+          "type": "release-notes",
+          "url": "https://github.com/encode/httpx/blob/master/CHANGELOG.md"
+        },
+        {
+          "comment": "from packaging metadata Project-URL: Homepage",
+          "type": "website",
+          "url": "https://github.com/encode/httpx"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "acknowledgement": "declared",
+            "id": "BSD-3-Clause"
+          }
+        },
+        {
+          "license": {
+            "acknowledgement": "declared",
+            "name": "License :: OSI Approved :: BSD License"
+          }
+        }
+      ],
+      "name": "httpx",
+      "properties": [
+        {
+          "name": "cdx:python:package:required-extra",
+          "value": "http2"
+        }
+      ],
+      "purl": "pkg:pypi/httpx@0.28.1",
+      "type": "library",
+      "version": "0.28.1"
+    },
+    {
       "bom-ref": "hyperlink==21.0.0",
       "description": "A featureful, immutable, and correct URL for Python.",
       "externalReferences": [
@@ -1926,6 +2070,57 @@
       "purl": "pkg:pypi/lxml@5.4.0",
       "type": "library",
       "version": "5.4.0"
+    },
+    {
+      "bom-ref": "markdown-it-py==4.0.0",
+      "description": "Python port of markdown-it. Markdown parsing, done right!",
+      "externalReferences": [
+        {
+          "comment": "from packaging metadata Project-URL: Documentation",
+          "type": "documentation",
+          "url": "https://markdown-it-py.readthedocs.io"
+        },
+        {
+          "comment": "from packaging metadata Project-URL: Homepage",
+          "type": "website",
+          "url": "https://github.com/executablebooks/markdown-it-py"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "acknowledgement": "declared",
+            "id": "MIT"
+          }
+        }
+      ],
+      "name": "markdown-it-py",
+      "purl": "pkg:pypi/markdown-it-py@4.0.0",
+      "type": "library",
+      "version": "4.0.0"
+    },
+    {
+      "bom-ref": "mdurl==0.1.2",
+      "description": "Markdown URL utilities",
+      "externalReferences": [
+        {
+          "comment": "from packaging metadata Project-URL: Homepage",
+          "type": "website",
+          "url": "https://github.com/executablebooks/mdurl"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "acknowledgement": "declared",
+            "id": "MIT"
+          }
+        }
+      ],
+      "name": "mdurl",
+      "purl": "pkg:pypi/mdurl@0.1.2",
+      "type": "library",
+      "version": "0.1.2"
     },
     {
       "bom-ref": "mypy==1.17.0",
@@ -3076,6 +3271,34 @@
       "version": "2.32.4"
     },
     {
+      "bom-ref": "rich==14.2.0",
+      "description": "Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal",
+      "externalReferences": [
+        {
+          "comment": "from packaging metadata Project-URL: Documentation",
+          "type": "documentation",
+          "url": "https://rich.readthedocs.io/en/latest/"
+        },
+        {
+          "comment": "from packaging metadata Project-URL: Homepage",
+          "type": "website",
+          "url": "https://github.com/Textualize/rich"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "acknowledgement": "declared",
+            "id": "MIT"
+          }
+        }
+      ],
+      "name": "rich",
+      "purl": "pkg:pypi/rich@14.2.0",
+      "type": "library",
+      "version": "14.2.0"
+    },
+    {
       "bom-ref": "robohash==2.0",
       "description": "One of the leading robot-based hashing tools on the web",
       "externalReferences": [
@@ -3309,6 +3532,53 @@
       "version": "1.17.0"
     },
     {
+      "bom-ref": "sniffio==1.3.1",
+      "description": "Sniff out which async library your code is running under",
+      "evidence": {
+        "licenses": [
+          {
+            "license": {
+              "acknowledgement": "declared",
+              "id": "MIT"
+            }
+          },
+          {
+            "license": {
+              "acknowledgement": "declared",
+              "name": "License :: OSI Approved :: Apache Software License"
+            }
+          }
+        ]
+      },
+      "externalReferences": [
+        {
+          "comment": "from packaging metadata Project-URL: Documentation",
+          "type": "documentation",
+          "url": "https://sniffio.readthedocs.io/"
+        },
+        {
+          "comment": "from packaging metadata Project-URL: Changelog",
+          "type": "release-notes",
+          "url": "https://sniffio.readthedocs.io/en/latest/history.html"
+        },
+        {
+          "comment": "from packaging metadata Project-URL: Homepage",
+          "type": "website",
+          "url": "https://github.com/python-trio/sniffio"
+        }
+      ],
+      "licenses": [
+        {
+          "acknowledgement": "declared",
+          "expression": "MIT OR Apache-2.0"
+        }
+      ],
+      "name": "sniffio",
+      "purl": "pkg:pypi/sniffio@1.3.1",
+      "type": "library",
+      "version": "1.3.1"
+    },
+    {
       "bom-ref": "sqlparse==0.5.3",
       "description": "A non-validating SQL parser.",
       "externalReferences": [
@@ -3350,6 +3620,39 @@
       "purl": "pkg:pypi/sqlparse@0.5.3",
       "type": "library",
       "version": "0.5.3"
+    },
+    {
+      "bom-ref": "sumup==0.0.10",
+      "description": "Official Python SDK for the SumUp API.",
+      "externalReferences": [
+        {
+          "comment": "from packaging metadata Project-URL: Issues",
+          "type": "issue-tracker",
+          "url": "https://github.com/sumup/sumup-py/issues"
+        },
+        {
+          "comment": "from packaging metadata Project-URL: Source Code",
+          "type": "other",
+          "url": "https://github.com/sumup/sumup-py"
+        },
+        {
+          "comment": "from packaging metadata Project-URL: Homepage",
+          "type": "website",
+          "url": "https://github.com/sumup/sumup-py"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "acknowledgement": "declared",
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "name": "sumup",
+      "purl": "pkg:pypi/sumup@0.0.10",
+      "type": "library",
+      "version": "0.0.10"
     },
     {
       "bom-ref": "tablib==3.8.0",
@@ -3899,6 +4202,7 @@
         "constantly==23.10.4",
         "coverage==7.10.0",
         "cryptography==45.0.5",
+        "httpx==0.28.1",
         "hyperlink==21.0.0",
         "idna==3.10",
         "incremental==24.7.2",
@@ -3915,6 +4219,14 @@
         "typing_extensions==4.14.1"
       ],
       "ref": "annotated-types==0.7.0"
+    },
+    {
+      "dependsOn": [
+        "idna==3.10",
+        "sniffio==1.3.1",
+        "typing_extensions==4.14.1"
+      ],
+      "ref": "anyio==4.11.0"
     },
     {
       "dependsOn": [
@@ -4208,6 +4520,29 @@
       "ref": "gunicorn==23.0.0"
     },
     {
+      "ref": "h11==0.16.0"
+    },
+    {
+      "dependsOn": [
+        "anyio==4.11.0",
+        "certifi==2025.7.14",
+        "h11==0.16.0"
+      ],
+      "ref": "httpcore==1.0.9"
+    },
+    {
+      "dependsOn": [
+        "Pygments==2.19.2",
+        "anyio==4.11.0",
+        "certifi==2025.7.14",
+        "click==7.1.2",
+        "httpcore==1.0.9",
+        "idna==3.10",
+        "rich==14.2.0"
+      ],
+      "ref": "httpx==0.28.1"
+    },
+    {
       "dependsOn": [
         "idna==3.10"
       ],
@@ -4267,6 +4602,20 @@
     },
     {
       "ref": "lxml==5.4.0"
+    },
+    {
+      "dependsOn": [
+        "PyYAML==6.0.2",
+        "coverage==7.10.0",
+        "mdurl==0.1.2",
+        "pytest-cov==6.2.1",
+        "pytest==8.4.1",
+        "requests==2.32.4"
+      ],
+      "ref": "markdown-it-py==4.0.0"
+    },
+    {
+      "ref": "mdurl==0.1.2"
     },
     {
       "dependsOn": [
@@ -4486,6 +4835,13 @@
     },
     {
       "dependsOn": [
+        "Pygments==2.19.2",
+        "markdown-it-py==4.0.0"
+      ],
+      "ref": "rich==14.2.0"
+    },
+    {
+      "dependsOn": [
         "natsort==8.4.0",
         "pillow==10.4.0"
       ],
@@ -4528,7 +4884,18 @@
       "ref": "six==1.17.0"
     },
     {
+      "ref": "sniffio==1.3.1"
+    },
+    {
       "ref": "sqlparse==0.5.3"
+    },
+    {
+      "dependsOn": [
+        "httpx==0.28.1",
+        "pydantic==2.11.7",
+        "typing_extensions==4.14.1"
+      ],
+      "ref": "sumup==0.0.10"
     },
     {
       "dependsOn": [
