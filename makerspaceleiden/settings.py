@@ -39,7 +39,6 @@ INSTALLED_APPS = [
     "daphne",
     "import_export",
     "simple_history",
-    "search_admin_autocomplete.apps.SearchAdminAutocompleteConfig",
     "qr_code",
     "djmoney",
     "makerspaceleiden",
