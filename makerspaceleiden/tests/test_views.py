@@ -5,11 +5,19 @@ from http import HTTPStatus
 import pytest
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.signing import TimestampSigner
 from django.test import Client, TestCase, override_settings
+from django.test.client import RequestFactory
 
 from makerspaceleiden.utils import derive_initials
 
 User = get_user_model()
+
+
+def generate_signed_url(req):
+    signer = TimestampSigner()
+    signed_val = signer.sign(req.path)
+    return req.build_absolute_uri(signed_val)
 
 
 class MakerspaceleidenTest(TestCase):
@@ -65,8 +73,8 @@ class ProtectedMediaViewTest(TestCase):
         self._create_users()
         self._create_test_files()
 
-    def tearDown(self):
-        self._cleanup_files()
+    # def tearDown(self):
+    #     self._cleanup_files()
 
     def _create_users(self):
         """Create test users with different permission levels"""
@@ -161,6 +169,24 @@ class ProtectedMediaViewTest(TestCase):
                     self.assertEqual(
                         self._get_file_content(response), self.test_content
                     )
+
+    # Signed URL Tests
+    def test_signed_url(self):
+        """Signed URL should work"""
+        with override_settings(
+            MEDIA_ROOT=self.temp_media_dir,
+            MEDIA_URL="/media/",
+        ):
+            url = "/media/test_file.txt"
+
+            factory = RequestFactory()
+            req = factory.get(url)
+            signed_url = generate_signed_url(req)
+
+            response = self.client.get(signed_url)
+
+            self.assertEqual(response.status_code, HTTPStatus.OK)
+            self.assertEqual(self._get_file_content(response), self.test_content)
 
     # Bearer Token Tests
     def test_bearer_token_x_header(self):

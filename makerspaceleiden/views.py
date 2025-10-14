@@ -26,7 +26,10 @@ class MySimpleHistoryAdmin(SimpleHistoryAdmin):
 
 
 @login_or_bearer_required
-def protected_media(request, path):
+def protected_media(request, path: str):
+    if hasattr(request, "msl_unsigned_path"):
+        path = request.msl_unsigned_path.lstrip(settings.MEDIA_URL)
+
     return static_serve(request, path, settings.MEDIA_ROOT)
 
 

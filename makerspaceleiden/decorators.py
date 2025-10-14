@@ -1,8 +1,10 @@
 import logging
 import re
 from functools import wraps
+from http import HTTPStatus
 
 from django.conf import settings
+from django.core.signing import BadSignature, SignatureExpired, TimestampSigner
 from django.http import HttpResponse
 
 HEADER = "HTTP_X_BEARER"
@@ -68,11 +70,18 @@ def superuser_or_bearer_required(function):
 def login_or_bearer_required(function):
     @wraps(function)
     def wrap(request, *args, **kwargs):
-        if (
-            request.user
-            and not request.user.is_anonymous
-            or is_superuser_or_bearer(request)
-        ):
+        signer = TimestampSigner()
+        ## Signed URLs always have access
+        try:
+            unsigned = signer.unsign(request.path, max_age=3600)  # 1hr expiry
+            ## Passing the unsigned URL to the function
+            request.msl_unsigned_path = unsigned
+            return function(request, *args, **kwargs)
+
+        except (SignatureExpired, BadSignature):
+            return HttpResponse("Invalid/expired link", status=HTTPStatus.GONE)
+
+        if request.user or is_superuser_or_bearer(request):
             return function(request, *args, **kwargs)
 
         # Quell some odd 'code 400, message Bad request syntax ('tag=1-2-3-4')'
