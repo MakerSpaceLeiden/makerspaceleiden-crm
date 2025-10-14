@@ -83,7 +83,11 @@ def login_or_bearer_required(function):
         except BadSignature:
             pass
 
-        if request.user or is_superuser_or_bearer(request):
+        if (
+            request.user
+            and not request.user.is_anonymous
+            or is_superuser_or_bearer(request)
+        ):
             return function(request, *args, **kwargs)
 
         # Quell some odd 'code 400, message Bad request syntax ('tag=1-2-3-4')'

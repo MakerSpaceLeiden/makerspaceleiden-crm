@@ -3,9 +3,10 @@ import tempfile
 from http import HTTPStatus
 
 import pytest
+import time_machine
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.core.signing import TimestampSigner
+from django.core.signing import TimestampSigner, datetime
 from django.test import Client, TestCase, override_settings
 from django.test.client import RequestFactory
 
@@ -171,7 +172,7 @@ class ProtectedMediaViewTest(TestCase):
                     )
 
     # Signed URL Tests
-    def test_signed_url(self):
+    def test_signed_url_valid(self):
         """Signed URL should work"""
         with override_settings(
             MEDIA_ROOT=self.temp_media_dir,
@@ -187,6 +188,47 @@ class ProtectedMediaViewTest(TestCase):
 
             self.assertEqual(response.status_code, HTTPStatus.OK)
             self.assertEqual(self._get_file_content(response), self.test_content)
+
+    def test_signed_url_invalid_signature(self):
+        """Signed URL should be invalid"""
+        with override_settings(
+            MEDIA_ROOT=self.temp_media_dir,
+            MEDIA_URL="/media/",
+        ):
+            url = "/media/test_file.txt"
+
+            factory = RequestFactory()
+            req = factory.get(url)
+            signed_url = generate_signed_url(req)
+
+            response = self.client.get(signed_url + "broken-sig")
+
+            self.assertEqual(response.status_code, HTTPStatus.FORBIDDEN)
+
+    def test_signed_url_expired(self):
+        """Signed URLs should expire"""
+        with override_settings(
+            MEDIA_ROOT=self.temp_media_dir,
+            MEDIA_URL="/media/",
+        ):
+            with time_machine.travel("2023-01-01") as traveller:
+                url = "/media/test_file.txt"
+
+                factory = RequestFactory()
+                req = factory.get(url)
+                signed_url = generate_signed_url(req)
+
+                response = self.client.get(signed_url)
+
+                self.assertEqual(response.status_code, HTTPStatus.OK)
+                self.assertEqual(self._get_file_content(response), self.test_content)
+
+                # Wait for the URL to expire
+                traveller.shift(datetime.timedelta(hours=2))
+
+                response = self.client.get(signed_url)
+
+                self.assertEqual(response.status_code, HTTPStatus.GONE)
 
     # Bearer Token Tests
     def test_bearer_token_x_header(self):
