@@ -78,8 +78,10 @@ def login_or_bearer_required(function):
             request.msl_unsigned_path = unsigned
             return function(request, *args, **kwargs)
 
-        except (SignatureExpired, BadSignature):
+        except SignatureExpired:
             return HttpResponse("Invalid/expired link", status=HTTPStatus.GONE)
+        except BadSignature:
+            pass
 
         if request.user or is_superuser_or_bearer(request):
             return function(request, *args, **kwargs)
