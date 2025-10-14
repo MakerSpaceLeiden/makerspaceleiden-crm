@@ -7,6 +7,7 @@ import re
 import sys
 
 import cryptography
+from django.core.signing import TimestampSigner
 from django.http import HttpResponse
 from dynamic_filenames import FilePattern
 from jsonschema import validate
@@ -126,3 +127,9 @@ pattern = re.compile("^(a|e)l( |-)|van der|van|de|ten", re.IGNORECASE)
 def derive_initials(first_name, last_name):
     normalized_last_name = re.sub(pattern, "", last_name).strip()
     return (first_name[:1] + normalized_last_name[:1]).upper()
+
+
+def generate_signed_url(req: str):
+    signer = TimestampSigner()
+    signed_val = signer.sign(req)
+    return signed_val

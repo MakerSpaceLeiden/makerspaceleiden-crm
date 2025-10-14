@@ -6,19 +6,13 @@ import pytest
 import time_machine
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.core.signing import TimestampSigner, datetime
+from django.core.signing import datetime
 from django.test import Client, TestCase, override_settings
 from django.test.client import RequestFactory
 
-from makerspaceleiden.utils import derive_initials
+from makerspaceleiden.utils import derive_initials, generate_signed_url
 
 User = get_user_model()
-
-
-def generate_signed_url(req):
-    signer = TimestampSigner()
-    signed_val = signer.sign(req.path)
-    return req.build_absolute_uri(signed_val)
 
 
 class MakerspaceleidenTest(TestCase):
@@ -178,12 +172,9 @@ class ProtectedMediaViewTest(TestCase):
             MEDIA_ROOT=self.temp_media_dir,
             MEDIA_URL="/media/",
         ):
-            url = "/media/test_file.txt"
-
             factory = RequestFactory()
-            req = factory.get(url)
-            signed_url = generate_signed_url(req)
-
+            req = factory.get("/media/test_file.txt")
+            signed_url = generate_signed_url(req.get_full_path())
             response = self.client.get(signed_url)
 
             self.assertEqual(response.status_code, HTTPStatus.OK)
@@ -195,12 +186,9 @@ class ProtectedMediaViewTest(TestCase):
             MEDIA_ROOT=self.temp_media_dir,
             MEDIA_URL="/media/",
         ):
-            url = "/media/test_file.txt"
-
             factory = RequestFactory()
-            req = factory.get(url)
-            signed_url = generate_signed_url(req)
-
+            req = factory.get("/media/test_file.txt")
+            signed_url = generate_signed_url(req.get_full_path())
             response = self.client.get(signed_url + "broken-sig")
 
             self.assertEqual(response.status_code, HTTPStatus.FORBIDDEN)
@@ -212,11 +200,9 @@ class ProtectedMediaViewTest(TestCase):
             MEDIA_URL="/media/",
         ):
             with time_machine.travel("2023-01-01") as traveller:
-                url = "/media/test_file.txt"
-
                 factory = RequestFactory()
-                req = factory.get(url)
-                signed_url = generate_signed_url(req)
+                req = factory.get("/media/test_file.txt")
+                signed_url = generate_signed_url(req.get_full_path())
 
                 response = self.client.get(signed_url)
 
