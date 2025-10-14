@@ -1,5 +1,6 @@
 import json
 from datetime import date, datetime, time, timezone
+from unittest.mock import patch
 
 import time_machine
 from django.contrib.auth.models import Permission
@@ -218,7 +219,11 @@ class MembersApiTests(TestCase):
         response = client.get("/api/v1/members/")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_members_list_returns_200_for_authed(self):
+    @patch("api.serializers.generate_signed_url")
+    def test_members_list_returns_200_for_authed(self, mock_generate_signed_url):
+        # Mock generate_signed_url to return the input URL unchanged for testing
+        mock_generate_signed_url.side_effect = lambda url: url
+
         client = APIClient()
         self.assertIs(client.login(email=self.user.email, password=self.password), True)
         response = client.get("/api/v1/members/")

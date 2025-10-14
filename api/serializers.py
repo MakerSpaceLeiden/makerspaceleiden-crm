@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from acl.models import Location, Machine
 from agenda.models import Agenda
+from makerspaceleiden.utils import generate_signed_url
 from members.models import User
 from servicelog.models import Servicelog
 
@@ -74,15 +75,17 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         ]
 
     def get_image(self, obj):
-        return self.context["request"].build_absolute_uri(obj.image_url("thumbnail"))
+        return self.context["request"].build_absolute_uri(
+            generate_signed_url(obj.image_url("thumbnail"))
+        )
 
     def get_images(self, obj):
         return {
             "original": self.context["request"].build_absolute_uri(
-                obj.image_url("original")
+                generate_signed_url(obj.image_url("original"))
             ),
             "thumbnail": self.context["request"].build_absolute_uri(
-                obj.image_url("thumbnail")
+                generate_signed_url(obj.image_url("thumbnail")),
             ),
         }
 
