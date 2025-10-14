@@ -6,6 +6,7 @@ from io import BytesIO
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
+from django.core.signing import SignatureExpired, TimestampSigner
 from django.http import Http404, HttpResponse
 from django.views.decorators.cache import cache_control
 from robohash import Robohash
@@ -18,18 +19,14 @@ DEFAULT_ROBOHASH_SET = "set1"
 DEFAULT_ROBOHASH_COLOR = "red"
 DEFAULT_CACHE_DIR = "avatar_cache"
 
+# Get avatar settings
+avatar_settings = getattr(settings, "AVATAR", {})
 
-@login_or_bearer_required
-@cache_control(max_age=86400)  # Cache for 24 hours in browser
-def index(request, pk=None):
-    if not pk:
-        pk = uuid.uuid4().hex[:16]
+# Define the file path for caching
+cache_dir = avatar_settings.get("CACHE_DIR", DEFAULT_CACHE_DIR)
 
-    # Get avatar settings
-    avatar_settings = getattr(settings, "AVATAR", {})
 
-    # Define the file path for caching
-    cache_dir = avatar_settings.get("CACHE_DIR", DEFAULT_CACHE_DIR)
+def handleImage(pk):
     filename = f"mugshot-{pk}.png"
     file_path = os.path.join(cache_dir, filename)
 
@@ -76,3 +73,26 @@ def index(request, pk=None):
     except Exception as e:
         logger.error(f"Failed to generate robohash for pk {pk}: {e}")
         raise Http404("Unable to generate robohash image")
+
+
+@login_or_bearer_required
+@cache_control(max_age=86400)  # Cache for 24 hours in browser
+def index(request, pk=None):
+    if not pk:
+        pk = uuid.uuid4().hex[:16]
+
+    return handleImage(pk)
+
+
+@login_or_bearer_required
+def handle_signed_url(request, slug):
+    ## Make this more generic
+    signer = TimestampSigner()
+    ## Signed URLs always have access
+    try:
+        unsigned = signer.unsign(request.path, max_age=3600)  # 1hr expiry
+        ## Passing the unsigned URL to the function
+        pk = unsigned
+        return handleImage(pk)
+    except SignatureExpired:
+        raise Http404("Invalid or expired signed URL")
