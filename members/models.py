@@ -14,6 +14,7 @@ from django.utils.translation import gettext_lazy as _
 from simple_history.models import HistoricalRecords
 from stdimage.models import StdImageField
 
+from avatar.utils import get_avatar_url, get_avatar_url_signed
 from makerspaceleiden.utils import upload_to_pattern
 
 logger = logging.getLogger(__name__)
@@ -154,7 +155,17 @@ class User(AbstractUser):
                     return variation.url
             return self.image.url
 
-        return reverse("generate-fake-mugshot", args=[self.id])
+        return get_avatar_url(self.id)
+
+    def image_url_signed(self, size: str = None):
+        if self.image:
+            if size in settings.IMG_VARIATIONS:
+                variation = getattr(self.image, size, None)
+                if variation:
+                    return variation.url
+            return self.image.url
+
+        return get_avatar_url_signed(self.id)
 
     def image_img(self):
         return str('<img src="%s" width=80/>' % self.image_url())
