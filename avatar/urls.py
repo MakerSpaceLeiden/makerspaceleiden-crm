@@ -6,6 +6,8 @@ from . import views
 urlpatterns = [
     path("<int:pk>", views.index, name="generate-fake-mugshot"),
     path(
-        "<path:signed_url_path>", views.handle_signed_url, name="generate-fake-mugshot"
+        "<path:signed_url_path>",
+        views.handle_signed_url,
+        name="generate-fake-mugshot-signed-urls",
     ),
 ]

@@ -73,7 +73,8 @@ def login_or_bearer_required(function):
     @wraps(function)
     def wrap(request, *args, **kwargs):
         try:
-            unsigned = process_signed_url(request.path)
+            chunk = request.path.split("/")[-1]
+            unsigned = process_signed_url(chunk)
             ## Passing the unsigned URL to the function
             request.msl_unsigned_path = unsigned
             return function(request, *args, **kwargs)
