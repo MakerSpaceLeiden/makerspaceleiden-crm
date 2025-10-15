@@ -7,7 +7,7 @@ from django.conf import settings
 from django.core.signing import BadSignature, SignatureExpired
 from django.http import HttpResponse
 
-from .utils import process_signed_url
+from .utils import process_signed_str
 
 HEADER = "HTTP_X_BEARER"
 MODERN_HEADER = "HTTP_AUTHORIZATION"
@@ -74,7 +74,7 @@ def login_or_bearer_required(function):
     def wrap(request, *args, **kwargs):
         try:
             chunk = request.path.split("/")[-1]
-            unsigned = process_signed_url(chunk)
+            unsigned = process_signed_str(chunk)
             ## Passing the unsigned URL to the function
             request.msl_unsigned_path = unsigned
             return function(request, *args, **kwargs)

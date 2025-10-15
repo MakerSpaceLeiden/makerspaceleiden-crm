@@ -219,11 +219,11 @@ class MembersApiTests(TestCase):
         response = client.get("/api/v1/members/")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    @patch("api.serializers.generate_signed_url")
-    def test_members_list_returns_200_for_authed(self, mock_generate_signed_url):
-        # Mock generate_signed_url to return the input URL unchanged for testing
+    @patch("api.serializers.generate_signed_str")
+    def test_members_list_returns_200_for_authed(self, mock_generate_signed_str):
+        # Mock generate_signed_str to return the input URL unchanged for testing
         mock_signature_value = "-signed"
-        mock_generate_signed_url.side_effect = lambda url: url + mock_signature_value
+        mock_generate_signed_str.side_effect = lambda url: url + mock_signature_value
 
         client = APIClient()
         self.assertIs(client.login(email=self.user.email, password=self.password), True)

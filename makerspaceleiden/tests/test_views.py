@@ -10,7 +10,7 @@ from django.core.signing import datetime
 from django.test import Client, TestCase, override_settings
 from django.test.client import RequestFactory
 
-from makerspaceleiden.utils import derive_initials, generate_signed_url
+from makerspaceleiden.utils import derive_initials, generate_signed_str
 
 User = get_user_model()
 
@@ -174,7 +174,7 @@ class ProtectedMediaViewTest(TestCase):
         ):
             factory = RequestFactory()
             req = factory.get("/media/test_file.txt")
-            signed_url = generate_signed_url(req.get_full_path())
+            signed_url = generate_signed_str(req.get_full_path())
             response = self.client.get(signed_url)
 
             self.assertEqual(response.status_code, HTTPStatus.OK)
@@ -188,7 +188,7 @@ class ProtectedMediaViewTest(TestCase):
         ):
             factory = RequestFactory()
             req = factory.get("/media/test_file.txt")
-            signed_url = generate_signed_url(req.get_full_path())
+            signed_url = generate_signed_str(req.get_full_path())
             response = self.client.get(signed_url + "broken-sig")
 
             self.assertEqual(response.status_code, HTTPStatus.FORBIDDEN)
@@ -202,7 +202,7 @@ class ProtectedMediaViewTest(TestCase):
             with time_machine.travel("2023-01-01") as traveller:
                 factory = RequestFactory()
                 req = factory.get("/media/test_file.txt")
-                signed_url = generate_signed_url(req.get_full_path())
+                signed_url = generate_signed_str(req.get_full_path())
 
                 response = self.client.get(signed_url)
 

@@ -129,13 +129,13 @@ def derive_initials(first_name, last_name):
     return (first_name[:1] + normalized_last_name[:1]).upper()
 
 
-def generate_signed_url(req: str):
+def generate_signed_str(req: str):
     signer = TimestampSigner()
     signed_val = signer.sign(req)
     return signed_val
 
 
-def process_signed_url(url: str):
+def process_signed_str(url: str):
     signer = TimestampSigner()
     try:
         unsigned = signer.unsign(url, max_age=3600)  # 1hr expiry
