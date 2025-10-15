@@ -11,8 +11,7 @@ from django.http import Http404, HttpResponse
 from django.views.decorators.cache import cache_control
 from robohash import Robohash
 
-from makerspaceleiden.decorators import login_or_bearer_required
-from makerspaceleiden.utils import process_signed_str
+from makerspaceleiden.decorators import login_or_bearer_required, signed_url_required
 
 logger = logging.getLogger(__name__)
 
@@ -85,12 +84,11 @@ def index(request, pk=None):
     return generate_avatar_image(pk)
 
 
-@login_or_bearer_required
-def handle_signed_url(request, signed_url_path):
+@signed_url_required
+def handle_signed_url(request, signed_id):
     ## Signed URLs always have access
     try:
-        unsigned = process_signed_str(signed_url_path)
-        pk = unsigned
+        pk = request.msl_unsigned
         logger.info(f"Generating avatar image for pk: {pk}")
         return generate_avatar_image(pk)
     except (SignatureExpired, BadSignature):
