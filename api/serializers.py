@@ -81,18 +81,17 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         ]
 
     def get_image(self, obj):
-        return generate_absolute_signed_uri(
-            self.context["request"], obj.image_url("thumbnail")
+        return self.context["request"].build_absolute_uri(
+            obj.image_url_signed("thumbnail")
         )
 
     def get_images(self, obj):
         return {
-            "original": generate_absolute_signed_uri(
-                self.context["request"], obj.image_url("original")
+            "original": self.context["request"].build_absolute_uri(
+                obj.image_url_signed("original")
             ),
-            "thumbnail": generate_absolute_signed_uri(
-                self.context["request"],
-                obj.image_url("thumbnail"),
+            "thumbnail": self.context["request"].build_absolute_uri(
+                obj.image_url_signed("thumbnail")
             ),
         }
 

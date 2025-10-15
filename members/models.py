@@ -15,7 +15,7 @@ from simple_history.models import HistoricalRecords
 from stdimage.models import StdImageField
 
 from avatar.utils import get_avatar_url, get_avatar_url_signed
-from makerspaceleiden.utils import upload_to_pattern
+from makerspaceleiden.utils import generate_signed_media_path, upload_to_pattern
 
 logger = logging.getLogger(__name__)
 
@@ -157,13 +157,21 @@ class User(AbstractUser):
 
         return get_avatar_url(self.id)
 
-    def image_url_signed(self, size: str = None):
+    def image_url_signed(self, size: str = None) -> str:
         if self.image:
             if size in settings.IMG_VARIATIONS:
                 variation = getattr(self.image, size, None)
                 if variation:
-                    return variation.url
-            return self.image.url
+                    print(f"variation.url: {variation.url}")
+                    print(
+                        f"generate_signed_media_path(variation.url): {generate_signed_media_path(variation.url)}"
+                    )
+                    return generate_signed_media_path(variation.url)
+            print(f"self.image.url: {self.image.url}")
+            print(
+                f"generate_signed_media_path(self.image.url): {generate_signed_media_path(self.image.url)}"
+            )
+            return generate_signed_media_path(self.image.url)
 
         return get_avatar_url_signed(self.id)
 

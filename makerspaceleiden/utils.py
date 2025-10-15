@@ -7,6 +7,7 @@ import re
 import sys
 
 import cryptography
+from django.conf import settings
 from django.core.signing import BadSignature, SignatureExpired, TimestampSigner
 from django.http import HttpResponse
 from dynamic_filenames import FilePattern
@@ -148,3 +149,22 @@ def process_signed_str(url: str) -> str:
     except BadSignature:
         logger.error(f"Invalid signed URL: {url}")
         raise BadSignature("Invalid signed URL")
+
+        # INSERT_YOUR_CODE
+
+
+def generate_signed_media_path(path: str) -> str:
+    """
+    Sign a media object path, excluding the 'media/' base.
+    All returned paths will begin with 'media/signed/' followed by the signed path.
+    """
+    # Remove leading slash if present
+    stripped_path = path
+    # Ensure path starts with 'media/'
+    if not stripped_path.startswith(settings.MEDIA_URL):
+        logger.error(f"Cannot sign path not under media/: {path}")
+        raise ValueError("Path must start with 'media/'")
+    # Exclude the 'media/' base for signing
+    to_sign = stripped_path[len(settings.MEDIA_URL) :]
+    signed_chunk = generate_signed_str(to_sign)
+    return f"{settings.MEDIA_URL}signed/{signed_chunk}"
