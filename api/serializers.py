@@ -2,7 +2,6 @@ from rest_framework import serializers
 
 from acl.models import Location, Machine
 from agenda.models import Agenda
-from makerspaceleiden.utils import generate_signed_str
 from members.models import User
 from servicelog.models import Servicelog
 
@@ -55,12 +54,6 @@ class AgendaSerializer(serializers.HyperlinkedModelSerializer):
                 dt = timezone.make_aware(dt, timezone.utc)
             return dt.isoformat().replace("+00:00", "Z")
         return None
-
-
-def generate_absolute_signed_uri(request, full_image_path):
-    last_chunk = full_image_path.split("/")[-1]
-    signed_chunk = generate_signed_str(last_chunk)
-    return request.build_absolute_uri(full_image_path.replace(last_chunk, signed_chunk))
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):

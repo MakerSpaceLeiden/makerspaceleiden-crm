@@ -162,15 +162,7 @@ class User(AbstractUser):
             if size in settings.IMG_VARIATIONS:
                 variation = getattr(self.image, size, None)
                 if variation:
-                    print(f"variation.url: {variation.url}")
-                    print(
-                        f"generate_signed_media_path(variation.url): {generate_signed_media_path(variation.url)}"
-                    )
                     return generate_signed_media_path(variation.url)
-            print(f"self.image.url: {self.image.url}")
-            print(
-                f"generate_signed_media_path(self.image.url): {generate_signed_media_path(self.image.url)}"
-            )
             return generate_signed_media_path(self.image.url)
 
         return get_avatar_url_signed(self.id)
