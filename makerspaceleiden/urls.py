@@ -52,11 +52,15 @@ urlpatterns = [
     path("sumup/", include("sumup_connector.urls")),
     # We strip the leading / to supress a warning.
     path(
+        settings.MEDIA_URL[1:] + "signed/<path:signed_path>",
+        views.protected_media_signed,
+        name="protected-media-signed",
+    ),
+    path(
         settings.MEDIA_URL[1:] + "<path:path>",
         views.protected_media,
         name="protected-media",
     ),
-    path("", include("nodered.urls")),
     path("oauth2/", include(oauth2_urls)),
     path("api/", include("api.urls")),
 ]

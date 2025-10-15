@@ -8,7 +8,6 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.signing import datetime
 from django.test import Client, TestCase, override_settings
-from django.test.client import RequestFactory
 
 from makerspaceleiden.utils import derive_initials, generate_signed_str
 
@@ -68,8 +67,8 @@ class ProtectedMediaViewTest(TestCase):
         self._create_users()
         self._create_test_files()
 
-    # def tearDown(self):
-    #     self._cleanup_files()
+    def tearDown(self):
+        self._cleanup_files()
 
     def _create_users(self):
         """Create test users with different permission levels"""
@@ -172,10 +171,11 @@ class ProtectedMediaViewTest(TestCase):
             MEDIA_ROOT=self.temp_media_dir,
             MEDIA_URL="/media/",
         ):
-            factory = RequestFactory()
-            req = factory.get("/media/test_file.txt")
-            signed_url = generate_signed_str(req.get_full_path())
-            response = self.client.get(signed_url)
+            signed_filename = generate_signed_str("test_file.txt")
+
+            url = f"/media/signed/{signed_filename}"
+            response = self.client.get(url)
+            print(f"response: {url}")
 
             self.assertEqual(response.status_code, HTTPStatus.OK)
             self.assertEqual(self._get_file_content(response), self.test_content)
@@ -186,12 +186,12 @@ class ProtectedMediaViewTest(TestCase):
             MEDIA_ROOT=self.temp_media_dir,
             MEDIA_URL="/media/",
         ):
-            factory = RequestFactory()
-            req = factory.get("/media/test_file.txt")
-            signed_url = generate_signed_str(req.get_full_path())
-            response = self.client.get(signed_url + "broken-sig")
+            signed_filename = generate_signed_str("test_file.txt")
 
-            self.assertEqual(response.status_code, HTTPStatus.FORBIDDEN)
+            url = f"/media/signed/{signed_filename}"
+            response = self.client.get(url + "broken-sig")
+
+            self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
 
     def test_signed_url_expired(self):
         """Signed URLs should expire"""
@@ -200,11 +200,10 @@ class ProtectedMediaViewTest(TestCase):
             MEDIA_URL="/media/",
         ):
             with time_machine.travel("2023-01-01") as traveller:
-                factory = RequestFactory()
-                req = factory.get("/media/test_file.txt")
-                signed_url = generate_signed_str(req.get_full_path())
+                signed_filename = generate_signed_str("test_file.txt")
 
-                response = self.client.get(signed_url)
+                url = f"/media/signed/{signed_filename}"
+                response = self.client.get(url)
 
                 self.assertEqual(response.status_code, HTTPStatus.OK)
                 self.assertEqual(self._get_file_content(response), self.test_content)
@@ -212,7 +211,7 @@ class ProtectedMediaViewTest(TestCase):
                 # Wait for the URL to expire
                 traveller.shift(datetime.timedelta(hours=2))
 
-                response = self.client.get(signed_url)
+                response = self.client.get(url)
 
                 self.assertEqual(response.status_code, HTTPStatus.GONE)
 

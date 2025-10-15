@@ -69,21 +69,27 @@ def superuser_or_bearer_required(function):
     return wrap
 
 
-def login_or_bearer_required(function):
+def signed_url_required(function):
     @wraps(function)
     def wrap(request, *args, **kwargs):
         try:
-            chunk = request.path.split("/")[-1]
-            unsigned = process_signed_str(chunk)
-            ## Passing the unsigned URL to the function
-            request.msl_unsigned_path = unsigned
+            # Extract signed_path/signed_id from kwargs (Django puts it there)
+            signed_value = kwargs.get("signed_path") or kwargs.get("signed_id")
+
+            unsigned_value = process_signed_str(signed_value)
+            request.msl_unsigned = unsigned_value
             return function(request, *args, **kwargs)
-
         except SignatureExpired:
-            return HttpResponse("Invalid/expired link", status=HTTPStatus.GONE)
+            return HttpResponse("Expired link", status=HTTPStatus.GONE)
         except BadSignature:
-            pass
+            return HttpResponse("Invalid link", status=HTTPStatus.BAD_REQUEST)
 
+    return wrap
+
+
+def login_or_bearer_required(function):
+    @wraps(function)
+    def wrap(request, *args, **kwargs):
         if (
             request.user
             and not request.user.is_anonymous
