@@ -61,6 +61,7 @@ urlpatterns = [
         views.protected_media,
         name="protected-media",
     ),
+    path("", include("nodered.urls")),
     path("oauth2/", include(oauth2_urls)),
     path("api/", include("api.urls")),
 ]
