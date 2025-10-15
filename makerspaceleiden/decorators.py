@@ -4,8 +4,10 @@ from functools import wraps
 from http import HTTPStatus
 
 from django.conf import settings
-from django.core.signing import BadSignature, SignatureExpired, TimestampSigner
+from django.core.signing import BadSignature, SignatureExpired
 from django.http import HttpResponse
+
+from .utils import process_signed_url
 
 HEADER = "HTTP_X_BEARER"
 MODERN_HEADER = "HTTP_AUTHORIZATION"
@@ -70,10 +72,8 @@ def superuser_or_bearer_required(function):
 def login_or_bearer_required(function):
     @wraps(function)
     def wrap(request, *args, **kwargs):
-        signer = TimestampSigner()
-        ## Signed URLs always have access
         try:
-            unsigned = signer.unsign(request.path, max_age=3600)  # 1hr expiry
+            unsigned = process_signed_url(request.path)
             ## Passing the unsigned URL to the function
             request.msl_unsigned_path = unsigned
             return function(request, *args, **kwargs)

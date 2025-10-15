@@ -57,6 +57,12 @@ class AgendaSerializer(serializers.HyperlinkedModelSerializer):
         return None
 
 
+def generate_absolute_signed_uri(request, full_image_path):
+    last_chunk = full_image_path.split("/")[-1]
+    signed_chunk = generate_signed_url(last_chunk)
+    return request.build_absolute_uri(full_image_path.replace(last_chunk, signed_chunk))
+
+
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     image = serializers.SerializerMethodField()
     images = serializers.SerializerMethodField()
@@ -75,17 +81,18 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         ]
 
     def get_image(self, obj):
-        return self.context["request"].build_absolute_uri(
-            generate_signed_url(obj.image_url("thumbnail"))
+        return generate_absolute_signed_uri(
+            self.context["request"], obj.image_url("thumbnail")
         )
 
     def get_images(self, obj):
         return {
-            "original": self.context["request"].build_absolute_uri(
-                generate_signed_url(obj.image_url("original"))
+            "original": generate_absolute_signed_uri(
+                self.context["request"], obj.image_url("original")
             ),
-            "thumbnail": self.context["request"].build_absolute_uri(
-                generate_signed_url(obj.image_url("thumbnail")),
+            "thumbnail": generate_absolute_signed_uri(
+                self.context["request"],
+                obj.image_url("thumbnail"),
             ),
         }
 

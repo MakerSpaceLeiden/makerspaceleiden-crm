@@ -222,7 +222,8 @@ class MembersApiTests(TestCase):
     @patch("api.serializers.generate_signed_url")
     def test_members_list_returns_200_for_authed(self, mock_generate_signed_url):
         # Mock generate_signed_url to return the input URL unchanged for testing
-        mock_generate_signed_url.side_effect = lambda url: url
+        mock_signature_value = "-signed"
+        mock_generate_signed_url.side_effect = lambda url: url + mock_signature_value
 
         client = APIClient()
         self.assertIs(client.login(email=self.user.email, password=self.password), True)
@@ -245,11 +246,17 @@ class MembersApiTests(TestCase):
                     "email": self.user.email,
                     "first_name": self.user.first_name,
                     "last_name": self.user.last_name,
-                    "image": "http://testserver/avatar/" + str(self.user.id),
+                    "image": "http://testserver/avatar/"
+                    + str(self.user.id)
+                    + mock_signature_value,
                     "is_onsite": False,
                     "images": {
-                        "original": "http://testserver/avatar/" + str(self.user.id),
-                        "thumbnail": "http://testserver/avatar/" + str(self.user.id),
+                        "original": "http://testserver/avatar/"
+                        + str(self.user.id)
+                        + mock_signature_value,
+                        "thumbnail": "http://testserver/avatar/"
+                        + str(self.user.id)
+                        + mock_signature_value,
                     },
                 }
             ],

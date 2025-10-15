@@ -6,12 +6,13 @@ from io import BytesIO
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
-from django.core.signing import SignatureExpired, TimestampSigner
+from django.core.signing import BadSignature, SignatureExpired
 from django.http import Http404, HttpResponse
 from django.views.decorators.cache import cache_control
 from robohash import Robohash
 
 from makerspaceleiden.decorators import login_or_bearer_required
+from makerspaceleiden.utils import process_signed_url
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +27,7 @@ avatar_settings = getattr(settings, "AVATAR", {})
 cache_dir = avatar_settings.get("CACHE_DIR", DEFAULT_CACHE_DIR)
 
 
-def handleImage(pk):
+def generate_avatar_image(pk):
     filename = f"mugshot-{pk}.png"
     file_path = os.path.join(cache_dir, filename)
 
@@ -81,18 +82,17 @@ def index(request, pk=None):
     if not pk:
         pk = uuid.uuid4().hex[:16]
 
-    return handleImage(pk)
+    return generate_avatar_image(pk)
 
 
 @login_or_bearer_required
-def handle_signed_url(request, slug):
-    ## Make this more generic
-    signer = TimestampSigner()
+def handle_signed_url(request, signed_url_path):
     ## Signed URLs always have access
     try:
-        unsigned = signer.unsign(request.path, max_age=3600)  # 1hr expiry
-        ## Passing the unsigned URL to the function
+        unsigned = process_signed_url(signed_url_path)
         pk = unsigned
-        return handleImage(pk)
-    except SignatureExpired:
+        logger.info(f"Generating avatar image for pk: {pk}")
+        return generate_avatar_image(pk)
+    except (SignatureExpired, BadSignature):
+        logger.error(f"Invalid or expired signed URL: {request.path}")
         raise Http404("Invalid or expired signed URL")

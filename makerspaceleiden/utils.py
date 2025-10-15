@@ -7,7 +7,7 @@ import re
 import sys
 
 import cryptography
-from django.core.signing import TimestampSigner
+from django.core.signing import BadSignature, SignatureExpired, TimestampSigner
 from django.http import HttpResponse
 from dynamic_filenames import FilePattern
 from jsonschema import validate
@@ -133,3 +133,16 @@ def generate_signed_url(req: str):
     signer = TimestampSigner()
     signed_val = signer.sign(req)
     return signed_val
+
+
+def process_signed_url(url: str):
+    signer = TimestampSigner()
+    try:
+        unsigned = signer.unsign(url, max_age=3600)  # 1hr expiry
+        return unsigned
+    except SignatureExpired:
+        logger.error(f"Expired signed URL: {url}")
+        raise SignatureExpired("Expired signed URL")
+    except BadSignature:
+        logger.error(f"Invalid signed URL: {url}")
+        raise BadSignature("Invalid signed URL")
