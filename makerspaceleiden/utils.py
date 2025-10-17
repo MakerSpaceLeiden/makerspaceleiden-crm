@@ -7,9 +7,13 @@ import re
 import sys
 
 import cryptography
+from django.conf import settings
+from django.core.signing import BadSignature, SignatureExpired, TimestampSigner
 from django.http import HttpResponse
 from dynamic_filenames import FilePattern
 from jsonschema import validate
+
+SIGNED_STR_MAX_AGE = 3600
 
 logger = logging.getLogger(__name__)
 
@@ -126,3 +130,41 @@ pattern = re.compile("^(a|e)l( |-)|van der|van|de|ten", re.IGNORECASE)
 def derive_initials(first_name, last_name):
     normalized_last_name = re.sub(pattern, "", last_name).strip()
     return (first_name[:1] + normalized_last_name[:1]).upper()
+
+
+def generate_signed_str(req: str) -> str:
+    signer = TimestampSigner()
+    signed_val = signer.sign(req)
+    return signed_val
+
+
+def process_signed_str(url: str) -> str:
+    signer = TimestampSigner()
+    try:
+        unsigned = signer.unsign(url, max_age=SIGNED_STR_MAX_AGE)
+        return unsigned
+    except SignatureExpired:
+        logger.error(f"Expired signed URL: {url}")
+        raise SignatureExpired("Expired signed URL")
+    except BadSignature:
+        logger.error(f"Invalid signed URL: {url}")
+        raise BadSignature("Invalid signed URL")
+
+        # INSERT_YOUR_CODE
+
+
+def generate_signed_media_path(path: str) -> str:
+    """
+    Sign a media object path, excluding the 'media/' base.
+    All returned paths will begin with 'media/signed/' followed by the signed path.
+    """
+    # Remove leading slash if present
+    stripped_path = path
+    # Ensure path starts with 'media/'
+    if not stripped_path.startswith(settings.MEDIA_URL):
+        logger.error(f"Cannot sign path not under media/: {path}")
+        raise ValueError("Path must start with 'media/'")
+    # Exclude the 'media/' base for signing
+    to_sign = stripped_path[len(settings.MEDIA_URL) :]
+    signed_chunk = generate_signed_str(to_sign)
+    return f"{settings.MEDIA_URL}signed/{signed_chunk}"

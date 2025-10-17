@@ -1,9 +1,13 @@
 import logging
 import re
 from functools import wraps
+from http import HTTPStatus
 
 from django.conf import settings
+from django.core.signing import BadSignature, SignatureExpired
 from django.http import HttpResponse
+
+from .utils import process_signed_str
 
 HEADER = "HTTP_X_BEARER"
 MODERN_HEADER = "HTTP_AUTHORIZATION"
@@ -61,6 +65,24 @@ def superuser_or_bearer_required(function):
 
         # raise PermissionDenied
         return HttpResponse("XS denied", status=403, content_type="text/plain")
+
+    return wrap
+
+
+def signed_url_required(function):
+    @wraps(function)
+    def wrap(request, *args, **kwargs):
+        try:
+            # Extract signed_path/signed_id from kwargs (Django puts it there)
+            signed_value = kwargs.get("signed_path") or kwargs.get("signed_id")
+
+            unsigned_value = process_signed_str(signed_value)
+            request.msl_unsigned = unsigned_value
+            return function(request, *args, **kwargs)
+        except SignatureExpired:
+            return HttpResponse("Expired link", status=HTTPStatus.GONE)
+        except BadSignature:
+            return HttpResponse("Invalid link", status=HTTPStatus.BAD_REQUEST)
 
     return wrap
 

@@ -6,11 +6,12 @@ from io import BytesIO
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
+from django.core.signing import BadSignature, SignatureExpired
 from django.http import Http404, HttpResponse
 from django.views.decorators.cache import cache_control
 from robohash import Robohash
 
-from makerspaceleiden.decorators import login_or_bearer_required
+from makerspaceleiden.decorators import login_or_bearer_required, signed_url_required
 
 logger = logging.getLogger(__name__)
 
@@ -18,18 +19,14 @@ DEFAULT_ROBOHASH_SET = "set1"
 DEFAULT_ROBOHASH_COLOR = "red"
 DEFAULT_CACHE_DIR = "avatar_cache"
 
+# Get avatar settings
+avatar_settings = getattr(settings, "AVATAR", {})
 
-@login_or_bearer_required
-@cache_control(max_age=86400)  # Cache for 24 hours in browser
-def index(request, pk=None):
-    if not pk:
-        pk = uuid.uuid4().hex[:16]
+# Define the file path for caching
+cache_dir = avatar_settings.get("CACHE_DIR", DEFAULT_CACHE_DIR)
 
-    # Get avatar settings
-    avatar_settings = getattr(settings, "AVATAR", {})
 
-    # Define the file path for caching
-    cache_dir = avatar_settings.get("CACHE_DIR", DEFAULT_CACHE_DIR)
+def generate_avatar_image(pk):
     filename = f"mugshot-{pk}.png"
     file_path = os.path.join(cache_dir, filename)
 
@@ -76,3 +73,24 @@ def index(request, pk=None):
     except Exception as e:
         logger.error(f"Failed to generate robohash for pk {pk}: {e}")
         raise Http404("Unable to generate robohash image")
+
+
+@login_or_bearer_required
+@cache_control(max_age=86400)  # Cache for 24 hours in browser
+def index(request, pk=None):
+    if not pk:
+        pk = uuid.uuid4().hex[:16]
+
+    return generate_avatar_image(pk)
+
+
+@signed_url_required
+def handle_signed_url(request, signed_id):
+    ## Signed URLs always have access
+    try:
+        pk = request.msl_unsigned
+        logger.info(f"Generating avatar image for pk: {pk}")
+        return generate_avatar_image(pk)
+    except (SignatureExpired, BadSignature):
+        logger.error(f"Invalid or expired signed URL: {request.path}")
+        raise Http404("Invalid or expired signed URL")

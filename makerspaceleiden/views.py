@@ -11,7 +11,7 @@ from simple_history.admin import SimpleHistoryAdmin
 from storage.forms import StorageForm
 from storage.models import Storage
 
-from .decorators import login_or_bearer_required
+from .decorators import login_or_bearer_required, signed_url_required
 
 logger = logging.getLogger(__name__)
 
@@ -26,8 +26,14 @@ class MySimpleHistoryAdmin(SimpleHistoryAdmin):
 
 
 @login_or_bearer_required
-def protected_media(request, path):
+def protected_media(request, path: str):
     return static_serve(request, path, settings.MEDIA_ROOT)
+
+
+@signed_url_required
+def protected_media_signed(request, signed_path: str):
+    signed_path = request.msl_unsigned
+    return static_serve(request, signed_path, settings.MEDIA_ROOT)
 
 
 @login_required

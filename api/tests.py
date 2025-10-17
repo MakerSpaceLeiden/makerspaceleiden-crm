@@ -1,5 +1,6 @@
 import json
 from datetime import date, datetime, time, timezone
+from unittest.mock import patch
 
 import time_machine
 from django.contrib.auth.models import Permission
@@ -218,7 +219,14 @@ class MembersApiTests(TestCase):
         response = client.get("/api/v1/members/")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_members_list_returns_200_for_authed(self):
+    @patch("members.models.User.image_url_signed")
+    def test_members_list_returns_200_for_authed(self, mock_image_url_signed):
+        # Mock image_url_signed to return a predictable URL for testing
+        mock_signature_value = "-signed"
+        mock_image_url_signed.return_value = (
+            f"/avatar/signed/{self.user.id}{mock_signature_value}"
+        )
+
         client = APIClient()
         self.assertIs(client.login(email=self.user.email, password=self.password), True)
         response = client.get("/api/v1/members/")
@@ -240,11 +248,17 @@ class MembersApiTests(TestCase):
                     "email": self.user.email,
                     "first_name": self.user.first_name,
                     "last_name": self.user.last_name,
-                    "image": "http://testserver/avatar/" + str(self.user.id),
+                    "image": "http://testserver/avatar/signed/"
+                    + str(self.user.id)
+                    + mock_signature_value,
                     "is_onsite": False,
                     "images": {
-                        "original": "http://testserver/avatar/" + str(self.user.id),
-                        "thumbnail": "http://testserver/avatar/" + str(self.user.id),
+                        "original": "http://testserver/avatar/signed/"
+                        + str(self.user.id)
+                        + mock_signature_value,
+                        "thumbnail": "http://testserver/avatar/signed/"
+                        + str(self.user.id)
+                        + mock_signature_value,
                     },
                 }
             ],
