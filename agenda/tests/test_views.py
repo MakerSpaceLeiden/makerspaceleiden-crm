@@ -32,7 +32,7 @@ class AgendaCreateViewTest(TestCase):
 
         original = Agenda.objects.create(
             startdatetime=datetime(2025, 5, 10, 9, 0, tzinfo=timezone.utc),
-            enddatetime=datetime(2025, 5, 10, 10, 0, tzinfo=timezone.utc),
+            enddatetime=datetime(2025, 5, 10, 15, 0, tzinfo=timezone.utc),
             item_title="Fixture Agenda Title",
             item_details="This is a fixture agenda item for testing.",
             user=self.user,
