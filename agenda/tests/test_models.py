@@ -3,6 +3,7 @@ from datetime import date, datetime, time, timedelta, timezone
 import pytest
 import time_machine
 from django.test import TestCase
+from django.utils import timezone as dj_timezone
 
 from acl.models import User
 from agenda.models import Agenda
@@ -152,10 +153,6 @@ class AgendaModelPropertiesTest(TestCase):
 
     @time_machine.travel("2025-05-10 12:00")
     def test_upcoming_includes_items_withenddatetime_gte_today(self):
-        from datetime import datetime
-
-        from django.utils import timezone as dj_timezone
-
         def make_agenda(start, end, title):
             return Agenda.objects.create(
                 startdatetime=datetime(*start, tzinfo=dj_timezone.utc),
@@ -165,7 +162,8 @@ class AgendaModelPropertiesTest(TestCase):
                 user=self.user,
             )
 
-        make_agenda((2025, 5, 8, 7, 0), (2025, 5, 10, 8, 0), "Ends today")
+        make_agenda((2025, 5, 8, 7, 0), (2025, 5, 10, 8, 0), "Ends earlier today")
+        make_agenda((2025, 5, 8, 7, 0), (2025, 5, 10, 16, 0), "Ends today")
         make_agenda((2025, 5, 12, 7, 0), (2025, 5, 12, 8, 0), "Future")
         make_agenda((2025, 5, 1, 7, 0), (2025, 5, 5, 8, 0), "Past")
 
@@ -173,6 +171,7 @@ class AgendaModelPropertiesTest(TestCase):
         titles = [a.item_title for a in upcoming]
         self.assertIn("Ends today", titles)
         self.assertIn("Future", titles)
+        self.assertNotIn("Ends earlier today", titles)
         self.assertNotIn("Past", titles)
 
     def test_set_status_creates_status_change_record(self):

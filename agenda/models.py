@@ -22,16 +22,10 @@ class AgendaQuerySet(models.QuerySet):
         return self.upcoming(chore__isnull=False)
 
     def upcoming(self, days=90, limit: int = None, **kwargs):
-        today = timezone.now().date()
-        end_date = today + timedelta(days=days)
+        end_datetime = timezone.now()
         base_kwargs = kwargs.copy()
-        start_q = Q(
-            startdatetime__gte=today, startdatetime__lte=end_date, **base_kwargs
-        )
-        end_q = Q(enddatetime__gte=today, **base_kwargs)
-        return self.filter(start_q | end_q).order_by("startdatetime", "item_title")[
-            :limit
-        ]
+        start_q = Q(enddatetime__gte=end_datetime, **base_kwargs)
+        return self.filter(start_q).order_by("startdatetime", "item_title")[:limit]
 
     def previous(self, days=90, limit: int = None, **kwargs):
         today = timezone.now().date()
