@@ -84,6 +84,7 @@ INSTALLED_APPS = [
 
 SITE_ID = 1
 SITE_NAME = "Makerspace Leiden"
+SITE_VERSION = os.getenv("SITE_VERSION", "-")
 
 MIDDLEWARE = [
     "simple_history.middleware.HistoryRequestMiddleware",
@@ -113,6 +114,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "django_settings_export.settings_export",
                 "motd.context_processors.motd_context",
+                "makerspaceleiden.context_processors.site_version",
                 "makerspaceleiden.context_processors.navbar_links",
             ],
         },
