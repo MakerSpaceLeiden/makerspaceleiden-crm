@@ -27,16 +27,24 @@ class MembersAutomatedCheckoutTest(TestCase):
 
     @time_machine.travel("2025-07-15 00:00")
     def test_member_automated_checkout(self):
+        exactly_8h_user = UserFactory(
+            email="exactly.8h@example.com",
+            is_onsite=True,
+            onsite_updated_at=datetime(2025, 7, 14, 16, 0, 0, 0, tzinfo=timezone.utc),
+        )
+
         call_command("member_automated_checkout")
 
+        exactly_8h_user.refresh_from_db()
         self.user.refresh_from_db()
         self.stale_user.refresh_from_db()
 
         self.assertEqual(self.user.is_onsite, True)
+        self.assertEqual(exactly_8h_user.is_onsite, True)
         self.assertEqual(self.stale_user.is_onsite, False)
 
+        self.assertIn(self.stale_user.email, [m.to[0] for m in mail.outbox])
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(
             mail.outbox[0].subject, MEMBER_AUTOMATED_CHECKOUT_EMAIL_SUBJECT
         )
-        self.assertEqual(mail.outbox[0].to, [self.stale_user.email])

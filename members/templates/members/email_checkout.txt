@@ -11,6 +11,5 @@ and it allows me to provide useful reminders, like if the lights are still on wh
 Checking out can be done when you leave, by simply swiping your card again, while you hold the door open on your way out.
 
 Or it can also be done via the Space State page: {{url_space_state}}
-page: {{url_notification_settings}}
 
 Your friendly makerbot.
