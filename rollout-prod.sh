@@ -2,6 +2,9 @@
 UK=$$
 DAYS=30
 
+echo "Updating version from current git sha"
+./scripts/update-site-version.sh
+
 trap cleanup INT
 cleanup () {
 	if test -f /tmp/backup.$UK; then
