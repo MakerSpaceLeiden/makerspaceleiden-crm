@@ -37,7 +37,7 @@
 <body class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}" data-admin-utc-offset="{% now "Z" %}">
 
     <!-- Container -->
-    <div id="container">
+    <div id="container" class="d-flex flex-column">
         {% if not is_popup %}
             <!-- Header -->
             <div id="header">
@@ -134,7 +134,7 @@
         {% endblock messages %}
 
         <!-- Content -->
-        <div id="content" class="{% block coltype %}colM{% endblock %}">
+        <div id="content">
             <div class="container">
             {% block pretitle %}{% endblock %}
             {% block content_title %}
@@ -145,12 +145,17 @@
                 {{ content }}
             {% endblock %}
             {% block sidebar %}{% endblock %}
-            <br class="clear">
-        </div>
+            </div>
         </div>
 
         <!-- Footer -->
-        {% block footer %}<div id="footer"></div>{% endblock %}
+        {% block footer %}
+        <div id="footer" class="bg-body-tertiary">
+            <div class="container">
+                Currently running version: <pre class="d-inline">{{ site_version }}</pre>
+            </div>
+        </div>
+        {% endblock %}
     </div>
 
     {% block scripts %}

@@ -1,4 +1,5 @@
 from django.urls import reverse
+from django.conf import settings
 
 from makerspaceleiden.templatetags.isingroup import (
     isInPettycashAdmin,
@@ -6,6 +7,9 @@ from makerspaceleiden.templatetags.isingroup import (
     isNoderedAdmin,
     isTreasurer,
 )
+
+def site_version(request):
+    return {"site_version": settings.SITE_VERSION}
 
 
 def get_trustee_links(user):
