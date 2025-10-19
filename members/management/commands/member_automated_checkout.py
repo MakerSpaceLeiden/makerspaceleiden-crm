@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 
 from django.conf import settings
-from django.core.mail import send_mail
+from django.core.mail import EmailMessage
 from django.core.management.base import BaseCommand
 from django.template.loader import render_to_string
 from django.urls import reverse
@@ -27,9 +27,9 @@ class Command(BaseCommand):
 
         for u in checked_in:
             u.checkout()
-            send_mail(
-                MEMBER_AUTOMATED_CHECKOUT_EMAIL_SUBJECT,
-                render_to_string(
+            EmailMessage(
+                subject=MEMBER_AUTOMATED_CHECKOUT_EMAIL_SUBJECT,
+                body=render_to_string(
                     "members/email_checkout.txt",
                     {
                         "user": u,
@@ -37,7 +37,6 @@ class Command(BaseCommand):
                         "url_notification_settings": reverse("notification_settings"),
                     },
                 ),
-                settings.DEFAULT_FROM_EMAIL,
-                [u.email],
-                fail_silently=False,
-            )
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[u.email],
+            ).send()
