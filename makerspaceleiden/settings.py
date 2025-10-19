@@ -84,7 +84,7 @@ INSTALLED_APPS = [
 
 SITE_ID = 1
 SITE_NAME = "Makerspace Leiden"
-SITE_VERSION = os.getenv("SITE_VERSION", None)
+SITE_VERSION = os.getenv("SITE_VERSION", "-")
 
 MIDDLEWARE = [
     "simple_history.middleware.HistoryRequestMiddleware",
