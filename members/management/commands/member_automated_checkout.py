@@ -1,3 +1,4 @@
+import logging
 from datetime import timedelta
 
 from django.conf import settings
@@ -10,8 +11,9 @@ from django.utils import timezone
 
 from members.models import User
 
-MAX_HOURS_BEFORE_STALE = 8
+logger = logging.getLogger(__name__)
 
+MAX_HOURS_BEFORE_STALE = 8
 MEMBER_AUTOMATED_CHECKOUT_EMAIL_SUBJECT = "Your account has been checked out"
 
 
@@ -20,6 +22,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         """Checkouts members who have been checked in for more than configured maximum hours"""
+        logger.info("checkout members")
         checked_in = User.objects.filter(
             is_onsite=True,
             onsite_updated_at__lte=timezone.now()
@@ -29,6 +32,8 @@ class Command(BaseCommand):
         if len(checked_in) == 0:
             self.stdout.write("No users to check out")
             return
+
+        logger.info(f"checkout members: {len(checked_in)}")
 
         for u in checked_in:
             try:
