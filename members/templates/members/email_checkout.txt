@@ -1,0 +1,15 @@
+Hello {{user.first_name}},
+
+It looks like you might have forgotten to checkout at the space yesterday?
+
+According to the logs you entered the space at {{user.onsite_updated_at}},
+but there's no trace of a checkout.
+
+Checking out is useful so that other people know when to expect other fellow makers at the space,
+and it allows me to provide useful reminders, like if the lights are still on when the last person leaves.
+
+Checking out can be done when you leave, by simply swiping your card again, while you hold the door open on your way out.
+
+Or it can also be done via the Space State page: {{url_space_state}}
+
+Your friendly makerbot.
