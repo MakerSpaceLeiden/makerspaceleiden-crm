@@ -26,6 +26,10 @@ class Command(BaseCommand):
             - timedelta(hours=MAX_HOURS_BEFORE_STALE),
         )
 
+        if len(checked_in) == 0:
+            self.stdout.write("No users to check out")
+            return
+
         for u in checked_in:
             try:
                 with transaction.atomic():
@@ -36,10 +40,10 @@ class Command(BaseCommand):
                             "members/email_checkout.txt",
                             {
                                 "user": u,
-                                "url_space_state": reverse("space_state"),
-                                "url_notification_settings": reverse(
-                                    "notification_settings"
-                                ),
+                                "url_space_state": settings.BASE
+                                + reverse("space_state"),
+                                "url_notification_settings": settings.BASE
+                                + reverse("notification_settings"),
                             },
                         ),
                         from_email=settings.DEFAULT_FROM_EMAIL,
