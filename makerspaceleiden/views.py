@@ -24,14 +24,17 @@ class MySimpleHistoryAdmin(SimpleHistoryAdmin):
     def has_change_permission(self, request, obj):
         return True
 
+
 @login_or_bearer_required
 def protected_media(request, path: str):
     return static_serve(request, path, settings.MEDIA_ROOT)
+
 
 @signed_url_required
 def protected_media_signed(request, signed_path: str):
     signed_path = request.msl_unsigned
     return static_serve(request, signed_path, settings.MEDIA_ROOT)
+
 
 @login_required
 def showhistory(request, aClass, pk, rev=None):
