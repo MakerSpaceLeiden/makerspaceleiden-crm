@@ -150,12 +150,14 @@
 
         <!-- Footer -->
         {% block footer %}
-        <div id="footer" class="bg-body-tertiary">
+        <div id="footer" class="bg-body-tertiary mt-4 border-top pt-3 pb-4">
             <div class="container">
-                Currently running version:
-                <a href="https://github.com/MakerSpaceLeiden/makerspaceleiden-crm/commit/{{ site_version }}" target="_blank">
-                    <pre class="d-inline">{{ site_version }}</pre>
-                </a>
+                <div class="small">
+                    Currently running version:
+                    <a href="https://github.com/MakerSpaceLeiden/makerspaceleiden-crm/commit/{{ site_version }}" target="_blank">
+                        <pre class="d-inline">{{ site_version }}</pre>
+                    </a>
+                </div>
             </div>
         </div>
         {% endblock %}
