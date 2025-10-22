@@ -17,4 +17,4 @@ if !  ${DJANGO_RUN} version > /dev/null; then
 	exit 1
 fi
 
-${DJANGO_RUN} member_automated_checkout $*
+${DJANGO_RUN} member_automated_checkout > /dev/null
