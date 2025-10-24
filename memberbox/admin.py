@@ -5,6 +5,7 @@ from simple_history.admin import SimpleHistoryAdmin
 from .models import Memberbox
 
 
+@admin.register(Memberbox)
 class MemberboxAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     search_fields = [
         "location",
@@ -17,6 +18,3 @@ class MemberboxAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
         "owner",
     )
     pass
-
-
-admin.site.register(Memberbox, MemberboxAdmin)

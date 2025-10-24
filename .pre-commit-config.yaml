@@ -16,6 +16,11 @@ repos:
       - id: debug-statements
       - id: detect-private-key
 
+  - repo: https://github.com/adamchainz/django-upgrade
+    rev: "1.29.0"  # replace with latest tag on GitHub
+    hooks:
+    -   id: django-upgrade
+
   - repo: https://github.com/pycqa/isort
     rev: 5.12.0
     hooks:

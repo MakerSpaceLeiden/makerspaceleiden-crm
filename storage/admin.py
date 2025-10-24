@@ -5,8 +5,6 @@ from simple_history.admin import SimpleHistoryAdmin
 from .models import Storage
 
 
+@admin.register(Storage)
 class StorageAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     pass
-
-
-admin.site.register(Storage, StorageAdmin)

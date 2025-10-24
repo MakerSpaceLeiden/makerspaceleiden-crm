@@ -15,6 +15,7 @@ from .models import Terminal
 logger = logging.getLogger(__name__)
 
 
+@admin.register(Terminal)
 class TerminalAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     list_display = ("pk", "accepted", "date", "used_at", "name", "fingerprint")
     readonly_fields = ["fingerprint", "nonce", "date", "used_at"]
@@ -43,6 +44,3 @@ class TerminalAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
                 out = out + f"<a href='{url}'>{obj.description}</a></br>"
             return format_html(out)
         return "--"
-
-
-admin.site.register(Terminal, TerminalAdmin)

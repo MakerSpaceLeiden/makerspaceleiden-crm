@@ -173,8 +173,8 @@ def sudo(request):
                 )
 
     rurl = reverse("index")
-    if "HTTP_REFERER" in request.META:
-        rurl = request.META["HTTP_REFERER"]
+    if "referer" in request.headers:
+        rurl = request.headers["referer"]
     form = NewAuditRecordForm(None, initial={"return_to": rurl})
     context = {
         "label": "GDPR (AVG)",
@@ -202,4 +202,4 @@ def drop(request):
         record.changereason = f"DROP in webinterface by {request.user} - but actual permission had already timed out."
     record.save()
 
-    return redirect(request.META["HTTP_REFERER"])
+    return redirect(request.headers["referer"])

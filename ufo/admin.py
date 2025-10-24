@@ -5,8 +5,6 @@ from simple_history.admin import SimpleHistoryAdmin
 from .models import Ufo
 
 
+@admin.register(Ufo)
 class UfoAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     pass
-
-
-admin.site.register(Ufo, UfoAdmin)

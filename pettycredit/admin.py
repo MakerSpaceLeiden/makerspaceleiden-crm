@@ -9,13 +9,11 @@ from .models import PettycreditClaim, PettycreditClaimChange
 logger = logging.getLogger(__name__)
 
 
+@admin.register(PettycreditClaim)
 class PettycreditClaimAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     pass
 
 
+@admin.register(PettycreditClaimChange)
 class PettycreditClaimChangeAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     pass
-
-
-admin.site.register(PettycreditClaim, PettycreditClaimAdmin)
-admin.site.register(PettycreditClaimChange, PettycreditClaimChangeAdmin)

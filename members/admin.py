@@ -39,6 +39,7 @@ class TagResource(resources.ModelResource):
         import_id_fields = ["owner", "tag"]
 
 
+@admin.register(User)
 class UserAdmin(
     ImportExportModelAdmin,
     BaseUserAdmin,
@@ -97,21 +98,14 @@ class UserAdmin(
     import_id_fields = ()  # 'email', 'first_name', 'last_name', 'is_staff', 'form_on_file', 'last_login','date_joined')
 
 
-admin.site.register(User, UserAdmin)
-
-
+@admin.register(Tag)
 class TagAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     list_display = ("tag", "owner", "last_used", "description")
     resource_class = TagResource
     search_fields = ["tag", "owner__first_name", "owner__last_name", "owner__email"]
 
 
-admin.site.register(Tag, TagAdmin)
-
-
+@admin.register(AuditRecord)
 class AuditRecordAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     list_display = ("user", "action", "recorded")
     resource_class = AuditRecord
-
-
-admin.site.register(AuditRecord, AuditRecordAdmin)
