@@ -98,6 +98,10 @@ def navbar_links(request):
                         "url": "https://wiki.makerspaceleiden.nl/mediawiki/index.php/Create_a_new_wiki_page",
                         "label": "Create a new wiki",
                     },
+                    {
+                        "url": "https://cloud.makerspaceleiden.nl",
+                        "label": "Nextcloud",
+                    },
                     {"url": "https://github.com/MakerSpaceLeiden", "label": "GitHub"},
                     {
                         "url": "https://wiki.makerspaceleiden.nl/mediawiki/index.php/About_Makerspace",
