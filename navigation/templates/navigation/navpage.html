@@ -10,7 +10,7 @@
 </style>
 
     <div class="row">
-        <div class="col-12 col-lg-2 mb-0 me-3">
+        <div class="col-12 col-lg-3 mb-0">
             <h2>{{ navbar_links.profile.label }}</h2>
             <ul class="nav flex-column custom-nav-menu">
                 {% for link in navbar_links.profile.children %}
@@ -22,7 +22,7 @@
                 {% endfor %}
             </ul>
         </div>
-        <div class="col-12 col-lg-2 me-3">
+        <div class="col-12 col-lg-3">
             <h2>{{ navbar_links.community.label }}</h2>
             <ul class="nav flex-column custom-nav-menu">
                 {% for link in navbar_links.community.children %}
@@ -38,7 +38,7 @@
                 {% endif %}
             </ul>
         </div>
-        <div class="col-12 col-lg-2 me-3">
+        <div class="col-12 col-lg-3">
             <h2>{{ navbar_links.events.label }}</h2>
             <ul class="nav flex-column custom-nav-menu">
                 {% for link in navbar_links.events.children %}
@@ -50,18 +50,8 @@
                 {% endfor %}
             </ul>
         </div>
-        <div class="col-12 col-lg-2 me-3">
-            <h2>{{ navbar_links.public.label }}</h2>
-            <ul class="nav flex-column custom-nav-menu">
-                {% for link in navbar_links.public.children %}
-                  <li class="nav-item pb-0">
-                    <a class="nav-link pt-1 pb-2 pe-1 ps-0" href="{{ link.url }}" target="_blank">{{ link.label }}</a>
-                  </li>
-                {% endfor %}
-            </ul>
-        </div>
         {% if user.is_privileged or user|isPettycashAdmin or user|isTreasurer or user|isMainsAdmin or user|isNoderedAdmin %}
-            <div class="col-12 col-lg-2 me-0">
+            <div class="col-12 col-lg-3 me-0">
                 <h2>{{ navbar_links.trustee.label }}</h2>
                 <ul class="nav flex-column custom-nav-menu">
                 {% for link in navbar_links.trustee.children %}

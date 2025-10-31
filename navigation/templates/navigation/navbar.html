@@ -47,6 +47,19 @@
                 <ul class="navbar-nav me-auto mb-md-0">
                   <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                      {{ navbar_links.profile.label }}
+                    </a>
+                    <ul class="dropdown-menu">
+                      {% for link in navbar_links.profile.children %}
+                        <li>
+                          <a class="dropdown-item" href="{{ link.url }}" target="_blank">{{ link.label }}</a>
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  </li>
+
+                  <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                       {{ navbar_links.community.label }}
                     </a>
                     <ul class="dropdown-menu">
@@ -73,18 +86,6 @@
                           <a class="dropdown-item" href="{{ link.url }}">
                             {{ link.label }}
                           </a>
-                        </li>
-                      {% endfor %}
-                    </ul>
-                  </li>
-                  <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                      {{ navbar_links.public.label }}
-                    </a>
-                    <ul class="dropdown-menu">
-                      {% for link in navbar_links.public.children %}
-                        <li>
-                          <a class="dropdown-item" href="{{ link.url }}" target="_blank">{{ link.label }}</a>
                         </li>
                       {% endfor %}
                     </ul>

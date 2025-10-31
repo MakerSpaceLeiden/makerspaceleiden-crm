@@ -73,7 +73,35 @@ def navbar_links(request):
         "navbar_links": {
             "public": {
                 "label": "Wiki & Public Info",
+                "children": [],
+            },
+            "events": {
+                "label": "Space Activity",
                 "children": [
+                    {"url": reverse("space_state"), "label": "Who is there now"},
+                    {
+                        "url": reverse("nodered_active_machines"),
+                        "label": "Active machines",
+                    },
+                    {
+                        "url": reverse("nodered_live_data_and_sensors"),
+                        "label": "Live data & sensors",
+                    },
+                    {"url": reverse("camindex"), "label": "Live 3D printer camera"},
+                    {"url": reverse("kwh_view"), "label": "Power consumption"},
+                    {"url": reverse("agenda"), "label": "Agenda"},
+                    {"url": reverse("motd_messages"), "label": "Message of the day"},
+                    {"url": reverse("ufo"), "label": "UFO lost and found"},
+                ],
+            },
+            "community": {
+                "label": "Resources & Community",
+                "children": [
+                    {"url": reverse("machine_list"), "label": "Machines"},
+                    {"url": reverse("overview"), "label": "All members"},
+                    {"url": reverse("boxes"), "label": "Member boxes"},
+                    {"url": reverse("chores"), "label": "Chores"},
+                    {"url": reverse("add_instruction"), "label": "Record instructions"},
                     {
                         "url": "https://wiki.makerspaceleiden.nl/",
                         "label": "Wiki documentation",
@@ -95,10 +123,6 @@ def navbar_links(request):
                         "label": "Procedures and principles",
                     },
                     {
-                        "url": "https://wiki.makerspaceleiden.nl/mediawiki/index.php/Create_a_new_wiki_page",
-                        "label": "Create a new wiki",
-                    },
-                    {
                         "url": "https://cloud.makerspaceleiden.nl",
                         "label": "Nextcloud",
                     },
@@ -109,32 +133,19 @@ def navbar_links(request):
                     },
                 ],
             },
-            "events": {
-                "label": "Current Events",
+            "profile": {
+                "label": "Account & Personal",
                 "children": [
-                    {"url": reverse("space_state"), "label": "Who is there now"},
+                    {"url": reverse("personal_page"), "label": "Personal profile"},
+                    {"url": reverse("userdetails"), "label": "Change personal details"},
+                    {"url": reverse("password_change"), "label": "Change password"},
+                    {"url": reverse("mytransactions"), "label": "Cash balance"},
                     {
-                        "url": reverse("nodered_active_machines"),
-                        "label": "Active machines",
+                        "url": reverse("mailinglists_edit"),
+                        "label": "Mailing lists subscriptions",
                     },
-                    {
-                        "url": reverse("nodered_live_data_and_sensors"),
-                        "label": "Live data & sensors",
-                    },
-                    {"url": reverse("agenda"), "label": "Agenda"},
-                    {"url": reverse("motd_messages"), "label": "Message of the day"},
-                    {"url": reverse("ufo"), "label": "UFO lost and found"},
-                    {"url": reverse("camindex"), "label": "Live 3D printer camera"},
-                    {"url": reverse("kwh_view"), "label": "Power consumption"},
-                ],
-            },
-            "community": {
-                "label": "Machines & Community",
-                "children": [
-                    {"url": reverse("overview"), "label": "All members"},
-                    {"url": reverse("machine_list"), "label": "Machines"},
-                    {"url": reverse("chores"), "label": "Chores"},
-                    {"url": reverse("add_instruction"), "label": "Record instructions"},
+                    {"url": reverse("notification_settings"), "label": "Notifications"},
+                    {"url": reverse("boxes"), "label": "Member box"},
                     {"url": reverse("mytransactions"), "label": "SpaceTegoed"},
                     # Only add 'Pay for a product' if user is authenticated
                     *(
@@ -149,22 +160,6 @@ def navbar_links(request):
                         if request.user.is_authenticated
                         else []
                     ),
-                    {"url": reverse("boxes"), "label": "Member boxes"},
-                ],
-            },
-            "profile": {
-                "label": "Profile Settings",
-                "children": [
-                    {"url": reverse("personal_page"), "label": "Personal profile"},
-                    {"url": reverse("userdetails"), "label": "Change personal details"},
-                    {"url": reverse("password_change"), "label": "Change password"},
-                    {"url": reverse("mytransactions"), "label": "Cash balance"},
-                    {
-                        "url": reverse("mailinglists_edit"),
-                        "label": "Mailing lists subscriptions",
-                    },
-                    {"url": reverse("notification_settings"), "label": "Notifications"},
-                    {"url": reverse("boxes"), "label": "Member box"},
                 ],
             },
             "trustee": {
