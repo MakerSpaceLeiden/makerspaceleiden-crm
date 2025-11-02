@@ -123,6 +123,9 @@ class PermitType(models.Model):
 class Location(models.Model):
     name = models.CharField(max_length=40, unique=True)
     description = models.CharField(max_length=200, blank=True)
+    location_parent = models.ForeignKey(
+        "self", on_delete=models.CASCADE, blank=True, null=True, related_name="children"
+    )
     history = HistoricalRecords()
 
     def __str__(self):
