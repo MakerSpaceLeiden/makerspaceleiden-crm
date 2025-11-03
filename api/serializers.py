@@ -56,9 +56,16 @@ class AgendaSerializer(serializers.HyperlinkedModelSerializer):
         return None
 
 
+class LocationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Location
+        fields = ["id", "name"]
+
+
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     image = serializers.SerializerMethodField()
     images = serializers.SerializerMethodField()
+    location = LocationSerializer()
 
     class Meta:
         model = User
@@ -71,6 +78,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
             "image",
             "images",
             "is_onsite",
+            "location",
         ]
 
     def get_image(self, obj):
@@ -88,6 +96,9 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
             ),
         }
 
+    def get_location(self, obj):
+        return obj.location.name if obj.location else None
+
 
 class ServicelogSerializer(serializers.ModelSerializer):
     class Meta:
@@ -95,16 +106,10 @@ class ServicelogSerializer(serializers.ModelSerializer):
         fields = ["last_updated", "description"]
 
 
-class LocationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Location
-        fields = ["id", "name"]
-
-
 class MachineSerializer(serializers.HyperlinkedModelSerializer):
     logs = serializers.SerializerMethodField()
     last_updated = serializers.SerializerMethodField()
-    location = serializers.SerializerMethodField()
+    location = LocationSerializer()
 
     class Meta:
         model = Machine

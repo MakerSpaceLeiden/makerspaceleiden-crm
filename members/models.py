@@ -178,21 +178,20 @@ class User(AbstractUser):
     def image_img(self):
         return str('<img src="%s" width=80/>' % self.image_url())
 
-    def checkin(self, location_id=None):
+    def checkin(self, location=None):
         self.is_onsite = True
 
-        if location_id:
-            self.location = location_id
+        if location:
+            self.location = location
 
         self.onsite_updated_at = datetime.datetime.now(tz=datetime.timezone.utc)
         self.save()
         return self
 
-    def checkout(self, location_id=None):
+    def checkout(self, location=None):
         self.is_onsite = False
 
-        if location_id:
-            self.location = None
+        self.location = None
 
         self.onsite_updated_at = datetime.datetime.now(tz=datetime.timezone.utc)
         self.save()

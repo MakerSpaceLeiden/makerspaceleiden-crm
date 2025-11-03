@@ -7,11 +7,16 @@ from django.utils.timezone import is_naive, make_aware
 from rest_framework import response, status, viewsets
 from rest_framework.decorators import action
 
-from acl.models import Machine
+from acl.models import Location, Machine
 from agenda.models import Agenda
 from members.models import User
 
-from .serializers import AgendaSerializer, MachineSerializer, UserSerializer
+from .serializers import (
+    AgendaSerializer,
+    LocationSerializer,
+    MachineSerializer,
+    UserSerializer,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -61,7 +66,16 @@ class UserViewSet(BaseListMetaViewSet):
     )
     def checkin(self, request, pk=None, **kwargs):
         user = self.get_object()
-        if user.checkin():
+        location = None
+
+        if request.data.get("location_id", None):
+            location = Location.objects.get(pk=request.data.get("location_id"))
+
+        if user.checkin(location=location):
+            location_data = None
+            if user.location:
+                location_data = LocationSerializer(user.location).data
+
             return response.Response(
                 status=status.HTTP_200_OK,
                 data={
@@ -70,6 +84,7 @@ class UserViewSet(BaseListMetaViewSet):
                     },
                     "data": {
                         "id": user.id,
+                        "location": location_data,
                         "is_onsite": user.is_onsite,
                         "onsite_updated_at": user.onsite_updated_at.strftime(
                             "%Y-%m-%dT%H:%M:%SZ"
