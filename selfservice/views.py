@@ -23,7 +23,7 @@ from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.views.decorators.http import require_POST
 
-from acl.models import Entitlement, Machine, PermitType, RecentUse
+from acl.models import Entitlement, Location, Machine, PermitType, RecentUse
 from agenda.models import Agenda
 from makerspaceleiden.decorators import (
     is_superuser_or_bearer,
@@ -663,11 +663,20 @@ def space_state(request):
             content_type="text/plain",
         )
 
+    users = User.objects.all().filter(is_onsite=True)
+    locations = Location.objects.all().filter(location_parent=None)
+
+    for location in locations:
+        location.users = users.filter(location=location)
+        if location.id in [settings.DEFAULT_LOCATION_ID]:
+            location.users = users.filter(location__isnull=True)
+
     context = {
         "user": user,
         "title": "State of the Space",
         "has_permission": request.user.is_authenticated,
-        "users_in_space": User.objects.all().filter(is_onsite=True),
+        "users_in_space": users,
+        "locations": locations,
     }
     return render(request, "space_state.html", context)
 
