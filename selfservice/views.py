@@ -669,18 +669,6 @@ def space_state(request):
         "has_permission": request.user.is_authenticated,
         "users_in_space": User.objects.all().filter(is_onsite=True),
     }
-    # aggregator_adapter = get_aggregator_adapter()
-
-    # try:
-    #     context = aggregator_adapter.fetch_state_space()
-    # except Exception as e:
-    #     logger.error("No data available, exception: {0}".format(str(e)))
-    #     context["no_data_available"] = True
-
-    # context["user"] = user
-    # context["title"] = "State of the Space"
-    # context["has_permission"] = request.user.is_authenticated
-
     return render(request, "space_state.html", context)
 
 
