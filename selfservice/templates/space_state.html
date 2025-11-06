@@ -18,52 +18,59 @@
   </p>
 {% endfor %}
 
-{% if users_in_space %}
-<h2>User check-ins</h2>
+<div class="row mt-4">
+  {% for location in locations %}
+  <div class="col-6">
+    <div class="card">
+      <div class="card-header">{{ location.name }}</div>
+      {% if location.users %}
+        <h2 class="px-3 py-2">User check-ins</h2>
 
-  <div class="row">
-    <div class="col-md-6">
-      <ul class="list-group">
-        {% for checkin in users_in_space %}
-        <li class="list-group-item py-3 d-flex justify-content-between align-items-center">
-          <div class="d-flex align-items-center">
-            <img
-              alt="Avatar for {{checkin.name}}"
-              src="{{ checkin.image_url }}"
-              loading="lazy"
-              class="avatar rounded-1 bg-secondary bg-gradient text-bg-secondary me-2"
-              style="width: 45px; height: 45px; object-fit: cover;"/>
-              <b><a href="{% url 'overview' member_id=checkin.id %}">{{ checkin.name }}</a></b>
-          </div>
-          <div>
-            {{ checkin.onsite_updated_at|naturaltime }}
-          </div>
-          <div>
-            <i>{{ checkin.onsite_updated_at }}</i>
-          </div>
-        </li>
-
-        {% if checkin.id == user.id %}
-          <li class="list-group-item list-group-item-secondary py-2">
-            <form method="post" action="{% url 'checkout_from_space_post' %}" class="d-flex justify-content-between align-items-center">
-                {% csrf_token %}
-                <div class="text-dark">
-                  Have you left the space?
-                </div>
-                <button
-                  data-test-hook="member-checkout"
-                  class="btn btn-outline-secondary btn-sm">Checkout</button>
-            </form>
+        <ul class="list-group list-group-flush py-0">
+          {% for checkin in location.users %}
+          <li class="list-group-item py-3 d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+              <img
+                alt="Avatar for {{checkin.name}}"
+                src="{{ checkin.image_url }}"
+                loading="lazy"
+                class="avatar rounded-1 bg-secondary bg-gradient text-bg-secondary me-2"
+                style="width: 45px; height: 45px; object-fit: cover;"/>
+                <b><a href="{% url 'overview' member_id=checkin.id %}">{{ checkin.name }}</a></b>
+            </div>
+            <div>
+              {{ checkin.onsite_updated_at|naturaltime }}
+            </div>
+            <div>
+              <i>{{ checkin.onsite_updated_at }}</i>
+            </div>
           </li>
-        {% endif %}
 
-        {% endfor %}
-      </ul>
+          {% if checkin.id == user.id %}
+            <li class="list-group-item list-group-item-secondary py-2">
+              <form method="post" action="{% url 'checkout_from_space_post' %}" class="d-flex justify-content-between align-items-center">
+                  {% csrf_token %}
+                  <div class="text-dark">
+                    Have you left the space?
+                  </div>
+                  <button
+                    data-test-hook="member-checkout"
+                    class="btn btn-outline-secondary btn-sm">Checkout</button>
+              </form>
+            </li>
+          {% endif %}
+
+          {% endfor %}
+        </ul>
+      {% else %}
+        <div class="py-5 text-center">
+          <i>There's no one at the space now.</i>
+        </div>
+      {% endif %}
     </div>
   </div>
-{% else %}
-<i>There's no one at the space now.</i>
-{% endif %}
+  {% endfor %}
+</div>
 
 {% endif %}
 {% endblock %}

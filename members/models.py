@@ -126,6 +126,14 @@ class User(AbstractUser):
         help_text="Receive notifications via email even when using a chat BOT",
     )
 
+    # Onsite
+    location = models.ForeignKey(
+        "acl.Location",
+        related_name="located_at",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+    )
     is_onsite = models.BooleanField(default=False)
     onsite_updated_at = models.DateTimeField(null=True, blank=True)
 
@@ -170,14 +178,21 @@ class User(AbstractUser):
     def image_img(self):
         return str('<img src="%s" width=80/>' % self.image_url())
 
-    def checkin(self):
+    def checkin(self, location=None):
         self.is_onsite = True
+
+        if location:
+            self.location = location
+
         self.onsite_updated_at = datetime.datetime.now(tz=datetime.timezone.utc)
         self.save()
         return self
 
-    def checkout(self):
+    def checkout(self, location=None):
         self.is_onsite = False
+
+        self.location = None
+
         self.onsite_updated_at = datetime.datetime.now(tz=datetime.timezone.utc)
         self.save()
         return self

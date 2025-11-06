@@ -4,7 +4,7 @@ from http import HTTPStatus
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from acl.models import Entitlement, Machine, PermitType
+from acl.models import Entitlement, Location, Machine, PermitType
 from members.models import User
 
 
@@ -94,12 +94,14 @@ class AclTest(TestCase):
         )
 
     def test_space_state_get(self):
+        location = Location.objects.create(name="Test location", location_parent=None)
         user = User.objects.create_user(
             email="test@test.nl",
             password="testpassword",
             first_name="Test",
             last_name="User",
             is_onsite=True,
+            location=location,
         )
 
         success = self.client.login(email=self.admin.email, password="testpassword")
@@ -109,16 +111,19 @@ class AclTest(TestCase):
         self.assertEqual(response.status_code, HTTPStatus.OK)
         html = response.content.decode("utf-8")
         self.assertIn("State of the Space", html)
+        self.assertIn(location.name, html)
         self.assertIn(user.name(), html)
         self.assertNotIn('data-test-hook="member-checkout"', html)
 
     def test_space_state_get_self(self):
+        location = Location.objects.create(name="Test location", location_parent=None)
         user = User.objects.create_user(
             email="test@test.nl",
             password="testpassword",
             first_name="Test",
             last_name="User",
             is_onsite=True,
+            location=location,
         )
 
         success = self.client.login(email=user.email, password="testpassword")

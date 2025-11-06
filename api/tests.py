@@ -5,11 +5,11 @@ from unittest.mock import patch
 import time_machine
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from acl.models import Machine
+from acl.models import Location, Machine
 from agenda.models import Agenda
 from members.models import User
 
@@ -252,6 +252,7 @@ class MembersApiTests(TestCase):
                     + str(self.user.id)
                     + mock_signature_value,
                     "is_onsite": False,
+                    "location": None,
                     "images": {
                         "original": "http://testserver/avatar/signed/"
                         + str(self.user.id)
@@ -281,6 +282,73 @@ class MembersApiTests(TestCase):
                 },
                 "data": {
                     "id": self.user.id,
+                    "is_onsite": True,
+                    "location": None,
+                    "onsite_updated_at": self.user.onsite_updated_at.strftime(
+                        "%Y-%m-%dT%H:%M:%SZ"
+                    ),
+                },
+            },
+        )
+
+    def test_member_checkin_with_default_location(self):
+        location = Location.objects.create(name="Test Location")
+
+        with override_settings(DEFAULT_LOCATION_ID=location.id):
+            client = APIClient()
+            self.assertTrue(client.login(email=self.user.email, password=self.password))
+
+            response = client.post(
+                f"/api/v1/members/{self.user.id}/checkin/",
+            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.user.refresh_from_db()
+
+            self.assertEqual(self.user.location, location)
+            self.assertDictEqual(
+                json.loads(response.content),
+                {
+                    "meta": {
+                        "action": "checkin",
+                    },
+                    "data": {
+                        "id": self.user.id,
+                        "is_onsite": True,
+                        "location": {
+                            "id": location.id,
+                            "name": location.name,
+                        },
+                        "onsite_updated_at": self.user.onsite_updated_at.strftime(
+                            "%Y-%m-%dT%H:%M:%SZ"
+                        ),
+                    },
+                },
+            )
+
+    def test_member_checkin_with_location(self):
+        client = APIClient()
+        self.assertTrue(client.login(email=self.user.email, password=self.password))
+
+        location = Location.objects.create(name="Test Location")
+
+        response = client.post(
+            f"/api/v1/members/{self.user.id}/checkin/",
+            data={"location_id": location.id},
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.user.refresh_from_db()
+        self.assertDictEqual(
+            json.loads(response.content),
+            {
+                "meta": {
+                    "action": "checkin",
+                },
+                "data": {
+                    "id": self.user.id,
+                    "location": {
+                        "id": location.id,
+                        "name": location.name,
+                    },
                     "is_onsite": True,
                     "onsite_updated_at": self.user.onsite_updated_at.strftime(
                         "%Y-%m-%dT%H:%M:%SZ"

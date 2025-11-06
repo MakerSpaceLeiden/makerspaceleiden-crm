@@ -33,6 +33,8 @@ DATABASES = {
     }
 }
 
+DEFAULT_LOCATION_ID = 11
+
 EMAIL_BACKEND = "django_sendmail_backend.backends.EmailBackend"
 
 

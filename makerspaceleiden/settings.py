@@ -97,6 +97,10 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+# Used by the api/members/checkins/ endpoint
+# to determine the default location to assign to a user
+DEFAULT_LOCATION_ID = None
+
 ROOT_URLCONF = "makerspaceleiden.urls"
 
 TEMPLATE_LOADERS = ("django.template.loaders.app_directories.load_template_source",)
@@ -381,6 +385,8 @@ SUMUP_API_KEY = "sup_sk_xxxxx"
 SUMUP_FEE_PERCENTAGE = 3.0
 SUMUP_NONCE = "xxx"  # At least 96 bits of entropy
 SUMPUP_DEMO_MODE = True
+
+CSRF_COOKIE_SECURE = False
 
 # Notification aliases
 NOTIFICATION_MAP = {
