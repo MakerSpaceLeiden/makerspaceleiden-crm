@@ -97,7 +97,9 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-DEFAULT_LOCATION_ID = 6
+# Used by the api/members/checkins/ endpoint
+# to determine the default location to assign to a user
+DEFAULT_LOCATION_ID = None
 
 ROOT_URLCONF = "makerspaceleiden.urls"
 

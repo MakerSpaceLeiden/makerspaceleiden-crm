@@ -1,6 +1,7 @@
 import logging
 from datetime import timezone
 
+from django.conf import settings
 from django.db.models import Q
 from django.utils.dateparse import parse_datetime
 from django.utils.timezone import is_naive, make_aware
@@ -70,6 +71,12 @@ class UserViewSet(BaseListMetaViewSet):
 
         if request.data.get("location_id", None):
             location = Location.objects.get(pk=request.data.get("location_id"))
+
+        if settings.DEFAULT_LOCATION_ID:
+            try:
+                location = Location.objects.get(pk=settings.DEFAULT_LOCATION_ID)
+            except Exception:
+                logger.warning("Failed to fetch Location based on DEFAULT_LOCATION_ID")
 
         if user.checkin(location=location):
             location_data = None

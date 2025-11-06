@@ -5,7 +5,7 @@ from unittest.mock import patch
 import time_machine
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from rest_framework import status
 from rest_framework.test import APIClient
 
@@ -290,6 +290,40 @@ class MembersApiTests(TestCase):
                 },
             },
         )
+
+    def test_member_checkin_with_default_location(self):
+        location = Location.objects.create(name="Test Location")
+
+        with override_settings(DEFAULT_LOCATION_ID=location.id):
+            client = APIClient()
+            self.assertTrue(client.login(email=self.user.email, password=self.password))
+
+            response = client.post(
+                f"/api/v1/members/{self.user.id}/checkin/",
+            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.user.refresh_from_db()
+
+            self.assertEqual(self.user.location, location)
+            self.assertDictEqual(
+                json.loads(response.content),
+                {
+                    "meta": {
+                        "action": "checkin",
+                    },
+                    "data": {
+                        "id": self.user.id,
+                        "is_onsite": True,
+                        "location": {
+                            "id": location.id,
+                            "name": location.name,
+                        },
+                        "onsite_updated_at": self.user.onsite_updated_at.strftime(
+                            "%Y-%m-%dT%H:%M:%SZ"
+                        ),
+                    },
+                },
+            )
 
     def test_member_checkin_with_location(self):
         client = APIClient()
