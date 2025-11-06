@@ -668,8 +668,6 @@ def space_state(request):
 
     for location in locations:
         location.users = users.filter(location=location)
-        if location.id in [settings.DEFAULT_LOCATION_ID]:
-            location.users = users.filter(location__isnull=True)
 
     context = {
         "user": user,
