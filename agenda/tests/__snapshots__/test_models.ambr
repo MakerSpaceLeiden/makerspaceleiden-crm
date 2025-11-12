@@ -1,0 +1,13 @@
+# serializer version: 1
+# name: TestAgendaModel.test_agenda_creation
+  '''
+  New event: Test Agenda
+  
+  Start: Sat 2025-05-03 9:00:00
+  End: Sat 2025-05-03 10:00:00
+  
+  Details:
+  Test details.
+  
+  '''
+# ---
