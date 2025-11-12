@@ -51,6 +51,17 @@
             <textarea id="item_details" name="item_details" class="form-control" rows="8" wrap="soft">{{ form.item_details.value }}</textarea>
         </div>
 
+        <div class="mb-3">
+            <label for="item_location" class="form-label">Location:</label> <small>&nbsp; (Not required.)</small>
+            <select id="item_location" name="location" class="form-control">
+                <option value="">None</option>
+                {% for location in locations %}
+                    <option value="{{ location.id }}" {% if form.instance.location == location %}selected{% endif %}>{{ location.name }}</option>
+                {% endfor %}
+            </select>
+
+        </div>
+
         {% if form.instance.recurrence_parent %}
           <div class="card" data-test-hook="recurrence-parent-agenda-item-found">
             <div class="card-body">

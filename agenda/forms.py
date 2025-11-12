@@ -55,6 +55,7 @@ class AgendaForm(forms.ModelForm):
             "item_title",
             "item_details",
             "recurrences",
+            "location",
         ]
 
         widgets = {
@@ -63,6 +64,7 @@ class AgendaForm(forms.ModelForm):
             "startdatetime": DateTimePickerInput(attrs={"class": "datetime-input"}),
             "enddatetime": DateTimePickerInput(attrs={"class": "datetime-input"}),
             "recurrences": forms.TextInput(attrs={"class": "form-control"}),
+            "location": forms.Select(attrs={"class": "form-control"}),
         }
 
 

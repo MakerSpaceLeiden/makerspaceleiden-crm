@@ -8,6 +8,7 @@ from django.db.models import Q
 from django.utils import timezone
 from simple_history.models import HistoricalRecords
 
+from acl.models import Location
 from chores.models import Chore
 from makerspaceleiden.settings import TIME_ZONE
 from members.models import User
@@ -128,7 +129,9 @@ class Agenda(models.Model):
     status = models.CharField(
         max_length=20, choices=STATUS_CHOICES, default=None, null=True
     )
-
+    location = models.ForeignKey(
+        Location, null=True, blank=True, on_delete=models.SET_NULL
+    )
     objects = AgendaManager.from_queryset(AgendaQuerySet)()
 
     @property

@@ -6,6 +6,8 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_safe
 
+from acl.models import Location
+
 from .forms import AgendaForm, AgendaStatusForm
 from .models import Agenda
 
@@ -123,6 +125,7 @@ def AgendaUpdateView(request, pk):
         "title": "Edit agenda item",
         "has_permission": request.user.is_authenticated,
         "agenda": agenda,
+        "locations": Location.objects.all(),
     }
     return render(request, "agenda/agenda_crud.html", context)
 
@@ -184,6 +187,7 @@ def AgendaCreateView(request):
         "form": form,
         "title": "Create new agenda item",
         "has_permission": request.user.is_authenticated,
+        "locations": Location.objects.all(),
     }
     return render(request, "agenda/agenda_crud.html", context)
 
