@@ -31,10 +31,16 @@
                         {% if selected_item.type == "chore" %}
                             {% agenda_badge selected_item %}
                         {% endif %}
+
                     </div>
                     <div>
                         <h3>
                             {{ selected_item.display_datetime }}
+                            {% if selected_item.location %}
+                            <span>
+                                @ {{ selected_item.location.name }}
+                            </span>
+                            {% endif %}
                         </h3>
                     </div>
 
@@ -93,6 +99,7 @@
                                         </a>
                                         {% endif %}
                                     </small>
+
                                 </div>
                             {% endif %}
                         </div>
@@ -145,6 +152,12 @@
                         <div class="row">
                                 <div class="col text-secondary" style="font-size: 14px;  ">
                                     {{ agenda_item.display_datetime }}
+
+                                    {% if agenda_item.location %}
+                                    <span>
+                                        @ {{ agenda_item.location.name }}
+                                    </span>
+                                    {% endif %}
                                 </div>
                             </div>
                             <div class="row">
