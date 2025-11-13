@@ -38,6 +38,10 @@ class TestAgendaModel:
         assert agenda.item_title in mail.outbox[0].subject
         assert snapshot == mail.outbox[0].body
 
+        agenda.item_title = "Test Agenda updated"
+        agenda.save()
+        assert 1 == len(mail.outbox)
+
     def test_agenda_creation_no_email_for_chore(self):
         Agenda.objects.create(
             startdate=date(2025, 5, 3),

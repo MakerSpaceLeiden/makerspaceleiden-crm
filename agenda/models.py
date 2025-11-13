@@ -267,7 +267,7 @@ class Agenda(models.Model):
         )
 
         # Send an email to the user when the event is created
-        if self.type != "chore":
+        if self.type != "chore" and self._state.adding:
             EmailMessage(
                 "[Agenda] " + self.item_title,
                 body,
