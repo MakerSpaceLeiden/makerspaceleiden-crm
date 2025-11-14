@@ -140,6 +140,12 @@ class NodeField(models.CharField):
         return str(value).lower()
 
 
+class NodeCapability(models.IntegerChoices):
+    NORMAL = (0, "Normal")
+    LOGIN = (1, "Login")
+    LOGOUT = (2, "Logout")
+
+
 class Machine(models.Model):
     name = models.CharField(max_length=40, unique=True)
 
@@ -150,6 +156,11 @@ class Machine(models.Model):
         max_length=20,
         blank=True,
         help_text="Name of device or machine used by the node",
+    )
+    node_capability = models.CharField(
+        choices=NodeCapability.choices,
+        max_length=1,
+        default=NodeCapability.NORMAL,
     )
 
     description = models.CharField(max_length=200, blank=True)
@@ -459,7 +470,16 @@ class RecentUse(models.Model):
                 e.delete()
             else:
                 break
+
+        # On creation only
+        is_new_record = self._state.adding
         r = super(RecentUse, self).save(*args, **kwargs)
+
+        if is_new_record and self.user and self.machine:
+            if self.machine.node_capability == NodeCapability.LOGIN:
+                self.user.checkin(self.machine.location)
+            elif self.machine.node_capability == NodeCapability.LOGOUT:
+                self.user.checkout()
 
         cutoff = timezone.now() - datetime.timedelta(days=DAYS_USERS_TRACKED)
         for e in (
