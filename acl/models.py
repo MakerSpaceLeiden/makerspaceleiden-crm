@@ -157,9 +157,8 @@ class Machine(models.Model):
         blank=True,
         help_text="Name of device or machine used by the node",
     )
-    node_capability = models.CharField(
+    node_capability = models.IntegerField(
         choices=NodeCapability.choices,
-        max_length=1,
         default=NodeCapability.NORMAL,
     )
 
