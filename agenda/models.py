@@ -268,15 +268,16 @@ class Agenda(models.Model):
 
         # Send an email to the user when the event is created
         if self.type != "chore" and self._state.adding:
-            EmailMessage(
-                "[Agenda] " + self.item_title,
-                body,
-                settings.DEFAULT_FROM_EMAIL,
-                [settings.MAILINGLIST],
-                ["bcc@example.com"],
-                reply_to=["another@example.com"],
-                headers={"Message-ID": "foo"},
-            ).send()
+            try:
+                EmailMessage(
+                    "[Agenda] " + self.item_title,
+                    body,
+                    settings.DEFAULT_FROM_EMAIL,
+                    [settings.MAILINGLIST],
+                    reply_to=[settings.DEFAULT_FROM_EMAIL],
+                ).send()
+            except Exception as e:
+                logger.error("Failed to send an email: {}".format(str(e)))
 
         super().save(*args, **kwargs)
 
