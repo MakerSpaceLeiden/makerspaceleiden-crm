@@ -917,7 +917,7 @@ def reimburseform(request):
 
         attachments = []
         if item.scan:
-            attachments.append(image2mime(item.scan))
+            attachments.append(image2mime(item.scan.large))
 
         emailPlain(
             "email_imbursement_notify.txt",
@@ -967,7 +967,7 @@ def reimburseque(request):
 
             attachments = []
             if item.scan:
-                attachments.append(image2mime(item.scan))
+                attachments.append(image2mime(item.scan.large))
 
             if approved:
                 context["reason"] = "Approved by %s (%d)" % (request.user, item.pk)
