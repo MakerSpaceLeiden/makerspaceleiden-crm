@@ -8,6 +8,7 @@ from simple_history.admin import SimpleHistoryAdmin
 from .models import Checkout
 
 
+@admin.register(Checkout)
 class CheckoutAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     readonly_fields = [
         "extra_information",
@@ -57,6 +58,3 @@ class CheckoutAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
             print(f"\n{fields}\n")
             return format_html(fields)
         return None
-
-
-admin.site.register(Checkout, CheckoutAdmin)

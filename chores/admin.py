@@ -5,6 +5,7 @@ from simple_history.admin import SimpleHistoryAdmin
 from .models import Chore, ChoreVolunteer
 
 
+@admin.register(Chore)
 class ChoreAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     list_display = (
         "name",
@@ -17,6 +18,7 @@ class ChoreAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     )
 
 
+@admin.register(ChoreVolunteer)
 class ChoreVolunteerAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     list_display = (
         "user",
@@ -24,7 +26,3 @@ class ChoreVolunteerAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
         "timestamp",
         "created_at",
     )
-
-
-admin.site.register(Chore, ChoreAdmin)
-admin.site.register(ChoreVolunteer, ChoreVolunteerAdmin)

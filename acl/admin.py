@@ -10,6 +10,7 @@ from .models import ChangeTracker, Entitlement, Location, Machine, PermitType, R
 
 
 # class MachineAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+@admin.register(Machine)
 class MachineAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     list_display = (
         "name",
@@ -26,15 +27,10 @@ class MachineAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     )
 
 
-admin.site.register(Machine, MachineAdmin)
-
-
 # class LocationAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+@admin.register(Location)
 class LocationAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     list_display = ("name", "description")
-
-
-admin.site.register(Location, LocationAdmin)
 
 
 class EntitlementResource(resources.ModelResource):
@@ -44,6 +40,7 @@ class EntitlementResource(resources.ModelResource):
         import_id_fields = ["permit", "holder", "issuer"]
 
 
+@admin.register(Entitlement)
 class EntitlementAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     list_display = ("permit", "holder", "issuer", "active", "issue_date")
     resource_class = EntitlementResource
@@ -77,27 +74,21 @@ class EntitlementAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
         return defaults
 
 
-admin.site.register(Entitlement, EntitlementAdmin)
-
-
+@admin.register(PermitType)
 class PermitAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     list_display = ("name", "description", "require_ok_trustee", "permit")
 
 
-admin.site.register(PermitType, PermitAdmin)
-
-
+@admin.register(RecentUse)
 class RecentUseAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     list_display = ("user", "machine", "used")
-
-
-admin.site.register(RecentUse, RecentUseAdmin)
 
 
 # We lock this class down - as making changes is rather
 # confusing for the (payment/access) nodes; as this controls
 # their caching and updates.
 #
+@admin.register(ChangeTracker)
 class ChangeTrackerAdmin(admin.ModelAdmin):
     class Meta:
         view_only = True
@@ -113,6 +104,3 @@ class ChangeTrackerAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, rec=None):
         return False
-
-
-admin.site.register(ChangeTracker, ChangeTrackerAdmin)

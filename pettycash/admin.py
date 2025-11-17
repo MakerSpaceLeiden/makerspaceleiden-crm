@@ -24,6 +24,7 @@ from .models import (
 logger = logging.getLogger(__name__)
 
 
+@admin.register(PettycashSku)
 class PettycashSkuAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     list_display = ("pk", "name", "amount", "description")
     form = PettycashSkuForm
@@ -34,6 +35,7 @@ class PettycashSkuAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
 #
 
 
+@admin.register(PettycashStation)
 class PettycashStationAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     list_display = ("description", "location", "terminal")
     formfield_overrides = {
@@ -88,6 +90,7 @@ class MonthFilter(admin.SimpleListFilter):
         return queryset
 
 
+@admin.register(PettycashTransaction)
 class PettycashTransactionAdmin(
     ImportExportModelAdmin, SimpleHistoryWithDeletedAdmin, ExportActionMixin
 ):
@@ -103,12 +106,14 @@ class PettycashTransactionAdmin(
     pass
 
 
+@admin.register(PettycashBalanceCache)
 class PettycashBalanceCacheAdmin(ImportExportModelAdmin, SimpleHistoryWithDeletedAdmin):
     list_display = ("owner", "balance", "lasttxdate")
     search_fields = ["owner__first_name", "owner__last_name"]
     pass
 
 
+@admin.register(PettycashReimbursementRequest)
 class PettycashReimbursementRequestAdmin(
     ImportExportModelAdmin, SimpleHistoryWithDeletedAdmin
 ):
@@ -123,14 +128,7 @@ class PettycashReimbursementRequestAdmin(
     pass
 
 
+@admin.register(PettycashImportRecord)
 class PettycashImportRecordAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     list_display = ("date", "by")
     pass
-
-
-admin.site.register(PettycashSku, PettycashSkuAdmin)
-admin.site.register(PettycashStation, PettycashStationAdmin)
-admin.site.register(PettycashTransaction, PettycashTransactionAdmin)
-admin.site.register(PettycashBalanceCache, PettycashBalanceCacheAdmin)
-admin.site.register(PettycashReimbursementRequest, PettycashReimbursementRequestAdmin)
-admin.site.register(PettycashImportRecord, PettycashImportRecordAdmin)
