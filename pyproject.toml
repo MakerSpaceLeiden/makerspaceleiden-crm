@@ -132,5 +132,7 @@ module = ["dateutil.tz.tz",
 "factory",
 "makerspaceleiden.local",
 "pytest",
+"PIL",
+"PIL.*",
 ]
 ignore_missing_imports = true
