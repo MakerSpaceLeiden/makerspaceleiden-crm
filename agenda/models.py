@@ -3,8 +3,11 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
 from dateutil import rrule
+from django.conf import settings
+from django.core.mail import EmailMessage
 from django.db import models, transaction
 from django.db.models import Q
+from django.template.loader import render_to_string
 from django.utils import timezone
 from simple_history.models import HistoricalRecords
 
@@ -255,6 +258,26 @@ class Agenda(models.Model):
             self.enddatetime = self._get_utc_from_cest_date_and_time(
                 self.enddate, self.endtime
             )
+
+        body = render_to_string(
+            "email/new_event.txt",
+            {
+                "event": self,
+            },
+        )
+
+        # Send an email to the user when the event is created
+        if self.type != "chore" and self._state.adding:
+            try:
+                EmailMessage(
+                    "[Agenda] " + self.item_title,
+                    body,
+                    settings.DEFAULT_FROM_EMAIL,
+                    [settings.MAILINGLIST],
+                    reply_to=[settings.DEFAULT_FROM_EMAIL],
+                ).send()
+            except Exception as e:
+                logger.error("Failed to send an email: {}".format(str(e)))
 
         super().save(*args, **kwargs)
 

@@ -1,0 +1,8 @@
+New event: {{ event.item_title }}
+
+Start: {{ event.start_datetime }}
+End: {{ event.end_datetime }}{% if event.location %}
+Location: {{ event.location.name}}{% endif %}
+
+Details:
+{{ event.item_details }}

@@ -2,12 +2,73 @@ from datetime import date, datetime, time, timedelta, timezone
 
 import pytest
 import time_machine
+from django.conf import settings
+from django.core import mail
 from django.test import TestCase
 from django.utils import timezone as dj_timezone
 
 from acl.models import User
 from agenda.models import Agenda
 from chores.models import Chore
+
+
+@pytest.mark.django_db
+class TestAgendaModel:
+    @pytest.fixture(autouse=True)
+    def setup(self, db):
+        self.user = User.objects.create_user(
+            first_name="Model",
+            last_name="Test",
+            password="testpassword",
+            email="modeltest@example.com",
+        )
+
+    def test_agenda_creation(self, snapshot):
+        agenda = Agenda.objects.create(
+            startdate=date(2025, 5, 3),
+            starttime=time(9, 0),
+            enddate=date(2025, 5, 3),
+            endtime=time(10, 0),
+            item_title="Test Agenda",
+            item_details="Test details.",
+            user=self.user,
+        )
+        assert 1 == len(mail.outbox)
+        assert settings.MAILINGLIST in mail.outbox[0].to
+        assert agenda.item_title in mail.outbox[0].subject
+        assert snapshot == mail.outbox[0].body
+
+        agenda.item_title = "Test Agenda updated"
+        agenda.save()
+        assert 1 == len(mail.outbox)
+
+    def test_agenda_creation_no_email_for_chore(self):
+        Agenda.objects.create(
+            startdate=date(2025, 5, 3),
+            starttime=time(9, 0),
+            enddate=date(2025, 5, 3),
+            endtime=time(10, 0),
+            item_title="Test Agenda",
+            item_details="Test details.",
+            user=self.user,
+            chore=Chore.objects.create(
+                name="Test Chore",
+                description="A test chore that needs volunteers.",
+                class_type="BasicChore",
+                configuration={
+                    "min_required_people": 1,
+                    "events_generation": {
+                        "event_type": "recurrent",
+                        "starting_time": "21/7/2021 8:00",
+                        "crontab": "0 22 * * sun",
+                        "take_one_every": 1,
+                    },
+                    "reminders": [],
+                },
+                creator=self.user,
+            ),
+        )
+        assert 0 == len(mail.outbox)
 
 
 class AgendaModelPropertiesTest(TestCase):
