@@ -259,7 +259,7 @@ IMG_VALIDATORS = [MinSizeValidator(100, 100), MaxSizeValidator(8000, 8000)]
 IMG_VARIATIONS = {
     "thumbnail": (100, 100, True),
     "medium": (300, 200),
-    "large": (600, 400),
+    "large": (1200, 1200),
 }
 
 UFO_DEADLINE_DAYS = 14
