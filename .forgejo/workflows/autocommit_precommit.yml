@@ -1,0 +1,18 @@
+name: pre-commit check
+
+on: [pull_request]
+
+jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Install uv
+      uses: astral-sh/setup-uv@v6
+      with:
+        version: 0.7.19
+    - name: Setup python
+      run: uv python install
+    - name: Install dependencies
+      run: uv sync
+    - uses: pre-commit/action@v3.0.0
