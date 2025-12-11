@@ -87,6 +87,7 @@ class AgendaManager(models.Manager):
                 user=parent.user,
                 item_title=parent.item_title,
                 item_details=parent.item_details,
+                location=parent.location,
             )
             created.append(agenda)
 
@@ -267,7 +268,11 @@ class Agenda(models.Model):
         )
 
         # Send an email to the user when the event is created
-        if self.type != "chore" and self._state.adding and self.recurrence_parent is None:
+        if (
+            self.type != "chore"
+            and self._state.adding
+            and self.recurrence_parent is None
+        ):
             try:
                 EmailMessage(
                     "[Agenda] " + self.item_title,

@@ -6,6 +6,7 @@ from django.core import mail
 from django.core.management import call_command
 from django.test import TestCase
 
+from acl.models import Location
 from agenda.models import Agenda
 from chores.tests.factories import UserFactory
 
@@ -38,3 +39,30 @@ class AgendaGenerateRecurringEvents(TestCase):
         # Verify that no emails were sent for automatically generated chores
         self.assertEqual(len(mail.outbox), 1)
 
+    @time_machine.travel("2025-05-06 10:00")
+    def test_agenda_generate_recurring_events_with_location(self):
+        location = Location.objects.create(name="Test Location")
+
+        # Add an Agenda item with a rrule defined
+        Agenda.objects.create(
+            user=self.user,
+            item_title="Test Agenda",
+            item_details="Test Description",
+            startdatetime=datetime(2025, 5, 3, 8, 0, tzinfo=timezone.utc),
+            enddatetime=datetime(2025, 5, 3, 16, 0, tzinfo=timezone.utc),
+            recurrences="FREQ=DAILY;INTERVAL=1",
+            location=location,
+        )
+
+        stdout = StringIO()
+        call_command("agenda_generate_recurring_events", stdout=stdout)
+        call_command("agenda_generate_recurring_events", stdout=StringIO())
+
+        items = Agenda.objects.all()
+        print(stdout.getvalue())
+        self.assertIn("Generated 31 recurring events", stdout.getvalue())
+        self.assertEqual(len(items), 32)
+
+        # Verify that location is set on the generated agenda items
+        for item in items:
+            self.assertEqual(item.location, location)
