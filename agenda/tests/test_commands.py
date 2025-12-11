@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 from io import StringIO
 
 import time_machine
+from django.core import mail
 from django.core.management import call_command
 from django.test import TestCase
 
@@ -33,3 +34,7 @@ class AgendaGenerateRecurringEvents(TestCase):
         print(stdout.getvalue())
         self.assertIn("Generated 31 recurring events", stdout.getvalue())
         self.assertEqual(len(items), 32)
+
+        # Verify that no emails were sent for automatically generated chores
+        self.assertEqual(len(mail.outbox), 1)
+

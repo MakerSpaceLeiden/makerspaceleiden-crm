@@ -267,7 +267,7 @@ class Agenda(models.Model):
         )
 
         # Send an email to the user when the event is created
-        if self.type != "chore" and self._state.adding:
+        if self.type != "chore" and self._state.adding and self.recurrence_parent is None:
             try:
                 EmailMessage(
                     "[Agenda] " + self.item_title,
