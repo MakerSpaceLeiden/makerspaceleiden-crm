@@ -12,6 +12,7 @@ from django.views.decorators.csrf import csrf_exempt
 from acl.models import Entitlement, PermitType
 from makerspaceleiden.decorators import superuser_or_bearer_required
 from members.models import Tag, User, clean_tag_string
+from terminal.decorators import is_paired_terminal
 
 from .forms import SelectTagForm, SelectUserForm
 from .models import Unknowntag
@@ -19,32 +20,39 @@ from .models import Unknowntag
 logger = logging.getLogger(__name__)
 
 
+def track_unkn_tag(request):
+    if not request.POST:
+        return None
+
+    try:
+        tagstr = clean_tag_string(request.POST.get("tag"))
+        if not tagstr:
+            return HttpResponse("Missing data", status=400, content_type="text/plain")
+
+        existing = Tag.objects.all().filter(tag=tagstr)
+        if existing and existing.count() > 0:
+            return HttpResponse("Overwhelmed", status=409, content_type="text/plain")
+
+        ut, created = Unknowntag.objects.get_or_create(tag=tagstr)
+        if created:
+            logger.debug("Added tag to the unknown tags list.")
+            return HttpResponse("OK", status=200, content_type="text/plain")
+
+        return HttpResponse(
+            "Already have that tag", status=409, content_type="text/plain"
+        )
+    except Exception as e:
+        logger.error("Unexpected error during unknown tag register: {}".format(e))
+
+    return HttpResponse("Adding failed", status=500, content_type="text/plain")
+
+
 @csrf_exempt
 @superuser_or_bearer_required
 def unknowntag(request):
-    if request.POST:
-        try:
-            tagstr = clean_tag_string(request.POST.get("tag"))
-            if not tagstr:
-                return HttpResponse("Unhappy", status=400, content_type="text/plain")
-
-            existing = Tag.objects.all().filter(tag=tagstr)
-            if existing and existing.count() > 0:
-                return HttpResponse(
-                    "Overwhelmed", status=409, content_type="text/plain"
-                )
-
-            ut, created = Unknowntag.objects.get_or_create(tag=tagstr)
-            if created:
-                logger.debug("Added tag to the unknown tags list.")
-                return HttpResponse("OK", status=200, content_type="text/plain")
-
-            return HttpResponse(
-                "Already have that tag", status=409, content_type="text/plain"
-            )
-        except Exception as e:
-            logger.error("Unexpected error during unknown tag register: {}".format(e))
-        return HttpResponse("Unhappy", status=500, content_type="text/plain")
+    r = track_unkn_tag(request)
+    if r is not None:
+        return r
 
     return render(
         request,
@@ -54,6 +62,15 @@ def unknowntag(request):
         },
         content_type="text/plain",
     )
+
+
+@csrf_exempt
+@is_paired_terminal
+def reg_unknowntag(request):
+    r = track_unkn_tag(request)
+    if r is not None:
+        return r
+    return HttpResponse("Bad request", status=400, content_type="text/plain")
 
 
 @login_required
