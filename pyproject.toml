@@ -8,7 +8,7 @@ readme = "README.md"
 dependencies = [
     "django>=4.2.17,<5",
     "pytz~=2023.3.post1",
-    "wheel>=0.42.0,<0.43",
+    "wheel>=0.42.0,<0.47",
     "django-import-export>4",
     "django-simple-history>=3.4.0,<4",
     "django-settings-export>=1.2.1,<2",

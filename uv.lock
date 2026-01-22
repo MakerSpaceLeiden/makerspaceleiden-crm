@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = "==3.13.*"
 
 [[package]]
@@ -864,7 +864,7 @@ requires-dist = [
     { name = "syrupy", specifier = ">=5.0.0" },
     { name = "time-machine", specifier = ">=2.16.0" },
     { name = "websockets", specifier = "~=12.0" },
-    { name = "wheel", specifier = ">=0.42.0,<0.43" },
+    { name = "wheel", specifier = ">=0.42.0,<0.47" },
 ]
 
 [package.metadata.requires-dev]
@@ -1661,11 +1661,14 @@ wheels = [
 
 [[package]]
 name = "wheel"
-version = "0.42.0"
+version = "0.46.2"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/b0/b4/bc2baae3970c282fae6c2cb8e0f179923dceb7eaffb0e76170628f9af97b/wheel-0.42.0.tar.gz", hash = "sha256:c45be39f7882c9d34243236f2d63cbd58039e360f85d0913425fbd7ceea617a8", size = 98667, upload-time = "2023-11-26T14:37:13.353Z" }
+dependencies = [
+    { name = "packaging" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/9b/92/3a64fa9639b8e290fe8630d8067a66f7c5510845c6d73686ad880c9b04d9/wheel-0.46.2.tar.gz", hash = "sha256:3d79e48fde9847618a5a181f3cc35764c349c752e2fe911e65fa17faab9809b0", size = 60274, upload-time = "2026-01-21T23:55:25.838Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/c7/c3/55076fc728723ef927521abaa1955213d094933dc36d4a2008d5101e1af5/wheel-0.42.0-py3-none-any.whl", hash = "sha256:177f9c9b0d45c47873b619f5b650346d632cdc35fb5e4d25058e09c9e581433d", size = 65375, upload-time = "2023-11-26T14:37:10.942Z" },
+    { url = "https://files.pythonhosted.org/packages/13/2c/5e079cefe955ae58e5a052fe037c850ce493eb7269dedeb960237e78fb0f/wheel-0.46.2-py3-none-any.whl", hash = "sha256:33ae60725d69eaa249bc1982e739943c23b34b58d51f1cb6253453773aca6e65", size = 29971, upload-time = "2026-01-21T23:55:24.447Z" },
 ]
 
 [[package]]
