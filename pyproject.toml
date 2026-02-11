@@ -8,7 +8,7 @@ readme = "README.md"
 dependencies = [
     "django>=4.2.17,<5",
     "pytz~=2023.3.post1",
-    "wheel>=0.42.0,<0.43",
+    "wheel>=0.42.0,<0.47",
     "django-import-export>4",
     "django-simple-history>=3.4.0,<4",
     "django-settings-export>=1.2.1,<2",
@@ -17,7 +17,7 @@ dependencies = [
     "django-six>=1.0.5,<2",
     "six>=1.16.0,<2",
     "django-revproxy>=0.12.0,<0.13",
-    "pillow>=10.3.0,<11",
+    "pillow>=10.3.0,<13",
     "django-qr-code>=3.1.1,<4",
     "django-ipware>=6.0.0,<7",
     "reportlab>=4.0.7,<5",
