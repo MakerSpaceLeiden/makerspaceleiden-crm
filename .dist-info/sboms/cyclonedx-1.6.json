@@ -3655,6 +3655,29 @@
       "version": "0.0.10"
     },
     {
+      "bom-ref": "syrupy==5.0.0",
+      "description": "Pytest Snapshot Test Utility",
+      "externalReferences": [
+        {
+          "comment": "from packaging metadata Project-URL: Repository",
+          "type": "vcs",
+          "url": "https://github.com/syrupy-project/syrupy"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "acknowledgement": "declared",
+            "id": "MIT"
+          }
+        }
+      ],
+      "name": "syrupy",
+      "purl": "pkg:pypi/syrupy@5.0.0",
+      "type": "library",
+      "version": "5.0.0"
+    },
+    {
       "bom-ref": "tablib==3.8.0",
       "description": "Format agnostic tabular data library (XLS, JSON, YAML, CSV, etc.)",
       "externalReferences": [
@@ -4899,6 +4922,12 @@
     },
     {
       "dependsOn": [
+        "pytest==8.4.1"
+      ],
+      "ref": "syrupy==5.0.0"
+    },
+    {
+      "dependsOn": [
         "PyYAML==6.0.2"
       ],
       "ref": "tablib==3.8.0"
@@ -5034,7 +5063,7 @@
           ],
           "name": "cyclonedx-py",
           "type": "application",
-          "version": "7.2.1"
+          "version": "7.3.1"
         },
         {
           "description": "Python library for CycloneDX",
@@ -5083,7 +5112,7 @@
           ],
           "name": "cyclonedx-python-lib",
           "type": "library",
-          "version": "11.5.0"
+          "version": "11.12.0"
         }
       ]
     }
